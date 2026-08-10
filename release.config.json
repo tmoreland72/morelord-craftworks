@@ -1,11 +1,25 @@
 {
   "moduleId": "morelord-craftworks",
   "moduleTitle": "Morelord Craftworks",
-  "repositoryOwner": "tmoreland72",
-  "repositoryName": "morelord-craftworks",
-  "branch": "main",
-  "assetName": "morelord-craftworks.zip",
-  "manifestPath": "module.json",
-  "packageJsonPath": "package.json",
-  "websiteReleaseUrl": "https://morelordgaming.com/releases"
+  "productSlug": "morelord-craftworks",
+  "githubOwner": "tmoreland72",
+  "githubRepo": "morelord-craftworks",
+  "releaseBranch": "main",
+  "archiveName": "morelord-craftworks.zip",
+  "websiteUrl": "https://morelordgaming.com",
+  "requiredPaths": [
+    "module.json",
+    "README.md",
+    "scripts",
+    "styles",
+    "templates",
+    "data"
+  ],
+  "optionalPaths": [
+    "assets",
+    "lang",
+    "LICENSE",
+    "LICENSE.md",
+    "ATTRIBUTION.md"
+  ]
 }

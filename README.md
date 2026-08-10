@@ -7,49 +7,6 @@ Craftworks separates **content packs** from the core module so campaigns can ena
 only the material, recipe, harvesting, gathering, and loot content appropriate for
 that world.
 
-
-## Installation
-
-Once the project has been pushed to GitHub and the first release has been published, install Morelord Craftworks in Foundry using this permanent manifest URL:
-
-```text
-https://raw.githubusercontent.com/tmoreland72/morelord-craftworks/main/module.json
-```
-
-In Foundry, open **Add-on Modules → Install Module**, paste the URL into **Manifest URL**, and choose **Install**. Future releases continue using this same manifest URL and can be updated through Foundry.
-
-Required/recommended dependencies are declared in `module.json`; Foundry will prompt for them as appropriate. Older versions are available from the repository's GitHub Releases page.
-
-## Release process
-
-Craftworks uses the same standardized Morelord release workflow as Morelord Marketplace and Morelord Drakkenheim Harvesting.
-
-1. Put the website publish token in the local `.env` file:
-
-   ```text
-   RELEASE_PUBLISH_TOKEN=your-token-value
-   ```
-
-   `.env` is intentionally excluded from Git.
-
-2. Create release notes using the standard filename, for example:
-
-   ```text
-   RELEASE-NOTES-0.1.0.md
-   ```
-
-3. Commit and push all normal development changes so `main` is clean and synchronized with `origin/main`.
-
-4. Run the release from PowerShell:
-
-   ```powershell
-   .\release.ps1 -Version 0.1.0
-   ```
-
-The script validates the project, updates `module.json` and `package.json`, creates the Foundry release ZIP, commits/pushes release metadata, creates and pushes the version tag, creates the GitHub Release, and publishes the release metadata to Morelord Gaming.
-
-Useful switches include `-Prerelease`, `-Draft`, `-DryRun`, `-SkipWebsitePublish`, `-WebsiteOnly`, `-WebsiteUrl`, `-WebsiteToken`, and `-ReleaseNotesPath`.
-
 ## Support baseline
 
 - Foundry Virtual Tabletop v14
@@ -472,3 +429,35 @@ other workflow routed through the D&D5e adapter's `rollSkill()` method.
 The native dialog is intentionally not fast-forwarded, allowing the player to
 choose Normal, Advantage, or Disadvantage and enter a situational bonus before
 rolling. Closing the dialog does not consume or record an acquisition attempt.
+
+## Installation
+
+After the first GitHub release is published, install Morelord Craftworks in Foundry using this permanent manifest URL:
+
+```text
+https://raw.githubusercontent.com/tmoreland72/morelord-craftworks/main/module.json
+```
+
+## Release workflow
+
+Morelord Craftworks uses the standard Morelord Foundry module release workflow shared with Morelord Marketplace and Morelord Drakkenheim Harvesting.
+
+Project-specific release settings are stored in `release.config.json`. Local website publishing credentials belong in `.env`:
+
+```text
+RELEASE_PUBLISH_TOKEN=your-token-here
+```
+
+Release notes use the standard filename format `RELEASE-NOTES-0.1.0.md`.
+
+Validate a release without modifying GitHub or the website:
+
+```powershell
+.\release.ps1 -Version 0.1.0 -DryRun
+```
+
+Publish the release:
+
+```powershell
+.\release.ps1 -Version 0.1.0
+```

@@ -1,5 +1,6 @@
-node_modules
-# Release tooling
+node_modules/
+.DS_Store
+*.log
 *.zip
-.release-*
+release/
 .env
