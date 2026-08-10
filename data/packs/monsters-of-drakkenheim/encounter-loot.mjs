@@ -1,0 +1,1 @@
+export const DRAKKENHEIM_ENCOUNTER_LOOT_PROFILES = [];

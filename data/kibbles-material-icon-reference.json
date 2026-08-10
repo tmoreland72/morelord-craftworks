@@ -1,0 +1,459 @@
+{
+  "source": "Kibbles Compendium of Craft and Creation - kccc-crafting-materials",
+  "purpose": "Development reference only. Exact-name matches; runtime uses standard-materials.seed.json.",
+  "matchedCount": 75,
+  "unmatchedCount": 0,
+  "matched": [
+    {
+      "materialId": "adamant-ingot",
+      "materialName": "Adamant Ingot",
+      "kibblesName": "Adamant Ingot",
+      "img": "icons/commodities/metal/ingot-worn-iron.webp"
+    },
+    {
+      "materialId": "armor-padding",
+      "materialName": "Armor Padding",
+      "kibblesName": "Armor Padding",
+      "img": "icons/equipment/chest/breastplate-quilted-brown.webp"
+    },
+    {
+      "materialId": "boiled-leather",
+      "materialName": "Boiled Leather",
+      "kibblesName": "Boiled Leather",
+      "img": "icons/commodities/leather/leather-scrap-white.webp"
+    },
+    {
+      "materialId": "buckle",
+      "materialName": "Buckle",
+      "kibblesName": "Buckle",
+      "img": "icons/equipment/waist/belt-buckle-ring-leather-tan.webp"
+    },
+    {
+      "materialId": "common-arcane-essence",
+      "materialName": "Common Arcane Essence",
+      "kibblesName": "Common Arcane Essence",
+      "img": "icons/commodities/materials/slime-thick-blue.webp"
+    },
+    {
+      "materialId": "common-branch",
+      "materialName": "Common Branch",
+      "kibblesName": "Common Branch",
+      "img": "icons/commodities/wood/kindling-stick-grey.webp"
+    },
+    {
+      "materialId": "common-curative-reagent",
+      "materialName": "Common Curative Reagent",
+      "kibblesName": "Common Curative Reagent",
+      "img": "icons/commodities/materials/bowl-powder-teal.webp"
+    },
+    {
+      "materialId": "common-divine-essence",
+      "materialName": "Common Divine Essence",
+      "kibblesName": "Common Divine Essence",
+      "img": "icons/commodities/materials/feather-white-glowing-beams.webp"
+    },
+    {
+      "materialId": "common-magical-ink",
+      "materialName": "Common Magical Ink",
+      "kibblesName": "Common Magical Ink",
+      "img": "icons/tools/scribal/ink-quill-pink.webp"
+    },
+    {
+      "materialId": "common-poisonous-reagent",
+      "materialName": "Common Poisonous Reagent",
+      "kibblesName": "Common Poisonous Reagent",
+      "img": "icons/commodities/materials/bowl-powder-pink.webp"
+    },
+    {
+      "materialId": "common-primal-essence",
+      "materialName": "Common Primal Essence",
+      "kibblesName": "Common Primal Essence",
+      "img": "icons/commodities/materials/slime-thick-orange.webp"
+    },
+    {
+      "materialId": "common-reactive-reagent",
+      "materialName": "Common Reactive Reagent",
+      "kibblesName": "Common Reactive Reagent",
+      "img": "icons/commodities/materials/bowl-powder-grey.webp"
+    },
+    {
+      "materialId": "crystal-vial",
+      "materialName": "Crystal Vial",
+      "kibblesName": "Crystal Vial",
+      "img": "icons/consumables/potions/vial-ornet-silver-black.webp"
+    },
+    {
+      "materialId": "esoteric-parts",
+      "materialName": "Esoteric Parts",
+      "kibblesName": "Esoteric Parts",
+      "img": "icons/commodities/tech/coil-steel-grey.webp"
+    },
+    {
+      "materialId": "fancy-parts",
+      "materialName": "Fancy Parts",
+      "kibblesName": "Fancy Parts",
+      "img": "icons/tools/fasteners/bolt-steel-blue.webp"
+    },
+    {
+      "materialId": "fletching",
+      "materialName": "Fletching",
+      "kibblesName": "Fletching",
+      "img": "icons/commodities/materials/feather-black-blue.webp"
+    },
+    {
+      "materialId": "glass-flask",
+      "materialName": "Glass Flask",
+      "kibblesName": "Glass Flask",
+      "img": "icons/consumables/potions/bottle-corked-empty.webp"
+    },
+    {
+      "materialId": "glass-vial",
+      "materialName": "Glass Vial",
+      "kibblesName": "Glass Vial",
+      "img": "icons/consumables/potions/vial-cork-empty.webp"
+    },
+    {
+      "materialId": "gold-scraps",
+      "materialName": "Gold Scraps",
+      "kibblesName": "Gold Scraps",
+      "img": "icons/commodities/currency/coins-plain-gold.webp"
+    },
+    {
+      "materialId": "hide",
+      "materialName": "Hide",
+      "kibblesName": "Hide",
+      "img": "icons/commodities/leather/fur-pelt-off-white.webp"
+    },
+    {
+      "materialId": "hide-scraps",
+      "materialName": "Hide Scraps",
+      "kibblesName": "Hide Scraps",
+      "img": "icons/commodities/leather/fur-simple-brown.webp"
+    },
+    {
+      "materialId": "iron-ingot",
+      "materialName": "Iron Ingot",
+      "kibblesName": "Iron Ingot",
+      "img": "icons/commodities/metal/ingot-iron.webp"
+    },
+    {
+      "materialId": "large-carapace",
+      "materialName": "Large Carapace",
+      "kibblesName": "Large Carapace",
+      "img": "icons/commodities/biological/shell-ridged-blue.webp"
+    },
+    {
+      "materialId": "leather-scraps",
+      "materialName": "Leather Scraps",
+      "kibblesName": "Leather Scraps",
+      "img": "icons/commodities/leather/leather-scraps-yellow.webp"
+    },
+    {
+      "materialId": "legendary-arcane-essence",
+      "materialName": "Legendary Arcane Essence",
+      "kibblesName": "Legendary Arcane Essence",
+      "img": "icons/magic/light/explosion-star-large-pink.webp"
+    },
+    {
+      "materialId": "legendary-curative-reagent",
+      "materialName": "Legendary Curative Reagent",
+      "kibblesName": "Legendary Curative Reagent",
+      "img": "icons/commodities/biological/wing-insect-blue.webp"
+    },
+    {
+      "materialId": "legendary-divine-essence",
+      "materialName": "Legendary Divine Essence",
+      "kibblesName": "Legendary Divine Essence",
+      "img": "icons/commodities/materials/feather-yellow.webp"
+    },
+    {
+      "materialId": "legendary-magical-ink",
+      "materialName": "Legendary Magical Ink",
+      "kibblesName": "Legendary Magical Ink",
+      "img": "icons/consumables/potions/conical-ornate-purple.webp"
+    },
+    {
+      "materialId": "legendary-parchment",
+      "materialName": "Legendary Parchment",
+      "kibblesName": "Legendary Parchment",
+      "img": "icons/sundries/scrolls/scroll-writing-orange-black.webp"
+    },
+    {
+      "materialId": "legendary-poisonous-reagent",
+      "materialName": "Legendary Poisonous Reagent",
+      "kibblesName": "Legendary Poisonous Reagent",
+      "img": "icons/commodities/biological/tongue-violet.webp"
+    },
+    {
+      "materialId": "legendary-primal-essence",
+      "materialName": "Legendary Primal Essence",
+      "kibblesName": "Legendary Primal Essence",
+      "img": "icons/commodities/bones/horn-engraved-vines-grey.webp"
+    },
+    {
+      "materialId": "legendary-reactive-reagent",
+      "materialName": "Legendary Reactive Reagent",
+      "kibblesName": "Legendary Reactive Reagent",
+      "img": "icons/commodities/stone/ore-chunk-green-brown.webp"
+    },
+    {
+      "materialId": "length-of-string",
+      "materialName": "Length of String",
+      "kibblesName": "Length of String",
+      "img": "icons/commodities/cloth/thread-spindle-white-grey.webp"
+    },
+    {
+      "materialId": "long-haft",
+      "materialName": "Long Haft",
+      "kibblesName": "Long Haft",
+      "img": "icons/commodities/wood/wood-pole.webp"
+    },
+    {
+      "materialId": "metal-scraps",
+      "materialName": "Metal Scraps",
+      "kibblesName": "Metal Scraps",
+      "img": "icons/commodities/metal/barstock-broken-steel.webp"
+    },
+    {
+      "materialId": "parchment",
+      "materialName": "Parchment",
+      "kibblesName": "Parchment",
+      "img": "icons/sundries/documents/paper-plain-white.webp"
+    },
+    {
+      "materialId": "parts",
+      "materialName": "Parts",
+      "kibblesName": "Parts",
+      "img": "icons/tools/fasteners/screw-flat-steel-grey.webp"
+    },
+    {
+      "materialId": "quality-branch",
+      "materialName": "Quality Branch",
+      "kibblesName": "Quality Branch",
+      "img": "icons/commodities/wood/log-rough-brown.webp"
+    },
+    {
+      "materialId": "rare-arcane-essence",
+      "materialName": "Rare Arcane Essence",
+      "kibblesName": "Rare Arcane Essence",
+      "img": "icons/commodities/biological/organ-heart-black.webp"
+    },
+    {
+      "materialId": "rare-branch",
+      "materialName": "Rare Branch",
+      "kibblesName": "Rare Branch",
+      "img": "icons/commodities/wood/kindling-stick-brown.webp"
+    },
+    {
+      "materialId": "rare-curative-reagent",
+      "materialName": "Rare Curative Reagent",
+      "kibblesName": "Rare Curative Reagent",
+      "img": "icons/consumables/plants/milkweed-stem-serrated-leaves-green.webp"
+    },
+    {
+      "materialId": "rare-divine-essence",
+      "materialName": "Rare Divine Essence",
+      "kibblesName": "Rare Divine Essence",
+      "img": "icons/commodities/biological/wing-insect-green.webp"
+    },
+    {
+      "materialId": "rare-magical-ink",
+      "materialName": "Rare Magical Ink",
+      "kibblesName": "Rare Magical Ink",
+      "img": "icons/consumables/potions/potion-flask-corked-tied-necklace-teal.webp"
+    },
+    {
+      "materialId": "rare-parchment",
+      "materialName": "Rare Parchment",
+      "kibblesName": "Rare Parchment",
+      "img": "icons/sundries/scrolls/scroll-plain-tan-red.webp"
+    },
+    {
+      "materialId": "rare-poisonous-reagent",
+      "materialName": "Rare Poisonous Reagent",
+      "kibblesName": "Rare Poisonous Reagent",
+      "img": "icons/consumables/plants/tearthumb-dried-halberd-leaf-brown.webp"
+    },
+    {
+      "materialId": "rare-primal-essence",
+      "materialName": "Rare Primal Essence",
+      "kibblesName": "Rare Primal Essence",
+      "img": "icons/commodities/biological/organ-heart-red.webp"
+    },
+    {
+      "materialId": "rare-reactive-reagent",
+      "materialName": "Rare Reactive Reagent",
+      "kibblesName": "Rare Reactive Reagent",
+      "img": "icons/consumables/plants/flax-leaves-spiked-bundle-orange.webp"
+    },
+    {
+      "materialId": "rawhide-leather",
+      "materialName": "Rawhide Leather",
+      "kibblesName": "Rawhide Leather",
+      "img": "icons/commodities/leather/leather-bolt-tan.webp"
+    },
+    {
+      "materialId": "scales",
+      "materialName": "Scales",
+      "kibblesName": "Scales",
+      "img": "icons/commodities/leather/scales-white.webp"
+    },
+    {
+      "materialId": "short-haft",
+      "materialName": "Short Haft",
+      "kibblesName": "Short Haft",
+      "img": "icons/commodities/wood/fence-post-tan.webp"
+    },
+    {
+      "materialId": "silver-scraps",
+      "materialName": "Silver Scraps",
+      "kibblesName": "Silver Scraps",
+      "img": "icons/commodities/currency/coin-embossed-unicorn-silver.webp"
+    },
+    {
+      "materialId": "steel-ingot",
+      "materialName": "Steel Ingot",
+      "kibblesName": "Steel Ingot",
+      "img": "icons/commodities/metal/ingot-plain-steel.webp"
+    },
+    {
+      "materialId": "tanned-leather",
+      "materialName": "Tanned Leather",
+      "kibblesName": "Tanned Leather",
+      "img": "icons/commodities/leather/leather-worn-tan.webp"
+    },
+    {
+      "materialId": "tough-leather",
+      "materialName": "Tough Leather",
+      "kibblesName": "Tough Leather",
+      "img": "icons/commodities/leather/leather-scrap-brown.webp"
+    },
+    {
+      "materialId": "uncommon-arcane-essence",
+      "materialName": "Uncommon Arcane Essence",
+      "kibblesName": "Uncommon Arcane Essence",
+      "img": "icons/commodities/gems/gem-rough-ball-purple.webp"
+    },
+    {
+      "materialId": "uncommon-branch",
+      "materialName": "Uncommon Branch",
+      "kibblesName": "Uncommon Branch",
+      "img": "icons/commodities/wood/kindling-stick-tan.webp"
+    },
+    {
+      "materialId": "uncommon-curative-reagent",
+      "materialName": "Uncommon Curative Reagent",
+      "kibblesName": "Uncommon Curative Reagent",
+      "img": "icons/commodities/materials/bowl-liquid-white.webp"
+    },
+    {
+      "materialId": "uncommon-divine-essence",
+      "materialName": "Uncommon Divine Essence",
+      "kibblesName": "Uncommon Divine Essence",
+      "img": "icons/commodities/gems/gem-faceted-cushion-teal-black.webp"
+    },
+    {
+      "materialId": "uncommon-magical-ink",
+      "materialName": "Uncommon Magical Ink",
+      "kibblesName": "Uncommon Magical Ink",
+      "img": "icons/consumables/potions/potion-vial-corked-labeled-purple.webp"
+    },
+    {
+      "materialId": "uncommon-parchment",
+      "materialName": "Uncommon Parchment",
+      "kibblesName": "Uncommon Parchment",
+      "img": "icons/sundries/scrolls/scroll-plain-tan.webp"
+    },
+    {
+      "materialId": "uncommon-poisonous-reagent",
+      "materialName": "Uncommon Poisonous Reagent",
+      "kibblesName": "Uncommon Poisonous Reagent",
+      "img": "icons/commodities/biological/tail-spiked-green.webp"
+    },
+    {
+      "materialId": "uncommon-primal-essence",
+      "materialName": "Uncommon Primal Essence",
+      "kibblesName": "Uncommon Primal Essence",
+      "img": "icons/commodities/gems/gem-oval-red.webp"
+    },
+    {
+      "materialId": "uncommon-reactive-reagent",
+      "materialName": "Uncommon Reactive Reagent",
+      "kibblesName": "Uncommon Reactive Reagent",
+      "img": "icons/commodities/materials/bowl-powder-gold.webp"
+    },
+    {
+      "materialId": "uncommon-supplies",
+      "materialName": "Uncommon Supplies",
+      "kibblesName": "Uncommon Supplies",
+      "img": "icons/consumables/food/preserves-jam-jelly-jar-brown-red.webp"
+    },
+    {
+      "materialId": "unit-of-stone",
+      "materialName": "Unit of Stone",
+      "kibblesName": "Unit of Stone",
+      "img": "icons/commodities/stone/masonry-block-cube-teal.webp"
+    },
+    {
+      "materialId": "very-rare-arcane-essence",
+      "materialName": "Very Rare Arcane Essence",
+      "kibblesName": "Very Rare Arcane Essence",
+      "img": "icons/commodities/gems/gem-faceted-rough-blue.webp"
+    },
+    {
+      "materialId": "very-rare-branch",
+      "materialName": "Very Rare Branch",
+      "kibblesName": "Very Rare Branch",
+      "img": "icons/commodities/wood/logs-pile-rough-brown.webp"
+    },
+    {
+      "materialId": "very-rare-curative-reagent",
+      "materialName": "Very Rare Curative Reagent",
+      "kibblesName": "Very Rare Curative Reagent",
+      "img": "icons/commodities/flowers/clover-purple.webp"
+    },
+    {
+      "materialId": "very-rare-divine-essence",
+      "materialName": "Very Rare Divine Essence",
+      "kibblesName": "Very Rare Divine Essence",
+      "img": "icons/commodities/gems/gem-faceted-rough-yellow.webp"
+    },
+    {
+      "materialId": "very-rare-magical-ink",
+      "materialName": "Very Rare Magical Ink",
+      "kibblesName": "Very Rare Magical Ink",
+      "img": "icons/consumables/potions/bottle-pear-corked-labeled-ornamental-purple.webp"
+    },
+    {
+      "materialId": "very-rare-parchment",
+      "materialName": "Very Rare Parchment",
+      "kibblesName": "Very Rare Parchment",
+      "img": "icons/sundries/scrolls/scroll-plain-red.webp"
+    },
+    {
+      "materialId": "very-rare-poisonous-reagent",
+      "materialName": "Very Rare Poisonous Reagent",
+      "kibblesName": "Very Rare Poisonous Reagent",
+      "img": "icons/commodities/flowers/flower-grey-orange.webp"
+    },
+    {
+      "materialId": "very-rare-primal-essence",
+      "materialName": "Very Rare Primal Essence",
+      "kibblesName": "Very Rare Primal Essence",
+      "img": "icons/commodities/gems/gem-faceted-rough-red.webp"
+    },
+    {
+      "materialId": "very-rare-reactive-reagent",
+      "materialName": "Very Rare Reactive Reagent",
+      "kibblesName": "Very Rare Reactive Reagent",
+      "img": "icons/commodities/flowers/dandelion-pod-blue.webp"
+    },
+    {
+      "materialId": "wooden-stock",
+      "materialName": "Wooden Stock",
+      "kibblesName": "Wooden Stock",
+      "img": "icons/weapons/crossbows/crossbow-simple-red.webp"
+    }
+  ],
+  "unmatched": []
+}

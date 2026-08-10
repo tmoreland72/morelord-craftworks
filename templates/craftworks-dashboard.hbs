@@ -1,0 +1,145 @@
+<section class="mcw app-shell mcw-dashboard">
+  <header class="mcw-dashboard-hero">
+    <div>
+      <h1>Morelord Craftworks</h1>
+      <p>Gather, harvest, loot, and understand the materials that drive your crafting economy.</p>
+    </div>
+    <button type="button" data-action="refresh" class="mcw-icon-button" title="Refresh">
+      <i class="fa-solid fa-arrows-rotate"></i>
+    </button>
+  </header>
+
+  {{#if isGM}}
+    <section class="mcw-dashboard-section">
+      <div class="mcw-dashboard-section-header">
+        <div>
+          <h2>Acquire</h2>
+          {{#if scene}}
+            <p>Current scene: <strong>{{scene.name}}</strong></p>
+          {{else}}
+            <p>No active scene.</p>
+          {{/if}}
+        </div>
+      </div>
+
+      <div class="mcw-dashboard-grid mcw-dashboard-acquire">
+        <button type="button" class="mcw-dashboard-card" data-action="harvest" {{#unless scene}}disabled{{/unless}}>
+          <i class="fa-solid fa-skull"></i>
+          <span class="mcw-dashboard-card-copy">
+            <strong>Harvest</strong>
+            <small>{{deadCreatureCount}} dead creature(s) detected</small>
+          </span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+        <button type="button" class="mcw-dashboard-card" data-action="gather" {{#unless scene}}disabled{{/unless}}>
+          <i class="fa-solid fa-seedling"></i>
+          <span class="mcw-dashboard-card-copy">
+            <strong>Gather</strong>
+            <small>{{gatherRecordCount}} character(s) already gathered here</small>
+          </span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+        <button type="button" class="mcw-dashboard-card" data-action="loot" {{#unless scene}}disabled{{/unless}}>
+          <i class="fa-solid fa-box-open"></i>
+          <span class="mcw-dashboard-card-copy">
+            <strong>Encounter Loot</strong>
+            <small>Materials, coin, and rare special treasure</small>
+          </span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+        <button type="button" class="mcw-dashboard-card" data-action="hoard">
+          <i class="fa-solid fa-vault"></i>
+          <span class="mcw-dashboard-card-copy">
+            <strong>Hoard</strong>
+            <small>Accumulated treasure for a lair, vault, or cache</small>
+          </span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </section>
+  {{/if}}
+
+  <section class="mcw-dashboard-section">
+    <div class="mcw-dashboard-section-header">
+      <div>
+        <h2>Craft</h2>
+        <p>Review materials and find recipes for the items you want to create.</p>
+      </div>
+    </div>
+
+    <div class="mcw-dashboard-grid">
+      <button type="button" class="mcw-dashboard-card" data-action="materials">
+        <i class="fa-solid fa-gem"></i>
+        <span class="mcw-dashboard-card-copy">
+          <strong>Materials</strong>
+          <small>{{materialsCount}} indexed materials</small>
+        </span>
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+
+      <button type="button" class="mcw-dashboard-card" data-action="recipes">
+        <i class="fa-solid fa-scroll"></i>
+        <span class="mcw-dashboard-card-copy">
+          <strong>Recipes</strong>
+          <small>{{recipesCount}} reference recipes</small>
+        </span>
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+  </section>
+
+  {{#if isGM}}
+    <section class="mcw-dashboard-section">
+      <div class="mcw-dashboard-section-header">
+        <div>
+          <h2>Tools</h2>
+          <p>GM utilities for crafting and generated treasure.</p>
+        </div>
+      </div>
+
+      <div class="mcw-dashboard-grid">
+        <button type="button"
+                class="mcw-dashboard-card"
+                data-action="spell-scroll-generator">
+          <i class="fa-solid fa-scroll"></i>
+          <span class="mcw-dashboard-card-copy">
+            <strong>Spell Scroll Generator</strong>
+            <small>
+              {{#if spellScrollGeneratorPremium}}
+                Generate a spell from enabled spell compendiums
+              {{else}}
+                Premium · Generate a spell from enabled spell compendiums
+              {{/if}}
+            </small>
+          </span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </section>
+
+    <section class="mcw-dashboard-storage-status" aria-label="Acquisition recipient">
+      {{#if partyInfo.enabled}}
+        <i class="fa-solid fa-users"></i>
+        {{#if partyInfo.valid}}
+          <span>Acquired materials and loot will be placed in the <strong>{{partyInfo.actorName}}</strong> group actor inventory.</span>
+        {{else}}
+          <span class="mcw-warning">Acquired materials and loot are configured for a group actor, but no valid Party/Group actor is available.</span>
+        {{/if}}
+      {{else}}
+        <i class="fa-solid fa-user"></i>
+        <span>Acquired materials will be placed in the individual actor's inventory.</span>
+      {{/if}}
+    </section>
+  {{else}}
+    <section class="mcw-dashboard-section">
+      <div class="mcw-panel">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>Acquisition sessions are started by the GM. Materials and Recipes are available as reference tools.</span>
+      </div>
+    </section>
+  {{/if}}
+
+</section>

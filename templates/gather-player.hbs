@@ -1,0 +1,51 @@
+<section class="mcw app-shell">
+  <header class="mcw-header">
+    <h2>Gathering Opportunity</h2>
+    <p>{{session.terrain.name}} • DC {{session.terrain.dc}} • {{session.sceneName}}</p>
+  </header>
+
+  {{#if actor}}
+    <div class="mcw-actor"><img src="{{actor.img}}" alt="{{actor.name}}"><strong>{{actor.name}}</strong></div>
+  {{else}}
+    <p class="mcw-warning">Select a token you own or configure a user character.</p>
+  {{/if}}
+
+  {{#if state}}
+    <div class="mcw-panel">
+      {{#if (eq state.status "declined")}}
+        <p>You declined this gathering opportunity. Declining does not consume this character's gathering opportunity for the scene.</p>
+      {{/if}}
+      {{#if (eq state.status "failed")}}
+        <p><strong>Nothing found.</strong> Your check total was {{state.total}}.</p>
+        <p>This character has now used their gathering opportunity for this scene.</p>
+      {{/if}}
+      {{#if (eq state.status "succeeded")}}
+        <p><strong>Gathering succeeded.</strong> Your check total was {{state.total}}.</p>
+        <div class="mcw-result"><img src="{{state.result.img}}" alt="{{state.result.name}}"> {{state.result.name}} ×{{state.result.quantity}}</div>
+        {{#if state.result.recipientName}}<p>Sent to <strong>{{state.result.recipientName}}</strong>.</p>{{/if}}
+        <p>This character has now used their gathering opportunity for this scene.</p>
+      {{/if}}
+    </div>
+  {{else}}
+    {{#if alreadyGathered}}
+      <div class="mcw-panel">
+        <p class="mcw-warning"><strong>{{actor.name}} has already gathered on this scene.</strong></p>
+        <p>The GM must reset gathering for this scene before this character can gather here again.</p>
+      </div>
+    {{else}}
+      <div class="mcw-panel">
+        <p>Gathering is optional. Choose a skill or decline.</p>
+        <div class="mcw-skill-row">
+          {{#each skills}}
+            <button type="button" data-action="roll" data-skill="{{id}}"><i class="fa-solid fa-dice-d20"></i> {{label}}</button>
+          {{/each}}
+        </div>
+        <button type="button" data-action="decline"><i class="fa-solid fa-ban"></i> Decline</button>
+      </div>
+    {{/if}}
+  {{/if}}
+
+  <footer class="mcw-actions">
+    <button type="button" data-action="close"><i class="fa-solid fa-xmark"></i> Close</button>
+  </footer>
+</section>

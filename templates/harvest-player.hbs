@@ -1,0 +1,59 @@
+<section class="mcw app-shell">
+  <header class="mcw-header">
+    <h2>Harvest</h2>
+    {{#if actor}}<p>Harvesting as <strong>{{actor.name}}</strong>. Each creature allows one attempt.</p>{{else}}<p class="mcw-warning">No character is available.</p>{{/if}}
+  </header>
+
+  <div class="mcw-harvest-creature-list">
+{{#each creatures}}
+    <article class="mcw-panel mcw-harvest-card" data-creature-token="{{tokenUuid}}">
+      <div class="mcw-creature">
+        <img src="{{img}}" alt="{{name}}">
+        <div>
+          <h3>{{name}}</h3>
+          <p>{{creatureType}} • CR {{cr}} • DC {{dc}}</p>
+        </div>
+      </div>
+
+      {{#if alreadyHarvested}}<p class="mcw-warning"><strong>This character has already attempted to harvest this creature.</strong></p>{{else}}{{#if state}}
+        {{#if (eq state.status "pending")}}
+          <p><i class="fa-solid fa-spinner fa-spin"></i> Resolving harvest check...</p>
+        {{/if}}
+        {{#if (eq state.status "failed")}}
+          <p class="mcw-failure"><i class="fa-solid fa-xmark"></i> Failed with {{state.total}}. No component recovered.</p>
+        {{/if}}
+        {{#if (eq state.status "no-results")}}
+          <p class="mcw-warning"><i class="fa-solid fa-triangle-exclamation"></i> The check succeeded, but no compatible Craftworks material is currently available for this creature.</p>
+        {{/if}}
+        {{#if (eq state.status "awaiting-claim")}}
+          <p class="mcw-success"><i class="fa-solid fa-check"></i> Success with {{state.total}}. Choose one component:</p>
+          <div class="mcw-choice-grid">
+            {{#each state.choices}}
+              <button type="button" class="mcw-choice" data-action="claim" data-creature="{{../tokenUuid}}" data-material="{{materialId}}">
+                <img src="{{img}}" alt="{{name}}">
+                <span>{{name}}</span>
+                {{#if rarity}}<small>{{rarity}}</small>{{/if}}
+              </button>
+            {{/each}}
+          </div>
+        {{/if}}
+        {{#if (eq state.status "claimed")}}
+          <p class="mcw-success"><i class="fa-solid fa-check-double"></i> Claimed {{state.claimedName}}.</p>
+        {{/if}}
+      {{else}}
+        <p>Choose a skill for your harvest check:</p>
+        <div class="mcw-skill-row">
+          {{#each ../skills}}
+            <button type="button" data-action="roll" data-creature="{{../tokenUuid}}" data-skill="{{id}}">
+              {{label}}
+            </button>
+          {{/each}}
+        </div>
+      {{/if}}{{/if}}
+    </article>
+  {{/each}}
+</div>
+  <footer class="mcw-actions">
+    <button type="button" data-action="close"><i class="fa-solid fa-xmark"></i> Close</button>
+  </footer>
+</section>

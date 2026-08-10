@@ -1,0 +1,109 @@
+<section class="mcw app-shell mcw-browser-shell">
+  <header class="mcw-header">
+    <h2>Treasure Hoard</h2>
+    <p>Create accumulated treasure for a lair, vault, cache, strongbox, treasure room, or similar location.</p>
+  </header>
+
+  {{#unless result}}
+    <div class="mcw-panel">
+      <label>
+        Hoard Challenge Tier
+        <select name="profile">
+          {{#each profiles}}
+            <option value="{{id}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+          {{/each}}
+        </select>
+      </label>
+
+      <p class="mcw-muted">Higher tiers generate substantially more coin, more Craftworks material rolls, and a greater chance of special treasure.</p>
+
+      <button type="button" data-action="roll">
+        <i class="fa-solid fa-dice-d20"></i> Generate Hoard
+      </button>
+    </div>
+  {{else}}
+    <div class="mcw-browser-results">
+      <div class="mcw-panel">
+        <h3>{{result.profileLabel}} Hoard</h3>
+
+        {{#if result.materials.length}}
+          <div class="mcw-loot-summary-grid">
+            {{#each result.materials}}
+              <div class="mcw-result">
+                <img src="{{img}}" alt="{{name}}">
+                <strong>{{name}} ×{{quantity}}</strong>
+              </div>
+            {{/each}}
+          </div>
+        {{/if}}
+
+        {{#if result.coinCopper}}
+          <p><i class="fa-solid fa-coins"></i> <strong>{{result.coinLabel}}</strong></p>
+        {{/if}}
+
+        {{#if result.special.enabled}}
+          <div class="mcw-special-treasure">
+            <strong>Special Treasure</strong>
+            {{#if result.special.triggered}}
+              <p>
+                Special treasure triggered ({{result.special.roll}} / {{result.special.chance}}%).
+                Rolled 1d4 = <strong>{{result.special.itemCountRoll}}</strong> item(s).
+              </p>
+
+              {{#if result.special.items.length}}
+                <div class="mcw-special-items">
+                  {{#each result.special.items}}
+                    <div class="mcw-result mcw-special-result">
+                      <img src="{{itemImg}}" alt="{{itemName}}">
+                      <div>
+                        <strong>{{itemName}}</strong>
+                        <div>Drawn from {{tableName}}</div>
+                      </div>
+                    </div>
+                  {{/each}}
+                </div>
+              {{/if}}
+
+              {{#if result.special.detail}}
+                <p class="mcw-warning">{{result.special.detail}}</p>
+              {{/if}}
+            {{else}}
+              <p>No special treasure ({{result.special.roll}} / {{result.special.chance}}%).</p>
+            {{/if}}
+          </div>
+        {{/if}}
+      </div>
+
+      <div class="mcw-panel">
+        <h3>Recipient</h3>
+
+        {{#if partyInfo.enabled}}
+          {{#if partyInfo.valid}}
+            <p>Hoard will be sent to <strong>{{partyInfo.actorName}}</strong>.</p>
+          {{else}}
+            <p class="mcw-warning">Party Recipient is enabled but no valid Party/Group actor is configured.</p>
+          {{/if}}
+        {{else}}
+          <label>
+            Party Carrier
+            <select name="recipient">
+              <option value="">Choose character…</option>
+              {{#each actors}}
+                <option value="{{uuid}}">{{name}}</option>
+              {{/each}}
+            </select>
+          </label>
+        {{/if}}
+
+        <div class="mcw-actions">
+          <button type="button" data-action="reroll">
+            <i class="fa-solid fa-dice"></i> Reroll Hoard
+          </button>
+          <button type="button" data-action="award" {{#unless result.found}}disabled{{/unless}}>
+            <i class="fa-solid fa-box-open"></i> Award Hoard
+          </button>
+        </div>
+      </div>
+    </div>
+  {{/unless}}
+</section>

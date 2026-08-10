@@ -1,0 +1,134 @@
+<section class="mcw app-shell mcw-browser-shell">
+  <header class="mcw-header">
+    <div>
+      <h2>Materials</h2>
+      <p>Reference Craftworks materials, acquisition methods, values, recipes, and inventory quantities.</p>
+    </div>
+  </header>
+
+  <div class="mcw-panel mcw-material-toolbar">
+    <div class="mcw-material-field mcw-material-search-field">
+      <label for="mcw-material-search">Search Materials</label>
+      <input
+        id="mcw-material-search"
+        type="search"
+        name="search"
+        value="{{search}}"
+        placeholder="Material, tag, category, source…"
+      >
+    </div>
+
+    <div class="mcw-material-field mcw-material-pack-field">
+      <span class="mcw-material-field-label">Content Pack</span>
+      <details class="mcw-multiselect mcw-material-multiselect"
+               data-filter="material-pack"
+               {{#if packFilterOpen}}open{{/if}}>
+        <summary>{{packFilterLabel}}</summary>
+        <div class="mcw-multiselect-menu">
+          {{#each packs}}
+            <label class="mcw-multiselect-option">
+              <input type="checkbox"
+                     name="material-pack-filter"
+                     value="{{id}}"
+                     {{#if selected}}checked{{/if}}>
+              <span>{{label}} ({{materialCount}})</span>
+            </label>
+          {{/each}}
+        </div>
+      </details>
+    </div>
+
+    <div class="mcw-material-field mcw-material-inventory-field">
+      <label for="mcw-material-actor">Check Inventory</label>
+      <select id="mcw-material-actor" name="actor">
+        <option value="">No inventory selected</option>
+        {{#each actors}}
+          <option value="{{uuid}}" {{#if selected}}selected{{/if}}>
+            {{name}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="mcw-material-search-action">
+      <button type="button"
+              class="mcw-browser-search-button"
+              data-action="search-materials"
+              {{#unless hasSearchCriteria}}disabled{{/unless}}>
+        <i class="fa-solid fa-magnifying-glass"></i>
+        Search
+      </button>
+    </div>
+  </div>
+
+  <div class="mcw-material-summary mcw-browser-query-summary">
+    <span><strong>{{totalMaterialCount}}</strong> total materials</span>
+    <span data-query-result-summary>
+      {{#if hasSearchCriteria}}
+        Search will return <strong>{{prospectiveCountLabel}}</strong> record(s).
+      {{else}}
+        Set at least one filter to search the catalog.
+      {{/if}}
+    </span>
+  </div>
+
+  <div class="mcw-reference-list mcw-browser-results">
+    {{#if searchExecuted}}
+    {{#each materials}}
+      <article class="mcw-reference-card mcw-material-card {{#if owned}}mcw-material-owned{{/if}} {{#if focused}}mcw-material-focused{{/if}}">
+        <img src="{{img}}" alt="{{name}}">
+
+        <div class="mcw-reference-main">
+          <div class="mcw-reference-title">
+            <strong>{{name}}</strong>
+            <span>{{rarity}} • {{category}} • {{packLabel}}</span>
+          </div>
+
+          <div class="mcw-pills">
+            {{#if ../actorName}}
+              <span class="mcw-owned-pill">
+                Owned: {{ownedQuantity}}
+              </span>
+            {{/if}}
+
+            {{#if acquisition.gatherable}}<span>Gather</span>{{/if}}
+            {{#if acquisition.harvestable}}<span>Harvest</span>{{/if}}
+            {{#if acquisition.lootable}}<span>Loot</span>{{/if}}
+            {{#if purchasable}}<span>Purchasable</span>{{/if}}
+            <span>{{priceLabel}}</span>
+          </div>
+
+          {{#if tags.length}}
+            <p>
+              <strong>Tags:</strong>
+              {{#each tags}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+            </p>
+          {{/if}}
+
+          {{#if producedBy.length}}
+            <p>
+              <strong>Produced by:</strong>
+              {{#each producedBy}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+            </p>
+          {{/if}}
+
+          {{#if usedIn.length}}
+            <p>
+              <strong>Used in:</strong>
+              {{#each usedIn}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+            </p>
+          {{/if}}
+        </div>
+      </article>
+    {{else}}
+      <div class="mcw-panel">
+        <p>No materials match the current search or Content Pack filter.</p>
+      </div>
+    {{/each}}
+    {{else}}
+      <div class="mcw-panel mcw-browser-empty-state">
+        <p>Choose your filters, review the result count above, then click <strong>Search</strong>.</p>
+      </div>
+    {{/if}}
+  </div>
+</section>

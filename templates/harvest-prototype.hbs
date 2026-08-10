@@ -1,0 +1,59 @@
+<section class="mcw app-shell">
+  <header class="mcw-header">
+    <h2>Harvest</h2>
+    <p>Craftworks automatically includes all dead creatures on the current scene.</p>
+  </header>
+
+  {{#if session}}
+    <div class="mcw-panel">
+      <h3>Dead Creatures</h3>
+      {{#each session.creatures}}
+        <article class="mcw-creature">
+          <img src="{{img}}" alt="{{name}}">
+          <div>
+            <h4>{{name}}</h4>
+            <p>{{creatureType}} • CR {{cr}} • Harvest DC {{dc}}</p>
+            {{#unless profileId}}<p class="mcw-warning">No harvest profile is defined for this creature type yet.</p>{{/unless}}
+          </div>
+        </article>
+      {{/each}}
+    </div>
+
+    <div class="mcw-panel mcw-progress">
+      <h3>Player Progress</h3>
+      {{#each progress}}
+        <div class="mcw-progress-user">
+          <strong>{{user}}</strong>
+          {{#each perCreature}}
+            <span>{{creature}}: {{status}}{{#if claimedName}} ({{claimedName}}){{/if}}{{#if total}} [{{total}}]{{/if}}</span>
+          {{/each}}
+        </div>
+      {{/each}}
+    </div>
+
+    <footer class="mcw-actions">
+      <button type="button" data-action="reset-harvest">
+        <i class="fa-solid fa-rotate-left"></i> Reset Harvest
+      </button>
+      <button type="button" data-action="finalize">
+        <i class="fa-solid fa-flag-checkered"></i> Finalize Harvest
+      </button>
+    </footer>
+  {{else}}
+    <div class="mcw-panel">
+      {{#if deadCreatures.length}}
+        <p><strong>{{deadCreatures.length}}</strong> dead creature(s) found on the current scene.</p>
+        <div class="mcw-dead-list">
+          {{#each deadCreatures}}
+            <span><img src="{{img}}" alt="{{name}}"> {{name}}</span>
+          {{/each}}
+        </div>
+        <div class="mcw-actions">
+          <button type="button" data-action="start"><i class="fa-solid fa-leaf"></i> Start Harvest</button>
+        </div>
+      {{else}}
+        <p class="mcw-warning">No dead creatures were found on the current scene.</p>
+      {{/if}}
+    </div>
+  {{/if}}
+</section>

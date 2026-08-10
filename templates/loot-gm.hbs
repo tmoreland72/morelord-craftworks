@@ -1,0 +1,153 @@
+<section class="mcw app-shell mcw-browser-shell">
+  <header class="mcw-header">
+    <h2>Encounter Loot</h2>
+    <p>Resolve materials and coin from every dead creature, plus one rare special-treasure check for the encounter.</p>
+  </header>
+
+  {{#unless session}}
+    <div class="mcw-panel">
+      <h3>Dead Creatures</h3>
+      {{#if creatures.length}}
+        <div class="mcw-loot-creatures">
+          {{#each creatures}}
+            <div class="mcw-creature">
+              <img src="{{img}}" alt="{{name}}">
+              <div>
+                <strong>{{name}}</strong>
+                <div>CR {{cr}}{{#if resolved}} • Already resolved{{/if}}</div>
+              </div>
+            </div>
+          {{/each}}
+        </div>
+
+        <div class="mcw-actions">
+          <button type="button" data-action="roll">
+            <i class="fa-solid fa-dice-d20"></i> Roll Encounter Loot
+          </button>
+          {{#if resolvedCount}}
+            <button type="button" data-action="reset-loot">
+              <i class="fa-solid fa-rotate-left"></i> Reset Looting for Scene
+            </button>
+          {{/if}}
+        </div>
+      {{else}}
+        <p class="mcw-warning">No dead creatures were found on the current scene.</p>
+      {{/if}}
+    </div>
+  {{else}}
+    <div class="mcw-browser-results">
+      <div class="mcw-panel">
+        <h3>Corpse Results</h3>
+        {{#each session.result.rolls}}
+          <div class="mcw-loot-roll">
+            <div>
+              <strong>{{creature}}</strong>
+              <span>CR {{cr}}</span>
+            </div>
+
+            <div class="mcw-loot-roll-result">
+              {{#if materialsEnabled}}
+                {{#if material}}
+                  <span class="mcw-result">
+                    <img src="{{material.img}}" alt="{{material.name}}">
+                    {{material.name}} ×{{material.quantity}}
+                  </span>
+                {{else}}
+                  <span>No crafting material</span>
+                {{/if}}
+              {{/if}}
+
+              {{#if coinEnabled}}
+                {{#if coin}}
+                  <span><i class="fa-solid fa-coins"></i> {{coin.label}}</span>
+                {{else}}
+                  <span>No coin</span>
+                {{/if}}
+              {{/if}}
+            </div>
+          </div>
+        {{/each}}
+      </div>
+
+      <div class="mcw-panel">
+        <h3>Encounter Haul</h3>
+
+        {{#if session.result.channels.materials}}
+          {{#if session.result.materials.length}}
+            <div class="mcw-loot-summary-grid">
+              {{#each session.result.materials}}
+                <div class="mcw-result">
+                  <img src="{{img}}" alt="{{name}}">
+                  <strong>{{name}} ×{{quantity}}</strong>
+                </div>
+              {{/each}}
+            </div>
+          {{else}}
+            <p>No Craftworks materials were recovered.</p>
+          {{/if}}
+        {{/if}}
+
+        {{#if session.result.channels.coin}}
+          {{#if session.result.coinTotalCopper}}
+            <p><i class="fa-solid fa-coins"></i> <strong>{{session.result.coinLabel}}</strong></p>
+          {{else}}
+            <p>No coin was recovered.</p>
+          {{/if}}
+        {{/if}}
+
+        {{#if session.result.channels.special}}
+          <div class="mcw-special-treasure">
+            <strong>Special Treasure</strong>
+            {{#if session.result.special.triggered}}
+              {{#if session.result.special.itemUuid}}
+                <div class="mcw-result mcw-special-result">
+                  <img src="{{session.result.special.itemImg}}" alt="{{session.result.special.itemName}}">
+                  <div>
+                    <strong>{{session.result.special.itemName}}</strong>
+                    <div>Drawn from {{session.result.special.tableName}}</div>
+                    <small>Special roll {{session.result.special.roll}} / {{session.result.special.chance}}%</small>
+                  </div>
+                </div>
+              {{else}}
+                <p class="mcw-warning">
+                  <i class="fa-solid fa-triangle-exclamation"></i>
+                  Special treasure triggered ({{session.result.special.roll}} / {{session.result.special.chance}}%), but no awardable Item was resolved.
+                  {{session.result.special.detail}}
+                </p>
+              {{/if}}
+            {{else}}
+              <p>No special treasure ({{session.result.special.roll}} / {{session.result.special.chance}}%).</p>
+            {{/if}}
+          </div>
+        {{/if}}
+      </div>
+
+      <div class="mcw-panel">
+        <h3>Recipient</h3>
+        {{#if partyInfo.enabled}}
+          {{#if partyInfo.valid}}
+            <p>Encounter loot will be sent to <strong>{{partyInfo.actorName}}</strong>.</p>
+          {{else}}
+            <p class="mcw-warning">Party Recipient is enabled but no valid Party/Group actor is configured.</p>
+          {{/if}}
+        {{else}}
+          <label>
+            Party Carrier
+            <select name="recipient">
+              <option value="">Choose character…</option>
+              {{#each actors}}<option value="{{uuid}}">{{name}}</option>{{/each}}
+            </select>
+          </label>
+        {{/if}}
+
+        <button type="button" data-action="award" {{#unless session.result.found}}disabled{{/unless}}>
+          <i class="fa-solid fa-box-open"></i> Award Encounter Loot
+        </button>
+
+        {{#unless session.result.found}}
+          <button type="button" data-action="finish">Finish</button>
+        {{/unless}}
+      </div>
+    </div>
+  {{/unless}}
+</section>

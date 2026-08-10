@@ -1,0 +1,1 @@
+export const DRAKKENHEIM_GATHERING_PROFILES = [];

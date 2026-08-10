@@ -1,0 +1,1 @@
+export const PHB_ENCOUNTER_LOOT_PROFILES = [];

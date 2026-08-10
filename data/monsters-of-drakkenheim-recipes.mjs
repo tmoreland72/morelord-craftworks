@@ -1,0 +1,1 @@
+export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [];

@@ -1,0 +1,201 @@
+<section class="mcw app-shell mcw-settings-shell">
+  <header class="mcw-header">
+    <div>
+      <h2>Morelord Craftworks Settings</h2>
+      <p>Configure content, material acquisition, recipe behavior, and crafting for this world.</p>
+    </div>
+  </header>
+
+  <form class="mcw-settings-form">
+    <section class="mcw-settings-section">
+      <div class="mcw-settings-section-heading">
+        <div>
+          <h3><i class="fa-solid fa-boxes-stacked"></i> Content Packs</h3>
+          <p>Choose which Craftworks content packs are active in this world.</p>
+        </div>
+        <button type="button" data-action="refresh-core">
+          <i class="fa-solid fa-arrows-rotate"></i> Refresh Morelord Core
+        </button>
+      </div>
+
+      <div class="mcw-core-status">
+        <strong>Morelord Core:</strong>
+        {{#if core.available}}
+          <span>Connected</span>
+          {{#if core.premium}}
+            <span class="mcw-core-premium">— Premium Access</span>
+          {{else}}
+            <span>— Standard Access</span>
+          {{/if}}
+          {{#if core.tier}}
+            <span>({{core.tier}})</span>
+          {{/if}}
+        {{else}}
+          <span class="mcw-warning">Not available</span>
+        {{/if}}
+      </div>
+
+      {{#if core.available}}
+        <div class="mcw-core-diagnostics">
+          <span><strong>Source:</strong> {{core.source}}</span>
+          {{#if core.entitlements.length}}
+            <span><strong>Entitlements:</strong> {{#each core.entitlements}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</span>
+          {{/if}}
+          {{#if core.features.length}}
+            <span><strong>Features:</strong> {{#each core.features}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</span>
+          {{/if}}
+        </div>
+      {{/if}}
+
+      <div class="mcw-content-pack-list">
+        {{#each packs}}
+          <article class="mcw-setting-card mcw-content-pack">
+            <div>
+              <div class="mcw-content-pack-heading">
+                <h4>{{label}}</h4>
+                <span class="mcw-content-pack-status {{#if premium}}mcw-content-pack-premium{{else}}mcw-content-pack-free{{/if}}">
+                  {{statusLabel}}
+                </span>
+              </div>
+              <p>{{description}}</p>
+              <small>{{rulesVersion}}</small>
+              <div class="mcw-pack-counts">
+                <span>{{counts.materials}} materials source</span>
+                <span>{{counts.recipes}} recipes</span>
+                <span>{{counts.harvest}} harvest profiles</span>
+                <span>{{counts.gathering}} gathering profiles</span>
+                <span>{{counts.loot}} loot tiers</span>
+                <span>{{counts.encounter}} encounter profiles</span>
+              </div>
+            </div>
+
+            <label class="mcw-toggle-row">
+              <span>{{#if enabled}}Enabled{{else}}Disabled{{/if}}</span>
+              <input
+                type="checkbox"
+                name="pack:{{id}}"
+                {{#if enabled}}checked{{/if}}
+                {{#unless canEnable}}disabled{{/unless}}
+              >
+            </label>
+          </article>
+        {{/each}}
+      </div>
+    </section>
+
+    <section class="mcw-settings-section">
+      <div class="mcw-settings-section-heading">
+        <div>
+          <h3><i class="fa-solid fa-gem"></i> Materials</h3>
+          <p>Configure acquisition, recipients, Harvesting, Gathering, and Encounter Loot. Available materials and acquisition profiles come only from active Content Packs.</p>
+        </div>
+      </div>
+
+      <div class="mcw-settings-subsection">
+        <h4>Material Storage</h4>
+
+        <label class="mcw-setting-row">
+          <span>
+            <strong>Use Party Actor for Acquired Materials</strong>
+            <small>Place Harvest, Gathering, and Encounter Loot materials in a shared Group actor.</small>
+          </span>
+          <input type="checkbox" name="usePartyRecipient" {{#if materials.usePartyRecipient}}checked{{/if}}>
+        </label>
+
+        <label class="mcw-setting-row">
+          <span>
+            <strong>Party Recipient Actor</strong>
+            <small>Choose the Group actor that receives shared Craftworks materials.</small>
+          </span>
+          <select name="partyActorUuid">
+            <option value="">Automatic (single populated Group)</option>
+            {{#each groups}}
+              <option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>
+            {{/each}}
+          </select>
+        </label>
+      </div>
+
+      <div class="mcw-settings-subsection">
+        <h4>Harvesting</h4>
+        <div class="mcw-settings-grid">
+          <label><span>DC Modifier</span><input type="number" name="harvestDcModifier" value="{{materials.harvestDcModifier}}"></label>
+          <label><span>Minimum Choices</span><input type="number" name="harvestChoicesMin" value="{{materials.harvestChoicesMin}}" min="1"></label>
+          <label><span>Maximum Choices</span><input type="number" name="harvestChoicesMax" value="{{materials.harvestChoicesMax}}" min="1"></label>
+          <label><span>Rare Result Bias (%)</span><input type="number" name="harvestRareBias" value="{{materials.harvestRareBias}}"></label>
+        </div>
+      </div>
+
+      <div class="mcw-settings-subsection">
+        <h4>Gathering</h4>
+        <div class="mcw-settings-grid">
+          <label><span>DC Modifier</span><input type="number" name="gatherDcModifier" value="{{materials.gatherDcModifier}}"></label>
+          <label><span>Quantity Multiplier</span><input type="number" step="0.1" name="gatherQuantityMultiplier" value="{{materials.gatherQuantityMultiplier}}"></label>
+          <label><span>Rare Result Bias (%)</span><input type="number" name="gatherRareBias" value="{{materials.gatherRareBias}}"></label>
+        </div>
+      </div>
+
+      <div class="mcw-settings-subsection">
+        <h4>Encounter Loot</h4>
+
+        <div class="mcw-settings-inline-toggles">
+          <label><input type="checkbox" name="lootEnableMaterials" {{#if materials.lootEnableMaterials}}checked{{/if}}> Materials</label>
+          <label><input type="checkbox" name="lootEnableCoin" {{#if materials.lootEnableCoin}}checked{{/if}}> Coin</label>
+          <label><input type="checkbox" name="lootEnableSpecial" {{#if materials.lootEnableSpecial}}checked{{/if}}> Special Treasure</label>
+        </div>
+
+        <div class="mcw-settings-grid">
+          <label><span>Material Chance Modifier (%)</span><input type="number" name="lootMaterialChanceModifier" value="{{materials.lootMaterialChanceModifier}}"></label>
+          <label><span>Coin Chance Modifier (%)</span><input type="number" name="lootCoinChanceModifier" value="{{materials.lootCoinChanceModifier}}"></label>
+          <label><span>Special Chance Modifier (%)</span><input type="number" name="lootSpecialChanceModifier" value="{{materials.lootSpecialChanceModifier}}"></label>
+          <label><span>Material Quantity Multiplier</span><input type="number" step="0.1" name="lootMaterialQuantityMultiplier" value="{{materials.lootMaterialQuantityMultiplier}}"></label>
+          <label><span>Coin Multiplier</span><input type="number" step="0.1" name="lootCoinMultiplier" value="{{materials.lootCoinMultiplier}}"></label>
+        </div>
+      </div>
+    </section>
+
+    <section class="mcw-settings-section">
+      <div class="mcw-settings-section-heading">
+        <div>
+          <h3><i class="fa-solid fa-scroll"></i> Recipes</h3>
+          <p>Recipe availability is controlled by the Content Packs section above.</p>
+        </div>
+        <span class="mcw-settings-summary">{{recipeCount}} active recipe(s)</span>
+      </div>
+
+      <div class="mcw-setting-card">
+        <p>
+          No additional recipe behavior settings are currently required.
+          Recipe search, inventory readiness, and processing plans automatically use only enabled and entitled content packs.
+        </p>
+      </div>
+    </section>
+
+    <section class="mcw-settings-section">
+      <div class="mcw-settings-section-heading">
+        <div>
+          <h3><i class="fa-solid fa-hammer"></i> Crafting</h3>
+          <p>Crafting execution belongs to Craftworks Premium.</p>
+        </div>
+        {{#if premiumCraftingAvailable}}
+          <span class="mcw-content-pack-status mcw-content-pack-premium">Premium Access</span>
+        {{else}}
+          <span class="mcw-content-pack-status">Premium — Access Required</span>
+        {{/if}}
+      </div>
+
+      <div class="mcw-setting-card">
+        <p>
+          Crafting execution settings will appear here as premium crafting workflows are implemented.
+          The current development build provides recipe reference, readiness, and processing planning only.
+        </p>
+      </div>
+    </section>
+
+    <footer class="mcw-settings-footer">
+      <button type="button" data-action="save">
+        <i class="fa-solid fa-floppy-disk"></i> Save Changes
+      </button>
+    </footer>
+  </form>
+</section>

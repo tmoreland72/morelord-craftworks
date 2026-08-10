@@ -1,0 +1,56 @@
+<section class="mcw app-shell">
+  <header class="mcw-header">
+    <h2>Gathering</h2>
+    <p>Start an optional gathering opportunity for every connected player.</p>
+  </header>
+
+  {{#if session}}
+    <div class="mcw-panel">
+      <h3>{{session.terrain.name}}</h3>
+      <p>{{session.sceneName}} • Gathering DC {{session.terrain.dc}}</p>
+    </div>
+
+    <div class="mcw-panel">
+      <h3>Player Progress</h3>
+      {{#each progress}}
+        <div class="mcw-progress-user">
+          <strong>{{user}}</strong>
+          <span>{{status}}{{#if total}} [{{total}}]{{/if}}</span>
+          {{#if result}}
+            <span class="mcw-result"><img src="{{result.img}}" alt="{{result.name}}"> {{result.name}} ×{{result.quantity}}</span>
+            {{#if result.recipientName}}<span>Recipient: {{result.recipientName}}</span>{{/if}}
+          {{/if}}
+        </div>
+      {{/each}}
+    </div>
+
+    <footer class="mcw-actions">
+      <button type="button" data-action="finalize"><i class="fa-solid fa-flag-checkered"></i> Finalize Gathering</button>
+    </footer>
+  {{else}}
+    <div class="mcw-panel">
+      <h3>{{sceneName}}</h3>
+      {{#if gatherRecordCount}}
+        <p>{{gatherRecordCount}} character(s) have already used their gathering opportunity on this scene.</p>
+      {{else}}
+        <p>No characters have gathered on this scene yet.</p>
+      {{/if}}
+
+      <label>
+        Terrain
+        <select name="terrain">
+          {{#each terrains}}
+            <option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}} — DC {{dc}}</option>
+          {{/each}}
+        </select>
+      </label>
+
+      <div class="mcw-actions">
+        <button type="button" data-action="start"><i class="fa-solid fa-seedling"></i> Start Gathering</button>
+        {{#if gatherRecordCount}}
+          <button type="button" data-action="reset"><i class="fa-solid fa-rotate-left"></i> Reset Gathering for Scene</button>
+        {{/if}}
+      </div>
+    </div>
+  {{/if}}
+</section>

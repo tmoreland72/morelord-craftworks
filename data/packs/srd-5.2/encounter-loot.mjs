@@ -1,0 +1,1 @@
+export const SRD_52_ENCOUNTER_LOOT_PROFILES = [];

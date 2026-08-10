@@ -1,0 +1,489 @@
+<section class="mcw app-shell mcw-browser-shell">
+  <header class="mcw-header">
+    <div>
+      <h2>Recipes</h2>
+      <p>Reference recipes and check whether an inventory currently satisfies their material requirements.</p>
+    </div>
+  </header>
+
+  <div class="mcw-panel mcw-recipe-browse-controls">
+    <label class="mcw-recipe-search">
+      Search Recipes
+      <input type="search"
+             name="search"
+             value="{{search}}"
+             placeholder="Recipe, material, tag, category…">
+    </label>
+
+    <div class="mcw-filter-field">
+      <span>Content Pack</span>
+      <details class="mcw-multiselect"
+               data-filter="recipe-pack"
+               {{#if packFilterOpen}}open{{/if}}>
+        <summary>{{packFilterLabel}}</summary>
+        <div class="mcw-multiselect-menu">
+          {{#each packs}}
+            <label>
+              <input type="checkbox"
+                     name="recipe-pack-filter"
+                     value="{{id}}"
+                     {{#if selected}}checked{{/if}}>
+              <span>{{label}} ({{recipeCount}})</span>
+            </label>
+          {{/each}}
+        </div>
+      </details>
+    </div>
+
+    <div class="mcw-filter-field">
+      <span>Category</span>
+      <details class="mcw-multiselect"
+               data-filter="recipe-category"
+               {{#if categoryFilterOpen}}open{{/if}}>
+        <summary>{{categoryFilterLabel}}</summary>
+        <div class="mcw-multiselect-menu">
+          {{#each categories}}
+            <label>
+              <input type="checkbox"
+                     name="recipe-category-filter"
+                     value="{{id}}"
+                     {{#if selected}}checked{{/if}}>
+              <span>{{label}}</span>
+            </label>
+          {{/each}}
+        </div>
+      </details>
+    </div>
+
+    <div class="mcw-filter-field">
+      <span>Ingredient Rarity</span>
+      <details class="mcw-multiselect"
+               data-filter="ingredient-rarity"
+               {{#if rarityFilterOpen}}open{{/if}}>
+        <summary>{{rarityFilterLabel}}</summary>
+        <div class="mcw-multiselect-menu">
+          {{#each ingredientRarities}}
+            <label>
+              <input type="checkbox"
+                     name="ingredient-rarity-filter"
+                     value="{{id}}"
+                     {{#if selected}}checked{{/if}}>
+              <span>{{label}}</span>
+            </label>
+          {{/each}}
+        </div>
+      </details>
+    </div>
+
+    <div class="mcw-filter-field">
+      <span>Ingredient Tag</span>
+      <details class="mcw-multiselect"
+               data-filter="ingredient-tag"
+               {{#if tagFilterOpen}}open{{/if}}>
+        <summary>{{tagFilterLabel}}</summary>
+        <div class="mcw-multiselect-menu">
+          {{#each ingredientTags}}
+            <label>
+              <input type="checkbox"
+                     name="ingredient-tag-filter"
+                     value="{{id}}"
+                     {{#if selected}}checked{{/if}}>
+              <span>{{label}}</span>
+            </label>
+          {{/each}}
+        </div>
+      </details>
+    </div>
+
+    <label class="mcw-browser-check-filter">
+      <span>Craftability</span>
+      <span class="mcw-checkbox-line">
+        <input type="checkbox"
+               name="only-craftable"
+               {{#if onlyCraftable}}checked{{/if}}
+               {{#unless canFilterCraftable}}disabled{{/unless}}>
+        Only Show Craftable Recipes
+      </span>
+    </label>
+
+    <button type="button"
+            class="mcw-browser-search-button"
+            data-action="search-recipes"
+            {{#unless hasSearchCriteria}}disabled{{/unless}}>
+      <i class="fa-solid fa-magnifying-glass"></i>
+      Search
+    </button>
+  <div class="mcw-recipe-query-summary-wrap">
+<div class="mcw-browser-query-summary mcw-recipe-query-summary">
+      <span><strong>{{totalRecipeCount}}</strong> total recipes</span>
+      <span data-query-result-summary>
+        {{#if hasSearchCriteria}}
+          Search will return <strong>{{prospectiveCountLabel}}</strong> record(s).
+        {{else}}
+          Set at least one filter to search the catalog.
+        {{/if}}
+      </span>
+    </div>
+  </div>
+  </div>
+
+  <div class="mcw-panel mcw-recipe-actor-context">
+    <div class="mcw-recipe-actor-field">
+      <div class="mcw-recipe-actor-label">
+        <label for="mcw-recipe-inventory-actor">Using Actor Inventory</label>
+        <button type="button"
+                class="mcw-context-help"
+                data-context-help="inventory"
+                title="What is Using Actor Inventory?">
+          <i class="fa-solid fa-circle-question"></i>
+        </button>
+      </div>
+      <select id="mcw-recipe-inventory-actor" name="actor">
+        <option value="">No inventory selected</option>
+        {{#each actors}}
+          <option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="mcw-recipe-actor-field">
+      <div class="mcw-recipe-actor-label">
+        <label for="mcw-recipe-crafter-actor">Using Crafter Actor</label>
+        <button type="button"
+                class="mcw-context-help"
+                data-context-help="crafter"
+                title="What is Using Crafter Actor?">
+          <i class="fa-solid fa-circle-question"></i>
+        </button>
+      </div>
+      <select id="mcw-recipe-crafter-actor" name="crafter">
+        <option value="">Select a character</option>
+        {{#each crafters}}
+          <option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>
+        {{/each}}
+      </select>
+    </div>
+  </div>
+
+  <div class="mcw-reference-list mcw-browser-results">
+    {{#if searchExecuted}}
+
+    {{#if hasRecipes}}
+      {{#each recipeGroups}}
+        <section class="mcw-recipe-category-group">
+          <h3 class="mcw-recipe-category-heading">{{label}}</h3>
+          <div class="mcw-recipe-category-list">
+            {{#each recipes}}
+              <article class="mcw-recipe-card">
+          <header class="mcw-recipe-header">
+            <div class="mcw-recipe-heading">
+              <div class="mcw-recipe-title-line">
+                <h3>{{name}}</h3>
+
+              </div>
+
+              <div class="mcw-recipe-meta">
+                {{#if showPremiumBadge}}
+                  <span class="mcw-source-badge">{{sourceBadgeLabel}}</span>
+                {{/if}}
+                {{#if sourceLabel}}
+                  <span>{{sourceLabel}}</span>
+                {{/if}}
+              </div>
+            </div>
+
+            {{#if tags.length}}
+              <div class="mcw-pills mcw-recipe-tags">
+                {{#each tags}}<span>{{this}}</span>{{/each}}
+              </div>
+            {{/if}}
+          </header>
+
+          {{#if description}}
+            <p class="mcw-recipe-description">{{description}}</p>
+          {{/if}}
+
+          {{#if craftMeta.tool}}
+            <div class="mcw-recipe-craft-meta">
+              <span>
+                <i class="fa-solid fa-screwdriver-wrench"></i>
+                <strong>Tool:</strong> {{craftMeta.tool}}
+              </span>
+
+              {{#if craftMeta.check}}
+                <span>
+                  <i class="fa-solid fa-dice-d20"></i>
+                  <strong>Check:</strong> {{craftMeta.check}}
+                  {{#if craftMeta.activeDc}} DC {{craftMeta.activeDc}}{{/if}}
+                  {{#if craftMeta.toolStatus.warningText}}
+                    <i class="fa-solid fa-circle-info mcw-tool-warning"
+                       title="{{craftMeta.toolStatus.warningText}}"></i>
+                  {{/if}}
+                </span>
+              {{else}}
+                {{#if craftMeta.activeDc}}
+                  <span>
+                    <i class="fa-solid fa-dice-d20"></i>
+                    <strong>DC:</strong> {{craftMeta.activeDc}}
+                    {{#if craftMeta.toolStatus.warningText}}
+                      <i class="fa-solid fa-circle-info mcw-tool-warning"
+                         title="{{craftMeta.toolStatus.warningText}}"></i>
+                    {{/if}}
+                  </span>
+                {{/if}}
+              {{/if}}
+
+              {{#if craftMeta.hoursRequired}}
+                <span class="mcw-recipe-craft-time" title="Total crafting time">
+                  <i class="fa-solid fa-clock"></i>
+                  {{craftMeta.hoursRequired}} hours
+                </span>
+              {{/if}}
+
+            </div>
+
+            {{#if craftingProgress}}
+              <div class="mcw-crafting-progress">
+                <i class="fa-solid fa-circle-check"></i>
+                <strong>
+                  {{craftingProgress.successes}} of {{craftingProgress.requiredSuccesses}} Successes
+                </strong>
+                <span>
+                  · {{craftingProgress.progressHours}} of {{craftingProgress.hoursRequired}} hours progress
+                  · {{craftingProgress.timeSpentHours}} hours spent
+                </span>
+                {{#if craftingProgress.materialPlanSummary}}
+                  <span class="mcw-crafting-material-summary"
+                        title="Materials already consumed for this job">
+                    · {{craftingProgress.materialPlanSummary}}
+                  </span>
+                {{/if}}
+              </div>
+            {{/if}}
+          {{/if}}
+
+          {{#if readiness.canProcess}}
+            <div class="mcw-processing-plan">
+              <strong><i class="fa-solid fa-gears"></i> Processing needed</strong>
+              <div class="mcw-processing-steps">
+                {{#each readiness.processingSteps}}
+                  <span>{{crafts}} × {{recipeName}} → {{totalOutput}} × {{outputLabel}}</span>
+                {{/each}}
+              </div>
+            </div>
+          {{/if}}
+
+          <div class="mcw-recipe-grid">
+            <section class="mcw-recipe-block">
+              <h4>Requires</h4>
+              <div class="mcw-requirement-list mcw-requirement-groups">
+                {{#each requirementGroupRows}}
+                  <div class="mcw-requirement-group">
+                    <div class="mcw-requirement-group-items">
+                      {{#each requirementRows}}
+                  {{#if alternativeRows.length}}
+                    <div class="mcw-requirement-alternatives">
+                      {{#each alternativeRows}}
+                        <div class="mcw-requirement-row">
+                          {{#if inventory}}
+                            {{#if inventory.ready}}
+                              <i class="fa-solid fa-circle-check mcw-requirement-ok" aria-hidden="true"></i>
+                            {{else}}
+                              <i class="fa-solid fa-circle-xmark mcw-requirement-bad" aria-hidden="true"></i>
+                            {{/if}}
+                          {{else}}
+                            <i class="fa-solid fa-circle-dot" aria-hidden="true"></i>
+                          {{/if}}
+
+                          <div class="mcw-requirement-compact" title="{{tooltip}}">
+                            {{#if materialImg}}
+                              {{#if materialId}}
+                                <button type="button"
+                                        class="mcw-material-icon-link"
+                                        data-material-id="{{materialId}}"
+                                        title="{{tooltip}}">
+                                  <img src="{{materialImg}}" alt="">
+                                </button>
+                              {{else}}
+                                <img class="mcw-requirement-icon" src="{{materialImg}}" alt="" title="{{tooltip}}">
+                              {{/if}}
+                            {{else}}
+                              <span class="mcw-requirement-icon-placeholder" title="{{tooltip}}">
+                                <i class="fa-solid fa-box"></i>
+                              </span>
+                            {{/if}}
+
+                            <strong class="mcw-requirement-quantity">×{{quantity}}</strong>
+
+                            {{#if inventory}}
+                              <strong class="mcw-requirement-count {{#if inventory.ready}}mcw-requirement-count-ok{{else}}mcw-requirement-count-bad{{/if}}">
+                                ({{inventory.available}} of {{inventory.required}})
+                              </strong>
+                            {{/if}}
+                          </div>
+                        </div>
+
+                        {{#unless @last}}
+                          <div class="mcw-requirement-or">OR</div>
+                        {{/unless}}
+                      {{/each}}
+                    </div>
+                  {{else}}
+                    <div class="mcw-requirement-row">
+                      {{#if inventory}}
+                        {{#if inventory.ready}}
+                          <i class="fa-solid fa-circle-check mcw-requirement-ok" aria-hidden="true"></i>
+                        {{else}}
+                          <i class="fa-solid fa-circle-xmark mcw-requirement-bad" aria-hidden="true"></i>
+                        {{/if}}
+                      {{else}}
+                        <i class="fa-solid fa-circle-dot" aria-hidden="true"></i>
+                      {{/if}}
+
+                      <div class="mcw-requirement-compact" title="{{tooltip}}">
+                        {{#if materialImg}}
+                          {{#if materialId}}
+                            <button type="button"
+                                    class="mcw-material-icon-link"
+                                    data-material-id="{{materialId}}"
+                                    title="{{tooltip}}">
+                              <img src="{{materialImg}}" alt="">
+                            </button>
+                          {{else}}
+                            <img class="mcw-requirement-icon" src="{{materialImg}}" alt="" title="{{tooltip}}">
+                          {{/if}}
+                        {{else}}
+                          <span class="mcw-requirement-icon-placeholder" title="{{tooltip}}">
+                            <i class="fa-solid fa-box"></i>
+                          </span>
+                        {{/if}}
+
+                        <strong class="mcw-requirement-quantity">×{{quantity}}</strong>
+
+                        {{#if inventory}}
+                          <strong class="mcw-requirement-count {{#if inventory.ready}}mcw-requirement-count-ok{{else}}mcw-requirement-count-bad{{/if}}">
+                            ({{inventory.available}} of {{inventory.required}})
+                          </strong>
+                        {{/if}}
+                      </div>
+                    </div>
+                  {{/if}}
+                                      {{/each}}
+                    </div>
+                  </div>
+
+                  {{#unless @last}}
+                    <div class="mcw-requirement-group-or">OR</div>
+                  {{/unless}}
+                {{/each}}
+              </div>
+            </section>
+
+            <section class="mcw-recipe-block">
+              <h4>Produces</h4>
+              <div class="mcw-recipe-output-card mcw-recipe-output-compact"
+                   title="{{output.quantity}} × {{output.label}} — {{outputTypeLabel}}">
+                {{#if output.img}}
+                  {{#if outputMaterialId}}
+                    <button type="button"
+                            class="mcw-material-icon-link mcw-output-icon-link"
+                            data-material-id="{{outputMaterialId}}"
+                            title="{{output.quantity}} × {{output.label}} — {{outputTypeLabel}}">
+                      <img src="{{output.img}}" alt="">
+                    </button>
+                  {{else}}
+                    {{#if outputDocumentUuid}}
+                      <button type="button"
+                              class="mcw-foundry-output-link"
+                              data-output-document-uuid="{{outputDocumentUuid}}"
+                              title="{{output.quantity}} × {{output.label}} — Open Item">
+                        <img class="mcw-recipe-output-icon"
+                             src="{{output.img}}"
+                             alt="">
+                      </button>
+                    {{else}}
+                      <img class="mcw-recipe-output-icon"
+                           src="{{output.img}}"
+                           alt=""
+                           title="{{output.quantity}} × {{output.label}} — {{outputTypeLabel}}">
+                    {{/if}}
+                  {{/if}}
+                {{else}}
+                  <div class="mcw-recipe-output-placeholder"
+                       title="{{output.quantity}} × {{output.label}} — {{outputTypeLabel}}">
+                    <i class="fa-solid fa-box"></i>
+                  </div>
+                {{/if}}
+
+                <strong class="mcw-recipe-output-quantity">×{{output.quantity}}</strong>
+                {{#if outputResolutionWarning}}
+                  <i class="fa-solid fa-triangle-exclamation mcw-output-warning"
+                     title="{{outputResolutionWarning}}"></i>
+                {{/if}}
+              </div>
+            </section>
+          </div>
+
+          {{#if craftingComplete}}
+            <div class="mcw-recipe-actions">
+              <span class="mcw-crafting-complete">
+                <i class="fa-solid fa-circle-check"></i>
+                Crafting Complete
+              </span>
+
+              {{#if readiness.ready}}
+                <button type="button"
+                        data-action="craft-again"
+                        data-recipe-id="{{id}}">
+                  <i class="fa-solid fa-hammer"></i>
+                  Craft Again
+                </button>
+              {{/if}}
+            </div>
+          {{else}}
+            {{#if canCraft}}
+              <div class="mcw-recipe-actions">
+                <button type="button"
+                        data-action="craft-check"
+                        data-recipe-id="{{id}}">
+                  <i class="fa-solid fa-dice-d20"></i>
+                  {{craftActionLabel}}
+                </button>
+
+                {{#if activeCraftingJob}}
+                  <button type="button"
+                          class="mcw-button-subtle"
+                          data-action="cancel-crafting"
+                          data-recipe-id="{{id}}"
+                          title="Cancel crafting and refund consumed materials">
+                    <i class="fa-solid fa-ban"></i>
+                    Cancel Crafting
+                  </button>
+                {{/if}}
+              </div>
+            {{/if}}
+          {{/if}}
+              </article>
+            {{/each}}
+          </div>
+        </section>
+      {{/each}}
+    {{else}}
+      <div class="mcw-panel">
+        {{#if hasEnabledRecipes}}
+          <p>No recipes match the current search or selected recipe pack.</p>
+        {{else}}
+          <p class="mcw-warning">
+            No recipe packs with recipe content are currently enabled.
+            A GM can enable recipe packs in Morelord Craftworks settings.
+          </p>
+        {{/if}}
+      </div>
+    {{/if}}
+    {{else}}
+      <div class="mcw-panel mcw-browser-empty-state">
+        <p>Choose your filters, review the result count above, then click <strong>Search</strong>.</p>
+      </div>
+    {{/if}}
+  </div>
+</section>

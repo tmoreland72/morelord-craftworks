@@ -1,0 +1,60 @@
+<section class="mcw app-shell">
+  <header class="mcw-header">
+    <div>
+      <h2>Spell Scroll Generator</h2>
+      <p>Generate a spell for a scroll using the spell compendiums currently available to this world.</p>
+    </div>
+  </header>
+
+  {{#if hasAccess}}
+    <div class="mcw-panel mcw-scroll-generator-controls">
+      <label>
+        Scroll Level
+        <select name="scroll-level">
+          {{#each levels}}
+            <option value="{{value}}" {{#if selected}}selected{{/if}}>
+              {{label}}
+            </option>
+          {{/each}}
+        </select>
+      </label>
+
+      <div class="mcw-scroll-generator-count">
+        {{spellCount}} available spell(s)
+      </div>
+
+      <button type="button" data-action="generate-scroll">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        Generate
+      </button>
+    </div>
+
+    {{#if result}}
+      <div class="mcw-panel mcw-scroll-generator-result">
+        <img src="{{result.img}}" alt="">
+        <div>
+          <strong>{{result.name}}</strong>
+          <span>
+            {{#if result.level}}
+              Level {{result.level}}
+            {{else}}
+              Cantrip
+            {{/if}}
+            · {{result.packLabel}}
+          </span>
+        </div>
+        <button type="button"
+                data-spell-uuid="{{result.uuid}}"
+                title="Open spell">
+          <i class="fa-solid fa-up-right-from-square"></i>
+        </button>
+      </div>
+    {{/if}}
+  {{else}}
+    <div class="mcw-panel">
+      <p class="mcw-warning">
+        Spell Scroll Generator is a premium Craftworks feature.
+      </p>
+    </div>
+  {{/if}}
+</section>
