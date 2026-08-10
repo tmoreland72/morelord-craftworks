@@ -24,7 +24,10 @@ export class LootApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const context = await super._prepareContext(options);
 
     const actors = game.actors
-      .filter(actor => actor.type === "character")
+      .filter(actor =>
+        actor.type === "character"
+        || actor.type === "group"
+      )
       .map(actor => ({ uuid: actor.uuid, name: actor.name, img: actor.img }));
 
     const allCreatures = this.session?.creatures ?? this.craftworks.loot.getDeadCreatureSummary();

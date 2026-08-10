@@ -1,0 +1,186 @@
+<article class="mcw-craft-card">
+  <header class="mcw-craft-card-header">
+    <div class="mcw-craft-card-title">
+      {{#if output.img}}
+        {{#if outputDocumentUuid}}
+          <button type="button"
+                  class="mcw-craft-card-image"
+                  data-output-document-uuid="{{outputDocumentUuid}}"
+                  title="Open source Item">
+            <img src="{{output.img}}" alt="{{name}}">
+          </button>
+        {{else}}
+          <img class="mcw-craft-card-image-static"
+               src="{{output.img}}"
+               alt="{{name}}">
+        {{/if}}
+      {{/if}}
+
+      <div>
+        <h3>{{name}}</h3>
+        <div class="mcw-recipe-meta">
+          <span>{{sourceLabel}}</span>
+          {{#if tags.length}}
+            {{#each tags}}<span>{{this}}</span>{{/each}}
+          {{/if}}
+        </div>
+      </div>
+    </div>
+
+    <button type="button"
+            class="mcw-button-subtle"
+            data-action="unmark"
+            data-recipe-id="{{id}}"
+            {{#if isActive}}disabled{{/if}}
+            title="Remove from Craft list">
+      <i class="fa-solid fa-bookmark"></i>
+      Remove
+    </button>
+  </header>
+
+  <div class="mcw-craft-card-meta">
+    {{#if craftMeta.tool}}
+      <span>
+        <i class="fa-solid fa-screwdriver-wrench"></i>
+        {{craftMeta.tool}}
+      </span>
+    {{/if}}
+    {{#if craftMeta.check}}
+      <span>
+        <i class="fa-solid fa-dice-d20"></i>
+        {{craftMeta.check}}
+        {{#if craftMeta.activeDc}} · DC {{craftMeta.activeDc}}{{/if}}
+      </span>
+    {{/if}}
+    {{#if craftMeta.hoursRequired}}
+      <span>
+        <i class="fa-solid fa-clock"></i>
+        {{craftMeta.hoursRequired}} hours
+      </span>
+    {{/if}}
+  </div>
+
+  {{#if progress}}
+    <div class="mcw-craft-progress-large">
+      <div>
+        <strong>{{progress.successes}} of {{progress.requiredSuccesses}} Successes</strong>
+        <span>{{progress.progressHours}} of {{progress.hoursRequired}} hours progress</span>
+      </div>
+      <span>{{progress.timeSpentHours}} hours spent</span>
+    </div>
+  {{/if}}
+
+  <div class="mcw-craft-card-body">
+    <section>
+      <h4>Requirements</h4>
+      <div class="mcw-craft-requirements">
+        {{#each requirementGroupRows}}
+          <div class="mcw-craft-requirement-group">
+            {{#each requirementRows}}
+              {{#if alternativeRows.length}}
+                <div class="mcw-craft-alternative-group">
+                  <strong>Choose one:</strong>
+                  {{#each alternativeRows}}
+                    <div class="mcw-craft-requirement-row {{#if inventory.ready}}mcw-ready{{else}}mcw-missing{{/if}}">
+                      {{#if materialImg}}
+                        <button type="button"
+                                data-material-id="{{materialId}}"
+                                class="mcw-material-icon-link">
+                          <img src="{{materialImg}}" alt="">
+                        </button>
+                      {{/if}}
+                      <span>{{display}}</span>
+                      {{#if inventory}}
+                        <strong>{{inventory.available}} / {{inventory.required}}</strong>
+                      {{/if}}
+                    </div>
+                  {{/each}}
+                </div>
+              {{else}}
+                <div class="mcw-craft-requirement-row {{#if inventory.ready}}mcw-ready{{else}}mcw-missing{{/if}}">
+                  {{#if materialImg}}
+                    <button type="button"
+                            data-material-id="{{materialId}}"
+                            class="mcw-material-icon-link">
+                      <img src="{{materialImg}}" alt="">
+                    </button>
+                  {{/if}}
+                  <span>{{display}}</span>
+                  {{#if inventory}}
+                    <strong>{{inventory.available}} / {{inventory.required}}</strong>
+                  {{/if}}
+                </div>
+              {{/if}}
+            {{/each}}
+          </div>
+          {{#unless @last}}<div class="mcw-requirement-group-or">OR</div>{{/unless}}
+        {{/each}}
+      </div>
+    </section>
+
+    <section class="mcw-craft-output-panel">
+      <h4>Produces</h4>
+      <div class="mcw-craft-output">
+        {{#if output.img}}
+          <img src="{{output.img}}" alt="{{output.label}}">
+        {{/if}}
+        <div>
+          <strong>{{output.label}}</strong>
+          <span>×{{output.quantity}}</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="mcw-craft-card-actions">
+    {{#if isCompletePending}}
+      <span class="mcw-crafting-complete">
+        <i class="fa-solid fa-trophy"></i>
+        Crafting Complete
+      </span>
+      <button type="button"
+              data-action="choose-destination"
+              data-recipe-id="{{id}}">
+        <i class="fa-solid fa-box-open"></i>
+        Choose Destination
+      </button>
+    {{else}}
+      {{#if isActive}}
+        <span class="mcw-muted">
+          Materials were consumed from {{inventoryActorName}}.
+        </span>
+        <button type="button"
+                data-action="craft"
+                data-recipe-id="{{id}}">
+          <i class="fa-solid fa-dice-d20"></i>
+          Roll Crafting Check
+        </button>
+        <button type="button"
+                class="mcw-button-subtle"
+                data-action="cancel-crafting"
+                data-recipe-id="{{id}}">
+          <i class="fa-solid fa-ban"></i>
+          Cancel
+        </button>
+      {{else}}
+        {{#if readiness.ready}}
+          <span class="mcw-craft-ready-label">
+            <i class="fa-solid fa-circle-check"></i>
+            Ready to Craft
+          </span>
+          <button type="button"
+                  data-action="craft"
+                  data-recipe-id="{{id}}">
+            <i class="fa-solid fa-hammer"></i>
+            Start Crafting
+          </button>
+        {{else}}
+          <span class="mcw-craft-missing-label">
+            <i class="fa-solid fa-circle-xmark"></i>
+            Missing Requirements
+          </span>
+        {{/if}}
+      {{/if}}
+    {{/if}}
+  </footer>
+</article>

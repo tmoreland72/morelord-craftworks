@@ -40,13 +40,40 @@
             {{else}}
               Cantrip
             {{/if}}
-            · {{result.packLabel}}
+            · {{result.sourceLabel}}
           </span>
         </div>
         <button type="button"
                 data-spell-uuid="{{result.uuid}}"
                 title="Open spell">
           <i class="fa-solid fa-up-right-from-square"></i>
+        </button>
+      </div>
+
+      <div class="mcw-panel">
+        <h3>Recipient</h3>
+        {{#if partyInfo.enabled}}
+          {{#if partyInfo.valid}}
+            <p>Spell scroll will be awarded to <strong>{{partyInfo.actorName}}</strong>.</p>
+          {{else}}
+            <p class="mcw-warning">Party Recipient is enabled but no valid Party/Group actor is configured.</p>
+          {{/if}}
+        {{else}}
+          <label>
+            Recipient
+            <select name="recipient">
+              <option value="">Choose character…</option>
+              {{#each actors}}
+                <option value="{{uuid}}">{{name}}</option>
+              {{/each}}
+            </select>
+          </label>
+        {{/if}}
+
+        <button type="button"
+                data-action="award-scroll">
+          <i class="fa-solid fa-scroll"></i>
+          Create & Award Spell Scroll
         </button>
       </div>
     {{/if}}

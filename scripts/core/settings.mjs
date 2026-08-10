@@ -25,7 +25,8 @@ const SETTINGS = Object.freeze({
   LOOT_COIN_MULTIPLIER: "lootCoinMultiplier",
 
   USE_PARTY_RECIPIENT: "usePartyRecipient",
-  PARTY_ACTOR_UUID: "partyActorUuid"
+  PARTY_ACTOR_UUID: "partyActorUuid",
+  HIDDEN_RECIPE_IDS: "hiddenRecipeIds"
 });
 
 export function registerSettings() {
@@ -50,6 +51,12 @@ export function registerSettings() {
     SETTINGS.PARTY_ACTOR_UUID,
     "Party Recipient Actor",
     ""
+  );
+
+  registerString(
+    SETTINGS.HIDDEN_RECIPE_IDS,
+    "Hidden Recipe IDs",
+    "[]"
   );
 
   registerNumber(SETTINGS.HARVEST_DC_MODIFIER, "Harvest DC Modifier", 0);
@@ -131,6 +138,48 @@ function registerString(key, name, defaultValue) {
     type: String,
     default: defaultValue
   });
+}
+
+export function getHiddenRecipeIds() {
+  try {
+    const raw = String(
+      game.settings.get(
+        MODULE_ID,
+        SETTINGS.HIDDEN_RECIPE_IDS
+      ) ?? "[]"
+    );
+
+    const parsed = JSON.parse(raw);
+    return new Set(
+      Array.isArray(parsed)
+        ? parsed.map(String)
+        : []
+    );
+  } catch {
+    return new Set();
+  }
+}
+
+export async function setHiddenRecipeIds(ids) {
+  const normalized = Array.from(
+    new Set(
+      Array.from(ids ?? [])
+        .map(String)
+        .filter(Boolean)
+    )
+  ).sort();
+
+  await game.settings.set(
+    MODULE_ID,
+    SETTINGS.HIDDEN_RECIPE_IDS,
+    JSON.stringify(normalized)
+  );
+
+  return new Set(normalized);
+}
+
+export function isRecipeHidden(recipeId) {
+  return getHiddenRecipeIds().has(String(recipeId));
 }
 
 export function getSetting(key) {

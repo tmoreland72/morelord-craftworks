@@ -148,6 +148,34 @@ export class CraftingJobService {
     };
   }
 
+  list(crafter, { activeOnly = false } = {}) {
+    if (!crafter) return [];
+
+    const persisted = crafter.flags?.[MODULE_ID]?.[FLAG_KEY] ?? {};
+    const recipeIds = new Set();
+
+    for (const [key, value] of Object.entries(persisted)) {
+      const recipeId = value?.recipeId
+        ?? String(key).split("::")[0];
+
+      if (recipeId) recipeIds.add(String(recipeId));
+    }
+
+    return Array.from(recipeIds)
+      .map(recipeId => this.get(recipeId, crafter))
+      .filter(Boolean)
+      .filter(job =>
+        !activeOnly
+        || (
+          job.materialsConsumed
+          && !job.outputAwarded
+        )
+      )
+      .sort((a, b) =>
+        Number(a.startedAt ?? 0) - Number(b.startedAt ?? 0)
+      );
+  }
+
   async start({
     recipeId,
     crafter,

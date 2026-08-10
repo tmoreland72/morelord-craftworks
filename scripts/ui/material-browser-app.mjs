@@ -1,4 +1,5 @@
 import { MODULE_ID, MODULE_TITLE } from "../constants.mjs";
+import { bindMultiselectBehavior } from "./multiselect-behavior.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -8,9 +9,12 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
     this.craftworks = craftworks;
     this.search = "";
     this.selectedPackIds = [];
+    this.selectedRarities = [];
+    this.selectedTags = [];
     this.actorUuid = null;
     this.focusMaterialId = null;
     this.searchExecuted = false;
+    this.displayedMaterialIds = [];
     this._searchTimer = null;
     this.restoreSearchFocus = false;
     this.searchSelectionStart = null;
@@ -43,7 +47,10 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
     this.selectedPackIds = material.packId
       ? [material.packId]
       : [];
+    this.selectedRarities = [];
+    this.selectedTags = [];
     this.searchExecuted = true;
+    this.displayedMaterialIds = [material.materialId];
     return true;
   }
 
@@ -89,48 +96,65 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
     this.selectedPackIds = this.selectedPackIds
       .filter(packId => validPackIds.has(packId));
 
-    const term = this.search.trim().toLowerCase();
-
-    let matchingMaterials = allMaterials;
-
-    if (this.selectedPackIds.length) {
-      const selected = new Set(this.selectedPackIds);
-      matchingMaterials = matchingMaterials.filter(material =>
-        selected.has(material.packId)
-      );
-    }
-
-    if (term) {
-      matchingMaterials = matchingMaterials.filter(material => {
-        const pack = this.craftworks.contentPacks?.get(material.packId);
-        const haystack = [
-          material.name,
-          material.category,
-          material.rarity,
-          material.stage,
-          material.packId,
-          pack?.label,
-          ...(material.tags ?? [])
-        ]
+    const rarities = Array.from(
+      new Set(
+        allMaterials
+          .map(material =>
+            String(material.rarity ?? "").toLowerCase()
+          )
           .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
+      )
+    ).sort();
 
-        return haystack.includes(term);
-      });
-    }
+    const tags = Array.from(
+      new Set(
+        allMaterials
+          .flatMap(material => material.tags ?? [])
+          .map(tag => String(tag).toLowerCase())
+          .filter(Boolean)
+      )
+    ).sort();
 
-    const totalMaterialCount = this.craftworks.materials.all().length;
+    const raritySet = new Set(rarities);
+    this.selectedRarities =
+      this.selectedRarities.filter(rarity =>
+        raritySet.has(rarity)
+      );
+
+    const tagSet = new Set(tags);
+    this.selectedTags =
+      this.selectedTags.filter(tag =>
+        tagSet.has(tag)
+      );
+
+    const matchingMaterials = this.#matchingMaterials();
+
+    const totalMaterialCount = allMaterials.length;
     const prospectiveCount = matchingMaterials.length;
     const prospectiveCountLabel = prospectiveCount > 500
       ? "500+"
       : String(prospectiveCount);
     const hasSearchCriteria = Boolean(
-      term || this.selectedPackIds.length
+      this.search.trim()
+      || this.selectedPackIds.length
+      || this.selectedRarities.length
+      || this.selectedTags.length
     );
 
-    const materials = this.searchExecuted && hasSearchCriteria
+    const autoShowResults =
+      matchingMaterials.length <= 50;
+
+    const displayedMaterials = autoShowResults
       ? matchingMaterials
+      : this.searchExecuted
+        ? this.displayedMaterialIds
+            .map(materialId =>
+              this.craftworks.materials.get(materialId)
+            )
+            .filter(Boolean)
+        : [];
+
+    const materials = displayedMaterials
           .sort((a,b) => a.name.localeCompare(b.name))
           .map(material => {
             const pack = this.craftworks.contentPacks?.get(material.packId);
@@ -165,8 +189,7 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
                 )
                 .map(recipe => recipe.name)
             };
-          })
-      : [];
+          });
 
     return foundry.utils.mergeObject(context, {
       search: this.search,
@@ -181,6 +204,40 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
         ? `${this.selectedPackIds.length} selected`
         : "All Content Packs",
       packFilterOpen: this.openFilterKey === "material-pack",
+      rarityFilterOpen:
+        this.openFilterKey === "material-rarity",
+      tagFilterOpen:
+        this.openFilterKey === "material-tag",
+      rarityFilterLabel: this.selectedRarities.length
+        ? `${this.selectedRarities.length} selected`
+        : "All Rarities",
+      tagFilterLabel: this.selectedTags.length
+        ? `${this.selectedTags.length} selected`
+        : "All Tags",
+      rarities: rarities.map(rarity => ({
+        id: rarity,
+        label: rarity
+          .split("-")
+          .map(part =>
+            part.charAt(0).toUpperCase()
+            + part.slice(1)
+          )
+          .join(" "),
+        selected:
+          this.selectedRarities.includes(rarity)
+      })),
+      tags: tags.map(tag => ({
+        id: tag,
+        label: tag
+          .split("-")
+          .map(part =>
+            part.charAt(0).toUpperCase()
+            + part.slice(1)
+          )
+          .join(" "),
+        selected:
+          this.selectedTags.includes(tag)
+      })),
       packs: enabledPacks.map(pack => ({
         id: pack.id,
         label: pack.label,
@@ -191,7 +248,9 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
       prospectiveCount,
       prospectiveCountLabel,
       hasSearchCriteria,
-      searchExecuted: this.searchExecuted,
+      searchExecuted:
+        this.searchExecuted || autoShowResults,
+      autoShowResults,
       materialCount: materials.length,
       ownedMaterialCount: materials.filter(material => material.owned).length,
       totalOwnedQuantity: materials.reduce(
@@ -205,13 +264,14 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
   async _onRender(context, options) {
     await super._onRender(context, options);
 
+    bindMultiselectBehavior(this);
+
     const searchInput = this.element.querySelector("[name='search']");
 
     if (searchInput) {
       searchInput.addEventListener("input", event => {
         this.search = event.currentTarget.value ?? "";
         this.focusMaterialId = null;
-        this.searchExecuted = false;
         this.#updateLiveQueryState();
       });
 
@@ -220,31 +280,68 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
     this.element.querySelector("[name='actor']")
       ?.addEventListener("change", event => {
         this.actorUuid = event.currentTarget.value || null;
+        this.openFilterKey = null;
         this.render();
       });
 
-    this.element.querySelectorAll("[name='material-pack-filter']")
-      .forEach(element => {
+    const bindMultiSelect = (
+      name,
+      stateKey,
+      filterKey
+    ) => {
+      this.element.querySelectorAll(
+        `[name='${name}']`
+      ).forEach(element => {
         element.addEventListener("change", event => {
-          const selected = new Set(this.selectedPackIds);
-          const value = event.currentTarget.value;
+          const selected = new Set(
+            this[stateKey]
+          );
 
-          if (event.currentTarget.checked) selected.add(value);
-          else selected.delete(value);
+          const value =
+            event.currentTarget.value;
 
-          this.selectedPackIds = [...selected];
-          this.openFilterKey = "material-pack";
+          if (event.currentTarget.checked) {
+            selected.add(value);
+          } else {
+            selected.delete(value);
+          }
+
+          this[stateKey] = [...selected];
+          this.openFilterKey = filterKey;
           this.focusMaterialId = null;
-          this.searchExecuted = false;
           this.render();
         });
       });
+    };
+
+    bindMultiSelect(
+      "material-pack-filter",
+      "selectedPackIds",
+      "material-pack"
+    );
+
+    bindMultiSelect(
+      "material-rarity-filter",
+      "selectedRarities",
+      "material-rarity"
+    );
+
+    bindMultiSelect(
+      "material-tag-filter",
+      "selectedTags",
+      "material-tag"
+    );
 
     this.element.querySelector("[data-action='search-materials']")
       ?.addEventListener("click", event => {
         event.preventDefault();
 
-        if (!this.search.trim() && !this.selectedPackIds.length) {
+        if (
+          !this.search.trim()
+          && !this.selectedPackIds.length
+          && !this.selectedRarities.length
+          && !this.selectedTags.length
+        ) {
           ui.notifications.warn(
             "Set at least one material search filter before searching."
           );
@@ -252,6 +349,9 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
         }
 
         clearTimeout(this._searchTimer);
+        this.openFilterKey = null;
+        this.displayedMaterialIds = this.#matchingMaterials()
+          .map(material => material.materialId);
         this.searchExecuted = true;
         this.render();
       });
@@ -261,15 +361,23 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
         if (event.key !== "Enter") return;
         event.preventDefault();
 
-        if (!this.search.trim() && !this.selectedPackIds.length) return;
+        if (
+          !this.search.trim()
+          && !this.selectedPackIds.length
+          && !this.selectedRarities.length
+          && !this.selectedTags.length
+        ) return;
 
         clearTimeout(this._searchTimer);
+        this.openFilterKey = null;
+        this.displayedMaterialIds = this.#matchingMaterials()
+          .map(material => material.materialId);
         this.searchExecuted = true;
         this.render();
       });
   }
 
-  #updateLiveQueryState() {
+  #matchingMaterials() {
     const term = this.search.trim().toLowerCase();
 
     let materials = this.craftworks.materials.all();
@@ -281,9 +389,37 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
       );
     }
 
+    if (this.selectedRarities.length) {
+      const selected = new Set(
+        this.selectedRarities
+      );
+
+      materials = materials.filter(material =>
+        selected.has(
+          String(material.rarity ?? "").toLowerCase()
+        )
+      );
+    }
+
+    if (this.selectedTags.length) {
+      const selected = new Set(
+        this.selectedTags
+      );
+
+      materials = materials.filter(material =>
+        (material.tags ?? []).some(tag =>
+          selected.has(
+            String(tag).toLowerCase()
+          )
+        )
+      );
+    }
+
     if (term) {
       materials = materials.filter(material => {
-        const pack = this.craftworks.contentPacks?.get(material.packId);
+        const pack = this.craftworks.contentPacks?.get(
+          material.packId
+        );
 
         return [
           material.name,
@@ -301,8 +437,18 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
       });
     }
 
+    return materials;
+  }
+
+  #updateLiveQueryState() {
+    const materials = this.#matchingMaterials();
+    const term = this.search.trim().toLowerCase();
+
     const hasCriteria = Boolean(
-      term || this.selectedPackIds.length
+      term
+      || this.selectedPackIds.length
+      || this.selectedRarities.length
+      || this.selectedTags.length
     );
 
     const countLabel = materials.length > 500
@@ -325,18 +471,10 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
 
     if (searchButton) {
       searchButton.disabled = !hasCriteria;
-    }
-
-    const results = this.element.querySelector(
-      ".mcw-browser-results"
-    );
-
-    if (results && this.searchExecuted === false) {
-      results.innerHTML = `
-        <div class="mcw-panel mcw-browser-empty-state">
-          <p>Choose your filters, review the result count above, then click <strong>Search</strong>.</p>
-        </div>
-      `;
+      searchButton.toggleAttribute(
+        "disabled",
+        !hasCriteria
+      );
     }
   }
 

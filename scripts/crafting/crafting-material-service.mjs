@@ -109,9 +109,11 @@ export class CraftingMaterialService {
     }
   }
 
-  async awardOutput(actor, recipe) {
-    if (!actor || !recipe?.output) {
-      throw new Error("Crafting completion requires an output Actor and recipe.");
+  async resolveOutput(recipe) {
+    if (!recipe?.output) {
+      throw new Error(
+        "Crafting completion requires a recipe output."
+      );
     }
 
     let source;
@@ -130,22 +132,37 @@ export class CraftingMaterialService {
       );
     }
 
-    const quantity = Math.max(
-      1,
-      Number(recipe.output.quantity ?? 1)
-    );
+    return {
+      source,
+      quantity: Math.max(
+        1,
+        Number(recipe.output.quantity ?? 1)
+      ),
+      label: source.name
+    };
+  }
+
+  async awardOutput(actor, recipe) {
+    if (!actor) {
+      throw new Error(
+        "Crafting completion requires an output Actor."
+      );
+    }
+
+    const resolved = await this.resolveOutput(recipe);
 
     const item = await this.adapter.addItemToActor(
       actor,
-      source,
-      quantity
+      resolved.source,
+      resolved.quantity
     );
 
     return {
       actor,
       item,
-      quantity,
-      label: source.name
+      source: resolved.source,
+      quantity: resolved.quantity,
+      label: resolved.label
     };
   }
 

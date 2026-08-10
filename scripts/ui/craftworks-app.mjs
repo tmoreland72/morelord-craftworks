@@ -66,6 +66,9 @@ export class CraftworksApp extends HandlebarsApplicationMixin(ApplicationV2) {
     this.element.querySelector("[data-action='recipes']")
       ?.addEventListener("click", () => this.craftworks.openRecipes());
 
+    this.element.querySelector("[data-action='craft']")
+      ?.addEventListener("click", () => this.craftworks.openCraft());
+
     this.element.querySelector("[data-action='harvest']")
       ?.addEventListener("click", () => this.#gmAction(() => this.craftworks.openHarvestPrototype()));
 

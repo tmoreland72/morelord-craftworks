@@ -32,7 +32,10 @@ export class HoardApp extends HandlebarsApplicationMixin(ApplicationV2) {
     const partyInfo = await this.craftworks.materialService.getPartyRecipientInfo();
 
     const actors = game.actors
-      .filter(actor => actor.type === "character")
+      .filter(actor =>
+        actor.type === "character"
+        || actor.type === "group"
+      )
       .map(actor => ({ uuid: actor.uuid, name: actor.name, img: actor.img }));
 
     return foundry.utils.mergeObject(context, {
@@ -63,6 +66,42 @@ export class HoardApp extends HandlebarsApplicationMixin(ApplicationV2) {
 
     this.element.querySelector("[data-action='award']")
       ?.addEventListener("click", () => this.#award());
+
+    this.element.querySelector("[data-action='send-chat']")
+      ?.addEventListener("click", () => this.#sendToChat());
+
+
+    this.element.querySelectorAll("[data-item-uuid]")
+      .forEach(element => {
+        element.addEventListener("click", async event => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          const uuid = event.currentTarget.dataset.itemUuid;
+          if (!uuid) return;
+
+          try {
+            const item = await fromUuid(uuid);
+
+            if (!item || item.documentName !== "Item") {
+              ui.notifications.warn(
+                "The source Item could not be opened."
+              );
+              return;
+            }
+
+            item.sheet?.render(true);
+          } catch (error) {
+            console.error(
+              "Morelord Craftworks | Unable to open hoard Item.",
+              error
+            );
+            ui.notifications.error(
+              "The source Item could not be opened."
+            );
+          }
+        });
+      });
   }
 
   async #roll() {
@@ -73,6 +112,146 @@ export class HoardApp extends HandlebarsApplicationMixin(ApplicationV2) {
       console.error("Morelord Craftworks | Hoard roll failed.", err);
       ui.notifications.error(err.message);
     }
+  }
+
+  async #sendToChat() {
+    if (!this.result) {
+      ui.notifications.warn(
+        "Generate a hoard before sending it to chat."
+      );
+      return;
+    }
+
+    const escape = foundry.utils.escapeHTML;
+
+    const materialRows = [];
+
+    for (const material of this.result.materials ?? []) {
+      let item = null;
+
+      try {
+        item = await this.craftworks.materials.resolveItem(
+          material.materialId
+        );
+      } catch {
+        item = null;
+      }
+
+      const itemLink = item?.uuid
+        ? `@UUID[${item.uuid}]{${material.name}}`
+        : escape(material.name);
+
+      materialRows.push(`
+        <li class="mcw-chat-result">
+          <img src="${escape(item?.img ?? material.img ?? "")}" alt="">
+          <span>
+            <strong>${itemLink}</strong>
+            ×${Number(material.quantity ?? 0)}
+          </span>
+        </li>
+      `);
+    }
+
+    const materials = materialRows.join("");
+
+    const specialItems = (this.result.special?.items ?? [])
+      .map(item => {
+        const itemName = item.itemName ?? "Special Treasure";
+        const itemLink = item.itemUuid
+          ? `@UUID[${item.itemUuid}]{${itemName}}`
+          : escape(itemName);
+
+        return `
+          <li class="mcw-chat-result">
+            <img src="${escape(item.itemImg ?? "")}" alt="">
+            <span>
+              <strong>${itemLink}</strong>
+              <small>${escape(item.sourceLabel ?? "Unknown Source")}</small>
+              <small>${escape(item.tableName ?? "")}</small>
+            </span>
+          </li>
+        `;
+      })
+      .join("");
+
+    const specialText = this.result.special?.enabled
+      ? this.result.special.triggered
+        ? specialItems
+          ? `
+            <section class="mcw-chat-section">
+              <h4>Special Treasure</h4>
+              <ul class="mcw-chat-results">${specialItems}</ul>
+            </section>
+          `
+          : `
+            <section class="mcw-chat-section">
+              <h4>Special Treasure</h4>
+              <p>No awardable special Item was resolved.</p>
+            </section>
+          `
+        : `
+          <section class="mcw-chat-section">
+            <h4>Special Treasure</h4>
+            <p>None.</p>
+          </section>
+        `
+      : "";
+
+    const content = `
+      <div class="mcw-chat-card mcw-hoard-chat-card">
+        <header>
+          <i class="fa-solid fa-vault"></i>
+          <div>
+            <h3>Treasure Hoard</h3>
+            <span>${escape(this.result.profileLabel ?? "")}</span>
+          </div>
+        </header>
+
+        ${
+          this.result.coinCopper > 0
+            ? `
+              <section class="mcw-chat-section">
+                <h4>Coin</h4>
+                <p>
+                  <i class="fa-solid fa-coins"></i>
+                  <strong>${escape(this.result.coinLabel)}</strong>
+                </p>
+              </section>
+            `
+            : ""
+        }
+
+        ${
+          materials
+            ? `
+              <section class="mcw-chat-section">
+                <h4>Crafting Materials</h4>
+                <ul class="mcw-chat-results">${materials}</ul>
+              </section>
+            `
+            : ""
+        }
+
+        ${specialText}
+      </div>
+    `;
+
+    const enrichedContent = await TextEditor.enrichHTML(
+      content,
+      {
+        async: true,
+        documents: true
+      }
+    );
+
+    await ChatMessage.create({
+      speaker: ChatMessage.getSpeaker(),
+      content: enrichedContent
+    });
+
+    ui.notifications.info(
+      "Treasure hoard sent to chat."
+    );
   }
 
   async #award() {

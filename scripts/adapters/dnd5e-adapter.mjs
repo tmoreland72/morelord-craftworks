@@ -48,12 +48,18 @@ export class Dnd5eAdapter extends SystemAdapter {
   }
 
   async rollSkill(actor, skillId, { dc, flavor } = {}) {
-    if (!actor) throw new Error("No actor available for the skill check.");
+    if (!actor) {
+      throw new Error(
+        "No actor available for the skill check."
+      );
+    }
 
     // D&D5e 5.3+ uses a three-part roll API:
     //   actor.rollSkill(processConfig, dialogConfig, messageConfig)
-    // The skill ID belongs in processConfig rather than being passed as the
-    // first positional argument.
+    //
+    // Craftworks intentionally leaves configure=true for every player-facing
+    // skill check. This is the native D&D5e configuration dialog that provides
+    // Normal / Advantage / Disadvantage and one-off situational bonuses.
     if (typeof actor.rollSkill === "function") {
       const result = await actor.rollSkill(
         {
@@ -61,7 +67,8 @@ export class Dnd5eAdapter extends SystemAdapter {
           target: dc
         },
         {
-          configure: false
+          configure: true,
+          title: flavor
         },
         {
           create: true,
@@ -70,16 +77,52 @@ export class Dnd5eAdapter extends SystemAdapter {
           }
         }
       );
-      return normalizeRollResult(result, dc);
+
+      if (!result) {
+        return {
+          cancelled: true,
+          total: null,
+          success: null,
+          roll: null
+        };
+      }
+
+      return {
+        cancelled: false,
+        ...normalizeRollResult(result, dc)
+      };
     }
 
-    const skill = actor.system?.skills?.[skillId];
-    if (!skill) throw new Error(`Skill '${skillId}' is not available on ${actor.name}.`);
+    const skill =
+      actor.system?.skills?.[skillId];
 
-    const modifier = Number(skill.total ?? skill.mod ?? 0);
-    const roll = await new Roll(`1d20 + ${modifier}`).evaluate();
+    if (!skill) {
+      throw new Error(
+        `Skill '${skillId}' is not available on ${actor.name}.`
+      );
+    }
+
+    // Compatibility fallback only. D&D5e worlds should use the native path
+    // above so situational roll configuration remains available.
+    const modifier = Number(
+      skill.total ?? skill.mod ?? 0
+    );
+
+    const roll = await new Roll(
+      `1d20 + ${modifier}`
+    ).evaluate();
+
     await roll.toMessage({ flavor });
-    return { total: roll.total, success: dc == null ? null : roll.total >= dc, roll };
+
+    return {
+      cancelled: false,
+      total: roll.total,
+      success:
+        dc == null
+          ? null
+          : roll.total >= dc,
+      roll
+    };
   }
 
   getCurrencyCopper(actor) {

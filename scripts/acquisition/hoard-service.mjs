@@ -96,6 +96,9 @@ export class HoardService {
               itemUuid: resolved.itemUuid,
               itemName: resolved.itemName,
               itemImg: resolved.itemImg,
+              sourceLabel:
+                resolved.sourceLabel
+                ?? "Unknown Source",
               tableName: resolved.tableName
             });
           } else {

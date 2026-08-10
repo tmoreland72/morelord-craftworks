@@ -38,6 +38,46 @@
       </details>
     </div>
 
+    <div class="mcw-material-field mcw-material-rarity-field">
+      <span class="mcw-material-field-label">Rarity</span>
+      <details class="mcw-multiselect mcw-material-multiselect"
+               data-filter="material-rarity"
+               {{#if rarityFilterOpen}}open{{/if}}>
+        <summary>{{rarityFilterLabel}}</summary>
+        <div class="mcw-multiselect-menu">
+          {{#each rarities}}
+            <label class="mcw-multiselect-option">
+              <input type="checkbox"
+                     name="material-rarity-filter"
+                     value="{{id}}"
+                     {{#if selected}}checked{{/if}}>
+              <span>{{label}}</span>
+            </label>
+          {{/each}}
+        </div>
+      </details>
+    </div>
+
+    <div class="mcw-material-field mcw-material-tag-field">
+      <span class="mcw-material-field-label">Tag</span>
+      <details class="mcw-multiselect mcw-material-multiselect"
+               data-filter="material-tag"
+               {{#if tagFilterOpen}}open{{/if}}>
+        <summary>{{tagFilterLabel}}</summary>
+        <div class="mcw-multiselect-menu">
+          {{#each tags}}
+            <label class="mcw-multiselect-option">
+              <input type="checkbox"
+                     name="material-tag-filter"
+                     value="{{id}}"
+                     {{#if selected}}checked{{/if}}>
+              <span>{{label}}</span>
+            </label>
+          {{/each}}
+        </div>
+      </details>
+    </div>
+
     <div class="mcw-material-field mcw-material-inventory-field">
       <label for="mcw-material-actor">Check Inventory</label>
       <select id="mcw-material-actor" name="actor">

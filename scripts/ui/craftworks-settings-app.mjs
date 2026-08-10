@@ -182,6 +182,6 @@ export class CraftworksSettingsApp extends HandlebarsApplicationMixin(Applicatio
     }
 
     ui.notifications.info("Morelord Craftworks settings saved.");
-    await this.render();
+    await this.close();
   }
 }

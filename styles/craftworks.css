@@ -1936,3 +1936,605 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* dev.90 — persistent active crafting jobs */
+.mcw .mcw-in-process-section {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border-light-2);
+}
+
+.mcw .mcw-in-process-heading {
+  margin: 0 0 9px;
+  font-size: 1.35rem;
+}
+
+.mcw .mcw-in-process-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.mcw .mcw-in-process-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.mcw .mcw-in-process-main {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.mcw .mcw-in-process-name {
+  margin-right: 8px;
+  font-size: 1.05rem;
+}
+
+.mcw .mcw-in-process-source {
+  opacity: .68;
+}
+
+.mcw .mcw-in-process-context,
+.mcw .mcw-in-process-progress {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 14px;
+  font-size: .84rem;
+}
+
+.mcw .mcw-in-process-context {
+  opacity: .78;
+}
+
+.mcw .mcw-in-process-context span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.mcw .mcw-in-process-card > button {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 170px;
+}
+
+@media (max-width: 720px) {
+  .mcw .mcw-in-process-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .mcw .mcw-in-process-card > button {
+    width: 100%;
+  }
+}
+
+
+/* dev.91 — Craftworks chat cards */
+.mcw-chat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mcw-chat-card > header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border-light-2);
+}
+
+.mcw-chat-card > header > i {
+  font-size: 1.6rem;
+}
+
+.mcw-chat-card > header h3 {
+  margin: 0;
+}
+
+.mcw-chat-card > header span {
+  opacity: .7;
+  font-size: .85rem;
+}
+
+.mcw-chat-section h4 {
+  margin: 0 0 5px;
+}
+
+.mcw-chat-results {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mcw-chat-result {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mcw-chat-result img {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border: 0;
+}
+
+.mcw-chat-result span {
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* dev.93 — clickable Treasure Hoard special Items */
+.mcw .mcw-special-item-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 0;
+  padding: 7px 8px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.mcw .mcw-special-item-link:hover,
+.mcw .mcw-special-item-link:focus-visible {
+  border-color: var(
+    --color-border-highlight,
+    var(--color-border-light-2)
+  );
+  background: rgb(255 255 255 / 5%);
+}
+
+.mcw .mcw-special-item-link > img {
+  flex: 0 0 auto;
+}
+
+.mcw .mcw-special-item-copy {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  text-align: left;
+}
+
+.mcw .mcw-special-item-copy > span {
+  opacity: .7;
+  font-size: .82rem;
+}
+
+.mcw .mcw-special-item-link > i {
+  flex: 0 0 auto;
+  opacity: .65;
+}
+
+
+/* dev.95 — Treasure Hoard opens special Items from the external icon only */
+.mcw .mcw-special-result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mcw .mcw-special-result > .mcw-special-item-copy {
+  flex: 1 1 auto;
+}
+
+.mcw .mcw-special-item-open {
+  flex: 0 0 auto;
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  min-height: 30px;
+  padding: 0;
+}
+
+
+/* dev.95 — GM recipe discovery visibility */
+.mcw .mcw-recipe-visibility-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border-light-2);
+  border-radius: 5px;
+}
+
+.mcw .mcw-recipe-visibility-toolbar > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  opacity: .78;
+}
+
+.mcw .mcw-recipe-visibility-toolbar .mcw-actions {
+  margin: 0;
+}
+
+.mcw .mcw-recipe-visibility-toolbar button {
+  width: auto;
+}
+
+.mcw .mcw-recipe-visibility-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: auto;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 3px 7px;
+  font-size: .75rem;
+}
+
+.mcw .mcw-recipe-visibility-toggle.mcw-recipe-hidden {
+  opacity: .72;
+}
+
+.mcw .mcw-recipe-card:has(.mcw-recipe-hidden) {
+  border-style: dashed;
+}
+
+@media (max-width: 720px) {
+  .mcw .mcw-recipe-visibility-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .mcw .mcw-recipe-visibility-toolbar .mcw-actions {
+    flex-wrap: wrap;
+  }
+}
+
+
+/* dev.96 — Material Rarity/Tag query fields */
+.mcw .mcw-material-toolbar
+  > .mcw-material-rarity-field,
+.mcw .mcw-material-toolbar
+  > .mcw-material-tag-field {
+  flex: 1 1 180px;
+  min-width: 160px;
+}
+
+
+/* dev.98 — Recipes are reference-only; Craft is the execution workspace */
+.mcw .mcw-recipe-mark-context {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mcw .mcw-recipe-title-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.mcw .mcw-recipe-mark-toggle {
+  width: auto;
+  min-width: 0;
+  padding: 3px 8px;
+}
+
+.mcw .mcw-recipe-mark-toggle.mcw-recipe-marked {
+  font-weight: 700;
+}
+
+.mcw-craft-window .window-content {
+  overflow: auto;
+}
+
+.mcw .mcw-craft-inventory-context {
+  display: grid;
+  grid-template-columns: minmax(260px, 420px) 1fr;
+  align-items: end;
+  gap: 16px;
+}
+
+.mcw .mcw-craft-inventory-context p {
+  margin: 0;
+}
+
+.mcw .mcw-craft-section {
+  margin-top: 14px;
+}
+
+.mcw .mcw-craft-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 1rem;
+}
+
+.mcw .mcw-craft-section-header > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mcw .mcw-craft-section-header small {
+  opacity: .7;
+}
+
+.mcw .mcw-craft-card-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.mcw .mcw-craft-card {
+  padding: 14px;
+  border: 1px solid var(--color-border-light-2);
+  border-radius: 8px;
+  background: rgb(0 0 0 / 4%);
+}
+
+.mcw .mcw-craft-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mcw .mcw-craft-card-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.mcw .mcw-craft-card-title h3 {
+  margin: 0 0 4px;
+  font-size: 1.3rem;
+}
+
+.mcw .mcw-craft-card-image,
+.mcw .mcw-craft-card-image-static {
+  width: 72px;
+  height: 72px;
+  min-width: 72px;
+  padding: 0;
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.mcw .mcw-craft-card-image img,
+.mcw img.mcw-craft-card-image-static {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+}
+
+.mcw .mcw-craft-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 12px 0;
+  padding: 8px 0;
+  border-top: 1px solid var(--color-border-light-2);
+  border-bottom: 1px solid var(--color-border-light-2);
+}
+
+.mcw .mcw-craft-card-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mcw .mcw-craft-card-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 20px;
+}
+
+.mcw .mcw-craft-card-body h4 {
+  margin-top: 0;
+}
+
+.mcw .mcw-craft-requirements {
+  display: grid;
+  gap: 8px;
+}
+
+.mcw .mcw-craft-requirement-row {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 5px 7px;
+  border-radius: 5px;
+}
+
+.mcw .mcw-craft-requirement-row.mcw-ready {
+  background: rgb(40 140 70 / 10%);
+}
+
+.mcw .mcw-craft-requirement-row.mcw-missing {
+  background: rgb(170 50 50 / 10%);
+}
+
+.mcw .mcw-craft-alternative-group {
+  display: grid;
+  gap: 4px;
+}
+
+.mcw .mcw-craft-output {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.mcw .mcw-craft-output img {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.mcw .mcw-craft-output div {
+  display: grid;
+  gap: 4px;
+}
+
+.mcw .mcw-craft-progress-large {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  background: rgb(80 120 190 / 10%);
+}
+
+.mcw .mcw-craft-progress-large > div {
+  display: grid;
+  gap: 3px;
+}
+
+.mcw .mcw-craft-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.mcw .mcw-craft-card-actions > span:first-child {
+  margin-right: auto;
+}
+
+.mcw .mcw-craft-ready-label {
+  font-weight: 700;
+}
+
+.mcw .mcw-craft-missing-label {
+  font-weight: 700;
+}
+
+.mcw .mcw-craft-session-log {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.mcw .mcw-craft-log-entry {
+  display: grid;
+  grid-template-columns: 80px 180px minmax(0, 1fr);
+  gap: 8px;
+  padding: 7px 9px;
+  border-bottom: 1px solid var(--color-border-light-2);
+}
+
+.mcw .mcw-craft-log-time {
+  opacity: .65;
+}
+
+.mcw .mcw-craft-completion-hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.mcw .mcw-craft-completion-hero > i {
+  font-size: 2.4rem;
+}
+
+.mcw .mcw-craft-completion-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.mcw .mcw-craft-completion-image {
+  width: 128px;
+  height: 128px;
+  min-width: 128px;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.mcw .mcw-craft-completion-image img {
+  width: 128px;
+  height: 128px;
+  object-fit: cover;
+}
+
+.mcw .mcw-craft-completion-summary h3 {
+  margin: 0 0 8px;
+  font-size: 1.45rem;
+}
+
+.mcw .mcw-craft-completion-description {
+  max-height: 260px;
+  overflow: auto;
+}
+
+.mcw .mcw-craft-completion-actions {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+@media (max-width: 760px) {
+  .mcw .mcw-craft-inventory-context,
+  .mcw .mcw-craft-card-body {
+    grid-template-columns: 1fr;
+  }
+
+  .mcw .mcw-craft-log-entry {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* dev.100 — Craft opens without preselecting a character */
+.mcw-craft-window .window-content {
+  overflow-y: auto !important;
+  overflow-x: hidden;
+}
+
+.mcw .mcw-craft-shell {
+  min-height: 0;
+}
+
+.mcw .mcw-craft-context-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(220px, 1fr)
+    minmax(260px, 1fr);
+  gap: 14px;
+  align-items: end;
+}
+
+.mcw .mcw-craft-inventory-note {
+  margin-top: 8px;
+}
+
+@media (max-width: 720px) {
+  .mcw .mcw-craft-context-grid {
+    grid-template-columns: 1fr;
+  }
+}

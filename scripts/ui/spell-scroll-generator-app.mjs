@@ -38,6 +38,19 @@ export class SpellScrollGeneratorApp
       ? await service.availableSpells({ level: this.level })
       : [];
 
+    const partyInfo =
+      await this.craftworks.materialService.getPartyRecipientInfo();
+
+    const actors = game.actors
+      .filter(actor =>
+        actor.type === "character"
+        || actor.type === "group"
+      )
+      .map(actor => ({
+        uuid: actor.uuid,
+        name: actor.name
+      }));
+
     return foundry.utils.mergeObject(context, {
       hasAccess: Boolean(service?.hasAccess),
       level: this.level,
@@ -47,7 +60,9 @@ export class SpellScrollGeneratorApp
         selected: level === this.level
       })),
       spellCount: spells.length,
-      result: this.result
+      result: this.result,
+      partyInfo,
+      actors
     }, { inplace: false });
   }
 
@@ -79,6 +94,57 @@ export class SpellScrollGeneratorApp
         }
 
         this.render();
+      });
+
+    this.element.querySelector("[data-action='award-scroll']")
+      ?.addEventListener("click", async event => {
+        event.preventDefault();
+
+        if (!this.result?.uuid) {
+          ui.notifications.warn(
+            "Generate a spell before awarding a scroll."
+          );
+          return;
+        }
+
+        const partyInfo =
+          await this.craftworks.materialService.getPartyRecipientInfo();
+
+        let actorUuid = null;
+
+        if (!partyInfo.enabled || !partyInfo.valid) {
+          actorUuid =
+            this.element.querySelector("[name='recipient']")
+              ?.value
+            ?? null;
+
+          if (!actorUuid) {
+            ui.notifications.warn(
+              "Choose a character to receive the spell scroll."
+            );
+            return;
+          }
+        }
+
+        try {
+          const awarded =
+            await this.craftworks.spellScrollGenerator
+              .createAndAwardScroll({
+                spellUuid: this.result.uuid,
+                level: this.level,
+                fallbackActorUuid: actorUuid
+              });
+
+          ui.notifications.info(
+            `${awarded.item.name} awarded to ${awarded.recipient.name}.`
+          );
+        } catch (error) {
+          console.error(
+            "Morelord Craftworks | Spell scroll award failed.",
+            error
+          );
+          ui.notifications.error(error.message);
+        }
       });
 
     this.element.querySelector("[data-spell-uuid]")

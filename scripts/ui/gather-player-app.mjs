@@ -73,6 +73,11 @@ export class GatherPlayerApp extends HandlebarsApplicationMixin(ApplicationV2) {
         flavor: `Gather in ${this.session.terrain.name} — DC ${this.session.terrain.dc}`
       });
 
+      if (roll?.cancelled) {
+        button.disabled = false;
+        return;
+      }
+
       await this.craftworks.socket.emit("gather.attempt", {
         sessionId: this.session.id,
         userId: game.user.id,

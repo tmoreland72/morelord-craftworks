@@ -53,11 +53,15 @@ const TABLE_WEIGHTS_BY_CR = [
 ];
 
 export class SpecialTreasureService {
-  constructor() {
+  constructor({ sourceFilter = null } = {}) {
+    this.sourceFilter = sourceFilter;
     this._tableCache = new Map();
+    this._itemNameIndex = null;
   }
 
   async rollForEncounter(maxCR) {
+    this._itemNameIndex = null;
+
     const profile = this.#profileForCR(maxCR);
     const candidates = [];
 
@@ -96,7 +100,15 @@ export class SpecialTreasureService {
       itemUuid: resolved.item.uuid,
       itemName: resolved.item.name,
       itemImg: resolved.item.img ?? "",
-      tableName: resolved.sourceTableName ?? chosen.table.name,
+      sourceLabel:
+        this.sourceFilter?.sourceLabelForPack(
+          resolved.item.pack
+        )
+        ?? resolved.item.pack
+        ?? "World",
+      tableName:
+        resolved.sourceTableName
+        ?? chosen.table.name,
       detail: null
     };
   }
@@ -137,8 +149,14 @@ export class SpecialTreasureService {
     if (world) return world;
 
     const packs = game.packs?.filter(pack =>
-      pack.documentName === "RollTable"
-      || pack.metadata?.type === "RollTable"
+      (
+        pack.documentName === "RollTable"
+        || pack.metadata?.type === "RollTable"
+      )
+      && (
+        !this.sourceFilter
+        || this.sourceFilter.isPackEnabled(pack)
+      )
     ) ?? [];
 
     for (const pack of packs) {
@@ -169,10 +187,17 @@ export class SpecialTreasureService {
     const document = await this.#resolveResultDocument(result);
 
     if (document?.documentName === "Item") {
-      return {
-        item: document,
-        sourceTableName: table.name
-      };
+      const resolvedItem =
+        this.#itemAllowed(document)
+          ? document
+          : await this.#findItemByName(document.name);
+
+      if (resolvedItem) {
+        return {
+          item: resolvedItem,
+          sourceTableName: table.name
+        };
+      }
     }
 
     if (document?.documentName === "RollTable") {
@@ -188,7 +213,17 @@ export class SpecialTreasureService {
       try {
         const resolved = await fromUuid(uuid);
         if (resolved?.documentName === "Item") {
-          return { item: resolved, sourceTableName: table.name };
+          const resolvedItem =
+            this.#itemAllowed(resolved)
+              ? resolved
+              : await this.#findItemByName(resolved.name);
+
+          if (resolvedItem) {
+            return {
+              item: resolvedItem,
+              sourceTableName: table.name
+            };
+          }
         }
         if (resolved?.documentName === "RollTable") {
           return this.#drawUntilItem(resolved, depth + 1);
@@ -198,10 +233,24 @@ export class SpecialTreasureService {
       }
     }
 
+    const plainText = this.#plainResultText(result);
+
+    if (plainText) {
+      const item = await this.#findItemByName(plainText);
+
+      if (item) {
+        return {
+          item,
+          sourceTableName: table.name
+        };
+      }
+    }
+
     return {
       item: null,
-      detail: this.#plainResultText(result)
-        || `${table.name} produced a result that is not an Item or nested RollTable.`
+      detail: plainText
+        ? `${table.name} produced '${plainText}', but no enabled Item compendium contains a matching Item.`
+        : `${table.name} produced a result that is not an Item or nested RollTable.`
     };
   }
 
@@ -243,6 +292,143 @@ export class SpecialTreasureService {
     }
 
     return null;
+  }
+
+  #itemAllowed(item) {
+    const packId = item?.pack;
+    if (!packId || !this.sourceFilter) return true;
+
+    return this.sourceFilter.isPackEnabled(packId);
+  }
+
+  async #findItemByName(name) {
+    if (!this._itemNameIndex) {
+      this._itemNameIndex = await this.#buildItemNameIndex();
+    }
+
+    for (const candidate of this.#candidateItemNames(name)) {
+      const target = this.#normalizeItemName(candidate);
+      if (!target) continue;
+
+      const match = this._itemNameIndex.get(target);
+      if (!match) continue;
+
+      try {
+        const item = await fromUuid(match.uuid);
+        if (item?.documentName === "Item") {
+          return item;
+        }
+      } catch {
+        // Continue through controlled aliases.
+      }
+    }
+
+    return null;
+  }
+
+  async #buildItemNameIndex() {
+    const indexByName = new Map();
+
+    const eligiblePacks = Array.from(game.packs ?? [])
+      .filter(pack =>
+        pack.documentName === "Item"
+        && (
+          !this.sourceFilter
+          || this.sourceFilter.isPackEnabled(pack)
+        )
+      );
+
+    const packs = this.sourceFilter
+      ? this.sourceFilter.sortPacks(eligiblePacks)
+      : eligiblePacks;
+
+    for (const pack of packs) {
+      try {
+        const index = await pack.getIndex({
+          fields: ["name", "img", "type"]
+        });
+
+        for (const row of index) {
+          const key = this.#normalizeItemName(row.name);
+          if (!key || indexByName.has(key)) continue;
+
+          indexByName.set(key, {
+            uuid:
+              `Compendium.${pack.collection}.Item.${row._id}`,
+            name: row.name,
+            img: row.img ?? "",
+            type: row.type ?? null,
+            packId: pack.collection
+          });
+        }
+      } catch (error) {
+        console.warn(
+          `Morelord Craftworks | Unable to index Item pack ${pack.collection} for special treasure.`,
+          error
+        );
+      }
+    }
+
+    return indexByName;
+  }
+
+  #candidateItemNames(value) {
+    const name = String(value ?? "").trim();
+    const candidates = [name];
+
+    const healing = name.match(
+      /^Potion of (Greater|Superior|Supreme) Healing$/i
+    );
+    if (healing) {
+      candidates.push(`Potion of Healing (${healing[1]})`);
+    }
+
+    const healingParenthetical = name.match(
+      /^Potion of Healing \((Greater|Superior|Supreme)\)$/i
+    );
+    if (healingParenthetical) {
+      candidates.push(
+        `Potion of ${healingParenthetical[1]} Healing`
+      );
+    }
+
+    const giant = name.match(
+      /^Potion of (Hill|Stone|Frost|Fire|Cloud|Storm) Giant Strength$/i
+    );
+    if (giant) {
+      const tier = giant[1];
+      candidates.push(`Potion of Giant Strength (${tier})`);
+      candidates.push(`Potion of Giant Strength, ${tier}`);
+    }
+
+    const giantParenthetical = name.match(
+      /^Potion of Giant Strength \((Hill|Stone|Frost|Fire|Cloud|Storm)\)$/i
+    );
+    if (giantParenthetical) {
+      candidates.push(
+        `Potion of ${giantParenthetical[1]} Giant Strength`
+      );
+    }
+
+    const giantComma = name.match(
+      /^Potion of Giant Strength,\s*(Hill|Stone|Frost|Fire|Cloud|Storm)$/i
+    );
+    if (giantComma) {
+      candidates.push(
+        `Potion of ${giantComma[1]} Giant Strength`
+      );
+    }
+
+    return [...new Set(candidates)];
+  }
+
+  #normalizeItemName(value) {
+    return String(value ?? "")
+      .normalize("NFKD")
+      .toLowerCase()
+      .replace(/^(\d+\s*[x×]\s*)/i, "")
+      .replace(/\s*\([^)]*\)\s*$/g, "")
+      .replace(/[^a-z0-9]/g, "");
   }
 
   #plainResultText(result) {

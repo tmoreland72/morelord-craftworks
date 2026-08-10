@@ -1,0 +1,11 @@
+{
+  "moduleId": "morelord-craftworks",
+  "moduleTitle": "Morelord Craftworks",
+  "repositoryOwner": "tmoreland72",
+  "repositoryName": "morelord-craftworks",
+  "branch": "main",
+  "assetName": "morelord-craftworks.zip",
+  "manifestPath": "module.json",
+  "packageJsonPath": "package.json",
+  "websiteReleaseUrl": "https://morelordgaming.com/releases"
+}

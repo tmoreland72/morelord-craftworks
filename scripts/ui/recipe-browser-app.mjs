@@ -1,4 +1,9 @@
 import { MODULE_TITLE } from "../constants.mjs";
+import {
+  getHiddenRecipeIds,
+  setHiddenRecipeIds
+} from "../core/settings.mjs";
+import { bindMultiselectBehavior } from "./multiselect-behavior.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -14,6 +19,7 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
     this.searchRenderTimer = null;
     this.restoreSearchFocus = false;
     this.searchExecuted = false;
+    this.displayedRecipeIds = [];
     this.searchSelectionStart = null;
     this.searchSelectionEnd = null;
     this.selectedIngredientRarities = [];
@@ -50,31 +56,18 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
 
-    const actors = this.#availableActors();
+    const actor = null;
+    const crafter =
+      this.craftworks.crafterContext.resolve();
 
-    if (!this.actorUuid) {
-      this.actorUuid = this.#defaultActorUuid(actors);
-    }
+    this.actorUuid = null;
+    this.crafterUuid = crafter?.uuid ?? null;
+    this.onlyCraftable = false;
 
-    const actor = this.actorUuid ? await fromUuid(this.actorUuid) : null;
-    const characterActors = actors.filter(entry => entry.type === "character");
+    const markedRecipeIds = new Set(
+      this.craftworks.markedRecipes.list(crafter)
+    );
 
-    const validCrafterUuids = new Set(characterActors.map(entry => entry.uuid));
-
-    if (!this.crafterUuid || !validCrafterUuids.has(this.crafterUuid)) {
-      if (
-        actor?.type === "character"
-        && validCrafterUuids.has(actor.uuid)
-      ) {
-        this.crafterUuid = actor.uuid;
-      } else {
-        this.crafterUuid = this.#defaultCrafterUuid(characterActors);
-      }
-    }
-
-    const crafter = this.crafterUuid
-      ? await fromUuid(this.crafterUuid)
-      : null;
     const effectiveRecipePacks = this.craftworks.recipes
       .packs({ includeDisabled: false })
       .filter(pack => Number(pack.recipeCount ?? 0) > 0);
@@ -86,66 +79,8 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
     this.selectedPackIds = this.selectedPackIds
       .filter(packId => validPackIds.has(packId));
 
-    let matchingRecipes = this.craftworks.recipes.search(this.search);
-
-    if (this.selectedPackIds.length) {
-      const selected = new Set(this.selectedPackIds);
-      matchingRecipes = matchingRecipes.filter(recipe =>
-        selected.has(recipe.packId)
-      );
-    }
-
-    if (this.selectedCategories.length) {
-      const selected = new Set(this.selectedCategories);
-      matchingRecipes = matchingRecipes.filter(recipe =>
-        selected.has(recipe.category)
-      );
-    }
-
-    const ingredientMaterialsForRecipe = recipe => {
-      const materialIds = new Set();
-
-      for (const group of recipe.requirementGroups ?? []) {
-        for (const requirement of group.requirements ?? []) {
-          if (requirement.match?.materialId) {
-            materialIds.add(requirement.match.materialId);
-          }
-
-          for (const alternative of requirement.alternatives ?? []) {
-            if (alternative.match?.materialId) {
-              materialIds.add(alternative.match.materialId);
-            }
-          }
-        }
-      }
-
-      return Array.from(materialIds)
-        .map(materialId => this.craftworks.materials.get(materialId))
-        .filter(Boolean);
-    };
-
-    const ingredientRarities = Array.from(
-      new Set(
-        this.craftworks.recipes.all()
-          .flatMap(recipe =>
-            ingredientMaterialsForRecipe(recipe)
-              .map(material => String(material.rarity ?? "").toLowerCase())
-          )
-          .filter(Boolean)
-      )
-    ).sort();
-
-    const ingredientTags = Array.from(
-      new Set(
-        this.craftworks.recipes.all()
-          .flatMap(recipe =>
-            ingredientMaterialsForRecipe(recipe)
-              .flatMap(material => material.tags ?? [])
-              .map(tag => String(tag).toLowerCase())
-          )
-          .filter(Boolean)
-      )
-    ).sort();
+    const ingredientRarities = this.#ingredientRarities();
+    const ingredientTags = this.#ingredientTags();
 
     const raritySet = new Set(ingredientRarities);
     this.selectedIngredientRarities =
@@ -159,39 +94,17 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
         tagSet.has(tag)
       );
 
-    if (this.selectedIngredientRarities.length) {
-      const selected = new Set(this.selectedIngredientRarities);
+    const matchingRecipes = this.#matchingRecipes(actor);
 
-      matchingRecipes = matchingRecipes.filter(recipe =>
-        ingredientMaterialsForRecipe(recipe).some(material =>
-          selected.has(
-            String(material.rarity ?? "").toLowerCase()
+    const hiddenRecipeIds = getHiddenRecipeIds();
+
+    const totalRecipeCount = game.user.isGM
+      ? this.craftworks.recipes.all().length
+      : this.craftworks.recipes.all()
+          .filter(recipe =>
+            !hiddenRecipeIds.has(recipe.id)
           )
-        )
-      );
-    }
-
-    if (this.selectedIngredientTags.length) {
-      const selected = new Set(this.selectedIngredientTags);
-
-      matchingRecipes = matchingRecipes.filter(recipe =>
-        ingredientMaterialsForRecipe(recipe).some(material =>
-          (material.tags ?? []).some(tag =>
-            selected.has(String(tag).toLowerCase())
-          )
-        )
-      );
-    }
-
-    if (this.onlyCraftable) {
-      matchingRecipes = actor
-        ? matchingRecipes.filter(recipe =>
-            this.craftworks.recipePlanner.plan(recipe, actor).ready
-          )
-        : [];
-    }
-
-    const totalRecipeCount = this.craftworks.recipes.all().length;
+          .length;
     const prospectiveCount = matchingRecipes.length;
     const prospectiveCountLabel = prospectiveCount > 500
       ? "500+"
@@ -202,12 +115,23 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
       || this.selectedCategories.length
       || this.selectedIngredientRarities.length
       || this.selectedIngredientTags.length
-      || this.onlyCraftable
     );
 
-    const recipes = this.searchExecuted && hasSearchCriteria
+    const autoShowResults =
+      matchingRecipes.length <= 50;
+
+    const recipes = autoShowResults
       ? matchingRecipes
-      : [];
+      : this.searchExecuted
+        ? this.displayedRecipeIds
+            .map(recipeId =>
+              this.craftworks.recipes.get(
+                recipeId,
+                { includeDisabled: true }
+              )
+            )
+            .filter(Boolean)
+        : [];
 
     const preparedRecipes = await Promise.all(recipes.map(async recipe => {
       const readiness = this.craftworks.recipePlanner.plan(recipe, actor);
@@ -217,21 +141,13 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
         craft.skill ? `(${craft.skill})` : null
       ].filter(Boolean);
 
-      const toolStatus = this.craftworks.toolInspector?.inspect(
-        crafter,
-        craft.tool
-      ) ?? {
-        hasTool: crafter ? false : null,
-        proficient: crafter ? false : null
+      const toolStatus = {
+        hasTool: null,
+        proficient: null,
+        qualifiesForNormalDc: null
       };
 
-      const activeDc = crafter
-        ? (
-            toolStatus.qualifiesForNormalDc
-              ? craft.dc
-              : craft.noToolDc
-          )
-        : craft.dc;
+      const activeDc = craft.dc;
 
       let resolvedOutput = recipe.output;
       let outputDocument = null;
@@ -270,43 +186,6 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
 
       const sourcePack = this.craftworks.contentPacks?.get(recipe.packId);
 
-      // Crafting progress belongs to the Crafter Actor + Recipe.
-      // The inventory UUID is supplied only as current material-source context
-      // and for migration of dev.71-dev.74 jobs.
-      const craftingProgress = crafter && actor
-        ? this.craftworks.craftingJobs?.getProgress(
-            recipe.id,
-            crafter,
-            actor.uuid
-          ) ?? null
-        : null;
-
-      const activeCraftingJob = Boolean(
-        craftingProgress
-        && craftingProgress.materialsConsumed
-        && !craftingProgress.outputAwarded
-      );
-
-      const craftingComplete = Boolean(
-        craftingProgress?.outputAwarded
-      );
-
-      const canCraft = Boolean(
-        actor
-        && crafter
-        && craft.dc != null
-        && (
-          activeCraftingJob
-          || readiness.ready
-        )
-      );
-
-      const craftActionLabel = activeCraftingJob
-        ? "Roll Crafting Check"
-        : craftingComplete
-          ? "Craft Again"
-          : "Craft";
-
       return {
         ...recipe,
         output: resolvedOutput,
@@ -315,6 +194,21 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
         showPremiumBadge: Boolean(sourcePack?.premium),
         sourceBadgeLabel: sourcePack?.premium ? "Premium" : null,
         sourceLabel: sourcePack?.label ?? recipe.packLabel ?? recipe.packId,
+        canMark: Boolean(crafter),
+        isMarked: markedRecipeIds.has(recipe.id),
+        markActionLabel:
+          markedRecipeIds.has(recipe.id)
+            ? "Marked"
+            : "Mark for Crafting",
+        isHidden: hiddenRecipeIds.has(recipe.id),
+        visibilityAction:
+          hiddenRecipeIds.has(recipe.id)
+            ? "show"
+            : "hide",
+        visibilityLabel:
+          hiddenRecipeIds.has(recipe.id)
+            ? "Show"
+            : "Hide",
         outputTypeLabel: recipe.output?.type === "foundry-item"
           ? "Foundry Item"
           : recipe.output?.type === "catalog-item"
@@ -339,11 +233,6 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
               : null
           }
         },
-        craftingProgress,
-        canCraft,
-        activeCraftingJob,
-        craftingComplete,
-        craftActionLabel,
         readiness: {
           ...readiness,
           canProcess: readiness.status === "processing"
@@ -412,15 +301,8 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
 
     return foundry.utils.mergeObject(context, {
       search: this.search,
-      actorUuid: this.actorUuid,
-      actorName: actor?.name ?? null,
-      actorType: actor?.type ?? null,
-      crafterUuid: this.crafterUuid,
       crafterName: crafter?.name ?? null,
-      crafters: characterActors.map(entry => ({
-        ...entry,
-        selected: entry.uuid === this.crafterUuid
-      })),
+      canMarkRecipes: Boolean(crafter),
       selectedPackIds: this.selectedPackIds,
       selectedCategories: this.selectedCategories,
       selectedIngredientRarities: this.selectedIngredientRarities,
@@ -487,26 +369,27 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
       prospectiveCount,
       prospectiveCountLabel,
       hasSearchCriteria,
-      searchExecuted: this.searchExecuted,
-      actors: actors.map(entry => ({
-        ...entry,
-        selected: entry.uuid === this.actorUuid
-      })),
+      searchExecuted:
+        this.searchExecuted || autoShowResults,
+      autoShowResults,
       recipeGroups,
-      hasRecipes: preparedRecipes.length > 0
+      hasRecipes: preparedRecipes.length > 0,
+      canManageRecipeVisibility: game.user.isGM,
+      hiddenRecipeCount: hiddenRecipeIds.size
     }, { inplace: false });
   }
 
   async _onRender(context, options) {
     await super._onRender(context, options);
 
+    bindMultiselectBehavior(this);
+
     const searchInput = this.element.querySelector("[name='search']");
 
     if (searchInput) {
       searchInput.addEventListener("input", event => {
         this.search = event.currentTarget.value ?? "";
-        this.searchExecuted = false;
-        this.#updateLiveQueryState(actor);
+        this.#updateLiveQueryState();
       });
 
     }
@@ -514,10 +397,7 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
     this.element.querySelector("[name='actor']")
       ?.addEventListener("change", event => {
         this.actorUuid = event.currentTarget.value || null;
-
-        if (this.onlyCraftable) {
-          this.searchExecuted = false;
-        }
+        this.openFilterKey = null;
 
         this.render();
       });
@@ -525,6 +405,7 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
     this.element.querySelector("[name='crafter']")
       ?.addEventListener("change", event => {
         this.crafterUuid = event.currentTarget.value || null;
+        this.openFilterKey = null;
         this.render();
       });
 
@@ -540,7 +421,6 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
 
             this[stateKey] = [...selected];
             this.openFilterKey = filterKey;
-            this.searchExecuted = false;
             this.render();
           });
         });
@@ -572,8 +452,19 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
 
     this.element.querySelector("[name='only-craftable']")
       ?.addEventListener("change", event => {
-        this.onlyCraftable = Boolean(event.currentTarget.checked);
-        this.searchExecuted = false;
+        const requested = Boolean(event.currentTarget.checked);
+
+        if (requested && !this.actorUuid) {
+          event.currentTarget.checked = false;
+          this.onlyCraftable = false;
+          ui.notifications.warn(
+            "Select Using Actor Inventory before filtering for craftable recipes."
+          );
+          return;
+        }
+
+        this.onlyCraftable = requested;
+        this.openFilterKey = null;
         this.render();
       });
 
@@ -633,6 +524,10 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
         }
 
         this.restoreSearchFocus = false;
+        this.openFilterKey = null;
+        this.displayedRecipeIds = this.#matchingRecipes(
+          this.#currentInventoryActor()
+        ).map(recipe => recipe.id);
         this.searchExecuted = true;
         this.render();
       });
@@ -657,8 +552,110 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
         }
 
         this.restoreSearchFocus = false;
+        this.openFilterKey = null;
+        this.displayedRecipeIds = this.#matchingRecipes(
+          this.#currentInventoryActor()
+        ).map(recipe => recipe.id);
         this.searchExecuted = true;
         this.render();
+      });
+
+    this.element.querySelector("[data-action='hide-all-recipes']")
+      ?.addEventListener("click", async event => {
+        event.preventDefault();
+
+        if (!game.user.isGM) return;
+
+        this.openFilterKey = null;
+
+        await setHiddenRecipeIds(
+          this.craftworks.recipes.all()
+            .map(recipe => recipe.id)
+        );
+
+        ui.notifications.info(
+          "All recipes are hidden from players."
+        );
+
+        await this.render();
+      });
+
+    this.element.querySelector("[data-action='unhide-all-recipes']")
+      ?.addEventListener("click", async event => {
+        event.preventDefault();
+
+        if (!game.user.isGM) return;
+
+        this.openFilterKey = null;
+        await setHiddenRecipeIds([]);
+
+        ui.notifications.info(
+          "All recipes are visible to players."
+        );
+
+        await this.render();
+      });
+
+    this.element.querySelectorAll("[data-recipe-visibility]")
+      .forEach(element => {
+        element.addEventListener("click", async event => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          if (!game.user.isGM) return;
+
+          const recipeId =
+            event.currentTarget.dataset.recipeId;
+
+          if (!recipeId) return;
+
+          const hidden = getHiddenRecipeIds();
+
+          if (hidden.has(recipeId)) {
+            hidden.delete(recipeId);
+          } else {
+            hidden.add(recipeId);
+          }
+
+          this.openFilterKey = null;
+          await setHiddenRecipeIds(hidden);
+          await this.render();
+        });
+      });
+
+    this.element.querySelectorAll("[data-action='toggle-mark-recipe']")
+      .forEach(element => {
+        element.addEventListener("click", async event => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          const crafter =
+            this.craftworks.crafterContext.resolve();
+
+          if (!crafter) {
+            ui.notifications.warn(
+              "Select a character token, assign a User Character, or ensure you own only one character before marking recipes."
+            );
+            return;
+          }
+
+          const recipeId =
+            event.currentTarget.dataset.recipeId;
+
+          const marked =
+            await this.craftworks.markedRecipes.toggle(
+              crafter,
+              recipeId
+            );
+
+          ui.notifications.info(
+            marked
+              ? `Recipe marked for crafting by ${crafter.name}.`
+              : `Recipe removed from ${crafter.name}'s Craft list.`
+          );
+
+          await this.render();
+        });
       });
 
     this.element.querySelectorAll("[data-material-id]")
@@ -689,6 +686,26 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
       });
 
 
+    this.element.querySelectorAll("[data-action='craft-in-process']")
+      .forEach(element => {
+        element.addEventListener("click", async event => {
+          event.preventDefault();
+          event.stopPropagation();
+
+          this.crafterUuid =
+            event.currentTarget.dataset.crafterUuid
+            || this.crafterUuid;
+
+          this.actorUuid =
+            event.currentTarget.dataset.inventoryActorUuid
+            || this.actorUuid;
+
+          await this.#rollCraftingCheck(
+            event.currentTarget.dataset.recipeId
+          );
+        });
+      });
+
     this.element.querySelectorAll("[data-action='craft-check']")
       .forEach(element => {
         element.addEventListener("click", async event => {
@@ -717,8 +734,76 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
       });
   }
 
-  #updateLiveQueryState(actor) {
+  #currentInventoryActor() {
+    if (!this.actorUuid) return null;
+
+    return game.actors.find(
+      actor => actor.uuid === this.actorUuid
+    ) ?? null;
+  }
+
+  #ingredientMaterialsForRecipe(recipe) {
+    const materialIds = new Set();
+
+    for (const group of recipe.requirementGroups ?? []) {
+      for (const requirement of group.requirements ?? []) {
+        if (requirement.match?.materialId) {
+          materialIds.add(requirement.match.materialId);
+        }
+
+        for (const alternative of requirement.alternatives ?? []) {
+          if (alternative.match?.materialId) {
+            materialIds.add(alternative.match.materialId);
+          }
+        }
+      }
+    }
+
+    return Array.from(materialIds)
+      .map(materialId =>
+        this.craftworks.materials.get(materialId)
+      )
+      .filter(Boolean);
+  }
+
+  #ingredientRarities() {
+    return Array.from(
+      new Set(
+        this.craftworks.recipes.all()
+          .flatMap(recipe =>
+            this.#ingredientMaterialsForRecipe(recipe)
+              .map(material =>
+                String(material.rarity ?? "").toLowerCase()
+              )
+          )
+          .filter(Boolean)
+      )
+    ).sort();
+  }
+
+  #ingredientTags() {
+    return Array.from(
+      new Set(
+        this.craftworks.recipes.all()
+          .flatMap(recipe =>
+            this.#ingredientMaterialsForRecipe(recipe)
+              .flatMap(material => material.tags ?? [])
+              .map(tag => String(tag).toLowerCase())
+          )
+          .filter(Boolean)
+      )
+    ).sort();
+  }
+
+  #matchingRecipes(actor = this.#currentInventoryActor()) {
     let recipes = this.craftworks.recipes.search(this.search);
+
+    if (!game.user.isGM) {
+      const hidden = getHiddenRecipeIds();
+      recipes = recipes.filter(recipe =>
+        !hidden.has(recipe.id)
+      );
+    }
 
     if (this.selectedPackIds.length) {
       const selected = new Set(this.selectedPackIds);
@@ -734,59 +819,52 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
       );
     }
 
-    const ingredientMaterials = recipe => {
-      const materialIds = new Set();
-
-      for (const group of recipe.requirementGroups ?? []) {
-        for (const requirement of group.requirements ?? []) {
-          if (requirement.match?.materialId) {
-            materialIds.add(requirement.match.materialId);
-          }
-
-          for (const alternative of requirement.alternatives ?? []) {
-            if (alternative.match?.materialId) {
-              materialIds.add(alternative.match.materialId);
-            }
-          }
-        }
-      }
-
-      return Array.from(materialIds)
-        .map(materialId => this.craftworks.materials.get(materialId))
-        .filter(Boolean);
-    };
-
     if (this.selectedIngredientRarities.length) {
-      const selected = new Set(this.selectedIngredientRarities);
+      const selected = new Set(
+        this.selectedIngredientRarities
+      );
 
       recipes = recipes.filter(recipe =>
-        ingredientMaterials(recipe).some(material =>
-          selected.has(
-            String(material.rarity ?? "").toLowerCase()
+        this.#ingredientMaterialsForRecipe(recipe)
+          .some(material =>
+            selected.has(
+              String(material.rarity ?? "").toLowerCase()
+            )
           )
-        )
       );
     }
 
     if (this.selectedIngredientTags.length) {
-      const selected = new Set(this.selectedIngredientTags);
+      const selected = new Set(
+        this.selectedIngredientTags
+      );
 
       recipes = recipes.filter(recipe =>
-        ingredientMaterials(recipe).some(material =>
-          (material.tags ?? []).some(tag =>
-            selected.has(String(tag).toLowerCase())
+        this.#ingredientMaterialsForRecipe(recipe)
+          .some(material =>
+            (material.tags ?? []).some(tag =>
+              selected.has(String(tag).toLowerCase())
+            )
           )
-        )
       );
     }
 
     if (this.onlyCraftable) {
       recipes = actor
         ? recipes.filter(recipe =>
-            this.craftworks.recipePlanner.plan(recipe, actor).ready
+            this.craftworks.recipePlanner.plan(
+              recipe,
+              actor
+            ).ready
           )
         : [];
     }
+
+    return recipes;
+  }
+
+  #updateLiveQueryState() {
+    const recipes = this.#matchingRecipes();
 
     const hasCriteria = Boolean(
       this.search.trim()
@@ -817,23 +895,18 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
 
     if (searchButton) {
       searchButton.disabled = !hasCriteria;
-    }
-
-    const results = this.element.querySelector(
-      ".mcw-browser-results"
-    );
-
-    if (results && this.searchExecuted === false) {
-      results.innerHTML = `
-        <div class="mcw-panel mcw-browser-empty-state">
-          <p>Choose your filters, review the result count above, then click <strong>Search</strong>.</p>
-        </div>
-      `;
+      searchButton.toggleAttribute(
+        "disabled",
+        !hasCriteria
+      );
     }
   }
 
   async #rollCraftingCheck(recipeId) {
-    const recipe = this.craftworks.recipes.get(recipeId);
+    const recipe = this.craftworks.recipes.get(
+      recipeId,
+      { includeDisabled: true }
+    );
     if (!recipe) {
       ui.notifications.warn("Craftworks could not find that recipe.");
       return;
@@ -959,6 +1032,14 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
       dc,
       toolStatus
     });
+
+    if (result?.cancelled) {
+      ui.notifications.info(
+        `${recipe.name}: crafting roll cancelled. No crafting attempt was spent.`
+      );
+      await this.render();
+      return;
+    }
 
     let progress = await this.craftworks.craftingJobs.recordAttempt(
       recipe.id,

@@ -42,9 +42,9 @@
         </button>
 
         <button type="button" class="mcw-dashboard-card" data-action="loot" {{#unless scene}}disabled{{/unless}}>
-          <i class="fa-solid fa-box-open"></i>
+          <i class="fa-solid fa-sack-dollar"></i>
           <span class="mcw-dashboard-card-copy">
-            <strong>Encounter Loot</strong>
+            <strong>Loot</strong>
             <small>Materials, coin, and rare special treasure</small>
           </span>
           <i class="fa-solid fa-chevron-right"></i>
@@ -88,6 +88,15 @@
         </span>
         <i class="fa-solid fa-chevron-right"></i>
       </button>
+
+      <button type="button" class="mcw-dashboard-card" data-action="craft">
+        <i class="fa-solid fa-hammer"></i>
+        <span class="mcw-dashboard-card-copy">
+          <strong>Craft</strong>
+          <small>Work on recipes you have marked for crafting</small>
+        </span>
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
     </div>
   </section>
 
@@ -120,19 +129,7 @@
       </div>
     </section>
 
-    <section class="mcw-dashboard-storage-status" aria-label="Acquisition recipient">
-      {{#if partyInfo.enabled}}
-        <i class="fa-solid fa-users"></i>
-        {{#if partyInfo.valid}}
-          <span>Acquired materials and loot will be placed in the <strong>{{partyInfo.actorName}}</strong> group actor inventory.</span>
-        {{else}}
-          <span class="mcw-warning">Acquired materials and loot are configured for a group actor, but no valid Party/Group actor is available.</span>
-        {{/if}}
-      {{else}}
-        <i class="fa-solid fa-user"></i>
-        <span>Acquired materials will be placed in the individual actor's inventory.</span>
-      {{/if}}
-    </section>
+
   {{else}}
     <section class="mcw-dashboard-section">
       <div class="mcw-panel">

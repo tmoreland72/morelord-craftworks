@@ -27,14 +27,18 @@ import { RecipeEvaluator } from "./recipes/recipe-evaluator.mjs";
 import { RecipePlanner } from "./recipes/recipe-planner.mjs";
 import { ToolInspector } from "./recipes/tool-inspector.mjs";
 import { MorelordCoreAccessService } from "./core/morelord-core-access-service.mjs";
+import { Dnd5eSourceFilterService } from "./core/dnd5e-source-filter-service.mjs";
 import { ContentPackService } from "./core/content-pack-service.mjs";
 import { CraftingJobService } from "./crafting/crafting-job-service.mjs";
 import { CraftingMaterialService } from "./crafting/crafting-material-service.mjs";
+import { CrafterContextService } from "./crafting/crafter-context-service.mjs";
+import { MarkedRecipeService } from "./crafting/marked-recipe-service.mjs";
 import { CraftingRollService } from "./crafting/crafting-roll-service.mjs";
 import { CraftworksSettingsApp } from "./ui/craftworks-settings-app.mjs";
 import { MaterialBrowserApp } from "./ui/material-browser-app.mjs";
 import { RecipeBrowserApp } from "./ui/recipe-browser-app.mjs";
 import { CraftworksApp } from "./ui/craftworks-app.mjs";
+import { CraftApp } from "./ui/craft-app.mjs";
 import {
   getCraftworksMaterialId,
   isCraftworksItem,
@@ -79,6 +83,7 @@ Hooks.on("getSceneControlButtons", controls => {
 Hooks.once("ready", async () => {
   exposePartyActorSetting();
   const adapter = createSystemAdapter();
+  const sourceFilter = new Dnd5eSourceFilterService();
   const coreAccess = new MorelordCoreAccessService();
   await coreAccess.refresh();
   const contentPacks = new ContentPackService({ coreAccess });
@@ -113,7 +118,11 @@ Hooks.once("ready", async () => {
   await dnd5eItemResolver.refresh();
 
   const spellScrollGenerator = new SpellScrollGeneratorService({
-    coreAccess
+    coreAccess,
+    sourceFilter,
+    adapter,
+    recipientResolver,
+    dnd5eItemResolver
   });
 
   const recipes = new RecipeRegistry({
@@ -131,6 +140,8 @@ Hooks.once("ready", async () => {
   const toolInspector = new ToolInspector();
   const craftingJobs = new CraftingJobService();
   const craftingRolls = new CraftingRollService();
+  const crafterContext = new CrafterContextService();
+  const markedRecipes = new MarkedRecipeService();
   const craftingMaterials = new CraftingMaterialService({
     materialRegistry: materials,
     adapter
@@ -150,7 +161,9 @@ Hooks.once("ready", async () => {
     sessions,
     contentPacks
   });
-  const specialTreasure = new SpecialTreasureService();
+  const specialTreasure = new SpecialTreasureService({
+    sourceFilter
+  });
   const loot = new LootService({
     adapter,
     materialRegistry: materials,
@@ -181,6 +194,7 @@ Hooks.once("ready", async () => {
   let recipeBrowserApp = null;
   let spellScrollGeneratorApp = null;
   let craftworksApp = null;
+  let craftApp = null;
 
   const api = {
     adapter,
@@ -195,6 +209,7 @@ Hooks.once("ready", async () => {
     specialTreasure,
     recipes,
     dnd5eItemResolver,
+    sourceFilter,
     spellScrollGenerator,
     coreAccess,
     contentPacks,
@@ -204,6 +219,8 @@ Hooks.once("ready", async () => {
     craftingJobs,
     craftingRolls,
     craftingMaterials,
+    crafterContext,
+    markedRecipes,
     socket,
     marketplaceIntegration: {
       isCraftworksItem,
@@ -279,6 +296,26 @@ Hooks.once("ready", async () => {
       if (recipeBrowserApp?.rendered) await recipeBrowserApp.close();
       recipeBrowserApp = new RecipeBrowserApp(api);
       return recipeBrowserApp.render({ force: true });
+    },
+    openCraft: async () => {
+      if (craftApp?.rendered) {
+        await craftApp.render({ force: true });
+        craftApp.bringToFront();
+        return craftApp;
+      }
+
+      craftApp = new CraftApp(api);
+
+      try {
+        return await craftApp.render({ force: true });
+      } catch (error) {
+        console.error(
+          "Morelord Craftworks | Craft window failed to render.",
+          error
+        );
+        craftApp = null;
+        throw error;
+      }
     },
     openSpellScrollGenerator: async () => {
       if (!game.user.isGM) {

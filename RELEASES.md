@@ -1461,3 +1461,300 @@ Workflow-oriented dashboard and Recipe browser layout:
 - Spell Scroll Generator remains in `Tools`.
 - Player dashboard behavior remains compatible: Craft/reference tools remain
   visible while GM-only acquisition/tools stay restricted.
+
+
+---
+
+## 0.1.0-dev.90
+
+Search result state and active crafting jobs:
+
+- Fixes Search buttons not activating while typing. Recipe live-query handling
+  referenced an out-of-scope actor variable; live query evaluation now resolves
+  the selected inventory actor directly.
+- Search buttons explicitly synchronize both their DOM `disabled` property and
+  boolean attribute.
+- Recipe and Material result lists are now snapshots of the last executed
+  Search.
+- Editing search text or changing query filters updates the prospective count
+  but leaves the currently displayed results untouched.
+- The visible result list changes only when Search is clicked or Enter is used
+  in the search field.
+- `Only Show Craftable Recipes` is no longer rendered as a disabled checkbox.
+- If craftable-only is selected without a `Using Actor Inventory`, Craftworks
+  explains that an inventory actor must be selected and leaves the option off.
+- Adds `CraftingJobService.list()` for enumerating a crafter's persisted jobs.
+- Recipes now includes a permanent `In Process` section at the bottom whenever
+  accessible characters have active Craftworks jobs.
+- In Process is independent of search/filter results and appears even before
+  the user runs a search.
+- Each active job shows recipe/source, crafter, material inventory, success/hour
+  progress, and a direct `Roll Crafting Check` button.
+- Clicking an In Process job automatically restores that job's crafter and
+  inventory context before continuing the crafting check.
+- In-progress jobs remain accessible even if their source content pack was
+  subsequently disabled.
+
+
+---
+
+## 0.1.0-dev.91
+
+Hoard chat, source-aware randomization, and awardable spell scrolls:
+
+- Adds `Send to Chat` to Treasure Hoard.
+- Hoard chat output uses a formatted Craftworks chat card with coin, materials,
+  and special treasure sections.
+- Special Treasure now supports RollTable results that contain plain-text item
+  names by resolving those names against enabled Item compendiums.
+- Special treasure Item and RollTable resolution respects D&D5e's
+  `packSourceConfiguration` / Configure Sources selection.
+- Adds a shared D&D5e Source Filter service implementing the system's own
+  exclusion behavior: packs are enabled unless explicitly configured `false`.
+- Encounter Loot and Hoard special treasure use the shared source filter.
+- Spell Scroll Generator uses the shared source filter for both spell selection
+  and scroll-template resolution.
+- Recipes intentionally do not use D&D5e source filtering; their visibility
+  remains controlled by Craftworks Content Pack settings.
+- Spell Scroll Generator can now create and award a real scroll Item.
+- Generated scrolls clone the official enabled scroll Item for the selected
+  level, preserving its image, price, uses, activities, effects, and other
+  D&D5e data.
+- The selected spell is recorded in the generated scroll's name, description,
+  and Craftworks flags.
+- Spell Scroll Generator now includes recipient selection and respects the
+  configured Party Recipient when enabled.
+
+
+---
+
+## 0.1.0-dev.92
+
+Settings, recipients, and source-aware treasure resolution:
+
+- Craftworks Settings closes immediately after successful Save.
+- Award recipient selectors now include both Character and Group actors in
+  Encounter Loot, Treasure Hoard, and Spell Scroll Generator.
+- Confirms randomized treasure/scroll source filtering uses the D&D5e system's
+  `packSourceConfiguration` Configure Sources setting rather than Craftworks
+  Content Pack settings.
+- Source filter handling now tolerates direct pack keys, nested package/pack
+  configuration, and explicit disabled-pack arrays.
+- Treasure-table Item links are no longer treated as the mandatory award source.
+- If a table result points to an Item from a D&D5e source the GM has disabled,
+  Craftworks uses the referenced Item's name as the treasure concept and resolves
+  an equivalent Item from the currently enabled Item compendiums.
+- Plain-text treasure results use the same enabled-source item resolver.
+- Adds controlled alternate-name resolution for Healing Potions and Giant
+  Strength Potions, including `Potion of Hill Giant Strength` and
+  `Potion of Giant Strength (Hill)` naming variants.
+- Special-treasure Item indexes are rebuilt for each roll so changes to D&D5e
+  Configure Sources are reflected without restarting the world.
+
+
+---
+
+## 0.1.0-dev.93
+
+Treasure Hoard source Item links:
+
+- Resolved Special Treasure entries in the Treasure Hoard window are now
+  clickable.
+- Clicking a special treasure row opens the exact Item document Craftworks
+  resolved from the enabled source compendium.
+- The link therefore shows the same source Item that will be awarded when
+  `Award Hoard` is used.
+- Adds a subtle hover/focus treatment and external-open icon so clickable
+  treasure is visually discoverable without making the result list noisy.
+
+
+---
+
+## 0.1.0-dev.94
+
+Native Item links in Treasure Hoard chat:
+
+- Treasure Hoard chat cards now use native Foundry `@UUID[...]` document links.
+- Special Treasure names link to the exact source-compendium Item resolved by
+  Craftworks and used by Award Hoard.
+- Craftworks Material names link to their actual Material Item documents.
+- Material chat rows use the resolved Material Item image when available.
+- Chat content is passed through Foundry's `TextEditor.enrichHTML` before the
+  ChatMessage is created so document links render as native clickable links.
+- Images remain for quick visual identification, but the Item document link is
+  now the authoritative chat representation.
+
+
+---
+
+## 0.1.0-dev.95
+
+Compendium priority, dashboard cleanup, hoard links, and recipe discovery:
+
+- Adds shared randomized-compendium priority.
+- Enabled non-SRD sourcebook compendiums are searched before SRD compendiums.
+- SRD fallback order is newest to oldest: SRD 5.2, then SRD 5.1, then
+  older/unrecognized SRD sources.
+- Special Treasure item-name resolution and Spell Scroll Generator spell/scroll
+  resolution both use this priority.
+- Dashboard `Encounter Loot` is renamed to `Loot`.
+- Dashboard Loot uses a sack/coin-style icon.
+- Removes the dashboard footer explaining where acquired items will be placed.
+- Treasure Hoard Special Treasure rows are plain result rows again; only the
+  external-open icon is clickable, matching Spell Scroll Generator behavior.
+- Adds persistent GM recipe visibility for in-world recipe discovery.
+- Recipes default to visible.
+- GMs get `Hide All` and `Unhide All` controls at the top of Recipes.
+- Every recipe card gets a clear `Visible` / `Hidden` toggle.
+- Hidden recipes remain visible to GMs for management and existing jobs.
+- Hidden recipes are excluded from normal player Recipe searches and counts.
+- Recipe visibility is stored at world scope and is independent from Content
+  Pack enable/disable state.
+
+
+---
+
+## 0.1.0-dev.96
+
+Filter behavior, small-scope auto display, Material filters, and source labels:
+
+- Fixes stale Recipe selector state causing Ingredient Rarity or Content Pack to
+  reopen after unrelated clicks.
+- Only the multi-select currently being edited is preserved through its checkbox
+  rerender.
+- Clicking anywhere outside a Craftworks multi-select closes open selectors.
+- `Only Show Craftable Recipes`, actor changes, searches, visibility actions,
+  and other unrelated controls clear stale selector state before rerendering.
+- Materials and Recipes automatically display the current result set whenever
+  the active scope contains 50 or fewer records.
+- Catalogs above 50 records keep the explicit Search workflow and frozen result
+  snapshot behavior.
+- Adds Material Rarity multi-select filtering.
+- Adds Material Tag multi-select filtering.
+- Special Treasure results now carry the descriptive source-compendium label.
+- Treasure Hoard shows the resolved Item source alongside each special result.
+- Encounter Loot shows the resolved Item source for special treasure.
+- Hoard chat cards include the descriptive source beneath special Item links.
+- Spell Scroll Generator results use a descriptive source label.
+- Generated spell-scroll Items persist that source label in Craftworks flags and
+  include it in the generated Item description.
+
+
+---
+
+## 0.1.0-dev.97
+
+Native D&D5e crafting roll configuration:
+
+- Replaces Craftworks' direct `new Roll("1d20 + modifier")` path for D&D5e
+  crafting checks with D&D5e's native actor roll APIs.
+- Skill-based recipes use the native D&D5e skill-check pipeline.
+- Tool-based recipes use the native D&D5e tool-check pipeline when the required
+  tool can be resolved to a D&D5e tool ID.
+- Remaining checks use the native D&D5e ability-check pipeline.
+- Native D&D5e roll configuration is not fast-forwarded, so the normal roll
+  dialog is presented to the player.
+- The native dialog provides Normal / Advantage / Disadvantage selection and
+  situational bonus entry using D&D5e's own roll system.
+- Actor effects and D&D5e check bonuses remain owned by the D&D5e roll pipeline
+  rather than being reconstructed by Craftworks.
+- Craftworks reads the resulting native D20 total and compares it with the
+  recipe's active DC to advance the crafting job.
+- Cancelling/closing the native D&D5e roll dialog does not consume a crafting
+  attempt or add two hours spent.
+- Retains the old manual roll only as a compatibility fallback if the expected
+  native actor API is unavailable.
+
+
+---
+
+## 0.1.0-dev.98
+
+Dedicated Craft workspace:
+
+- Materials and Recipes are now reference tools; crafting controls are removed
+  from the Recipes browser.
+- Recipes can be marked/unmarked for crafting by the current crafter character.
+- Marked recipe IDs persist on the crafter Actor.
+- Adds a dedicated `Craft` dashboard entry and Craft ApplicationV2 window.
+- Craft resolves the crafter from the controlled character token, assigned User
+  Character, or a single unambiguous owned character.
+- Craft has only the `Using Actor Inventory` selector; there is no crafter
+  selector and no search/filter panel.
+- Marked recipes are automatically divided into collapsible `Craftable` and
+  `Not Craftable` sections.
+- Active jobs appear first in a collapsible `In Process` section.
+- Craft cards use a larger layout with output image, source, tool/check/DC,
+  progress, requirements, inventory counts, and output preview.
+- Active recipes cannot be removed from the Craft list until their job is
+  canceled or completed.
+- Adds a `This Session` crafting log at the bottom of Craft. It is intentionally
+  client-session-only and is not persisted to world/actor data.
+- Successful crafting no longer auto-awards the output to the ingredient
+  inventory.
+- Successful crafting opens a dedicated completion window with a large source
+  Item image and enriched description/details from the real source Item.
+- Completion provides `Place in My Inventory`.
+- When the configured Party Recipient resolves to a valid Group Actor, completion
+  also provides `Place in <Group Name> Inventory`.
+- The output is only awarded and the job marked complete after the player chooses
+  a destination.
+- Closing the completion window leaves the completed job pending in `In Process`
+  with a `Choose Destination` action.
+
+
+---
+
+## 0.1.0-dev.99
+
+Craft window render fix:
+
+- Fixes Craft failing to render after recipes were marked.
+- Removes the runtime dependency on an unregistered Handlebars Craft-card partial.
+- Craftable, Not Craftable, and In Process cards are rendered directly by the
+  Craft template.
+- Removes the obsolete `templates/partials/craft-card.hbs`.
+- `openCraft()` recreates a non-rendered Craft application instead of reusing an
+  instance that may have failed during an earlier render.
+- A Craft render exception clears the cached application so the next open can
+  recover normally.
+
+
+---
+
+## 0.1.0-dev.100
+
+Craft crafter-selection and scrolling:
+
+- Craft no longer requires a character to be selected before the window opens.
+- Adds a Crafter selector directly inside the Craft window.
+- Players default to their resolved/assigned/single owned Character when the
+  crafter is unambiguous.
+- Players who own multiple Characters can select the crafter from the Craft
+  window.
+- GMs can open Craft immediately and choose any available Character afterward.
+- Changing the crafter defaults `Using Actor Inventory` to the newly selected
+  Character unless the current inventory source is a Group Actor.
+- Craft actions use the crafter selected in the Craft window instead of
+  re-resolving character context on every action.
+- Adds an explicit vertical scrollbar to the Craft window and prevents horizontal
+  overflow from larger recipe cards.
+
+
+---
+
+## 0.1.0-dev.101
+
+Native roll dialogs for Harvesting and Gathering:
+
+- Changes the shared D&D5e adapter `rollSkill()` path to use the native D&D5e
+  roll configuration dialog instead of fast-forwarding the check.
+- Harvesting skill checks now present the normal D&D5e dialog before rolling.
+- Gathering skill checks now present the normal D&D5e dialog before rolling.
+- Players can select Normal / Advantage / Disadvantage and enter one-off
+  situational bonuses using the D&D5e system UI.
+- Actor-specific D&D5e bonuses and effects remain handled by the system roll.
+- Closing/canceling the D&D5e roll dialog does not count as a Harvest or
+  Gathering attempt.
+- The native-dialog behavior now lives in the shared D&D5e adapter so future
+  Craftworks workflows that use `adapter.rollSkill()` receive the same behavior.

@@ -1,0 +1,55 @@
+<section class="mcw app-shell mcw-craft-completion">
+  <header class="mcw-craft-completion-hero">
+    <i class="fa-solid fa-trophy"></i>
+    <div>
+      <h2>Crafting Success!</h2>
+      <p>{{crafterName}} successfully completed {{recipeName}}.</p>
+    </div>
+  </header>
+
+  <div class="mcw-craft-completion-item">
+    <button type="button"
+            class="mcw-craft-completion-image"
+            data-action="open-item"
+            title="Open source Item">
+      <img src="{{itemImg}}" alt="{{itemName}}">
+    </button>
+
+    <div class="mcw-craft-completion-summary">
+      <h3>{{itemName}}</h3>
+      <div class="mcw-recipe-meta">
+        {{#if sourceLabel}}<span>{{sourceLabel}}</span>{{/if}}
+        {{#if rarity}}<span>{{rarity}}</span>{{/if}}
+        {{#if price}}<span>{{price}}</span>{{/if}}
+        <span>Quantity: {{quantity}}</span>
+      </div>
+    </div>
+  </div>
+
+  {{#if description}}
+    <div class="mcw-panel mcw-craft-completion-description">
+      {{{description}}}
+    </div>
+  {{/if}}
+
+  <div class="mcw-craft-completion-actions">
+    <button type="button"
+            class="mcw-primary-action"
+            data-action="place-self">
+      <i class="fa-solid fa-user"></i>
+      Place in My Inventory
+    </button>
+
+    {{#if partyActor}}
+      <button type="button"
+              data-action="place-party">
+        <i class="fa-solid fa-users"></i>
+        Place in {{partyActor.name}} Inventory
+      </button>
+    {{/if}}
+  </div>
+
+  <p class="mcw-muted">
+    The crafted Item is not placed anywhere until you choose a destination.
+  </p>
+</section>

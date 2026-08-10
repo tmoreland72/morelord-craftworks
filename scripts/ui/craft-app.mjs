@@ -1,0 +1,1000 @@
+import { MODULE_TITLE } from "../constants.mjs";
+import { CraftCompletionApp } from "./craft-completion-app.mjs";
+
+const {
+  ApplicationV2,
+  HandlebarsApplicationMixin
+} = foundry.applications.api;
+
+export class CraftApp
+  extends HandlebarsApplicationMixin(ApplicationV2) {
+
+  constructor(craftworks, options = {}) {
+    super(options);
+    this.craftworks = craftworks;
+    this.crafterActorUuid = null;
+    this.inventoryActorUuid = null;
+    this.sessionLog = [];
+    this.sectionState = {
+      inProcess: true,
+      craftable: true,
+      notCraftable: false,
+      log: true
+    };
+  }
+
+  static DEFAULT_OPTIONS = {
+    id: "morelord-craftworks-craft",
+    classes: [
+      "morelord-craftworks",
+      "mcw-window",
+      "mcw-craft-window"
+    ],
+    position: {
+      width: 980,
+      height: 850
+    },
+    window: {
+      title: `${MODULE_TITLE} — Craft`,
+      resizable: true
+    }
+  };
+
+  static PARTS = {
+    content: {
+      template:
+        "modules/morelord-craftworks/templates/craft.hbs"
+    }
+  };
+
+  async _prepareContext(options) {
+    const context =
+      await super._prepareContext(options);
+
+    const crafterActors =
+      this.craftworks.crafterContext
+        .availableCharacters();
+
+    if (!this.crafterActorUuid) {
+      const resolved =
+        this.craftworks.crafterContext.resolve();
+
+      if (resolved) {
+        this.crafterActorUuid = resolved.uuid;
+      } else if (
+        !game.user.isGM
+        && crafterActors.length === 1
+      ) {
+        this.crafterActorUuid =
+          crafterActors[0].uuid;
+      }
+    }
+
+    let crafter =
+      this.crafterActorUuid
+        ? await fromUuid(this.crafterActorUuid)
+        : null;
+
+    if (
+      crafter
+      && !crafterActors.some(
+        actor => actor.uuid === crafter.uuid
+      )
+    ) {
+      crafter = null;
+      this.crafterActorUuid = null;
+    }
+
+    const inventoryActors =
+      this.#availableInventoryActors();
+
+    if (!crafter) {
+      return foundry.utils.mergeObject(
+        context,
+        {
+          hasCrafter: false,
+          crafterActorUuid:
+            this.crafterActorUuid,
+          crafterActors:
+            crafterActors.map(actor => ({
+              uuid: actor.uuid,
+              name: actor.name,
+              selected: false
+            })),
+          inventoryActors:
+            inventoryActors.map(actor => ({
+              uuid: actor.uuid,
+              name: actor.name,
+              type: actor.type,
+              selected: false
+            })),
+          sessionLog: this.sessionLog,
+          hasSessionLog:
+            this.sessionLog.length > 0,
+          sections: this.sectionState,
+          canChooseCrafter:
+            game.user.isGM
+            || crafterActors.length > 1
+        },
+        { inplace: false }
+      );
+    }
+
+    if (
+      !this.inventoryActorUuid
+      || !inventoryActors.some(
+        actor => actor.uuid === this.inventoryActorUuid
+      )
+    ) {
+      this.inventoryActorUuid = crafter.uuid;
+    }
+
+    const inventoryActor =
+      this.inventoryActorUuid
+        ? await fromUuid(this.inventoryActorUuid)
+        : null;
+
+    const markedIds =
+      this.craftworks.markedRecipes.list(crafter);
+
+    const activeJobs =
+      this.craftworks.craftingJobs.list(
+        crafter,
+        { activeOnly: true }
+      );
+
+    const activeIds = new Set(
+      activeJobs.map(job => job.recipeId)
+    );
+
+    const inProcess = [];
+
+    for (const job of activeJobs) {
+      const recipe = this.craftworks.recipes.get(
+        job.recipeId,
+        { includeDisabled: true }
+      );
+
+      if (!recipe) continue;
+
+      const card = await this.#prepareRecipeCard(
+        recipe,
+        crafter,
+        inventoryActor,
+        {
+          job,
+          forceInventoryUuid:
+            job.inventoryActorUuid
+        }
+      );
+
+      inProcess.push(card);
+    }
+
+    const craftable = [];
+    const notCraftable = [];
+
+    for (const recipeId of markedIds) {
+      if (activeIds.has(recipeId)) continue;
+
+      const recipe = this.craftworks.recipes.get(
+        recipeId,
+        { includeDisabled: true }
+      );
+
+      if (!recipe) continue;
+
+      const card = await this.#prepareRecipeCard(
+        recipe,
+        crafter,
+        inventoryActor
+      );
+
+      if (card.readiness.ready) {
+        craftable.push(card);
+      } else {
+        notCraftable.push(card);
+      }
+    }
+
+    const sortByName = (a, b) =>
+      a.name.localeCompare(b.name);
+
+    craftable.sort(sortByName);
+    notCraftable.sort(sortByName);
+    inProcess.sort(sortByName);
+
+    return foundry.utils.mergeObject(
+      context,
+      {
+        hasCrafter: true,
+        crafter: {
+          uuid: crafter.uuid,
+          name: crafter.name,
+          img: crafter.img
+        },
+        crafterActorUuid:
+          this.crafterActorUuid,
+        crafterActors:
+          crafterActors.map(actor => ({
+            uuid: actor.uuid,
+            name: actor.name,
+            selected:
+              actor.uuid
+              === this.crafterActorUuid
+          })),
+        canChooseCrafter:
+          game.user.isGM
+          || crafterActors.length > 1,
+        inventoryActorUuid:
+          this.inventoryActorUuid,
+        inventoryActors:
+          inventoryActors.map(actor => ({
+            uuid: actor.uuid,
+            name: actor.name,
+            type: actor.type,
+            selected:
+              actor.uuid
+              === this.inventoryActorUuid
+          })),
+        inProcess,
+        craftable,
+        notCraftable,
+        hasInProcess: inProcess.length > 0,
+        hasCraftable: craftable.length > 0,
+        hasNotCraftable:
+          notCraftable.length > 0,
+        hasMarked:
+          markedIds.length > 0
+          || inProcess.length > 0,
+        sessionLog: this.sessionLog,
+        hasSessionLog:
+          this.sessionLog.length > 0,
+        sections: this.sectionState
+      },
+      { inplace: false }
+    );
+  }
+
+  async _onRender(context, options) {
+    await super._onRender(context, options);
+
+    this.element
+      .querySelector("[name='crafter-actor']")
+      ?.addEventListener(
+        "change",
+        event => {
+          this.crafterActorUuid =
+            event.currentTarget.value || null;
+
+          // Default ingredient inventory to the newly selected
+          // crafter unless the current inventory selection is a Group.
+          const currentInventory =
+            this.inventoryActorUuid
+              ? globalThis.fromUuidSync?.(
+                  this.inventoryActorUuid
+                )
+              : null;
+
+          if (
+            !currentInventory
+            || currentInventory.type !== "group"
+          ) {
+            this.inventoryActorUuid =
+              this.crafterActorUuid;
+          }
+
+          this.render();
+        }
+      );
+
+    this.element
+      .querySelector("[name='inventory-actor']")
+      ?.addEventListener(
+        "change",
+        event => {
+          this.inventoryActorUuid =
+            event.currentTarget.value || null;
+          this.render();
+        }
+      );
+
+    this.element
+      .querySelectorAll("[data-section-toggle]")
+      .forEach(element => {
+        element.addEventListener(
+          "click",
+          event => {
+            const key =
+              event.currentTarget
+                .dataset.sectionToggle;
+            if (!(key in this.sectionState)) return;
+            this.sectionState[key] =
+              !this.sectionState[key];
+            this.render();
+          }
+        );
+      });
+
+    this.element
+      .querySelectorAll("[data-action='craft']")
+      .forEach(element => {
+        element.addEventListener(
+          "click",
+          () => this.#craft(
+            element.dataset.recipeId
+          )
+        );
+      });
+
+    this.element
+      .querySelectorAll("[data-action='choose-destination']")
+      .forEach(element => {
+        element.addEventListener(
+          "click",
+          () => this.#showCompletion(
+            element.dataset.recipeId
+          )
+        );
+      });
+
+    this.element
+      .querySelectorAll("[data-action='cancel-crafting']")
+      .forEach(element => {
+        element.addEventListener(
+          "click",
+          () => this.#cancel(
+            element.dataset.recipeId
+          )
+        );
+      });
+
+    this.element
+      .querySelectorAll("[data-action='unmark']")
+      .forEach(element => {
+        element.addEventListener(
+          "click",
+          () => this.#unmark(
+            element.dataset.recipeId
+          )
+        );
+      });
+
+    this.element
+      .querySelectorAll("[data-material-id]")
+      .forEach(element => {
+        element.addEventListener(
+          "click",
+          event => {
+            event.stopPropagation();
+            this.craftworks.openMaterials({
+              materialId:
+                event.currentTarget.dataset.materialId
+            });
+          }
+        );
+      });
+
+    this.element
+      .querySelectorAll("[data-output-document-uuid]")
+      .forEach(element => {
+        element.addEventListener(
+          "click",
+          async event => {
+            const document = await fromUuid(
+              event.currentTarget
+                .dataset.outputDocumentUuid
+            );
+            document?.sheet?.render(true);
+          }
+        );
+      });
+  }
+
+  async #prepareRecipeCard(
+    recipe,
+    crafter,
+    inventoryActor,
+    {
+      job = null,
+      forceInventoryUuid = null
+    } = {}
+  ) {
+    let effectiveInventory = inventoryActor;
+
+    if (forceInventoryUuid) {
+      effectiveInventory =
+        await fromUuid(forceInventoryUuid)
+        ?? inventoryActor;
+    }
+
+    const readiness =
+      this.craftworks.recipePlanner.plan(
+        recipe,
+        effectiveInventory
+      );
+
+    const progress =
+      this.craftworks.craftingJobs
+        .getProgress(
+          recipe.id,
+          crafter,
+          forceInventoryUuid
+          ?? effectiveInventory?.uuid
+        );
+
+    const craft = recipe.craft ?? {};
+    const toolStatus =
+      this.craftworks.toolInspector?.inspect(
+        crafter,
+        craft.tool
+      ) ?? {
+        hasTool: false,
+        proficient: false,
+        qualifiesForNormalDc: false
+      };
+
+    const activeDc =
+      toolStatus.qualifiesForNormalDc
+        ? craft.dc
+        : craft.noToolDc;
+
+    let output = {
+      ...recipe.output
+    };
+    let outputDocumentUuid = null;
+
+    if (recipe.output?.type === "foundry-item") {
+      const source = await fromUuid(
+        recipe.output.uuid
+      );
+
+      if (source?.documentName === "Item") {
+        output = {
+          ...output,
+          label: source.name,
+          img: source.img
+        };
+        outputDocumentUuid = source.uuid;
+      }
+    }
+
+    const sourcePack =
+      this.craftworks.contentPacks?.get(
+        recipe.packId
+      );
+
+    const requirementGroupRows =
+      recipe.requirementGroups.map(
+        (group, groupIndex) => ({
+          ...group,
+          ready:
+            readiness.requirementGroups
+              ?.[groupIndex]?.ready
+            ?? null,
+          requirementRows:
+            group.requirements.map(
+              (requirement, requirementIndex) => {
+                const inventory =
+                  readiness.requirementGroups
+                    ?.[groupIndex]
+                    ?.requirements
+                    ?.[requirementIndex]
+                  ?? null;
+
+                const materialId =
+                  requirement.match?.materialId
+                  ?? null;
+
+                const material = materialId
+                  ? this.craftworks.materials
+                      .get(materialId)
+                  : null;
+
+                return {
+                  ...requirement,
+                  materialId,
+                  materialImg:
+                    material?.img ?? null,
+                  inventory,
+                  alternativeRows:
+                    requirement.type
+                    === "alternatives"
+                      ? requirement.alternatives
+                          .map(
+                            (alternative, altIndex) => {
+                              const altMaterialId =
+                                alternative.match
+                                  ?.materialId
+                                ?? null;
+
+                              const altMaterial =
+                                altMaterialId
+                                  ? this.craftworks
+                                      .materials
+                                      .get(altMaterialId)
+                                  : null;
+
+                              return {
+                                ...alternative,
+                                materialId:
+                                  altMaterialId,
+                                materialImg:
+                                  altMaterial?.img
+                                  ?? null,
+                                inventory:
+                                  inventory
+                                    ?.alternatives
+                                    ?.[altIndex]
+                                  ?? null
+                              };
+                            }
+                          )
+                      : []
+                };
+              }
+            )
+        })
+      );
+
+    return {
+      ...recipe,
+      output,
+      outputDocumentUuid,
+      sourceLabel:
+        sourcePack?.label
+        ?? recipe.packLabel
+        ?? recipe.packId,
+      craftMeta: {
+        tool: craft.tool,
+        check: [
+          craft.ability,
+          craft.skill
+            ? `(${craft.skill})`
+            : null
+        ].filter(Boolean).join(" "),
+        activeDc,
+        hoursRequired:
+          craft.hoursRequired
+      },
+      readiness,
+      requirementGroupRows,
+      progress,
+      inventoryActorName:
+        effectiveInventory?.name
+        ?? "Missing inventory actor",
+      isCompletePending:
+        Boolean(
+          progress?.complete
+          && !progress?.outputAwarded
+        ),
+      isActive:
+        Boolean(
+          job
+          || (
+            progress?.materialsConsumed
+            && !progress?.outputAwarded
+          )
+        )
+    };
+  }
+
+  async #craft(recipeId) {
+    const crafter =
+      await this.#selectedCrafter();
+
+    if (!crafter) {
+      ui.notifications.warn(
+        "Select or assign a character before crafting."
+      );
+      return;
+    }
+
+    const recipe =
+      this.craftworks.recipes.get(
+        recipeId,
+        { includeDisabled: true }
+      );
+
+    let inventoryActor =
+      this.inventoryActorUuid
+        ? await fromUuid(this.inventoryActorUuid)
+        : crafter;
+
+    if (!recipe || !inventoryActor) return;
+
+    let job =
+      this.craftworks.craftingJobs.get(
+        recipe.id,
+        crafter,
+        inventoryActor.uuid
+      );
+
+    if (job?.outputAwarded) {
+      await this.craftworks.craftingJobs.clear(
+        recipe.id,
+        crafter
+      );
+      job = null;
+    }
+
+    if (!job) {
+      const readiness =
+        this.craftworks.recipePlanner.plan(
+          recipe,
+          inventoryActor
+        );
+
+      if (!readiness.ready) {
+        ui.notifications.warn(
+          "The selected inventory no longer satisfies this recipe."
+        );
+        await this.render();
+        return;
+      }
+
+      const plans =
+        this.craftworks.craftingMaterials
+          .planOptions(
+            recipe,
+            inventoryActor
+          );
+
+      if (!plans.length) {
+        ui.notifications.warn(
+          "Craftworks could not determine a valid material-consumption path."
+        );
+        return;
+      }
+
+      const plan = plans.length === 1
+        ? plans[0]
+        : await this.#chooseMaterialPlan(
+            recipe,
+            plans
+          );
+
+      if (!plan) return;
+
+      const consumedMaterials =
+        await this.craftworks.craftingMaterials
+          .consume(
+            inventoryActor,
+            plan
+          );
+
+      job =
+        await this.craftworks.craftingJobs.start({
+          recipeId: recipe.id,
+          crafter,
+          inventoryActorUuid:
+            inventoryActor.uuid,
+          hoursRequired:
+            recipe.craft?.hoursRequired,
+          consumedMaterials,
+          materialPlanSummary:
+            plan.summary
+        });
+    } else if (job.inventoryActorUuid) {
+      inventoryActor =
+        await fromUuid(job.inventoryActorUuid)
+        ?? inventoryActor;
+    }
+
+    const toolStatus =
+      this.craftworks.toolInspector?.inspect(
+        crafter,
+        recipe.craft?.tool
+      ) ?? {
+        qualifiesForNormalDc: false
+      };
+
+    const dc =
+      toolStatus.qualifiesForNormalDc
+        ? recipe.craft?.dc
+        : recipe.craft?.noToolDc;
+
+    const result =
+      await this.craftworks.craftingRolls.roll({
+        recipe,
+        crafter,
+        dc,
+        toolStatus
+      });
+
+    if (result?.cancelled) {
+      this.#log({
+        recipe,
+        text:
+          "Roll canceled; no crafting attempt was spent.",
+        kind: "neutral"
+      });
+      await this.render();
+      return;
+    }
+
+    const progress =
+      await this.craftworks.craftingJobs
+        .recordAttempt(
+          recipe.id,
+          crafter,
+          inventoryActor.uuid,
+          { success: result.success }
+        );
+
+    this.#log({
+      recipe,
+      text: result.success
+        ? `Success: ${result.total} vs DC ${dc}. ${progress.successes} of ${progress.requiredSuccesses} successes.`
+        : `Failure: ${result.total} vs DC ${dc}. 2 hours spent with no progress.`,
+      kind:
+        result.success
+          ? "success"
+          : "failure"
+    });
+
+    if (
+      progress.complete
+      && !progress.outputAwarded
+    ) {
+      await this.#showCompletion(
+        recipe.id,
+        progress
+      );
+    }
+
+    await this.render();
+  }
+
+  async #showCompletion(
+    recipeId,
+    suppliedProgress = null
+  ) {
+    const crafter =
+      await this.#selectedCrafter();
+
+    const recipe =
+      this.craftworks.recipes.get(
+        recipeId,
+        { includeDisabled: true }
+      );
+
+    if (!crafter || !recipe) return;
+
+    const progress =
+      suppliedProgress
+      ?? this.craftworks.craftingJobs
+        .getProgress(
+          recipe.id,
+          crafter
+        );
+
+    if (
+      !progress?.complete
+      || progress.outputAwarded
+    ) {
+      return;
+    }
+
+    const completion =
+      new CraftCompletionApp(
+        this.craftworks,
+        {
+          recipe,
+          crafter,
+          progress,
+          onPlaced: async ({
+            destination,
+            awarded
+          }) => {
+            this.#log({
+              recipe,
+              kind: "complete",
+              text:
+                `Completed: ${awarded.quantity} × ${awarded.label} placed in ${destination.name}.`
+            });
+            await this.render();
+          }
+        }
+      );
+
+    await completion.render({
+      force: true
+    });
+  }
+
+  async #cancel(recipeId) {
+    const crafter =
+      await this.#selectedCrafter();
+
+    if (!crafter) return;
+
+    const job =
+      this.craftworks.craftingJobs.get(
+        recipeId,
+        crafter
+      );
+
+    if (!job || job.outputAwarded) return;
+
+    const inventoryActor =
+      job.inventoryActorUuid
+        ? await fromUuid(job.inventoryActorUuid)
+        : null;
+
+    if (
+      inventoryActor
+      && job.materialsConsumed
+      && job.consumedMaterials?.length
+    ) {
+      await this.craftworks.craftingMaterials
+        .refund(
+          inventoryActor,
+          job.consumedMaterials
+        );
+    }
+
+    await this.craftworks.craftingJobs.clear(
+      recipeId,
+      crafter
+    );
+
+    const recipe =
+      this.craftworks.recipes.get(
+        recipeId,
+        { includeDisabled: true }
+      );
+
+    if (recipe) {
+      this.#log({
+        recipe,
+        kind: "neutral",
+        text:
+          inventoryActor
+            ? `Canceled; consumed materials returned to ${inventoryActor.name}.`
+            : "Canceled."
+      });
+    }
+
+    await this.render();
+  }
+
+  async #unmark(recipeId) {
+    const crafter =
+      await this.#selectedCrafter();
+
+    if (!crafter) return;
+
+    const job =
+      this.craftworks.craftingJobs.get(
+        recipeId,
+        crafter
+      );
+
+    if (
+      job?.materialsConsumed
+      && !job.outputAwarded
+    ) {
+      ui.notifications.warn(
+        "Cancel the active crafting job before removing this recipe from the Craft list."
+      );
+      return;
+    }
+
+    await this.craftworks.markedRecipes.set(
+      crafter,
+      recipeId,
+      false
+    );
+
+    await this.render();
+  }
+
+  async #chooseMaterialPlan(
+    recipe,
+    plans
+  ) {
+    const options = plans
+      .map(
+        (plan, index) => `
+          <label class="mcw-crafting-plan-option">
+            <input type="radio"
+                   name="plan"
+                   value="${index}"
+                   ${index === 0 ? "checked" : ""}>
+            <span>${foundry.utils.escapeHTML(plan.summary)}</span>
+          </label>
+        `
+      )
+      .join("");
+
+    const formData =
+      await foundry.applications.api
+        .DialogV2.input({
+          window: {
+            title:
+              `Choose Materials — ${recipe.name}`
+          },
+          content: `
+            <p>More than one valid material path is available. Choose which materials to consume.</p>
+            <div class="mcw-crafting-plan-options">
+              ${options}
+            </div>
+          `,
+          ok: {
+            label: "Use Materials"
+          }
+        });
+
+    if (!formData) return null;
+
+    return plans[
+      Number(formData.plan)
+    ] ?? null;
+  }
+
+  #log({
+    recipe,
+    text,
+    kind = "neutral"
+  }) {
+    this.sessionLog.unshift({
+      id:
+        `${Date.now()}-${Math.random()}`,
+      time:
+        new Date().toLocaleTimeString(
+          [],
+          {
+            hour: "numeric",
+            minute: "2-digit"
+          }
+        ),
+      recipeName: recipe.name,
+      text,
+      kind
+    });
+  }
+
+  async #selectedCrafter() {
+    if (!this.crafterActorUuid) {
+      return null;
+    }
+
+    const actor =
+      await fromUuid(this.crafterActorUuid);
+
+    if (
+      !actor
+      || actor.type !== "character"
+    ) {
+      return null;
+    }
+
+    const allowed =
+      this.craftworks.crafterContext
+        .availableCharacters()
+        .some(candidate =>
+          candidate.uuid === actor.uuid
+        );
+
+    return allowed ? actor : null;
+  }
+
+  #availableInventoryActors() {
+    return game.actors
+      .filter(actor =>
+        ["character", "group"]
+          .includes(actor.type)
+      )
+      .filter(actor =>
+        game.user.isGM
+        || actor.testUserPermission(
+          game.user,
+          "OWNER"
+        )
+      )
+      .sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
+  }
+}

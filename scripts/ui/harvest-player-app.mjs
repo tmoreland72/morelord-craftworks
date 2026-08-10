@@ -109,6 +109,11 @@ export class HarvestPlayerApp extends HandlebarsApplicationMixin(ApplicationV2) 
         flavor: `Harvest ${creature.name} — DC ${creature.dc}`
       });
 
+      if (roll?.cancelled) {
+        button.disabled = false;
+        return;
+      }
+
       this.states[creatureTokenUuid] = {
         status: "pending",
         total: roll.total,

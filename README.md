@@ -7,6 +7,49 @@ Craftworks separates **content packs** from the core module so campaigns can ena
 only the material, recipe, harvesting, gathering, and loot content appropriate for
 that world.
 
+
+## Installation
+
+Once the project has been pushed to GitHub and the first release has been published, install Morelord Craftworks in Foundry using this permanent manifest URL:
+
+```text
+https://raw.githubusercontent.com/tmoreland72/morelord-craftworks/main/module.json
+```
+
+In Foundry, open **Add-on Modules → Install Module**, paste the URL into **Manifest URL**, and choose **Install**. Future releases continue using this same manifest URL and can be updated through Foundry.
+
+Required/recommended dependencies are declared in `module.json`; Foundry will prompt for them as appropriate. Older versions are available from the repository's GitHub Releases page.
+
+## Release process
+
+Craftworks uses the same standardized Morelord release workflow as Morelord Marketplace and Morelord Drakkenheim Harvesting.
+
+1. Put the website publish token in the local `.env` file:
+
+   ```text
+   RELEASE_PUBLISH_TOKEN=your-token-value
+   ```
+
+   `.env` is intentionally excluded from Git.
+
+2. Create release notes using the standard filename, for example:
+
+   ```text
+   RELEASE-NOTES-0.1.0.md
+   ```
+
+3. Commit and push all normal development changes so `main` is clean and synchronized with `origin/main`.
+
+4. Run the release from PowerShell:
+
+   ```powershell
+   .\release.ps1 -Version 0.1.0
+   ```
+
+The script validates the project, updates `module.json` and `package.json`, creates the Foundry release ZIP, commits/pushes release metadata, creates and pushes the version tag, creates the GitHub Release, and publishes the release metadata to Morelord Gaming.
+
+Useful switches include `-Prerelease`, `-Draft`, `-DryRun`, `-SkipWebsitePublish`, `-WebsiteOnly`, `-WebsiteUrl`, `-WebsiteToken`, and `-ReleaseNotesPath`.
+
 ## Support baseline
 
 - Foundry Virtual Tabletop v14
@@ -301,3 +344,131 @@ pool from spell Items in compendiums currently available to the world, filters
 by scroll level, and can generate a random spell result. The utility is exposed
 through the Craftworks API/dashboard foundation for future scroll creation and
 loot integration.
+
+
+### D&D5e source filtering
+
+Randomized compendium-backed features respect the D&D5e system's
+`Configure Sources` selection. Craftworks treats a compendium as available
+unless D&D5e's `packSourceConfiguration` setting explicitly disables it.
+
+This source filter applies to Spell Scroll Generator, Encounter Loot special
+treasure, and Hoard special treasure. Recipe catalogs intentionally use
+Craftworks Content Pack settings instead and do not follow D&D5e's source filter.
+
+### Hoard chat and special treasure
+
+Generated Hoards can be sent to chat as a formatted Craftworks card. Special
+treasure results resolve to actual Item documents. When a RollTable produces a
+plain-text item name, Craftworks attempts to resolve that name against enabled
+Item compendiums before awarding the result.
+
+### Generated spell scrolls
+
+The premium Spell Scroll Generator can create and award an Item based on the
+official enabled spell-scroll template for the chosen level. The generated Item
+keeps the official scroll mechanics/image and records the selected spell in its
+name, description, and Craftworks flags.
+
+
+### Randomized Item source resolution
+
+For randomized treasure and generated scrolls, Craftworks uses the D&D5e
+system's Configure Sources setting, not Craftworks Content Pack settings.
+
+Treasure-table document links are treated as references to an item concept. If
+a table points at an Item in a disabled source, Craftworks uses that Item's name
+and searches the currently enabled D&D5e Item compendiums for an equivalent
+Item. This supports worlds that disable the built-in SRD packs while using
+official PHB/DMG or other sourcebook compendiums.
+
+
+Hoard chat cards use native Foundry UUID content links for resolved Material and
+Special Treasure Items. The displayed names therefore open the actual Item
+documents used by Craftworks rather than acting as plain text labels.
+
+
+### Randomized compendium priority
+
+When more than one enabled compendium contains the same randomized Item or
+Spell, Craftworks prefers enabled non-SRD sourcebooks first. SRD sources are
+fallbacks, ordered newest to oldest: SRD 5.2 before SRD 5.1, followed by any
+older or unrecognized SRD source.
+
+### Recipe discovery visibility
+
+Recipes are visible by default. GMs can hide or show individual recipes from
+the Recipe browser and can bulk Hide All or Unhide All. Hidden recipes remain
+available to the GM for management and existing crafting jobs, but are omitted
+from normal player recipe browsing. Recipe visibility is world-persistent and
+independent of Content Pack enablement.
+
+
+### Catalog auto-display threshold
+
+Materials and Recipes continue to support explicit Search for large catalogs.
+When the current filter/search scope contains 50 or fewer records, Craftworks
+displays those records immediately while retaining all active filters.
+
+### Multi-select behavior
+
+Craftworks multi-select filters close when the user clicks outside them. Only
+the selector explicitly being edited is preserved across the rerender required
+to update its checkbox state.
+
+Materials supports Content Pack, Rarity, and Tag multi-select filters.
+
+### Randomized Item source labels
+
+Generated spell-scroll results and Special Treasure results include the
+descriptive label of the resolved D&D5e source compendium, such as Player's
+Handbook, Dungeon Master's Guide, SRD 5.2, or SRD 5.1.
+
+
+### Native D&D5e crafting roll dialog
+
+Crafting checks use the D&D5e system's native D20 roll pipeline when running on
+D&D5e. Craftworks invokes the appropriate native skill, tool, or ability check,
+which presents D&D5e's standard roll configuration dialog before the roll.
+
+This allows one-off Normal/Advantage/Disadvantage selection and situational
+bonus formulas while preserving actor-specific D&D5e bonuses, effects, skill
+proficiency, and tool proficiency. Craftworks then reads the completed native
+roll total and compares it with the recipe DC.
+
+Closing the D&D5e roll dialog does not count as a failed crafting attempt.
+
+
+### Craft workspace
+
+Materials and Recipes are reference tools. Recipes do not execute crafting.
+A character can mark recipes for crafting, and those marked recipes appear in
+the dedicated Craft workspace without search controls.
+
+Marked recipes are persisted on the crafter Actor. Craft uses the current
+character context: a controlled character token first, then the user's assigned
+Character, then the user's single owned Character when unambiguous.
+
+Craft has one inventory selector for the Actor or Group supplying ingredients.
+Marked recipes are grouped into collapsible In Process, Craftable, and Not
+Craftable sections. Crafting progress remains tied to Crafter + Recipe.
+
+A session-only Craft log is held in the Craft application instance. It survives
+closing/reopening the Craft window during the current Foundry client session and
+resets when the client reloads.
+
+Successful crafting opens a completion window using the actual output Item from
+its source compendium. The player chooses the output destination after success:
+their own crafter inventory, or the configured Party Group inventory when a
+valid Group recipient exists.
+
+
+### Native D&D5e skill-check configuration
+
+Player-facing Craftworks skill checks use the D&D5e system's native skill-roll
+configuration dialog. This includes Harvesting and Gathering as well as any
+other workflow routed through the D&D5e adapter's `rollSkill()` method.
+
+The native dialog is intentionally not fast-forwarded, allowing the player to
+choose Normal, Advantage, or Disadvantage and enter a situational bonus before
+rolling. Closing the dialog does not consume or record an acquisition attempt.

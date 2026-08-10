@@ -55,10 +55,17 @@
                   {{#each result.special.items}}
                     <div class="mcw-result mcw-special-result">
                       <img src="{{itemImg}}" alt="{{itemName}}">
-                      <div>
+                      <div class="mcw-special-item-copy">
                         <strong>{{itemName}}</strong>
-                        <div>Drawn from {{tableName}}</div>
+                        <span>{{sourceLabel}}</span>
+                        <span>Drawn from {{tableName}}</span>
                       </div>
+                      <button type="button"
+                              class="mcw-icon-button mcw-special-item-open"
+                              data-item-uuid="{{itemUuid}}"
+                              title="Open {{itemName}} from its source compendium">
+                        <i class="fa-solid fa-up-right-from-square"></i>
+                      </button>
                     </div>
                   {{/each}}
                 </div>
@@ -96,6 +103,9 @@
         {{/if}}
 
         <div class="mcw-actions">
+          <button type="button" data-action="send-chat">
+            <i class="fa-solid fa-message"></i> Send to Chat
+          </button>
           <button type="button" data-action="reroll">
             <i class="fa-solid fa-dice"></i> Reroll Hoard
           </button>
