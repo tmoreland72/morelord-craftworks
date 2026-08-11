@@ -8,6 +8,7 @@ export class HarvestPrototypeApp extends HandlebarsApplicationMixin(ApplicationV
     this.craftworks = craftworks;
     this.session = null;
     this.collapsedCreatures = new Set();
+    this.preflightCreatures = null;
   }
 
   static DEFAULT_OPTIONS = {
@@ -56,10 +57,85 @@ export class HarvestPrototypeApp extends HandlebarsApplicationMixin(ApplicationV
         }))
       : [];
 
-    const deadCreatures = this.craftworks.adapter.getDeadCreatureTokens().map(token => ({
-      name: token.name,
-      img: token.document.texture?.src ?? token.actor?.img
-    }));
+    if (!this.session) {
+      const deadTokens =
+        this.craftworks.adapter
+          .getDeadCreatureTokens()
+          .filter(token => token.actor);
+
+      this.preflightCreatures = [];
+
+      for (const token of deadTokens) {
+        this.preflightCreatures.push(
+          await this.craftworks.harvest
+            .buildCreatureContext(token)
+        );
+      }
+    }
+
+    const deadCreatures =
+      foundry.utils.deepClone(
+        this.preflightCreatures ?? []
+      );
+
+    const playerCharacters = [];
+    const seenActors = new Set();
+
+    for (
+      const user of game.users.filter(
+        entry =>
+          !entry.isGM
+          && entry.active
+      )
+    ) {
+      const candidates = [];
+
+      if (
+        user.character?.type ===
+        "character"
+      ) {
+        candidates.push(user.character);
+      }
+
+      for (
+        const actor of game.actors.filter(
+          entry =>
+            entry.type === "character"
+            && entry.testUserPermission(
+              user,
+              "OWNER"
+            )
+        )
+      ) {
+        candidates.push(actor);
+      }
+
+      for (const actor of candidates) {
+        if (seenActors.has(actor.uuid)) {
+          continue;
+        }
+
+        seenActors.add(actor.uuid);
+
+        playerCharacters.push({
+          actorUuid: actor.uuid,
+          actorName: actor.name,
+          actorImg: actor.img,
+          userId: user.id,
+          userName: user.name,
+          isAssigned:
+            user.character?.uuid ===
+            actor.uuid
+        });
+      }
+    }
+
+    playerCharacters.sort(
+      (a, b) =>
+        a.actorName.localeCompare(
+          b.actorName
+        )
+    );
 
     const claimsByCreature = new Map();
 
@@ -141,7 +217,14 @@ export class HarvestPrototypeApp extends HandlebarsApplicationMixin(ApplicationV
       session,
       progress,
       claimedItems,
-      deadCreatures
+      deadCreatures,
+      playerCharacters,
+      hasSpecialHarvestItems:
+        deadCreatures.some(
+          creature =>
+            (creature.specialItems ?? [])
+              .length > 0
+        )
     }, { inplace: false });
   }
 
@@ -211,7 +294,25 @@ export class HarvestPrototypeApp extends HandlebarsApplicationMixin(ApplicationV
         );
       }
 
-      this.session = await this.craftworks.harvest.start();
+      const skipSkillChecks =
+        Array.from(
+          this.element.querySelectorAll(
+            "[data-skip-skill-check]:checked"
+          )
+        ).map(input => ({
+          actorUuid:
+            input.dataset.actorUuid,
+          userId:
+            input.dataset.userId
+        }));
+
+      this.session =
+        await this.craftworks.harvest.start({
+          creatureContexts:
+            this.preflightCreatures,
+          skipSkillChecks
+        });
+
       const players = game.users.filter(user => user.active && !user.isGM);
       if (!players.length) throw new Error("No active player users are connected.");
 
@@ -308,7 +409,10 @@ export class HarvestPrototypeApp extends HandlebarsApplicationMixin(ApplicationV
   async #finalizeHarvest() {
     if (!this.session) return;
 
-    const session = this.craftworks.harvest.finalize(this.session.id);
+    const session =
+      await this.craftworks.harvest.finalize(
+        this.session.id
+      );
     const players = game.users.filter(user => user.active && !user.isGM);
 
     await Promise.all(players.map(user =>

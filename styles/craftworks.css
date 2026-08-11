@@ -3871,3 +3871,331 @@
     border-right: 0;
   }
 }
+
+/* Harvest preflight controls and Drakkenheim special item instructions */
+.mcw-harvest-modern .mlh-harvest-preflight,
+.mcw-harvest-modern .mlh-skip-skill-section {
+  margin-bottom: 14px;
+}
+
+.mcw-harvest-modern .mlh-preflight-creatures,
+.mcw-harvest-modern .mlh-skip-skill-list {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+}
+
+.mcw-harvest-modern .mlh-preflight-creature,
+.mcw-harvest-modern .mlh-skip-skill-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border: 1px solid rgba(197, 160, 91, 0.2);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.mcw-harvest-modern .mlh-preflight-creature > img,
+.mcw-harvest-modern .mlh-skip-character > img {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid rgba(197, 160, 91, 0.25);
+}
+
+.mcw-harvest-modern .mlh-preflight-creature-copy,
+.mcw-harvest-modern .mlh-skip-character {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.mcw-harvest-modern .mlh-preflight-creature-copy > strong,
+.mcw-harvest-modern .mlh-preflight-creature-copy > small,
+.mcw-harvest-modern .mlh-skip-character strong,
+.mcw-harvest-modern .mlh-skip-character small {
+  display: block;
+}
+
+.mcw-harvest-modern .mlh-skip-character {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mcw-harvest-modern .mlh-skip-skill-row {
+  justify-content: space-between;
+}
+
+.mcw-harvest-modern .mlh-skip-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.mcw-harvest-modern .mlh-preflight-help {
+  margin: 8px 10px 0;
+  opacity: .78;
+}
+
+.mcw-harvest-modern .mlh-special-harvest-items {
+  margin-top: 7px;
+  padding: 8px 10px;
+  border: 1px solid rgba(225, 153, 49, 0.45);
+  border-radius: 6px;
+  background: rgba(225, 153, 49, 0.08);
+}
+
+.mcw-harvest-modern .mlh-special-harvest-heading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  color: #e1a84e;
+  font-weight: 800;
+}
+
+.mcw-harvest-modern .mlh-special-harvest-instruction + .mlh-special-harvest-instruction {
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px solid rgba(225, 153, 49, 0.2);
+}
+
+/* Spellbook Generator */
+.mcw-spellbook-level-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px 12px;
+  margin: 12px 0;
+}
+
+.mcw-spellbook-level-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mcw-spellbook-level-row span strong,
+.mcw-spellbook-level-row span small {
+  display: block;
+}
+
+.mcw-spellbook-level-row input {
+  width: 68px;
+  flex: 0 0 68px;
+  text-align: center;
+}
+
+.mcw-spellbook-result-level + .mcw-spellbook-result-level {
+  margin-top: 12px;
+}
+
+.mcw-spellbook-result-list {
+  display: grid;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.mcw-spellbook-spell {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+}
+
+.mcw-spellbook-spell img {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.mcw-spellbook-spell span strong,
+.mcw-spellbook-spell span small {
+  display: block;
+}
+
+.chat-message .mcw-spellbook-card {
+  overflow: hidden;
+  border: 1px solid rgba(197, 160, 91, 0.5);
+  border-radius: 8px;
+}
+
+.chat-message .mcw-spellbook-card header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px;
+  background: rgba(197, 160, 91, 0.1);
+}
+
+.chat-message .mcw-spellbook-card header img {
+  width: 42px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.chat-message .mcw-spellbook-card header strong,
+.chat-message .mcw-spellbook-card header span {
+  display: block;
+}
+
+.chat-message .mcw-spellbook-card-spells {
+  padding: 8px 10px;
+}
+
+.chat-message .mcw-spellbook-card-level + .mcw-spellbook-card-level {
+  margin-top: 8px;
+}
+
+.chat-message .mcw-spellbook-card-level ul {
+  margin: 3px 0 0 18px;
+}
+
+.chat-message .mcw-spellbook-card footer {
+  padding: 4px 8px;
+  text-align: right;
+  font-size: 9px;
+  text-transform: uppercase;
+  opacity: .55;
+}
+
+/* Spellbook Generator result scrolling */
+.mcw-spellbook-generator-window .window-content {
+  overflow: hidden;
+}
+
+.mcw-spellbook-generator {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.mcw-spellbook-preview {
+  min-height: 0;
+}
+
+.mcw-spellbook-results-scroll {
+  max-height: 340px;
+  min-height: 120px;
+  margin-top: 8px;
+  padding-right: 6px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Spellbook Generator corrected results layout */
+.mcw-spellbook-generator-window .window-content {
+  overflow: hidden;
+}
+
+.mcw-spellbook-generator {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.mcw-spellbook-preview {
+  display: flex;
+  flex-direction: column;
+  min-height: 220px;
+  max-height: 430px;
+  overflow: hidden;
+}
+
+.mcw-spellbook-results-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 6px;
+}
+
+.mcw-spellbook-result-level {
+  min-width: 0;
+}
+
+.mcw-spellbook-result-list {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.mcw-spellbook-spell {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 38px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  min-height: 56px;
+  padding: 6px 8px;
+  border: 1px solid rgba(197, 160, 91, 0.24);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.mcw-spellbook-spell-image {
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  border: 1px solid rgba(197, 160, 91, 0.22);
+  border-radius: 5px;
+  object-fit: cover;
+}
+
+.mcw-spellbook-spell-copy {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.mcw-spellbook-spell-copy strong,
+.mcw-spellbook-spell-copy small {
+  display: block;
+  min-width: 0;
+}
+
+.mcw-spellbook-spell-copy strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mcw-spellbook-spell-copy small {
+  margin-top: 2px;
+  opacity: .7;
+}
+
+.mcw-spellbook-spell-open {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  padding: 0;
+  margin: 0;
+}
+
+.mcw-spellbook-generator > .mcw-panel:last-child {
+  flex: 0 0 auto;
+}
+
+/* Harvest preflight Skip Skill Checks alignment */
+.mcw-harvest-modern .mlh-skip-character {
+  flex: 1 1 auto;
+}
+
+.mcw-harvest-modern .mlh-skip-toggle {
+  margin-left: auto;
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  text-align: right;
+}

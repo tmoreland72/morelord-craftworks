@@ -194,9 +194,94 @@
       </section>
     {{else}}
       {{#if deadCreatures.length}}
-        <section class="mlh-gm-managed"><div class="mlh-mode-heading"><i class="fa-solid fa-skull"></i> {{deadCreatures.length}} dead creature(s) found</div><div class="mcw-dead-list">{{#each deadCreatures}}<span><img src="{{img}}" alt="{{name}}"> {{name}}</span>{{/each}}</div></section>
+        <section class="mlh-gm-managed mlh-harvest-preflight">
+          <div class="mlh-mode-heading">
+            <i class="fa-solid fa-skull"></i>
+            {{deadCreatures.length}} dead creature(s) found
+          </div>
+
+          <div class="mlh-preflight-creatures">
+            {{#each deadCreatures}}
+              <article class="mlh-preflight-creature">
+                <img src="{{img}}" alt="{{name}}">
+                <div class="mlh-preflight-creature-copy">
+                  <strong>{{name}}</strong>
+                  <small>
+                    {{creatureType}} · CR {{cr}} · Harvest DC {{dc}}
+                    {{#if harvestRarity}} · {{harvestRarity}}{{/if}}
+                  </small>
+
+                  {{#if specialItems.length}}
+                    <div class="mlh-special-harvest-items">
+                      <div class="mlh-special-harvest-heading">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        Special Harvest Items / Instructions
+                      </div>
+                      {{#each specialItems}}
+                        <div class="mlh-special-harvest-instruction">
+                          {{{html}}}
+                        </div>
+                      {{/each}}
+                    </div>
+                  {{/if}}
+                </div>
+              </article>
+            {{/each}}
+          </div>
+        </section>
+
+        <section class="mlh-gm-managed mlh-skip-skill-section">
+          <div class="mlh-mode-heading">
+            <i class="fa-solid fa-users"></i>
+            Player Characters
+          </div>
+          <p class="mlh-preflight-help">
+            Check <strong>Skip Skill Checks</strong> for any character that
+            should automatically succeed at Harvesting. Those players will
+            open directly to their claimable components.
+          </p>
+
+          {{#if playerCharacters.length}}
+            <div class="mlh-skip-skill-list">
+              {{#each playerCharacters}}
+                <label class="mlh-skip-skill-row">
+                  <span class="mlh-skip-character">
+                    {{#if actorImg}}
+                      <img src="{{actorImg}}" alt="{{actorName}}">
+                    {{/if}}
+                    <span>
+                      <strong>{{actorName}}</strong>
+                      <small>
+                        {{userName}}
+                        {{#if isAssigned}} · Assigned Character{{/if}}
+                      </small>
+                    </span>
+                  </span>
+
+                  <span class="mlh-skip-toggle">
+                    <span>Skip Skill Checks</span>
+                    <input
+                      type="checkbox"
+                      data-skip-skill-check
+                      data-actor-uuid="{{actorUuid}}"
+                      data-user-id="{{userId}}"
+                    >
+                  </span>
+                </label>
+              {{/each}}
+            </div>
+          {{else}}
+            <div class="mlh-harvest-message mcw-warning">
+              No active player characters were found.
+            </div>
+          {{/if}}
+        </section>
       {{else}}
-        <section class="mlh-empty"><i class="fa-solid fa-scalpel"></i><h2>No Dead Creatures</h2><p>No dead creatures were found on the current scene.</p></section>
+        <section class="mlh-empty">
+          <i class="fa-solid fa-scalpel"></i>
+          <h2>No Dead Creatures</h2>
+          <p>No dead creatures were found on the current scene.</p>
+        </section>
       {{/if}}
     {{/if}}
   </main>

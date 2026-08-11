@@ -1,0 +1,149 @@
+<section class="mcw app-shell mcw-spellbook-generator">
+  <header class="mcw-header">
+    <div>
+      <h2>Spellbook Generator</h2>
+      <p>
+        Choose how many spells of each level the recovered spellbook contains.
+        Generate a random draft, reroll until satisfied, then create the book.
+      </p>
+    </div>
+  </header>
+
+  {{#if hasAccess}}
+    <section class="mcw-panel">
+      <label class="mcw-spellbook-name">
+        <span>Spellbook Name</span>
+        <input
+          type="text"
+          name="spellbook-name"
+          value="{{bookName}}"
+        >
+      </label>
+
+      <div class="mcw-spellbook-level-grid">
+        {{#each levels}}
+          <label class="mcw-spellbook-level-row">
+            <span>
+              <strong>{{label}}</strong>
+              <small>{{available}} available</small>
+            </span>
+            <input
+              type="number"
+              min="0"
+              max="{{available}}"
+              step="1"
+              value="{{count}}"
+              data-spellbook-level="{{level}}"
+            >
+          </label>
+        {{/each}}
+      </div>
+
+      <div class="mcw-actions">
+        <button
+          type="button"
+          data-action="generate-spellbook"
+        >
+          <i class="fa-solid fa-dice"></i>
+          Generate
+        </button>
+
+        {{#if hasResult}}
+          <button
+            type="button"
+            data-action="reroll-spellbook"
+          >
+            <i class="fa-solid fa-arrows-rotate"></i>
+            Reroll
+          </button>
+        {{/if}}
+      </div>
+    </section>
+
+    {{#if hasResult}}
+      <section class="mcw-panel mcw-spellbook-preview">
+        <div class="mcw-spellbook-preview-heading">
+          <i class="fa-solid fa-book"></i>
+          <h3>{{bookName}}</h3>
+        </div>
+
+        <div class="mcw-spellbook-results-scroll">
+          {{#each resultGroups}}
+            <div class="mcw-spellbook-result-level">
+              <strong>{{label}}</strong>
+              <div class="mcw-spellbook-result-list">
+                {{#each spells}}
+                  <div class="mcw-spellbook-spell">
+                    <img
+                      class="mcw-spellbook-spell-image"
+                      src="{{img}}"
+                      alt="{{name}}"
+                    >
+
+                    <div class="mcw-spellbook-spell-copy">
+                      <strong>{{name}}</strong>
+                      <small>{{sourceLabel}}</small>
+                    </div>
+
+                    <button
+                      type="button"
+                      class="mcw-spellbook-spell-open"
+                      data-spell-uuid="{{uuid}}"
+                      title="Open {{name}}"
+                      aria-label="Open {{name}}"
+                    >
+                      <i class="fa-solid fa-up-right-from-square"></i>
+                    </button>
+                  </div>
+                {{/each}}
+              </div>
+            </div>
+          {{/each}}
+        </div>
+      </section>
+
+      <section class="mcw-panel">
+        <h3>Recipient</h3>
+
+        {{#if partyInfo.enabled}}
+          {{#if partyInfo.valid}}
+            <p>
+              Spellbook will be awarded to
+              <strong>{{partyInfo.actorName}}</strong>.
+            </p>
+          {{else}}
+            <p class="mcw-warning">
+              Party Recipient is enabled but no valid Party/Group actor is configured.
+            </p>
+          {{/if}}
+        {{else}}
+          <label>
+            Recipient
+            <select name="recipient">
+              <option value="">Choose character…</option>
+              {{#each actors}}
+                <option value="{{uuid}}">
+                  {{name}}
+                </option>
+              {{/each}}
+            </select>
+          </label>
+        {{/if}}
+
+        <button
+          type="button"
+          data-action="award-spellbook"
+        >
+          <i class="fa-solid fa-book"></i>
+          Create & Award Spellbook
+        </button>
+      </section>
+    {{/if}}
+  {{else}}
+    <div class="mcw-panel">
+      <p class="mcw-warning">
+        Spellbook Generator requires premium Craftworks access.
+      </p>
+    </div>
+  {{/if}}
+</section>

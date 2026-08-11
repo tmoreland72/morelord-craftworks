@@ -53,6 +53,8 @@ export class CraftworksApp extends HandlebarsApplicationMixin(ApplicationV2) {
       gatherRecordCount: Object.keys(gatherRecords).length,
       spellScrollGeneratorPremium:
         Boolean(this.craftworks.spellScrollGenerator?.hasAccess),
+      spellbookGeneratorPremium:
+        Boolean(this.craftworks.spellbookGenerator?.hasAccess),
       partyInfo
     }, { inplace: false });
   }
@@ -86,6 +88,14 @@ export class CraftworksApp extends HandlebarsApplicationMixin(ApplicationV2) {
         "click",
         () => this.#gmAction(
           () => this.craftworks.openSpellScrollGenerator()
+        )
+      );
+
+    this.element.querySelector("[data-action='spellbook-generator']")
+      ?.addEventListener(
+        "click",
+        () => this.#gmAction(
+          () => this.craftworks.openSpellbookGenerator()
         )
       );
 

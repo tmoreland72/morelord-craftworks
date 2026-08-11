@@ -126,6 +126,23 @@
           </span>
           <i class="fa-solid fa-chevron-right"></i>
         </button>
+
+        <button type="button"
+                class="mcw-dashboard-card"
+                data-action="spellbook-generator">
+          <i class="fa-solid fa-book"></i>
+          <span class="mcw-dashboard-card-copy">
+            <strong>Spellbook Generator</strong>
+            <small>
+              {{#if spellbookGeneratorPremium}}
+                Randomize a custom spellbook from enabled spell sources
+              {{else}}
+                Premium · Randomize a custom spellbook from enabled spell sources
+              {{/if}}
+            </small>
+          </span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
       </div>
     </section>
 

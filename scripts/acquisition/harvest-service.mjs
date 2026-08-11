@@ -5,6 +5,7 @@ import { findHarvestProfile } from "./harvest-profiles.mjs";
 import { weightedDistinctSample } from "./weighted-choice.mjs";
 import { DrakkenheimMonsterDataService } from "../integrations/drakkenheim-monster-data-service.mjs";
 import { DrakkenheimMaterialMatchService } from "../integrations/drakkenheim-material-match-service.mjs";
+import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
 
 const HARVEST_FLAG = "harvestAttempts";
 
@@ -62,7 +63,8 @@ export class HarvestService {
       profileId: profile?.id ?? null,
       harvestMode: "standard",
       harvestRarity: null,
-      components: standardComponents
+      components: standardComponents,
+      specialItems: []
     };
 
     // Drakkenheim is an enhancement path, never a dependency. A Drakkenheim
@@ -83,6 +85,10 @@ export class HarvestService {
       context.harvestMode = "drakkenheim";
       context.harvestRarity = harvestData.rarity ?? null;
       context.profileId = "monsters-of-drakkenheim-exact";
+      context.specialItems =
+        Array.isArray(harvestData.specialItems)
+          ? harvestData.specialItems
+          : [];
       context.components = matches.map((match, index) => {
         const materialId = match.item?.materialId ?? match.item?.id ?? null;
         const material = materialId ? this.materialRegistry.get(materialId) : null;
@@ -106,21 +112,83 @@ export class HarvestService {
     return context;
   }
 
-  async start() {
-    const tokens = this.adapter.getDeadCreatureTokens();
-    const creatures = [];
-    for (const token of tokens.filter(t => t.actor)) {
-      creatures.push(await this.buildCreatureContext(token));
+  async start({
+    creatureContexts = null,
+    skipSkillChecks = []
+  } = {}) {
+    let creatures =
+      Array.isArray(creatureContexts)
+        ? foundry.utils.deepClone(creatureContexts)
+        : null;
+
+    if (!creatures) {
+      const tokens =
+        this.adapter.getDeadCreatureTokens();
+
+      creatures = [];
+
+      for (
+        const token of tokens.filter(
+          entry => entry.actor
+        )
+      ) {
+        creatures.push(
+          await this.buildCreatureContext(token)
+        );
+      }
     }
-    if (!creatures.length) throw new Error("No dead creatures were found on the current scene.");
-    return this.sessions.create({
+
+    if (!creatures.length) {
+      throw new Error(
+        "No dead creatures were found on the current scene."
+      );
+    }
+
+    const session = this.sessions.create({
       type: "harvest",
       sceneId: canvas.scene?.id ?? null,
       sceneName: canvas.scene?.name ?? null,
       creatures,
       participants: {},
-      results: []
+      results: [],
+      skipSkillChecks:
+        foundry.utils.deepClone(
+          skipSkillChecks ?? []
+        )
     });
+
+    for (const entry of skipSkillChecks ?? []) {
+      if (!entry?.actorUuid || !entry?.userId) {
+        continue;
+      }
+
+      for (const creature of creatures) {
+        if (
+          await this.hasHarvested(
+            creature.tokenUuid,
+            entry.actorUuid
+          )
+        ) {
+          continue;
+        }
+
+        const key =
+          `${entry.userId}:${creature.tokenUuid}`;
+
+        session.participants[key] =
+          this.#buildSuccessfulState({
+            creature,
+            userId: entry.userId,
+            actorUuid: entry.actorUuid,
+            skillId: null,
+            total: null,
+            naturalD20: null,
+            automaticSuccess: true
+          });
+      }
+    }
+
+    return session;
   }
 
   getSkillOptions() {
@@ -168,6 +236,177 @@ export class HarvestService {
     return session?.participants?.[`${userId}:${creatureTokenUuid}`] ?? null;
   }
 
+  #buildChoices(creature) {
+    if (creature.harvestMode === "drakkenheim") {
+      return (creature.components ?? [])
+        .filter(
+          component =>
+            component.matched
+            && component.materialId
+        )
+        .map(component => {
+          const material =
+            this.materialRegistry.get(
+              component.materialId
+            );
+
+          return material
+            ? {
+                ...material,
+                componentId: component.id,
+                componentName:
+                  component.componentName,
+                category:
+                  component.category
+              }
+            : null;
+        })
+        .filter(Boolean);
+    }
+
+    const candidates =
+      (creature.components ?? [])
+        .filter(
+          component =>
+            component.matched
+            && component.materialId
+        )
+        .map(component => ({
+          materialId:
+            component.materialId,
+          weight:
+            Number(component.weight ?? 1)
+        }));
+
+    const rareBias =
+      Number(
+        getSetting(
+          SETTINGS.HARVEST_RARE_BIAS
+        ) ?? 0
+      );
+
+    const weightedCandidates =
+      this.#applyRarityBias(
+        candidates,
+        rareBias
+      );
+
+    return weightedDistinctSample(
+      weightedCandidates,
+      getHarvestChoiceCount()
+    )
+      .map(result => {
+        const material =
+          this.materialRegistry.get(
+            result.materialId
+          );
+
+        if (!material) return null;
+
+        const component =
+          (creature.components ?? [])
+            .find(
+              entry =>
+                entry.materialId ===
+                result.materialId
+            );
+
+        return {
+          ...material,
+          componentId:
+            component?.id ?? null,
+          componentName:
+            component?.componentName
+            ?? material.name,
+          category:
+            component?.category
+            ?? material.category
+            ?? "Harvest Material"
+        };
+      })
+      .filter(Boolean);
+  }
+
+  #buildSuccessfulState({
+    creature,
+    userId,
+    actorUuid,
+    skillId,
+    total,
+    naturalD20 = null,
+    automaticSuccess = false
+  }) {
+    const choices =
+      this.#buildChoices(creature);
+
+    if (!choices.length) {
+      return {
+        userId,
+        actorUuid,
+        creatureTokenUuid:
+          creature.tokenUuid,
+        skillId,
+        status: "no-results",
+        total,
+        naturalD20,
+        automaticSuccess
+      };
+    }
+
+    const doubleClaimEnabled =
+      !automaticSuccess
+      && Boolean(
+        getSetting(
+          SETTINGS.HARVEST_NAT20_DOUBLE_CLAIM
+        )
+      );
+
+    const claimsAllowed =
+      Math.min(
+        choices.length,
+        doubleClaimEnabled
+        && Number(naturalD20) === 20
+          ? 2
+          : 1
+      );
+
+    return {
+      userId,
+      actorUuid,
+      creatureTokenUuid:
+        creature.tokenUuid,
+      skillId,
+      status: "awaiting-claim",
+      total,
+      naturalD20:
+        Number(naturalD20) || null,
+      automaticSuccess,
+      claimsAllowed,
+      claimsMade: 0,
+      claimsRemaining: claimsAllowed,
+      claimedComponentIds: [],
+      claimedMaterialIds: [],
+      claimedNames: [],
+      choices: choices.map(choice => ({
+        materialId:
+          choice.materialId,
+        name:
+          choice.name,
+        img:
+          choice.img,
+        rarity:
+          choice.rarity,
+        componentId:
+          choice.componentId ?? null,
+        componentName:
+          choice.componentName
+          ?? choice.name,
+        category:
+          choice.category ?? null
+      }))
+    };
+  }
+
   async recordAttempt({
     sessionId,
     creatureTokenUuid,
@@ -213,107 +452,34 @@ export class HarvestService {
       return session.participants[key];
     }
 
-    let choices = [];
-
-    if (creature.harvestMode === "drakkenheim") {
-      choices = (creature.components ?? [])
-        .filter(component => component.matched && component.materialId)
-        .map(component => {
-          const material = this.materialRegistry.get(component.materialId);
-          return material ? { ...material, componentId: component.id, componentName: component.componentName, category: component.category } : null;
-        })
-        .filter(Boolean);
-    } else {
-      const candidates = (creature.components ?? [])
-        .filter(component => component.matched && component.materialId)
-        .map(component => ({
-          materialId: component.materialId,
-          weight: Number(component.weight ?? 1)
-        }));
-
-      const rareBias = Number(getSetting(SETTINGS.HARVEST_RARE_BIAS) ?? 0);
-      const weightedCandidates = this.#applyRarityBias(candidates, rareBias);
-
-      choices = weightedDistinctSample(
-        weightedCandidates,
-        getHarvestChoiceCount()
-      )
-        .map(result => {
-          const material = this.materialRegistry.get(result.materialId);
-          if (!material) return null;
-
-          const component = (creature.components ?? [])
-            .find(entry => entry.materialId === result.materialId);
-
-          return {
-            ...material,
-            componentId: component?.id ?? null,
-            componentName: component?.componentName ?? material.name,
-            category: component?.category ?? material.category ?? "Harvest Material"
-          };
-        })
-        .filter(Boolean);
-    }
-
-    if (!choices.length) {
-      session.participants[key] = {
+    const successState =
+      this.#buildSuccessfulState({
+        creature,
         userId,
         actorUuid,
-        creatureTokenUuid,
         skillId,
-        status: "no-results",
-        total: numericTotal
-      };
-
-      await this.#writeHarvestRecord(creatureTokenUuid, actorUuid, {
-        status: "no-results",
-        skillId,
-        total: numericTotal
+        total: numericTotal,
+        naturalD20,
+        automaticSuccess: false
       });
 
-      return session.participants[key];
+    session.participants[key] =
+      successState;
+
+    if (
+      successState.status ===
+      "no-results"
+    ) {
+      await this.#writeHarvestRecord(
+        creatureTokenUuid,
+        actorUuid,
+        {
+          status: "no-results",
+          skillId,
+          total: numericTotal
+        }
+      );
     }
-
-    const natural =
-      Number(naturalD20) || null;
-
-    const doubleClaimEnabled = Boolean(
-      getSetting(
-        SETTINGS.HARVEST_NAT20_DOUBLE_CLAIM
-      )
-    );
-
-    const claimsAllowed = Math.min(
-      choices.length,
-      doubleClaimEnabled && natural === 20
-        ? 2
-        : 1
-    );
-
-    session.participants[key] = {
-      userId,
-      actorUuid,
-      creatureTokenUuid,
-      skillId,
-      status: "awaiting-claim",
-      total: numericTotal,
-      naturalD20: natural,
-      claimsAllowed,
-      claimsMade: 0,
-      claimsRemaining: claimsAllowed,
-      claimedComponentIds: [],
-      claimedMaterialIds: [],
-      claimedNames: [],
-      choices: choices.map(c => ({
-        materialId: c.materialId,
-        name: c.name,
-        img: c.img,
-        rarity: c.rarity,
-        componentId: c.componentId ?? null,
-        componentName: c.componentName ?? c.name,
-        category: c.category ?? null
-      }))
-    };
 
     return session.participants[key];
   }
@@ -389,11 +555,16 @@ export class HarvestService {
       );
     }
 
-    const { item, recipient } = await this.materialService.award(
-      actor,
-      choice.materialId,
-      1
-    );
+    const recipient =
+      await this.materialService.getRecipient(
+        actor
+      );
+
+    if (!recipient) {
+      throw new Error(
+        "No recipient Actor is available for this Harvest claim."
+      );
+    }
 
     const user = game.users.get(userId);
 
@@ -473,8 +644,9 @@ export class HarvestService {
       claimedName: state.claimedName,
       recipientUuid: recipient.uuid,
       recipientName: recipient.name,
-      itemUuid: item.uuid,
-      sourceItemUuid: material.uuid
+      itemUuid: null,
+      sourceItemUuid: material.uuid,
+      awarded: false
     });
 
     const creature = session.creatures.find(
@@ -511,8 +683,10 @@ export class HarvestService {
         ?? null,
       rollTotal: state.total,
       skillId: state.skillId,
-      itemUuid: item.uuid,
-      sourceItemUuid: material.uuid
+      itemUuid: null,
+      sourceItemUuid: material.uuid,
+      awarded: false,
+      awardedAt: null
     };
 
     session.results.push(result);
@@ -548,11 +722,256 @@ export class HarvestService {
     });
   }
 
-  finalize(sessionId) {
-    const session = this.sessions.get(sessionId);
-    if (!session) throw new Error("Harvest session not found.");
+  async finalize(sessionId) {
+    const session =
+      this.sessions.get(sessionId);
+
+    if (!session) {
+      throw new Error(
+        "Harvest session not found."
+      );
+    }
+
+    if (
+      session.status === "complete"
+      && session.awardsFinalized === true
+    ) {
+      return session;
+    }
+
+    session.status = "finalizing";
+
+    // Award each reserved claim exactly once. The awarded flag lives on the
+    // authoritative session result so retrying Finalize after an interruption
+    // cannot duplicate items already delivered.
+    for (const result of session.results ?? []) {
+      if (result.awarded === true) {
+        continue;
+      }
+
+      const actor =
+        result.actorUuid
+          ? await fromUuid(result.actorUuid)
+          : null;
+
+      if (!actor) {
+        session.status = "open";
+        throw new Error(
+          `Could not resolve harvesting actor for ${
+            result.componentName
+            ?? result.materialName
+            ?? "a claimed component"
+          }.`
+        );
+      }
+
+      const material =
+        this.materialRegistry.get(
+          result.materialId
+        );
+
+      if (!material) {
+        session.status = "open";
+        throw new Error(
+          `Could not resolve Craftworks material '${
+            result.materialId
+          }' while finalizing Harvest.`
+        );
+      }
+
+      const resolved =
+        await this.materialService.award(
+          actor,
+          result.materialId,
+          1,
+          { postChatCard: false }
+        );
+
+      result.recipientUuid =
+        resolved.recipient.uuid;
+      result.recipientName =
+        resolved.recipient.name;
+      result.itemUuid =
+        resolved.item.uuid;
+      result.awarded = true;
+      result.awardedAt = Date.now();
+
+      const stateKey =
+        `${result.userId}:${result.creatureTokenUuid}`;
+
+      const state =
+        session.participants?.[stateKey];
+
+      if (state) {
+        state.recipientUuid =
+          resolved.recipient.uuid;
+        state.recipientName =
+          resolved.recipient.name;
+      }
+
+      await this.#writeHarvestRecord(
+        result.creatureTokenUuid,
+        actor.uuid,
+        {
+          status:
+            state?.status ?? "claimed",
+          skillId:
+            result.skillId ?? null,
+          total:
+            result.rollTotal ?? null,
+          naturalD20:
+            state?.naturalD20 ?? null,
+          claimsAllowed:
+            state?.claimsAllowed ?? 1,
+          claimsMade:
+            state?.claimsMade ?? 1,
+          claimedMaterialIds:
+            state?.claimedMaterialIds
+            ?? [result.materialId],
+          claimedComponentIds:
+            state?.claimedComponentIds
+            ?? [result.componentId],
+          claimedNames:
+            state?.claimedNames
+            ?? [result.materialName],
+          materialId:
+            result.materialId,
+          componentId:
+            result.componentId,
+          claimedName:
+            result.materialName,
+          recipientUuid:
+            resolved.recipient.uuid,
+          recipientName:
+            resolved.recipient.name,
+          itemUuid:
+            resolved.item.uuid,
+          sourceItemUuid:
+            material.uuid,
+          awarded: true
+        }
+      );
+    }
+
+    const byRecipient =
+      new Map();
+
+    for (const result of session.results ?? []) {
+      if (
+        result.awarded !== true
+        || !result.recipientUuid
+      ) {
+        continue;
+      }
+
+      if (
+        !byRecipient.has(
+          result.recipientUuid
+        )
+      ) {
+        byRecipient.set(
+          result.recipientUuid,
+          {
+            recipientUuid:
+              result.recipientUuid,
+            items: []
+          }
+        );
+      }
+
+      byRecipient
+        .get(result.recipientUuid)
+        .items.push({
+          uuid:
+            result.sourceItemUuid
+            ?? result.itemUuid
+            ?? null,
+          name:
+            result.materialName
+            ?? result.componentName
+            ?? "Harvested Component",
+          img:
+            result.materialImg
+            ?? null,
+          rarity:
+            result.rarity
+            ?? null,
+          quantity: 1
+        });
+    }
+
+    const postedRecipients =
+      new Set(
+        session.awardCardRecipientUuids
+        ?? []
+      );
+
+    for (const group of byRecipient.values()) {
+      if (
+        postedRecipients.has(
+          group.recipientUuid
+        )
+      ) {
+        continue;
+      }
+
+      const recipient =
+        await fromUuid(
+          group.recipientUuid
+        );
+
+      if (!recipient) {
+        continue;
+      }
+
+      const aggregated =
+        new Map();
+
+      for (const item of group.items) {
+        const key =
+          item.uuid
+          ?? `${item.name}::${
+            item.rarity ?? ""
+          }`;
+
+        if (!aggregated.has(key)) {
+          aggregated.set(
+            key,
+            { ...item }
+          );
+          continue;
+        }
+
+        aggregated.get(key).quantity +=
+          Number(item.quantity ?? 1);
+      }
+
+      await AwardChatCardService.post({
+        recipient,
+        items:
+          [...aggregated.values()],
+        title:
+          "Harvested Items Received",
+        subtitle:
+          session.sceneName
+            ? `Harvest from ${session.sceneName}`
+            : "Harvest Complete"
+      });
+
+      postedRecipients.add(
+        group.recipientUuid
+      );
+
+      session.awardCardRecipientUuids =
+        [...postedRecipients];
+    }
+
     session.status = "complete";
     session.completedAt = Date.now();
+    session.awardsFinalized = true;
+    session.awardCardsPosted = true;
+
     return session;
   }
+
 }

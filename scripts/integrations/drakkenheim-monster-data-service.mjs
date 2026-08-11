@@ -866,6 +866,136 @@ export class DrakkenheimMonsterDataService {
     }
 
     /**
+     * Parse special "Items:" instructions from the Harvestable Components
+     * section. These are not Craftworks materials; they are GM-facing loot
+     * instructions supplied by Monsters of Drakkenheim.
+     *
+     * @param {string} html
+     * @returns {{text:string, html:string}[]}
+     */
+    static parseHarvestSpecialItems(html) {
+        if (
+            typeof html !== "string" ||
+            !html.trim()
+        ) {
+            return [];
+        }
+
+        const parser = new DOMParser();
+        const parsedDocument =
+            parser.parseFromString(
+                html,
+                "text/html"
+            );
+
+        const headings =
+            Array.from(
+                parsedDocument.querySelectorAll(
+                    "h1, h2, h3, h4, h5, h6"
+                )
+            );
+
+        const harvestHeading =
+            headings.find(
+                heading =>
+                    /harvestable\s+components/i.test(
+                        heading.textContent ?? ""
+                    )
+            );
+
+        if (!harvestHeading) {
+            return [];
+        }
+
+        const paragraphs = [];
+        let currentElement =
+            harvestHeading.nextElementSibling;
+
+        while (currentElement) {
+            if (
+                /^H[1-6]$/.test(
+                    currentElement.tagName
+                )
+            ) {
+                break;
+            }
+
+            if (currentElement.matches?.("p")) {
+                paragraphs.push(currentElement);
+            }
+
+            if (currentElement.querySelectorAll) {
+                paragraphs.push(
+                    ...Array.from(
+                        currentElement.querySelectorAll("p")
+                    )
+                );
+            }
+
+            currentElement =
+                currentElement.nextElementSibling;
+        }
+
+        const items = [];
+
+        for (const paragraph of paragraphs) {
+            const strong =
+                paragraph.querySelector("strong");
+
+            if (!strong) continue;
+
+            const category =
+                String(strong.textContent ?? "")
+                    .replace(/:\s*$/, "")
+                    .trim()
+                    .toLowerCase();
+
+            if (category !== "items") continue;
+
+            const clone =
+                paragraph.cloneNode(true);
+
+            clone.querySelector("strong")?.remove();
+
+            const cleanInlineRolls =
+                value =>
+                    String(value ?? "")
+                        .replace(
+                            /\[\[\s*\/r\s+([^\]]+)\]\]/gi,
+                            "$1"
+                        )
+                        .replace(
+                            /\[\[\s*\/roll\s+([^\]]+)\]\]/gi,
+                            "$1"
+                        );
+
+            const text =
+                cleanInlineRolls(
+                    clone.textContent
+                )
+                    .replace(/^\s*:\s*/, "")
+                    .replace(/\s+/g, " ")
+                    .trim();
+
+            const itemHtml =
+                cleanInlineRolls(
+                    clone.innerHTML
+                )
+                    .replace(/^\s*:\s*/, "")
+                    .trim();
+
+            if (!text) continue;
+
+            items.push({
+                text,
+                html: itemHtml || text
+            });
+        }
+
+        return items;
+    }
+
+    /**
      * Parse component rarity information.
      *
      * @param {string} html
@@ -1125,6 +1255,8 @@ export class DrakkenheimMonsterDataService {
                 categories:
                     [],
                 components:
+                    [],
+                specialItems:
                     []
             };
         }
@@ -1155,6 +1287,9 @@ export class DrakkenheimMonsterDataService {
         const rarityEntries =
             [];
 
+        const specialItems =
+            [];
+
         for (
             const harvestDocument of
             harvestDocuments
@@ -1169,8 +1304,17 @@ export class DrakkenheimMonsterDataService {
                     harvestDocument.html
                 );
 
+            const documentSpecialItems =
+                this.parseHarvestSpecialItems(
+                    harvestDocument.html
+                );
+
             parsedCategories.push(
                 ...documentCategories
+            );
+
+            specialItems.push(
+                ...documentSpecialItems
             );
 
             rarityEntries.push({
@@ -1198,6 +1342,8 @@ export class DrakkenheimMonsterDataService {
                     return (
                         normalizedCategory !==
                         "delerium"
+                        && normalizedCategory !==
+                        "items"
                     );
                 }
             );
@@ -1240,7 +1386,8 @@ export class DrakkenheimMonsterDataService {
                 rarityEntries,
                 categories:
                     harvestableCategories,
-                components
+                components,
+                specialItems
             }
         );
 
@@ -1275,7 +1422,8 @@ export class DrakkenheimMonsterDataService {
             rarityEntries,
             categories:
                 harvestableCategories,
-            components
+            components,
+            specialItems
         };
     }
 }

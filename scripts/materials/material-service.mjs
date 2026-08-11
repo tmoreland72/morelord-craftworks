@@ -15,7 +15,12 @@ export class MaterialService {
     return this.recipientResolver.describe();
   }
 
-  async award(actor, materialId, quantity = 1) {
+  async award(
+    actor,
+    materialId,
+    quantity = 1,
+    { postChatCard = true } = {}
+  ) {
     const source = await this.registry.resolveItem(materialId);
     if (!source) throw new Error(`Unknown Craftworks material '${materialId}'.`);
 
@@ -28,16 +33,18 @@ export class MaterialService {
       quantity
     );
 
-    await AwardChatCardService.post({
-      recipient,
-      items: [{
-        document: source,
-        uuid: source.uuid,
-        quantity,
-        rarity: source.system?.rarity
-      }],
-      title: "Material Received"
-    });
+    if (postChatCard) {
+      await AwardChatCardService.post({
+        recipient,
+        items: [{
+          document: source,
+          uuid: source.uuid,
+          quantity,
+          rarity: source.system?.rarity
+        }],
+        title: "Material Received"
+      });
+    }
 
     return { item, recipient };
   }

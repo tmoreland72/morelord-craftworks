@@ -11,6 +11,29 @@ export class HarvestPlayerApp extends HandlebarsApplicationMixin(ApplicationV2) 
     this.focusedCreatureTokenUuid = null;
     this.collapsedCreatures = new Set();
     this.selectedSkills = new Map();
+
+    // A Harvest session may already contain authoritative participant state
+    // before the player window opens (for example when the GM selected
+    // "Skip Skill Checks"). Hydrate that state immediately so the initial
+    // render goes straight to component claiming instead of showing a roll.
+    for (const creature of session?.creatures ?? []) {
+      const state =
+        session.participants?.[
+          `${game.user.id}:${creature.tokenUuid}`
+        ]
+        ?? null;
+
+      if (!state) continue;
+
+      this.states[creature.tokenUuid] =
+        foundry.utils.deepClone(state);
+
+      if (state.status === "claimed") {
+        this.collapsedCreatures.add(
+          creature.tokenUuid
+        );
+      }
+    }
   }
 
   static DEFAULT_OPTIONS = {

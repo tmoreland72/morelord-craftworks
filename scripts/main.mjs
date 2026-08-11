@@ -23,6 +23,8 @@ import { RecipeRegistry } from "./recipes/recipe-registry.mjs";
 import { Dnd5eCompendiumItemResolver } from "./recipes/dnd5e-compendium-item-resolver.mjs";
 import { SpellScrollGeneratorService } from "./scrolls/spell-scroll-generator-service.mjs";
 import { SpellScrollGeneratorApp } from "./ui/spell-scroll-generator-app.mjs";
+import { SpellbookGeneratorService } from "./spellbooks/spellbook-generator-service.mjs";
+import { SpellbookGeneratorApp } from "./ui/spellbook-generator-app.mjs";
 import { RecipeEvaluator } from "./recipes/recipe-evaluator.mjs";
 import { RecipePlanner } from "./recipes/recipe-planner.mjs";
 import { ToolInspector } from "./recipes/tool-inspector.mjs";
@@ -126,6 +128,12 @@ Hooks.once("ready", async () => {
     dnd5eItemResolver
   });
 
+  const spellbookGenerator = new SpellbookGeneratorService({
+    spellScrollGenerator,
+    adapter,
+    recipientResolver
+  });
+
   const recipes = new RecipeRegistry({
     materialRegistry: materials,
     coreAccess,
@@ -190,6 +198,7 @@ Hooks.once("ready", async () => {
   let materialBrowserApp = null;
   let recipeBrowserApp = null;
   let spellScrollGeneratorApp = null;
+  let spellbookGeneratorApp = null;
   let craftworksApp = null;
   let craftApp = null;
 
@@ -208,6 +217,7 @@ Hooks.once("ready", async () => {
     dnd5eItemResolver,
     sourceFilter,
     spellScrollGenerator,
+    spellbookGenerator,
     coreAccess,
     contentPacks,
     recipeEvaluator,
@@ -329,6 +339,25 @@ Hooks.once("ready", async () => {
 
       spellScrollGeneratorApp = new SpellScrollGeneratorApp(api);
       return spellScrollGeneratorApp.render({ force: true });
+    },
+    openSpellbookGenerator: async () => {
+      if (!game.user.isGM) {
+        throw new Error(
+          "Only the GM can use the Spellbook Generator."
+        );
+      }
+
+      if (spellbookGeneratorApp?.rendered) {
+        spellbookGeneratorApp.bringToFront();
+        return spellbookGeneratorApp;
+      }
+
+      spellbookGeneratorApp =
+        new SpellbookGeneratorApp(api);
+
+      return spellbookGeneratorApp.render({
+        force: true
+      });
     }
   };
 
@@ -354,8 +383,15 @@ Hooks.once("ready", async () => {
       await playerHarvestApp.close();
     }
 
-    playerHarvestApp = new HarvestPlayerApp(api, imported);
-    await playerHarvestApp.render({ force: true });
+    playerHarvestApp =
+      new HarvestPlayerApp(api, imported);
+
+    // Constructor hydration loads any pre-seeded automatic-success state.
+    // The first client render must still be forced so ApplicationV2 actually
+    // opens a newly-created Harvest window.
+    await playerHarvestApp.render({
+      force: true
+    });
 
     log(`Player Harvest window rendered for session ${imported.id}.`);
   });

@@ -44,30 +44,32 @@
         </header>
 
         {{#unless isCollapsed}}
-          <div class="mlh-check-panel">
-            <div class="mlh-check-controls">
-              <select
-                data-action="select-skill"
-                data-creature="{{tokenUuid}}"
-                aria-label="Harvest skill"
-                {{#if checkLocked}}disabled{{/if}}
-              >
-                <option value="">Choose skill...</option>
-                {{#each skillOptions}}
-                  <option value="{{id}}" {{#if selected}}selected{{/if}}>{{label}}</option>
-                {{/each}}
-              </select>
+          {{#unless state.automaticSuccess}}
+            <div class="mlh-check-panel">
+              <div class="mlh-check-controls">
+                <select
+                  data-action="select-skill"
+                  data-creature="{{tokenUuid}}"
+                  aria-label="Harvest skill"
+                  {{#if checkLocked}}disabled{{/if}}
+                >
+                  <option value="">Choose skill...</option>
+                  {{#each skillOptions}}
+                    <option value="{{id}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+                  {{/each}}
+                </select>
 
-              <button
-                type="button"
-                data-action="roll"
-                data-creature="{{tokenUuid}}"
-                {{#unless canRoll}}disabled{{/unless}}
-              >
-                <i class="fa-solid fa-dice-d20"></i> Roll
-              </button>
+                <button
+                  type="button"
+                  data-action="roll"
+                  data-creature="{{tokenUuid}}"
+                  {{#unless canRoll}}disabled{{/unless}}
+                >
+                  <i class="fa-solid fa-dice-d20"></i> Roll
+                </button>
+              </div>
             </div>
-          </div>
+          {{/unless}}
 
           {{#if alreadyHarvested}}
             <div class="mlh-harvest-message mlh-locked">
@@ -99,7 +101,9 @@
             {{#if (eq state.status "awaiting-claim")}}
               <div class="mlh-harvest-message mlh-mine">
                 <i class="fa-solid fa-check"></i>
-                {{#if state.claimsMade}}
+                {{#if state.automaticSuccess}}
+                  Skill check skipped by the GM. Choose one highlighted component.
+                {{else if state.claimsMade}}
                   Natural 20 harvest: choose {{state.claimsRemaining}} more highlighted component.
                 {{else if (eq state.claimsAllowed 2)}}
                   Natural 20! Harvest succeeded with {{state.total}}. Choose two highlighted components.
