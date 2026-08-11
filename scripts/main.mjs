@@ -10,7 +10,7 @@ import { HarvestService } from "./acquisition/harvest-service.mjs";
 import { HarvestPrototypeApp } from "./ui/harvest-app.mjs";
 import { HarvestPlayerApp } from "./ui/harvest-player-app.mjs";
 import { SocketService } from "./socket/socket-service.mjs";
-import { StandardMaterialInstaller } from "./dev/standard-material-installer.mjs";
+import { ContentPackMaterialInstaller } from "./dev/content-pack-material-installer.mjs";
 import { GatherService } from "./acquisition/gather-service.mjs";
 import { LootService } from "./acquisition/loot-service.mjs";
 import { SpecialTreasureService } from "./acquisition/special-treasure-service.mjs";
@@ -94,16 +94,17 @@ Hooks.once("ready", async () => {
   // Standard material Items are world compendium documents. Synchronize them
   // from Craftworks' own static material seed before indexing so existing
   // worlds receive current names, metadata, and icon paths.
-  const startupMaterialInstaller = new StandardMaterialInstaller({
-    registry: materials
+  const startupMaterialInstaller = new ContentPackMaterialInstaller({
+    registry: materials,
+    contentPacks
   });
 
   if (game.user.isGM) {
     try {
-      await startupMaterialInstaller.install();
+      await startupMaterialInstaller.installAll();
     } catch (error) {
       console.warn(
-        "Morelord Craftworks | Automatic Standard material synchronization failed.",
+        "Morelord Craftworks | Automatic content-pack material synchronization failed.",
         error
       );
       await materials.indexConfiguredPacks();
@@ -180,10 +181,6 @@ Hooks.once("ready", async () => {
     recipientResolver,
     specialTreasure
   });
-  const standardMaterialInstaller = new StandardMaterialInstaller({
-    registry: materials
-  });
-
   let gmHarvestApp = null;
   let playerHarvestApp = null;
   let gmGatherApp = null;
@@ -228,7 +225,8 @@ Hooks.once("ready", async () => {
       getMaterialId: getCraftworksMaterialId
     },
     dev: {
-      installStandardMaterials: () => standardMaterialInstaller.install(),
+      installStandardMaterials: () => startupMaterialInstaller.installAll(),
+      syncContentPackMaterials: () => startupMaterialInstaller.installAll(),
       socketPing: targetUserId => socket.ping(targetUserId)
     },
     openHarvest: () => {
@@ -379,19 +377,35 @@ Hooks.once("ready", async () => {
 
   socket.on("harvest.claim", async data => {
     if (!game.user.isGM) return;
-    const state = await harvest.claim(data);
-    socket.emit("harvest.state", {
-      sessionId: data.sessionId,
-      creatureTokenUuid: data.creatureTokenUuid,
-      state
-    }, { targetUserId: data.userId });
-    gmHarvestApp?.setSession(sessions.get(data.sessionId));
+
+    const resolved = await harvest.claim(data);
+    const session = resolved.session;
+
+    // Broadcast the authoritative session to every connected Harvest client.
+    // This mirrors the standalone Drakkenheim Harvesting model: once a claim
+    // succeeds, all clients immediately receive the same claim state.
+    await socket.emit("harvest.session", {
+      session
+    });
+
+    gmHarvestApp?.setSession(session);
   });
 
   socket.on("harvest.state", async ({ sessionId, creatureTokenUuid, state }) => {
     if (game.user.isGM) return;
     if (!playerHarvestApp || playerHarvestApp.session?.id !== sessionId) return;
     await playerHarvestApp.setState(creatureTokenUuid, state);
+  });
+
+  socket.on("harvest.session", async ({ session }) => {
+    if (game.user.isGM) return;
+    if (!session?.id) return;
+    if (!playerHarvestApp || playerHarvestApp.session?.id !== session.id) return;
+
+    const imported = sessions.import(session);
+    await playerHarvestApp.setSession(imported, {
+      preserveFocus: true
+    });
   });
 
 
@@ -451,6 +465,32 @@ Hooks.once("ready", async () => {
     } else {
       ui.notifications.info("The party recovered no encounter loot.");
     }
+  });
+
+  socket.on("harvest.cancel", async ({ sessionId }) => {
+    if (game.user.isGM) return;
+
+    log(
+      `Closing Harvest client window for cancelled session ${
+        sessionId ?? "unknown"
+      }.`
+    );
+
+    if (playerHarvestApp?.rendered) {
+      await playerHarvestApp.close();
+    }
+
+    playerHarvestApp = null;
+
+    for (const app of HarvestPlayerApp.instances()) {
+      if (app.rendered) {
+        await app.close();
+      }
+    }
+
+    ui.notifications.info(
+      "Harvesting was cancelled by the GM."
+    );
   });
 
   socket.on("harvest.complete", async ({ sessionId }) => {

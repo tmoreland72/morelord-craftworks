@@ -1,59 +1,235 @@
-<section class="mcw app-shell">
-  <header class="mcw-header">
-    <h2>Harvest</h2>
-    <p>Craftworks automatically includes all dead creatures on the current scene.</p>
+<div class="mlh-shell">
+  <header class="mlh-header">
+    <div class="mlh-title"><div><h1><i class="fa-solid fa-scalpel"></i> Harvesting</h1><div class="mlh-scene">{{#if session}}{{session.sceneName}}{{else}}Current Scene{{/if}}</div></div></div>
+    {{#if session}}
+      <div class="mlh-instructions">Players make one harvest attempt per creature and choose one component after a successful check.</div>
+      <div class="mlh-summary"><span><i class="fa-solid fa-skull"></i> {{session.creatures.length}} Creatures</span><span><i class="fa-solid fa-users"></i> Player Progress</span></div>
+    {{/if}}
   </header>
 
-  {{#if session}}
-    <div class="mcw-panel">
-      <h3>Dead Creatures</h3>
+  <main class="mlh-creatures">
+    {{#if session}}
       {{#each session.creatures}}
-        <article class="mcw-creature">
-          <img src="{{img}}" alt="{{name}}">
+        <section class="mlh-creature {{#if isCollapsed}}mlh-creature-collapsed{{/if}}" data-creature-token="{{tokenUuid}}">
+          <header class="mlh-creature-header">
+            {{#if img}}
+              <img class="mlh-creature-image" src="{{img}}" alt="{{name}}">
+            {{/if}}
+
+            <div class="mlh-creature-info">
+              <h2>{{name}}</h2>
+              <div class="mlh-creature-meta">
+                <span>{{creatureType}} · CR {{cr}}</span>
+                <span>Harvest DC {{dc}}</span>
+                {{#if harvestRarity}}
+                  <span class="mlh-rarity">{{harvestRarity}}</span>
+                {{/if}}
+                {{#if (eq harvestMode "drakkenheim")}}
+                  <span class="mlh-has-claim">
+                    <i class="fa-solid fa-radiation"></i>
+                    Drakkenheim Components
+                  </span>
+                {{else}}
+                  <span>
+                    <i class="fa-solid fa-leaf"></i>
+                    Standard Harvest
+                  </span>
+                {{/if}}
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="mlh-creature-toggle"
+              data-action="toggle-creature"
+              data-creature="{{tokenUuid}}"
+              title="{{#if isCollapsed}}Expand{{else}}Collapse{{/if}}"
+            >
+              <i class="fa-solid {{#if isCollapsed}}fa-chevron-down{{else}}fa-chevron-up{{/if}}"></i>
+            </button>
+          </header>
+
+          {{#unless isCollapsed}}
+            {{#if (eq harvestMode "drakkenheim")}}
+              <div class="mlh-components mlh-preview-components">
+                {{#each components}}
+                  <article class="mlh-component {{#unless matched}}mlh-component-unavailable{{/unless}}">
+                    <div class="mlh-component-image">
+                      {{#if img}}
+                        <img src="{{img}}" alt="{{name}}">
+                      {{else}}
+                        <i class="fa-solid fa-flask"></i>
+                      {{/if}}
+                    </div>
+
+                    <div class="mlh-component-body">
+                      <div class="mlh-component-name">{{componentName}}</div>
+                      <div class="mlh-component-category">{{category}} · {{rarity}}</div>
+                      {{#if name}}
+                        <div class="mlh-ingredient-name">
+                          <i class="fa-solid fa-arrow-right"></i>
+                          {{name}}
+                        </div>
+                      {{/if}}
+                    </div>
+
+                    <div class="mlh-component-action">
+                      {{#if claimed}}
+                        <div class="mlh-claim-status mlh-taken">
+                          <i class="fa-solid fa-lock"></i>
+                          <span>
+                            Claimed by <strong>{{claimantName}}</strong>
+                            {{#if claimRoll}} · Roll {{claimRoll}}{{/if}}
+                          </span>
+                        </div>
+                      {{else}}
+                        <div class="mlh-claim-status {{#if matched}}mlh-mine{{else}}mlh-unavailable{{/if}}">
+                          {{#if matched}}Available{{else}}No material match{{/if}}
+                        </div>
+                      {{/if}}
+                    </div>
+                  </article>
+                {{/each}}
+              </div>
+            {{else}}
+              <div class="mlh-components mlh-preview-components">
+                {{#each components}}
+                  <article class="mlh-component">
+                    <div class="mlh-component-image">
+                      {{#if img}}
+                        <img src="{{img}}" alt="{{name}}">
+                      {{else}}
+                        <i class="fa-solid fa-flask"></i>
+                      {{/if}}
+                    </div>
+
+                    <div class="mlh-component-body">
+                      <div class="mlh-component-name">{{componentName}}</div>
+                      <div class="mlh-component-category">
+                        {{category}}{{#if rarity}} · {{rarity}}{{/if}}
+                      </div>
+                      {{#if name}}
+                        <div class="mlh-ingredient-name">
+                          <i class="fa-solid fa-arrow-right"></i>{{name}}
+                        </div>
+                      {{/if}}
+                    </div>
+
+                    <div class="mlh-component-action">
+                      {{#if claimed}}
+                        <div class="mlh-claim-status mlh-taken">
+                          <i class="fa-solid fa-lock"></i>
+                          <span>
+                            Claimed by <strong>{{claimantName}}</strong>
+                            {{#if claimRoll}} · Roll {{claimRoll}}{{/if}}
+                          </span>
+                        </div>
+                      {{else}}
+                        <div class="mlh-claim-status mlh-mine">Available</div>
+                      {{/if}}
+                    </div>
+                  </article>
+                {{/each}}
+
+                {{#unless components.length}}
+                  <div class="mlh-harvest-message mcw-warning">
+                    No compatible Craftworks components are available for this creature.
+                  </div>
+                {{/unless}}
+              </div>
+            {{/if}}
+          {{/unless}}
+        </section>
+      {{/each}}
+
+      <section class="mlh-claimed-section">
+        <div class="mlh-claimed-heading">
           <div>
-            <h4>{{name}}</h4>
-            <p>{{creatureType}} • CR {{cr}} • Harvest DC {{dc}}</p>
-            {{#unless profileId}}<p class="mcw-warning">No harvest profile is defined for this creature type yet.</p>{{/unless}}
+            <i class="fa-solid fa-box-open"></i>
+            <span>Claimed Components</span>
           </div>
-        </article>
-      {{/each}}
-    </div>
-
-    <div class="mcw-panel mcw-progress">
-      <h3>Player Progress</h3>
-      {{#each progress}}
-        <div class="mcw-progress-user">
-          <strong>{{user}}</strong>
-          {{#each perCreature}}
-            <span>{{creature}}: {{status}}{{#if claimedName}} ({{claimedName}}){{/if}}{{#if total}} [{{total}}]{{/if}}</span>
-          {{/each}}
+          <span class="mlh-claimed-count">{{claimedItems.length}}</span>
         </div>
-      {{/each}}
-    </div>
 
-    <footer class="mcw-actions">
-      <button type="button" data-action="reset-harvest">
-        <i class="fa-solid fa-rotate-left"></i> Reset Harvest
-      </button>
-      <button type="button" data-action="finalize">
-        <i class="fa-solid fa-flag-checkered"></i> Finalize Harvest
-      </button>
-    </footer>
-  {{else}}
-    <div class="mcw-panel">
+        {{#if claimedItems.length}}
+          <div class="mlh-claimed-list">
+            {{#each claimedItems}}
+              <article class="mlh-claimed-item">
+                <button
+                  type="button"
+                  class="mlh-claimed-image-link"
+                  data-action="open-claimed-item"
+                  data-uuid="{{linkUuid}}"
+                  {{#unless linkUuid}}disabled{{/unless}}
+                  title="{{#if linkUuid}}Open {{displayName}}{{else}}{{displayName}}{{/if}}"
+                >
+                  {{#if displayImg}}
+                    <img src="{{displayImg}}" alt="{{displayName}}">
+                  {{else}}
+                    <i class="fa-solid fa-flask"></i>
+                  {{/if}}
+                </button>
+
+                <div class="mlh-claimed-body">
+                  <div class="mlh-claimed-name">{{displayName}}</div>
+                  <div class="mlh-claimed-meta">
+                    <span class="mlh-claimed-rarity">{{displayRarity}}</span>
+                    <span>{{creatureName}}</span>
+                    <span>Claimed by {{displayClaimant}}</span>
+                  </div>
+                </div>
+
+                <div class="mlh-claimed-roll">
+                  <span>Harvest Roll</span>
+                  <strong>{{displayRoll}}</strong>
+                </div>
+              </article>
+            {{/each}}
+          </div>
+        {{else}}
+          <div class="mlh-claimed-empty">
+            No components have been claimed yet.
+          </div>
+        {{/if}}
+      </section>
+    {{else}}
       {{#if deadCreatures.length}}
-        <p><strong>{{deadCreatures.length}}</strong> dead creature(s) found on the current scene.</p>
-        <div class="mcw-dead-list">
-          {{#each deadCreatures}}
-            <span><img src="{{img}}" alt="{{name}}"> {{name}}</span>
-          {{/each}}
-        </div>
-        <div class="mcw-actions">
-          <button type="button" data-action="start"><i class="fa-solid fa-leaf"></i> Start Harvest</button>
-        </div>
+        <section class="mlh-gm-managed"><div class="mlh-mode-heading"><i class="fa-solid fa-skull"></i> {{deadCreatures.length}} dead creature(s) found</div><div class="mcw-dead-list">{{#each deadCreatures}}<span><img src="{{img}}" alt="{{name}}"> {{name}}</span>{{/each}}</div></section>
       {{else}}
-        <p class="mcw-warning">No dead creatures were found on the current scene.</p>
+        <section class="mlh-empty"><i class="fa-solid fa-scalpel"></i><h2>No Dead Creatures</h2><p>No dead creatures were found on the current scene.</p></section>
+      {{/if}}
+    {{/if}}
+  </main>
+
+  <footer class="mlh-footer">
+    <div class="mlh-footer-status">{{#if session}}Harvest session active{{else}}Ready to scan the scene{{/if}}</div>
+    <div class="mcw-actions">
+      {{#if session}}
+        <button
+          type="button"
+          class="mlh-cancel-harvest"
+          data-action="cancel-harvest"
+        >
+          <i class="fa-solid fa-ban"></i> Cancel Harvest
+        </button>
+        <button
+          type="button"
+          data-action="reset-harvest"
+        >
+          <i class="fa-solid fa-rotate-left"></i> Reset Harvest
+        </button>
+        <button
+          type="button"
+          class="mlh-finalize"
+          data-action="finalize"
+        >
+          <i class="fa-solid fa-box-open"></i> Finalize Harvest
+        </button>
+      {{else if deadCreatures.length}}
+        <button type="button" data-action="start">
+          <i class="fa-solid fa-scalpel"></i> Start Harvest
+        </button>
       {{/if}}
     </div>
-  {{/if}}
-</section>
+  </footer>
+</div>

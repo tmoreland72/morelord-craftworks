@@ -170,17 +170,6 @@ export class CraftCompletionApp
           this.progress?.inventoryActorUuid
         );
 
-      await ChatMessage.create({
-        speaker: ChatMessage.getSpeaker({
-          actor: this.crafter
-        }),
-        content:
-          `<strong>${foundry.utils.escapeHTML(this.recipe.name)} complete!</strong><br>`
-          + `${foundry.utils.escapeHTML(this.crafter.name)} crafted `
-          + `${awarded.quantity} × @UUID[${awarded.source.uuid}]{${foundry.utils.escapeHTML(awarded.label)}} `
-          + `and placed it in ${foundry.utils.escapeHTML(destination.name)}.`
-      });
-
       await this.onPlaced?.({
         destination,
         awarded

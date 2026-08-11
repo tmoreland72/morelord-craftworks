@@ -1,6 +1,7 @@
 import { SRD_52_RECIPES } from "../srd-5.2-recipes.mjs";
 import { SRD_51_RECIPES } from "../srd-5.1-recipes.mjs";
 import { PHB_RECIPES } from "../phb-recipes.mjs";
+import { DMG_RECIPES } from "../dmg-recipes.mjs";
 import { MONSTERS_OF_DRAKKENHEIM_RECIPES } from "../monsters-of-drakkenheim-recipes.mjs";
 
 import { STANDARD_HARVEST_PROFILES } from "./standard/harvest.mjs";
@@ -22,6 +23,12 @@ import { PHB_HARVEST_PROFILES } from "./phb/harvest.mjs";
 import { PHB_GATHERING_PROFILES } from "./phb/gathering.mjs";
 import { PHB_LOOT_TIERS } from "./phb/loot.mjs";
 import { PHB_ENCOUNTER_LOOT_PROFILES } from "./phb/encounter-loot.mjs";
+
+import { DMG_HARVEST_PROFILES } from "./dmg/harvest.mjs";
+import { DMG_GATHERING_PROFILES } from "./dmg/gathering.mjs";
+import { DMG_LOOT_TIERS } from "./dmg/loot.mjs";
+import { DMG_ENCOUNTER_LOOT_PROFILES } from "./dmg/encounter-loot.mjs";
+
 
 import { DRAKKENHEIM_HARVEST_PROFILES } from "./monsters-of-drakkenheim/harvest.mjs";
 import { DRAKKENHEIM_GATHERING_PROFILES } from "./monsters-of-drakkenheim/gathering.mjs";
@@ -73,9 +80,22 @@ export const CONTENT_PACK_MANIFESTS = [
     encounterLootProfiles: PHB_ENCOUNTER_LOOT_PROFILES
   },
   {
+    id: "dmg",
+    priority: 105,
+    materials: { seedPath: null, entries: [] },
+    recipes: DMG_RECIPES,
+    harvestProfiles: DMG_HARVEST_PROFILES,
+    gatheringProfiles: DMG_GATHERING_PROFILES,
+    lootTiers: DMG_LOOT_TIERS,
+    encounterLootProfiles: DMG_ENCOUNTER_LOOT_PROFILES
+  },
+  {
     id: "monsters-of-drakkenheim",
     priority: 110,
-    materials: { seedPath: null, entries: [] },
+    materials: {
+      seedPath: "data/drakkenheim-materials.seed.json",
+      entries: []
+    },
     recipes: MONSTERS_OF_DRAKKENHEIM_RECIPES,
     harvestProfiles: DRAKKENHEIM_HARVEST_PROFILES,
     gatheringProfiles: DRAKKENHEIM_GATHERING_PROFILES,

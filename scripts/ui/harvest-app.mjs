@@ -7,14 +7,15 @@ export class HarvestPrototypeApp extends HandlebarsApplicationMixin(ApplicationV
     super(options);
     this.craftworks = craftworks;
     this.session = null;
+    this.collapsedCreatures = new Set();
   }
 
   static DEFAULT_OPTIONS = {
     id: "morelord-craftworks-harvest",
-    classes: ["morelord-craftworks", "mcw-window"],
+    classes: ["morelord-craftworks", "mcw-window", "mcw", "mcw-harvest-modern"],
     position: {
-      width: 760,
-      height: "auto"
+      width: 820,
+      height: 720
     },
     window: {
       title: `${MODULE_TITLE} — Harvest`,
@@ -60,10 +61,86 @@ export class HarvestPrototypeApp extends HandlebarsApplicationMixin(ApplicationV
       img: token.document.texture?.src ?? token.actor?.img
     }));
 
+    const claimsByCreature = new Map();
+
+    for (const result of this.session?.results ?? []) {
+      if (!claimsByCreature.has(result.creatureTokenUuid)) {
+        claimsByCreature.set(result.creatureTokenUuid, new Map());
+      }
+
+      claimsByCreature
+        .get(result.creatureTokenUuid)
+        .set(result.componentId, result);
+    }
+
+    const session = this.session
+      ? {
+          ...this.session,
+          creatures: this.session.creatures.map(creature => {
+            const creatureClaims =
+              claimsByCreature.get(creature.tokenUuid)
+              ?? new Map();
+
+            return {
+              ...creature,
+              isCollapsed: this.collapsedCreatures.has(creature.tokenUuid),
+              components: (creature.components ?? []).map(component => {
+                const claim =
+                  creatureClaims.get(component.id)
+                  ?? null;
+
+                return {
+                  ...component,
+                  claimed: Boolean(claim),
+                  claimantName:
+                    claim?.actorName
+                    ?? claim?.userName
+                    ?? null,
+                  claimRoll:
+                    claim?.rollTotal
+                    ?? null
+                };
+              })
+            };
+          })
+        }
+      : null;
+
+    const claimedItems = (this.session?.results ?? [])
+      .map(result => ({
+        ...result,
+        displayName:
+          result.componentName
+          ?? result.materialName
+          ?? "Claimed Component",
+        displayImg:
+          result.materialImg
+          ?? "",
+        displayRarity:
+          result.rarity
+          ?? "Unspecified",
+        displayClaimant:
+          result.actorName
+          ?? result.userName
+          ?? "Unknown",
+        displayRoll:
+          result.rollTotal
+          ?? "—",
+        linkUuid:
+          result.sourceItemUuid
+          ?? result.itemUuid
+          ?? null
+      }))
+      .sort((a, b) =>
+        Number(a.claimedAt ?? 0)
+        - Number(b.claimedAt ?? 0)
+      );
+
     return foundry.utils.mergeObject(context, {
       isGM: game.user.isGM,
-      session: this.session,
+      session,
       progress,
+      claimedItems,
       deadCreatures
     }, { inplace: false });
   }
@@ -79,6 +156,51 @@ export class HarvestPrototypeApp extends HandlebarsApplicationMixin(ApplicationV
 
     this.element.querySelector("[data-action='reset-harvest']")
       ?.addEventListener("click", () => this.#resetHarvest());
+
+    this.element.querySelector("[data-action='cancel-harvest']")
+      ?.addEventListener("click", () => this.#cancelHarvest());
+
+    this.element.querySelectorAll("[data-action='open-claimed-item']")
+      .forEach(button => button.addEventListener("click", async event => {
+        event.preventDefault();
+
+        const uuid = button.dataset.uuid;
+        if (!uuid) return;
+
+        try {
+          const item = await fromUuid(uuid);
+          if (item?.sheet) {
+            item.sheet.render(true);
+          }
+        } catch {
+          // Keep the claimed-row display usable even if a document is no
+          // longer resolvable.
+        }
+      }));
+
+    this.element.querySelectorAll("[data-action='toggle-creature']")
+      .forEach(button => button.addEventListener("click", async event => {
+        event.preventDefault();
+
+        const id = button.dataset.creature;
+        if (!id) return;
+
+        const scroll = this.element.querySelector(".mlh-creatures");
+        const scrollTop = scroll?.scrollTop ?? 0;
+
+        if (this.collapsedCreatures.has(id)) {
+          this.collapsedCreatures.delete(id);
+        } else {
+          this.collapsedCreatures.add(id);
+        }
+
+        await this.render();
+
+        requestAnimationFrame(() => {
+          const nextScroll = this.element.querySelector(".mlh-creatures");
+          if (nextScroll) nextScroll.scrollTop = scrollTop;
+        });
+      }));
   }
 
   async #startHarvest() {
@@ -89,7 +211,7 @@ export class HarvestPrototypeApp extends HandlebarsApplicationMixin(ApplicationV
         );
       }
 
-      this.session = this.craftworks.harvest.start();
+      this.session = await this.craftworks.harvest.start();
       const players = game.users.filter(user => user.active && !user.isGM);
       if (!players.length) throw new Error("No active player users are connected.");
 
@@ -120,7 +242,7 @@ export class HarvestPrototypeApp extends HandlebarsApplicationMixin(ApplicationV
       if (this.session?.status === "open") {
         const players = game.users.filter(user => user.active && !user.isGM);
 
-        this.session = this.craftworks.harvest.start();
+        this.session = await this.craftworks.harvest.start();
 
         await Promise.all(players.map(user =>
           this.craftworks.socket.emit(
@@ -138,6 +260,46 @@ export class HarvestPrototypeApp extends HandlebarsApplicationMixin(ApplicationV
       );
 
       await this.render();
+    } catch (err) {
+      ui.notifications.error(err.message);
+    }
+  }
+
+  async #cancelHarvest() {
+    try {
+      const sessionId = this.session?.id ?? null;
+      const count =
+        await this.craftworks.harvest
+          .resetSceneHarvesting();
+
+      if (sessionId) {
+        this.craftworks.sessions.delete(sessionId);
+      }
+
+      this.session = null;
+
+      const players =
+        game.users.filter(
+          user => user.active && !user.isGM
+        );
+
+      await Promise.all(
+        players.map(user =>
+          this.craftworks.socket.emit(
+            "harvest.cancel",
+            { sessionId },
+            { targetUserId: user.id }
+          )
+        )
+      );
+
+      ui.notifications.info(
+        `Harvesting cancelled. Reset ${count} dead creature token${
+          count === 1 ? "" : "s"
+        }.`
+      );
+
+      await this.close();
     } catch (err) {
       ui.notifications.error(err.message);
     }

@@ -10,8 +10,10 @@ const SETTINGS = Object.freeze({
   HARVEST_CHOICES_MIN: "harvestChoicesMin",
   HARVEST_CHOICES_MAX: "harvestChoicesMax",
   HARVEST_RARE_BIAS: "harvestRareBias",
+  HARVEST_NAT20_DOUBLE_CLAIM: "harvestNat20DoubleClaim",
 
   GATHER_DC_MODIFIER: "gatherDcModifier",
+  GATHER_DC_OVERRIDES: "gatherDcOverrides",
   GATHER_QUANTITY_MULTIPLIER: "gatherQuantityMultiplier",
   GATHER_RARE_BIAS: "gatherRareBias",
 
@@ -63,8 +65,14 @@ export function registerSettings() {
   registerNumber(SETTINGS.HARVEST_CHOICES_MIN, "Minimum Harvest Choices", 3);
   registerNumber(SETTINGS.HARVEST_CHOICES_MAX, "Maximum Harvest Choices", 6);
   registerNumber(SETTINGS.HARVEST_RARE_BIAS, "Harvest Rare Result Bias (%)", 0);
+  registerBoolean(
+    SETTINGS.HARVEST_NAT20_DOUBLE_CLAIM,
+    "Natural 20 Grants Two Harvest Claims",
+    true
+  );
 
   registerNumber(SETTINGS.GATHER_DC_MODIFIER, "Gathering DC Modifier", 0);
+  registerString(SETTINGS.GATHER_DC_OVERRIDES, "Gathering Terrain DC Overrides", "{}");
   registerNumber(SETTINGS.GATHER_QUANTITY_MULTIPLIER, "Gathering Quantity Multiplier", 1);
   registerNumber(SETTINGS.GATHER_RARE_BIAS, "Gathering Rare Result Bias (%)", 0);
 
@@ -180,6 +188,53 @@ export async function setHiddenRecipeIds(ids) {
 
 export function isRecipeHidden(recipeId) {
   return getHiddenRecipeIds().has(String(recipeId));
+}
+
+export function getGatherDcOverrides() {
+  try {
+    const raw = String(
+      game.settings.get(
+        MODULE_ID,
+        SETTINGS.GATHER_DC_OVERRIDES
+      ) ?? "{}"
+    );
+
+    const parsed = JSON.parse(raw);
+
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return {};
+    }
+
+    const normalized = {};
+
+    for (const [profileId, value] of Object.entries(parsed)) {
+      const numeric = Number(value);
+      if (!profileId || !Number.isFinite(numeric)) continue;
+      normalized[String(profileId)] = Math.max(1, Math.round(numeric));
+    }
+
+    return normalized;
+  } catch {
+    return {};
+  }
+}
+
+export async function setGatherDcOverrides(overrides = {}) {
+  const normalized = {};
+
+  for (const [profileId, value] of Object.entries(overrides ?? {})) {
+    const numeric = Number(value);
+    if (!profileId || !Number.isFinite(numeric)) continue;
+    normalized[String(profileId)] = Math.max(1, Math.round(numeric));
+  }
+
+  await game.settings.set(
+    MODULE_ID,
+    SETTINGS.GATHER_DC_OVERRIDES,
+    JSON.stringify(normalized)
+  );
+
+  return normalized;
 }
 
 export function getSetting(key) {

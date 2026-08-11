@@ -121,6 +121,7 @@ export class Dnd5eAdapter extends SystemAdapter {
         dc == null
           ? null
           : roll.total >= dc,
+      naturalD20: extractNaturalD20(roll),
       roll
     };
   }
@@ -193,6 +194,40 @@ function normalizeRollResult(result, dc) {
   return {
     total,
     success: Number.isFinite(total) && dc != null ? total >= dc : null,
+    naturalD20: extractNaturalD20(roll),
     roll
   };
+}
+
+function extractNaturalD20(roll) {
+  if (!roll) return null;
+
+  const dice = Array.from(roll.dice ?? []);
+  const d20 =
+    dice.find(die => Number(die.faces) === 20)
+    ?? Array.from(roll.terms ?? [])
+      .find(term => Number(term.faces) === 20)
+    ?? null;
+
+  if (!d20) return null;
+
+  const results = Array.from(d20.results ?? []);
+  const active =
+    results.find(result =>
+      result?.active !== false
+      && result?.discarded !== true
+    )
+    ?? results.find(result => result?.discarded !== true)
+    ?? results[0]
+    ?? null;
+
+  const value = Number(
+    active?.result
+    ?? active?.value
+    ?? NaN
+  );
+
+  return Number.isFinite(value)
+    ? value
+    : null;
 }

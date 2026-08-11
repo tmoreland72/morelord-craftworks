@@ -7,6 +7,7 @@ export const CONTENT_PACKS = [
     description: "Shared Kibbles-defined crafting materials and Craftworks acquisition/reference infrastructure.",
     premium: false,
     requiredEntitlements: [],
+    requiredFeatures: ["craftworks.standard"],
     enabledByDefault: true,
     sort: 0,
     capabilities: ["materials", "harvest", "gathering", "loot"]
@@ -19,6 +20,7 @@ export const CONTENT_PACKS = [
     description: "Kibbles crafting recipes whose finished output exists in the D&D5e SRD 5.2 Equipment compendium.",
     premium: false,
     requiredEntitlements: [],
+    requiredFeatures: ["craftworks.content-srd52"],
     enabledByDefault: true,
     sort: 10,
     capabilities: ["materials", "recipes", "harvest", "gathering", "loot"]
@@ -40,11 +42,25 @@ export const CONTENT_PACKS = [
     label: "Player's Handbook",
     shortLabel: "PHB",
     rulesVersion: "2024",
-    description: "Premium Player's Handbook Craftworks content pack.",
+    description: "Kibbles crafting recipes whose finished output exists in the 2024 D&D Player's Handbook Equipment compendium.",
     premium: true,
-    requiredEntitlements: ["premium-modules"],
+    requiredEntitlements: [],
+    requiredFeatures: ["craftworks.content-phb"],
     enabledByDefault: false,
     sort: 100,
+    capabilities: ["materials", "recipes", "harvest", "gathering", "loot", "crafting"]
+  },
+  {
+    id: "dmg",
+    label: "Dungeon Master's Guide",
+    shortLabel: "DMG",
+    rulesVersion: "2024",
+    description: "Kibbles crafting recipes whose finished output exists in the 2024 D&D Dungeon Master's Guide Equipment compendium.",
+    premium: true,
+    requiredEntitlements: [],
+    requiredFeatures: ["craftworks.content-dmg"],
+    enabledByDefault: false,
+    sort: 105,
     capabilities: ["materials", "recipes", "harvest", "gathering", "loot", "crafting"]
   },
   {
@@ -54,7 +70,8 @@ export const CONTENT_PACKS = [
     rulesVersion: "2024",
     description: "Premium Monsters of Drakkenheim materials, monster harvesting data, recipes, and acquisition content.",
     premium: true,
-    requiredEntitlements: ["premium-modules"],
+    requiredEntitlements: [],
+    requiredFeatures: ["craftworks.content-mod"],
     enabledByDefault: false,
     sort: 110,
     capabilities: ["materials", "recipes", "harvest", "gathering", "loot", "crafting"]

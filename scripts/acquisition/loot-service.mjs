@@ -1,3 +1,4 @@
+import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
 import { MODULE_ID } from "../constants.mjs";
 import { SETTINGS, getSetting } from "../core/settings.mjs";
 import { getEncounterLootProfile } from "./encounter-loot-profiles.mjs";
@@ -235,23 +236,71 @@ export class LootService {
       throw new Error("No valid recipient is available for encounter loot.");
     }
 
+    const awardedItems = [];
+
     for (const material of result.materials) {
       // Award directly to resolved recipient so we do not resolve Party twice.
-      const source = await this.materialRegistry.resolveItem(material.materialId);
-      await this.adapter.addItemToActor(recipient, source, material.quantity);
+      const source = await this.materialRegistry.resolveItem(
+        material.materialId
+      );
+
+      await this.adapter.addItemToActor(
+        recipient,
+        source,
+        material.quantity
+      );
+
+      awardedItems.push({
+        document: source,
+        uuid: source.uuid,
+        quantity: material.quantity,
+        rarity: source.system?.rarity
+      });
     }
 
     if (result.coinTotalCopper > 0) {
-      await this.adapter.adjustCurrencyCopper(recipient, result.coinTotalCopper);
+      await this.adapter.adjustCurrencyCopper(
+        recipient,
+        result.coinTotalCopper
+      );
     }
 
     if (result.special?.itemUuid) {
-      const specialItem = await fromUuid(result.special.itemUuid);
+      const specialItem = await fromUuid(
+        result.special.itemUuid
+      );
+
       if (!specialItem || specialItem.documentName !== "Item") {
-        throw new Error(`Special treasure Item could not be resolved: ${result.special.itemName ?? result.special.itemUuid}`);
+        throw new Error(
+          `Special treasure Item could not be resolved: ${
+            result.special.itemName ?? result.special.itemUuid
+          }`
+        );
       }
-      await this.adapter.addItemToActor(recipient, specialItem, 1);
+
+      await this.adapter.addItemToActor(
+        recipient,
+        specialItem,
+        1
+      );
+
+      awardedItems.push({
+        document: specialItem,
+        uuid: specialItem.uuid,
+        quantity: 1,
+        rarity: specialItem.system?.rarity
+      });
     }
+
+    await AwardChatCardService.post({
+      recipient,
+      items: awardedItems,
+      coinLabel:
+        result.coinTotalCopper > 0
+          ? result.coinLabel
+          : null,
+      title: "Encounter Loot Received"
+    });
 
     result.awarded = true;
     result.recipientUuid = recipient.uuid;

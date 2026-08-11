@@ -13,39 +13,44 @@
           <h3><i class="fa-solid fa-boxes-stacked"></i> Content Packs</h3>
           <p>Choose which Craftworks content packs are active in this world.</p>
         </div>
-        <button type="button" data-action="refresh-core">
-          <i class="fa-solid fa-arrows-rotate"></i> Refresh Morelord Core
-        </button>
       </div>
 
-      <div class="mcw-core-status">
-        <strong>Morelord Core:</strong>
-        {{#if core.available}}
-          <span>Connected</span>
-          {{#if core.premium}}
-            <span class="mcw-core-premium">— Premium Access</span>
+      <section class="mcw-premium-access {{#unless core.connected}}is-locked{{/unless}}">
+        <div class="mcw-premium-access-icon">
+          <i class="fa-solid fa-crown"></i>
+        </div>
+
+        <div class="mcw-premium-access-copy">
+          <strong>Craftworks Content Access</strong>
+
+          {{#if core.connected}}
+            <span>Connected with {{core.tierLabel}}</span>
           {{else}}
-            <span>— Standard Access</span>
+            {{#if core.coreActive}}
+              <span>Connect a Morelord account to unlock entitled Craftworks content.</span>
+            {{else}}
+              <span>Morelord Core must be enabled to manage premium access.</span>
+            {{/if}}
           {{/if}}
-          {{#if core.tier}}
-            <span>({{core.tier}})</span>
-          {{/if}}
-        {{else}}
-          <span class="mcw-warning">Not available</span>
-        {{/if}}
-      </div>
 
-      {{#if core.available}}
-        <div class="mcw-core-diagnostics">
-          <span><strong>Source:</strong> {{core.source}}</span>
-          {{#if core.entitlements.length}}
-            <span><strong>Entitlements:</strong> {{#each core.entitlements}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</span>
-          {{/if}}
-          {{#if core.features.length}}
-            <span><strong>Features:</strong> {{#each core.features}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</span>
+          {{#if core.validatedAtLabel}}
+            <small>Access last checked {{core.validatedAtLabel}}</small>
           {{/if}}
         </div>
-      {{/if}}
+
+        <div class="mcw-premium-access-actions">
+          <button type="button" data-action="manage-account">
+            <i class="fa-solid fa-user-gear"></i>
+            {{#if core.connected}}Manage Account{{else}}Connect Account{{/if}}
+          </button>
+
+          {{#if core.connected}}
+            <button type="button" data-action="refresh-core">
+              <i class="fa-solid fa-rotate"></i> Refresh
+            </button>
+          {{/if}}
+        </div>
+      </section>
 
       <div class="mcw-content-pack-list">
         {{#each packs}}
@@ -59,6 +64,9 @@
               </div>
               <p>{{description}}</p>
               <small>{{rulesVersion}}</small>
+              {{#if requiredFeature}}
+                <small><strong>Feature:</strong> {{requiredFeature}}</small>
+              {{/if}}
               <div class="mcw-pack-counts">
                 <span>{{counts.materials}} materials source</span>
                 <span>{{counts.recipes}} recipes</span>
@@ -124,14 +132,76 @@
           <label><span>Maximum Choices</span><input type="number" name="harvestChoicesMax" value="{{materials.harvestChoicesMax}}" min="1"></label>
           <label><span>Rare Result Bias (%)</span><input type="number" name="harvestRareBias" value="{{materials.harvestRareBias}}"></label>
         </div>
+
+        <label class="mcw-setting-row">
+          <span>
+            <strong>Natural 20 Grants Two Claims</strong>
+            <small>
+              When enabled, a natural 20 on a Harvest skill check allows the
+              player to claim two distinct available components from that creature.
+            </small>
+          </span>
+          <input
+            type="checkbox"
+            name="harvestNat20DoubleClaim"
+            {{#if materials.harvestNat20DoubleClaim}}checked{{/if}}
+          >
+        </label>
       </div>
 
       <div class="mcw-settings-subsection">
         <h4>Gathering</h4>
         <div class="mcw-settings-grid">
-          <label><span>DC Modifier</span><input type="number" name="gatherDcModifier" value="{{materials.gatherDcModifier}}"></label>
-          <label><span>Quantity Multiplier</span><input type="number" step="0.1" name="gatherQuantityMultiplier" value="{{materials.gatherQuantityMultiplier}}"></label>
-          <label><span>Rare Result Bias (%)</span><input type="number" name="gatherRareBias" value="{{materials.gatherRareBias}}"></label>
+          <label>
+            <span>Global DC Modifier</span>
+            <input type="number" name="gatherDcModifier" value="{{materials.gatherDcModifier}}">
+          </label>
+          <label>
+            <span>Quantity Multiplier</span>
+            <input type="number" step="0.1" name="gatherQuantityMultiplier" value="{{materials.gatherQuantityMultiplier}}">
+          </label>
+          <label>
+            <span>Rare Result Bias (%)</span>
+            <input type="number" name="gatherRareBias" value="{{materials.gatherRareBias}}">
+          </label>
+        </div>
+
+        <div class="mcw-gather-dc-settings">
+          <div class="mcw-gather-dc-heading">
+            <div>
+              <strong>Terrain Gather DCs</strong>
+              <small>
+                Set the base Gather DC for each terrain supplied by the currently active Content Packs.
+                The Global DC Modifier above is applied after these values.
+              </small>
+            </div>
+          </div>
+
+          {{#if materials.gatherTerrains.length}}
+            <div class="mcw-gather-dc-list">
+              {{#each materials.gatherTerrains}}
+                <label class="mcw-gather-dc-row">
+                  <span class="mcw-gather-dc-copy">
+                    <strong>{{name}}</strong>
+                    <small>{{packLabel}} · Default DC {{defaultDc}}</small>
+                  </span>
+
+                  <input
+                    type="number"
+                    name="gatherDc:{{id}}"
+                    value="{{dc}}"
+                    min="1"
+                    step="1"
+                    aria-label="{{name}} Gather DC"
+                  >
+                </label>
+              {{/each}}
+            </div>
+          {{else}}
+            <div class="mcw-settings-empty">
+              No active Content Pack currently provides Gathering terrains.
+            </div>
+          {{/if}}
         </div>
       </div>
 

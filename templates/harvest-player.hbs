@@ -1,59 +1,266 @@
-<section class="mcw app-shell">
-  <header class="mcw-header">
-    <h2>Harvest</h2>
-    {{#if actor}}<p>Harvesting as <strong>{{actor.name}}</strong>. Each creature allows one attempt.</p>{{else}}<p class="mcw-warning">No character is available.</p>{{/if}}
+<div class="mlh-shell mcw-harvest-modern">
+  <header class="mlh-header">
+    <div class="mlh-title">
+      <div>
+        <h1><i class="fa-solid fa-scalpel"></i> Harvesting</h1>
+        <div class="mlh-scene">{{session.sceneName}}</div>
+      </div>
+    </div>
+
+    {{#if actor}}
+      <div class="mlh-user">
+        {{#if actor.img}}<img src="{{actor.img}}" alt="{{actor.name}}">{{/if}}
+        <div><strong>{{actor.name}}</strong><span>{{game.user.name}}</span></div>
+      </div>
+      <div class="mlh-instructions">Make one harvest attempt per creature. On a successful check, choose one available component.</div>
+    {{else}}
+      <div class="mlh-instructions mcw-warning">No character is available. Select a token you own or configure a user character.</div>
+    {{/if}}
+
+    <div class="mlh-summary">
+      <span><i class="fa-solid fa-skull"></i> {{summary.creatures}} Creatures</span>
+      <span><i class="fa-solid fa-check"></i> {{summary.completed}} Resolved</span>
+      {{#if summary.drakkenheim}}<span><i class="fa-solid fa-radiation"></i> {{summary.drakkenheim}} Drakkenheim</span>{{/if}}
+    </div>
   </header>
 
-  <div class="mcw-harvest-creature-list">
-{{#each creatures}}
-    <article class="mcw-panel mcw-harvest-card" data-creature-token="{{tokenUuid}}">
-      <div class="mcw-creature">
-        <img src="{{img}}" alt="{{name}}">
+  <main class="mlh-creatures">
+    {{#each creatures}}
+      <section class="mlh-creature {{#if isCollapsed}}mlh-creature-collapsed{{/if}}" data-creature-token="{{tokenUuid}}">
+        <header class="mlh-creature-header">
+          {{#if img}}<img class="mlh-creature-image" src="{{img}}" alt="{{name}}">{{/if}}
+          <div class="mlh-creature-info">
+            <h2>{{name}}</h2>
+            <div class="mlh-creature-meta">
+              <span>{{creatureType}} · CR {{cr}}</span>
+              <span>Harvest DC {{dc}}</span>
+              {{#if rarity}}<span class="mlh-rarity">{{rarity}}</span>{{/if}}
+              {{#if (eq harvestMode "drakkenheim")}}<span class="mlh-has-claim"><i class="fa-solid fa-radiation"></i> Drakkenheim</span>{{/if}}
+            </div>
+          </div>
+          <button type="button" class="mlh-creature-toggle" data-action="toggle-creature" data-creature="{{tokenUuid}}" title="{{#if isCollapsed}}Expand{{else}}Collapse{{/if}}">
+            <i class="fa-solid {{#if isCollapsed}}fa-chevron-down{{else}}fa-chevron-up{{/if}}"></i>
+          </button>
+        </header>
+
+        {{#unless isCollapsed}}
+          <div class="mlh-check-panel">
+            <div class="mlh-check-controls">
+              <select
+                data-action="select-skill"
+                data-creature="{{tokenUuid}}"
+                aria-label="Harvest skill"
+                {{#if checkLocked}}disabled{{/if}}
+              >
+                <option value="">Choose skill...</option>
+                {{#each skillOptions}}
+                  <option value="{{id}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+                {{/each}}
+              </select>
+
+              <button
+                type="button"
+                data-action="roll"
+                data-creature="{{tokenUuid}}"
+                {{#unless canRoll}}disabled{{/unless}}
+              >
+                <i class="fa-solid fa-dice-d20"></i> Roll
+              </button>
+            </div>
+          </div>
+
+          {{#if alreadyHarvested}}
+            <div class="mlh-harvest-message mlh-locked">
+              <i class="fa-solid fa-lock"></i>
+              This character has already attempted to harvest this creature.
+            </div>
+          {{else if state}}
+            {{#if (eq state.status "pending")}}
+              <div class="mlh-harvest-message">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                Resolving harvest check...
+              </div>
+            {{/if}}
+
+            {{#if (eq state.status "failed")}}
+              <div class="mlh-harvest-message mcw-failure">
+                <i class="fa-solid fa-xmark"></i>
+                Failed with {{state.total}}. No component recovered.
+              </div>
+            {{/if}}
+
+            {{#if (eq state.status "no-results")}}
+              <div class="mlh-harvest-message mcw-warning">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                The check succeeded, but no compatible component is available.
+              </div>
+            {{/if}}
+
+            {{#if (eq state.status "awaiting-claim")}}
+              <div class="mlh-harvest-message mlh-mine">
+                <i class="fa-solid fa-check"></i>
+                {{#if state.claimsMade}}
+                  Natural 20 harvest: choose {{state.claimsRemaining}} more highlighted component.
+                {{else if (eq state.claimsAllowed 2)}}
+                  Natural 20! Harvest succeeded with {{state.total}}. Choose two highlighted components.
+                {{else}}
+                  Harvest succeeded with {{state.total}}. Choose one highlighted component.
+                {{/if}}
+              </div>
+            {{/if}}
+
+            {{#if (eq state.status "claimed")}}
+              <div class="mlh-harvest-message mlh-mine">
+                <i class="fa-solid fa-check-double"></i>
+                {{#if (eq state.claimsMade 2)}}
+                  Natural 20 harvest complete. Claimed two components.
+                {{else}}
+                  Claimed {{state.claimedName}}.
+                {{/if}}
+              </div>
+            {{/if}}
+          {{/if}}
+
+          <div class="mlh-components">
+            {{#each displayComponents}}
+              <article class="mlh-component {{#if claimable}}mlh-component-available{{else}}mlh-component-unavailable{{/if}} {{#if neededForCrafting}}mlh-component-needed{{/if}}">
+                <div class="mlh-component-image">
+                  {{#if img}}
+                    <img src="{{img}}" alt="{{name}}">
+                  {{else}}
+                    <i class="fa-solid fa-flask"></i>
+                  {{/if}}
+                </div>
+
+                <div class="mlh-component-body">
+                  <div class="mlh-component-name">{{componentName}}</div>
+                  <div class="mlh-component-category">
+                    {{category}}{{#if rarity}} · {{rarity}}{{/if}}
+                  </div>
+                  {{#if name}}
+                    <div class="mlh-ingredient-name">
+                      <i class="fa-solid fa-arrow-right"></i>{{name}}
+                    </div>
+                  {{/if}}
+
+                  {{#if neededForCrafting}}
+                    <div
+                      class="mlh-needed-badge"
+                      title="Needed for: {{neededByLabel}}"
+                    >
+                      <i class="fa-solid fa-hammer"></i>
+                      Needed for Crafting
+                    </div>
+                  {{/if}}
+                </div>
+
+                <div class="mlh-component-action">
+                  {{#if claimed}}
+                    <div class="mlh-claim-status {{#if claimedByCurrentUser}}mlh-mine{{else}}mlh-taken{{/if}}">
+                      <i class="fa-solid {{#if claimedByCurrentUser}}fa-check{{else}}fa-lock{{/if}}"></i>
+                      <span>
+                        {{#if claimedByCurrentUser}}
+                          Claimed by you
+                        {{else}}
+                          Claimed by <strong>{{claimantName}}</strong>
+                        {{/if}}
+                        {{#if claimRoll}}
+                          · Roll {{claimRoll}}
+                        {{/if}}
+                      </span>
+                    </div>
+                  {{else}}
+                    <button
+                      type="button"
+                      class="mlh-claim"
+                      data-action="claim"
+                      data-creature="{{../tokenUuid}}"
+                      data-material="{{materialId}}"
+                      data-component="{{id}}"
+                      {{#unless claimable}}disabled{{/unless}}
+                    >
+                      <i class="fa-solid fa-hand"></i> Claim
+                    </button>
+                  {{/if}}
+                </div>
+              </article>
+            {{/each}}
+
+            {{#unless displayComponents.length}}
+              <div class="mlh-harvest-message mcw-warning">
+                No compatible Craftworks components are available for this creature.
+              </div>
+            {{/unless}}
+          </div>
+        {{/unless}}
+      </section>
+    {{/each}}
+
+    <section class="mlh-claimed-section">
+      <div class="mlh-claimed-heading">
         <div>
-          <h3>{{name}}</h3>
-          <p>{{creatureType}} • CR {{cr}} • DC {{dc}}</p>
+          <i class="fa-solid fa-box-open"></i>
+          <span>Claimed Components</span>
         </div>
+        <span class="mlh-claimed-count">{{summary.claimed}}</span>
       </div>
 
-      {{#if alreadyHarvested}}<p class="mcw-warning"><strong>This character has already attempted to harvest this creature.</strong></p>{{else}}{{#if state}}
-        {{#if (eq state.status "pending")}}
-          <p><i class="fa-solid fa-spinner fa-spin"></i> Resolving harvest check...</p>
-        {{/if}}
-        {{#if (eq state.status "failed")}}
-          <p class="mcw-failure"><i class="fa-solid fa-xmark"></i> Failed with {{state.total}}. No component recovered.</p>
-        {{/if}}
-        {{#if (eq state.status "no-results")}}
-          <p class="mcw-warning"><i class="fa-solid fa-triangle-exclamation"></i> The check succeeded, but no compatible Craftworks material is currently available for this creature.</p>
-        {{/if}}
-        {{#if (eq state.status "awaiting-claim")}}
-          <p class="mcw-success"><i class="fa-solid fa-check"></i> Success with {{state.total}}. Choose one component:</p>
-          <div class="mcw-choice-grid">
-            {{#each state.choices}}
-              <button type="button" class="mcw-choice" data-action="claim" data-creature="{{../tokenUuid}}" data-material="{{materialId}}">
-                <img src="{{img}}" alt="{{name}}">
-                <span>{{name}}</span>
-                {{#if rarity}}<small>{{rarity}}</small>{{/if}}
+      {{#if claimedItems.length}}
+        <div class="mlh-claimed-list">
+          {{#each claimedItems}}
+            <article class="mlh-claimed-item {{#if neededForCrafting}}mlh-claimed-needed{{/if}}">
+              <button
+                type="button"
+                class="mlh-claimed-image-link"
+                data-action="open-claimed-item"
+                data-uuid="{{linkUuid}}"
+                {{#unless linkUuid}}disabled{{/unless}}
+                title="{{#if linkUuid}}Open {{displayName}}{{else}}{{displayName}}{{/if}}"
+              >
+                {{#if displayImg}}
+                  <img src="{{displayImg}}" alt="{{displayName}}">
+                {{else}}
+                  <i class="fa-solid fa-flask"></i>
+                {{/if}}
               </button>
-            {{/each}}
-          </div>
-        {{/if}}
-        {{#if (eq state.status "claimed")}}
-          <p class="mcw-success"><i class="fa-solid fa-check-double"></i> Claimed {{state.claimedName}}.</p>
-        {{/if}}
-      {{else}}
-        <p>Choose a skill for your harvest check:</p>
-        <div class="mcw-skill-row">
-          {{#each ../skills}}
-            <button type="button" data-action="roll" data-creature="{{../tokenUuid}}" data-skill="{{id}}">
-              {{label}}
-            </button>
+
+              <div class="mlh-claimed-body">
+                <div class="mlh-claimed-name">
+                  {{displayName}}
+                  {{#if neededForCrafting}}
+                    <span
+                      class="mlh-needed-inline"
+                      title="Needed for: {{neededByLabel}}"
+                    >
+                      <i class="fa-solid fa-hammer"></i>
+                      Needed
+                    </span>
+                  {{/if}}
+                </div>
+                <div class="mlh-claimed-meta">
+                  <span class="mlh-claimed-rarity">{{displayRarity}}</span>
+                  <span>{{creatureName}}</span>
+                  <span>Claimed by {{displayClaimant}}</span>
+                </div>
+              </div>
+
+              <div class="mlh-claimed-roll">
+                <span>Harvest Roll</span>
+                <strong>{{displayRoll}}</strong>
+              </div>
+            </article>
           {{/each}}
         </div>
-      {{/if}}{{/if}}
-    </article>
-  {{/each}}
-</div>
-  <footer class="mcw-actions">
+      {{else}}
+        <div class="mlh-claimed-empty">
+          No components have been claimed yet.
+        </div>
+      {{/if}}
+    </section>
+  </main>
+
+  <footer class="mlh-footer">
+    <div class="mlh-footer-status"><span>{{summary.completed}} of {{summary.creatures}} creature attempts resolved</span></div>
     <button type="button" data-action="close"><i class="fa-solid fa-xmark"></i> Close</button>
   </footer>
-</section>
+</div>

@@ -770,15 +770,40 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
     return Array.from(
       new Set(
         this.craftworks.recipes.all()
-          .flatMap(recipe =>
-            this.#ingredientMaterialsForRecipe(recipe)
-              .map(material =>
-                String(material.rarity ?? "").toLowerCase()
-              )
-          )
+          .flatMap(recipe => this.#raritiesForRecipe(recipe))
           .filter(Boolean)
       )
     ).sort();
+  }
+
+  #raritiesForRecipe(recipe) {
+    const rarities = new Set();
+
+    if (recipe.rarity) {
+      rarities.add(String(recipe.rarity).toLowerCase());
+    }
+
+    for (const material of this.#ingredientMaterialsForRecipe(recipe)) {
+      if (material?.rarity) {
+        rarities.add(String(material.rarity).toLowerCase());
+      }
+    }
+
+    for (const group of recipe.requirementGroups ?? []) {
+      for (const requirement of group.requirements ?? []) {
+        if (requirement.match?.rarity) {
+          rarities.add(String(requirement.match.rarity).toLowerCase());
+        }
+
+        for (const alternative of requirement.alternatives ?? []) {
+          if (alternative.match?.rarity) {
+            rarities.add(String(alternative.match.rarity).toLowerCase());
+          }
+        }
+      }
+    }
+
+    return Array.from(rarities);
   }
 
   #ingredientTags() {
@@ -825,12 +850,8 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
       );
 
       recipes = recipes.filter(recipe =>
-        this.#ingredientMaterialsForRecipe(recipe)
-          .some(material =>
-            selected.has(
-              String(material.rarity ?? "").toLowerCase()
-            )
-          )
+        this.#raritiesForRecipe(recipe)
+          .some(rarity => selected.has(rarity))
       );
     }
 
@@ -1064,14 +1085,6 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
         ui.notifications.info(
           `${recipe.name} complete: ${awarded.quantity} × ${awarded.label} added to ${inventoryActor.name}.`
         );
-
-        await ChatMessage.create({
-          speaker: ChatMessage.getSpeaker({ actor: crafter }),
-          content:
-            `<strong>${this.#escapeHtml(recipe.name)} complete!</strong><br>`
-            + `${this.#escapeHtml(crafter.name)} crafted `
-            + `${awarded.quantity} × ${this.#escapeHtml(awarded.label)}.`
-        });
       } catch (error) {
         console.error(
           "Morelord Craftworks | Failed to award crafting output.",

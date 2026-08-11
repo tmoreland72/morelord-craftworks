@@ -1,3 +1,5 @@
+import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
+
 export class MaterialService {
   constructor({ registry, adapter, recipientResolver }) {
     this.registry = registry;
@@ -20,7 +22,23 @@ export class MaterialService {
     const recipient = await this.getRecipient(actor);
     if (!recipient) throw new Error("No recipient Actor is available for this Craftworks material.");
 
-    const item = await this.adapter.addItemToActor(recipient, source, quantity);
+    const item = await this.adapter.addItemToActor(
+      recipient,
+      source,
+      quantity
+    );
+
+    await AwardChatCardService.post({
+      recipient,
+      items: [{
+        document: source,
+        uuid: source.uuid,
+        quantity,
+        rarity: source.system?.rarity
+      }],
+      title: "Material Received"
+    });
+
     return { item, recipient };
   }
 }

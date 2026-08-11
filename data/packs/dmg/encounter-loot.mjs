@@ -1,0 +1,1 @@
+export const DMG_ENCOUNTER_LOOT_PROFILES = [];

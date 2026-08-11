@@ -1,3 +1,4 @@
+import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
 import { MODULE_ID } from "../constants.mjs";
 
 export class CraftingMaterialService {
@@ -156,6 +157,18 @@ export class CraftingMaterialService {
       resolved.source,
       resolved.quantity
     );
+
+    await AwardChatCardService.post({
+      recipient: actor,
+      items: [{
+        document: resolved.source,
+        uuid: resolved.source.uuid,
+        quantity: resolved.quantity,
+        rarity: resolved.source.system?.rarity
+      }],
+      title: "Crafted Item Received",
+      subtitle: recipe.name
+    });
 
     return {
       actor,

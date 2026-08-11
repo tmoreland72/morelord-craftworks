@@ -1,442 +1,322 @@
 import { weightedPick } from "./random-choice.mjs";
 
-const TABLE_PREFIX = "Magic Item Table ";
-const MAX_NESTED_DRAWS = 5;
-
 /**
- * Craftworks-owned weighting for selecting among source-backed Magic Item Tables.
- * This is not a reproduction of DMG treasure-hoard ranges.
+ * Special treasure is intentionally self-contained.
+ *
+ * It never requires add-on RollTables or any add-on module.
+ * Eligible items come from:
+ *   1. World Items with a D&D5e rarity; and
+ *   2. Item compendiums shipped by the active game system itself.
  */
-const TABLE_WEIGHTS_BY_CR = [
+
+const RARITY_PROFILES_BY_CR = [
   {
     minCR: 0,
     maxCR: 4,
-    tables: [
-      { letter: "A", weight: 70 },
-      { letter: "B", weight: 25 },
-      { letter: "C", weight: 5 }
+    rarities: [
+      { rarity: "common", weight: 70 },
+      { rarity: "uncommon", weight: 30 }
     ]
   },
   {
     minCR: 5,
     maxCR: 10,
-    tables: [
-      { letter: "A", weight: 20 },
-      { letter: "B", weight: 30 },
-      { letter: "C", weight: 30 },
-      { letter: "D", weight: 15 },
-      { letter: "E", weight: 5 }
+    rarities: [
+      { rarity: "common", weight: 10 },
+      { rarity: "uncommon", weight: 55 },
+      { rarity: "rare", weight: 35 }
     ]
   },
   {
     minCR: 11,
     maxCR: 16,
-    tables: [
-      { letter: "C", weight: 10 },
-      { letter: "D", weight: 25 },
-      { letter: "E", weight: 30 },
-      { letter: "F", weight: 25 },
-      { letter: "G", weight: 10 }
+    rarities: [
+      { rarity: "uncommon", weight: 15 },
+      { rarity: "rare", weight: 55 },
+      { rarity: "very rare", weight: 30 }
     ]
   },
   {
     minCR: 17,
     maxCR: Infinity,
-    tables: [
-      { letter: "E", weight: 5 },
-      { letter: "F", weight: 15 },
-      { letter: "G", weight: 25 },
-      { letter: "H", weight: 30 },
-      { letter: "I", weight: 25 }
+    rarities: [
+      { rarity: "rare", weight: 15 },
+      { rarity: "very rare", weight: 50 },
+      { rarity: "legendary", weight: 35 }
     ]
   }
 ];
 
+const RARITY_ORDER = [
+  "common",
+  "uncommon",
+  "rare",
+  "very rare",
+  "legendary"
+];
+
 export class SpecialTreasureService {
   constructor({ sourceFilter = null } = {}) {
+    // Retained for API compatibility with existing construction code.
     this.sourceFilter = sourceFilter;
-    this._tableCache = new Map();
-    this._itemNameIndex = null;
+    this._itemPool = null;
   }
 
   async rollForEncounter(maxCR) {
-    this._itemNameIndex = null;
+    const pool = await this.#getItemPool();
 
-    const profile = this.#profileForCR(maxCR);
-    const candidates = [];
-
-    for (const entry of profile.tables) {
-      const table = await this.findMagicItemTable(entry.letter);
-      if (table) candidates.push({ ...entry, table });
-    }
-
-    if (!candidates.length) {
+    if (!pool.length) {
       return {
         status: "missing-source",
         itemUuid: null,
         itemName: null,
         itemImg: null,
+        sourceLabel: null,
         tableName: null,
-        detail: "No usable Magic Item Table A-I RollTables were found in the world or installed RollTable compendiums."
+        detail:
+          "No eligible magic items were found in the world or the D&D5e system compendiums."
       };
     }
 
-    const chosen = weightedPick(candidates);
-    const resolved = await this.#drawUntilItem(chosen.table, 0);
+    const profile = this.#profileForCR(maxCR);
+    const availableRarities = new Set(pool.map(entry => entry.rarity));
 
-    if (!resolved?.item) {
+    const weightedRarities = profile.rarities.filter(entry =>
+      availableRarities.has(entry.rarity)
+    );
+
+    let targetRarity = weightedPick(weightedRarities)?.rarity ?? null;
+
+    if (!targetRarity) {
+      targetRarity = this.#nearestAvailableRarity(
+        profile.rarities.map(entry => entry.rarity),
+        [...availableRarities]
+      );
+    }
+
+    const candidates = pool.filter(entry => entry.rarity === targetRarity);
+    const itemRef = candidates[
+      Math.floor(Math.random() * candidates.length)
+    ] ?? pool[Math.floor(Math.random() * pool.length)];
+
+    if (!itemRef) {
       return {
         status: "unresolved-result",
         itemUuid: null,
         itemName: null,
         itemImg: null,
-        tableName: chosen.table.name,
-        detail: resolved?.detail ?? "The selected treasure table did not resolve to an Item document."
+        sourceLabel: null,
+        tableName: null,
+        detail: "No eligible magic item could be selected."
+      };
+    }
+
+    let item = null;
+    try {
+      item = itemRef.uuid.startsWith("Item.")
+        ? game.items.get(itemRef.id)
+        : await fromUuid(itemRef.uuid);
+    } catch {
+      item = null;
+    }
+
+    if (!item || item.documentName !== "Item") {
+      this._itemPool = null;
+      return {
+        status: "unresolved-result",
+        itemUuid: null,
+        itemName: itemRef.name,
+        itemImg: itemRef.img,
+        sourceLabel: itemRef.sourceLabel,
+        tableName: null,
+        detail: `${itemRef.name} could not be resolved to an Item document.`
       };
     }
 
     return {
       status: "item",
-      itemUuid: resolved.item.uuid,
-      itemName: resolved.item.name,
-      itemImg: resolved.item.img ?? "",
-      sourceLabel:
-        this.sourceFilter?.sourceLabelForPack(
-          resolved.item.pack
-        )
-        ?? resolved.item.pack
-        ?? "World",
-      tableName:
-        resolved.sourceTableName
-        ?? chosen.table.name,
+      itemUuid: item.uuid,
+      itemName: item.name,
+      itemImg: item.img ?? "",
+      sourceLabel: itemRef.sourceLabel,
+      rarity: itemRef.rarity,
+      tableName: null,
       detail: null
     };
   }
 
-  async findMagicItemTable(letter) {
-    const normalizedLetter = String(letter ?? "").trim().toUpperCase();
-    if (!/^[A-I]$/.test(normalizedLetter)) return null;
-
-    if (this._tableCache.has(normalizedLetter)) {
-      return this._tableCache.get(normalizedLetter);
-    }
-
-    const promise = this.#findTableByName(`${TABLE_PREFIX}${normalizedLetter}`);
-    this._tableCache.set(normalizedLetter, promise);
-    return promise;
-  }
-
   async sourceStatus() {
-    const found = [];
-    for (const letter of "ABCDEFGHI") {
-      const table = await this.findMagicItemTable(letter);
-      if (table) found.push({ letter, name: table.name, uuid: table.uuid });
-    }
-    return found;
+    const pool = await this.#getItemPool();
+    const counts = Object.fromEntries(
+      RARITY_ORDER.map(rarity => [
+        rarity,
+        pool.filter(entry => entry.rarity === rarity).length
+      ])
+    );
+
+    return {
+      total: pool.length,
+      counts
+    };
   }
 
   #profileForCR(cr) {
     const value = Math.max(0, Number(cr ?? 0));
-    return TABLE_WEIGHTS_BY_CR.find(p => value >= p.minCR && value <= p.maxCR)
-      ?? TABLE_WEIGHTS_BY_CR[0];
+    return RARITY_PROFILES_BY_CR.find(
+      profile => value >= profile.minCR && value <= profile.maxCR
+    ) ?? RARITY_PROFILES_BY_CR[0];
   }
 
-  async #findTableByName(name) {
-    const normalize = value => String(value ?? "").trim().toLowerCase();
-    const target = normalize(name);
-
-    const world = game.tables?.find(table => normalize(table.name) === target);
-    if (world) return world;
-
-    const packs = game.packs?.filter(pack =>
-      (
-        pack.documentName === "RollTable"
-        || pack.metadata?.type === "RollTable"
-      )
-      && (
-        !this.sourceFilter
-        || this.sourceFilter.isPackEnabled(pack)
-      )
-    ) ?? [];
-
-    for (const pack of packs) {
-      try {
-        const index = await pack.getIndex({ fields: ["name"] });
-        const match = index.find(entry => normalize(entry.name) === target);
-        if (match) return await pack.getDocument(match._id);
-      } catch (err) {
-        console.warn(`Morelord Craftworks | Unable to inspect RollTable pack ${pack.collection}.`, err);
-      }
+  async #getItemPool() {
+    if (!this._itemPool) {
+      this._itemPool = await this.#buildItemPool();
     }
-
-    return null;
+    return this._itemPool;
   }
 
-  async #drawUntilItem(table, depth) {
-    if (!table || depth > MAX_NESTED_DRAWS) {
-      return { item: null, detail: "Treasure table nesting exceeded the supported depth." };
+  async #buildItemPool() {
+    const entries = [];
+    const seen = new Set();
+
+    for (const item of Array.from(game.items ?? [])) {
+      if (!this.#isEligibleItem(item)) continue;
+
+      const rarity = this.#normalizeRarity(item.system?.rarity);
+      if (!rarity) continue;
+
+      const key = this.#key(item.name, rarity);
+      if (seen.has(key)) continue;
+      seen.add(key);
+
+      entries.push({
+        id: item.id,
+        uuid: item.uuid,
+        name: item.name,
+        img: item.img ?? "",
+        rarity,
+        sourceLabel: "World"
+      });
     }
 
-    const draw = await table.draw({ displayChat: false });
-    const result = draw?.results?.[0] ?? null;
+    const systemPacks = Array.from(game.packs ?? [])
+      .filter(pack => pack.documentName === "Item")
+      .filter(pack => this.#isSystemPack(pack));
 
-    if (!result) {
-      return { item: null, detail: `${table.name} produced no result.` };
-    }
-
-    const document = await this.#resolveResultDocument(result);
-
-    if (document?.documentName === "Item") {
-      const resolvedItem =
-        this.#itemAllowed(document)
-          ? document
-          : await this.#findItemByName(document.name);
-
-      if (resolvedItem) {
-        return {
-          item: resolvedItem,
-          sourceTableName: table.name
-        };
-      }
-    }
-
-    if (document?.documentName === "RollTable") {
-      const nested = await this.#drawUntilItem(document, depth + 1);
-      return {
-        ...nested,
-        sourceTableName: nested.sourceTableName ?? document.name
-      };
-    }
-
-    const uuid = this.#extractUuid(result);
-    if (uuid) {
-      try {
-        const resolved = await fromUuid(uuid);
-        if (resolved?.documentName === "Item") {
-          const resolvedItem =
-            this.#itemAllowed(resolved)
-              ? resolved
-              : await this.#findItemByName(resolved.name);
-
-          if (resolvedItem) {
-            return {
-              item: resolvedItem,
-              sourceTableName: table.name
-            };
-          }
-        }
-        if (resolved?.documentName === "RollTable") {
-          return this.#drawUntilItem(resolved, depth + 1);
-        }
-      } catch {
-        // Fall through to a clear unresolved result.
-      }
-    }
-
-    const plainText = this.#plainResultText(result);
-
-    if (plainText) {
-      const item = await this.#findItemByName(plainText);
-
-      if (item) {
-        return {
-          item,
-          sourceTableName: table.name
-        };
-      }
-    }
-
-    return {
-      item: null,
-      detail: plainText
-        ? `${table.name} produced '${plainText}', but no enabled Item compendium contains a matching Item.`
-        : `${table.name} produced a result that is not an Item or nested RollTable.`
-    };
-  }
-
-  async #resolveResultDocument(result) {
-    try {
-      if (typeof result?.getDocument === "function") {
-        const doc = await result.getDocument();
-        if (doc) return doc;
-      }
-    } catch {
-      // Continue through the v14 UUID fallback.
-    }
-
-    const uuid = result?.uuid;
-    if (!uuid) return null;
-
-    try {
-      const resolved = await fromUuid(uuid);
-      if (resolved?.documentName === "Item" || resolved?.documentName === "RollTable") {
-        return resolved;
-      }
-    } catch {
-      // The result may still be plain text with an embedded document link.
-    }
-
-    return null;
-  }
-
-  #extractUuid(result) {
-    const text = String(result?.text ?? "");
-    const uuidMatch = text.match(/@UUID\[([^\]]+)\]/i);
-    if (uuidMatch) return uuidMatch[1];
-
-    const compendiumMatch = text.match(/@Compendium\[([^\]]+)\]/i);
-    if (compendiumMatch) {
-      const raw = compendiumMatch[1];
-      if (raw.startsWith("Compendium.")) return raw;
-      return `Compendium.${raw}`;
-    }
-
-    return null;
-  }
-
-  #itemAllowed(item) {
-    const packId = item?.pack;
-    if (!packId || !this.sourceFilter) return true;
-
-    return this.sourceFilter.isPackEnabled(packId);
-  }
-
-  async #findItemByName(name) {
-    if (!this._itemNameIndex) {
-      this._itemNameIndex = await this.#buildItemNameIndex();
-    }
-
-    for (const candidate of this.#candidateItemNames(name)) {
-      const target = this.#normalizeItemName(candidate);
-      if (!target) continue;
-
-      const match = this._itemNameIndex.get(target);
-      if (!match) continue;
-
-      try {
-        const item = await fromUuid(match.uuid);
-        if (item?.documentName === "Item") {
-          return item;
-        }
-      } catch {
-        // Continue through controlled aliases.
-      }
-    }
-
-    return null;
-  }
-
-  async #buildItemNameIndex() {
-    const indexByName = new Map();
-
-    const eligiblePacks = Array.from(game.packs ?? [])
-      .filter(pack =>
-        pack.documentName === "Item"
-        && (
-          !this.sourceFilter
-          || this.sourceFilter.isPackEnabled(pack)
-        )
-      );
-
-    const packs = this.sourceFilter
-      ? this.sourceFilter.sortPacks(eligiblePacks)
-      : eligiblePacks;
-
-    for (const pack of packs) {
+    for (const pack of systemPacks) {
       try {
         const index = await pack.getIndex({
-          fields: ["name", "img", "type"]
+          fields: [
+            "name",
+            "img",
+            "type",
+            "system.rarity",
+            "flags.morelord-craftworks.materialId"
+          ]
         });
 
         for (const row of index) {
-          const key = this.#normalizeItemName(row.name);
-          if (!key || indexByName.has(key)) continue;
+          if (row.flags?.["morelord-craftworks"]?.materialId) continue;
 
-          indexByName.set(key, {
-            uuid:
-              `Compendium.${pack.collection}.Item.${row._id}`,
+          const rarity = this.#normalizeRarity(row.system?.rarity);
+          if (!rarity) continue;
+
+          const key = this.#key(row.name, rarity);
+          if (seen.has(key)) continue;
+          seen.add(key);
+
+          entries.push({
+            id: row._id,
+            uuid: `Compendium.${pack.collection}.Item.${row._id}`,
             name: row.name,
             img: row.img ?? "",
-            type: row.type ?? null,
-            packId: pack.collection
+            rarity,
+            sourceLabel:
+              pack.collection === "dnd5e.equipment24"
+                ? "D&D 5e SRD 5.2"
+                : String(
+                    pack.metadata?.label
+                    ?? pack.title
+                    ?? "D&D 5e System"
+                  )
           });
         }
       } catch (error) {
         console.warn(
-          `Morelord Craftworks | Unable to index Item pack ${pack.collection} for special treasure.`,
+          `Morelord Craftworks | Unable to index system Item pack ${pack.collection} for special treasure.`,
           error
         );
       }
     }
 
-    return indexByName;
+    console.log(
+      `Morelord Craftworks | Indexed ${entries.length} self-contained special-treasure magic item(s) from World Items and system compendiums.`
+    );
+
+    return entries;
   }
 
-  #candidateItemNames(value) {
-    const name = String(value ?? "").trim();
-    const candidates = [name];
-
-    const healing = name.match(
-      /^Potion of (Greater|Superior|Supreme) Healing$/i
-    );
-    if (healing) {
-      candidates.push(`Potion of Healing (${healing[1]})`);
-    }
-
-    const healingParenthetical = name.match(
-      /^Potion of Healing \((Greater|Superior|Supreme)\)$/i
-    );
-    if (healingParenthetical) {
-      candidates.push(
-        `Potion of ${healingParenthetical[1]} Healing`
-      );
-    }
-
-    const giant = name.match(
-      /^Potion of (Hill|Stone|Frost|Fire|Cloud|Storm) Giant Strength$/i
-    );
-    if (giant) {
-      const tier = giant[1];
-      candidates.push(`Potion of Giant Strength (${tier})`);
-      candidates.push(`Potion of Giant Strength, ${tier}`);
-    }
-
-    const giantParenthetical = name.match(
-      /^Potion of Giant Strength \((Hill|Stone|Frost|Fire|Cloud|Storm)\)$/i
-    );
-    if (giantParenthetical) {
-      candidates.push(
-        `Potion of ${giantParenthetical[1]} Giant Strength`
-      );
-    }
-
-    const giantComma = name.match(
-      /^Potion of Giant Strength,\s*(Hill|Stone|Frost|Fire|Cloud|Storm)$/i
-    );
-    if (giantComma) {
-      candidates.push(
-        `Potion of ${giantComma[1]} Giant Strength`
-      );
-    }
-
-    return [...new Set(candidates)];
+  #isEligibleItem(item) {
+    if (!item || item.documentName !== "Item") return false;
+    if (item.getFlag?.("morelord-craftworks", "materialId")) return false;
+    return Boolean(this.#normalizeRarity(item.system?.rarity));
   }
 
-  #normalizeItemName(value) {
-    return String(value ?? "")
-      .normalize("NFKD")
+  #isSystemPack(pack) {
+    const packageType = String(pack.metadata?.packageType ?? "").toLowerCase();
+    const packageName = String(
+      pack.metadata?.packageName
+      ?? pack.metadata?.package
+      ?? ""
+    ).toLowerCase();
+    const collection = String(pack.collection ?? "").toLowerCase();
+    const systemId = String(game.system?.id ?? "").toLowerCase();
+
+    return packageType === "system"
+      || packageName === systemId
+      || collection.startsWith(`${systemId}.`);
+  }
+
+  #normalizeRarity(value) {
+    const raw = String(value ?? "")
+      .trim()
       .toLowerCase()
-      .replace(/^(\d+\s*[x×]\s*)/i, "")
-      .replace(/\s*\([^)]*\)\s*$/g, "")
-      .replace(/[^a-z0-9]/g, "");
+      .replace(/[_-]+/g, " ")
+      .replace(/\s+/g, " ");
+
+    const aliases = {
+      common: "common",
+      uncommon: "uncommon",
+      rare: "rare",
+      "very rare": "very rare",
+      veryrare: "very rare",
+      legendary: "legendary"
+    };
+
+    return aliases[raw] ?? null;
   }
 
-  #plainResultText(result) {
-    const raw = String(result?.text ?? "").trim();
-    if (!raw) return null;
+  #nearestAvailableRarity(preferred, available) {
+    if (!available.length) return null;
 
-    const div = document.createElement("div");
-    div.innerHTML = raw;
-    return div.textContent?.trim() || raw;
+    for (const rarity of preferred) {
+      if (available.includes(rarity)) return rarity;
+    }
+
+    const preferredIndexes = preferred
+      .map(rarity => RARITY_ORDER.indexOf(rarity))
+      .filter(index => index >= 0);
+
+    const center = preferredIndexes.length
+      ? preferredIndexes.reduce((a, b) => a + b, 0) / preferredIndexes.length
+      : 0;
+
+    return [...available].sort((a, b) =>
+      Math.abs(RARITY_ORDER.indexOf(a) - center)
+      - Math.abs(RARITY_ORDER.indexOf(b) - center)
+    )[0];
+  }
+
+  #key(name, rarity) {
+    return `${String(name ?? "").trim().toLowerCase()}::${rarity}`;
   }
 }

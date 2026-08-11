@@ -547,13 +547,16 @@ export class CraftApp
         ?? recipe.packId,
       craftMeta: {
         tool: craft.tool,
-        check: [
+        checkRequired: craft.checkRequired !== false,
+        check: craft.checkRequired === false
+          ? "No check"
+          : [
           craft.ability,
           craft.skill
             ? `(${craft.skill})`
             : null
         ].filter(Boolean).join(" "),
-        activeDc,
+        activeDc: craft.checkRequired === false ? null : activeDc,
         hoursRequired:
           craft.hoursRequired
       },
@@ -679,6 +682,37 @@ export class CraftApp
       inventoryActor =
         await fromUuid(job.inventoryActorUuid)
         ?? inventoryActor;
+    }
+
+    if (recipe.craft?.checkRequired === false) {
+      const progress =
+        await this.craftworks.craftingJobs
+          .completeWithoutCheck(
+            recipe.id,
+            crafter,
+            inventoryActor.uuid
+          );
+
+      this.#log({
+        recipe,
+        text:
+          `Crafting completed after ${recipe.craft?.hoursRequired ?? 8} hours `
+          + `at the required workshop; no crafting check was required.`,
+        kind: "success"
+      });
+
+      if (
+        progress.complete
+        && !progress.outputAwarded
+      ) {
+        await this.#showCompletion(
+          recipe.id,
+          progress
+        );
+      }
+
+      await this.render();
+      return;
     }
 
     const toolStatus =

@@ -1,11 +1,20 @@
-const SRD_ITEM_PACKS = Object.freeze({
+const DND5E_ITEM_PACKS = Object.freeze({
   "SRD 5.2": [
     "dnd5e.equipment24"
   ],
   "SRD 5.1": [
     "dnd5e.items",
     "dnd5e.tradegoods"
-  ]
+  ],
+  "Player's Handbook": [
+    "dnd-players-handbook.equipment"
+  ],
+  "Dungeon Master's Guide": [
+    "dnd-dungeon-masters-guide.equipment"
+  ],
+  "Monsters of Drakkenheim": {
+    packageId: "drakkenheim-monsters"
+  }
 });
 
 export class Dnd5eCompendiumItemResolver {
@@ -18,9 +27,21 @@ export class Dnd5eCompendiumItemResolver {
     this._bySourceBook.clear();
     this._indexedPacks.clear();
 
-    for (const [sourceBook, collections] of Object.entries(SRD_ITEM_PACKS)) {
+    for (const [sourceBook, source] of Object.entries(DND5E_ITEM_PACKS)) {
       const byName = new Map();
       const indexed = [];
+
+      const collections = Array.isArray(source)
+        ? source
+        : game.packs
+            .filter(pack =>
+              pack.documentName === "Item"
+              && (
+                pack.metadata?.packageName === source.packageId
+                || pack.collection.startsWith(`${source.packageId}.`)
+              )
+            )
+            .map(pack => pack.collection);
 
       for (const collection of collections) {
         const pack = game.packs.get(collection);
@@ -62,7 +83,7 @@ export class Dnd5eCompendiumItemResolver {
 
       console.log(
         `Morelord Craftworks | Indexed ${byName.size} ${sourceBook} craftable Item candidate(s) `
-        + `from ${indexed.length} exact SRD Item pack(s).`
+        + `from ${indexed.length} exact D&D5e Item pack(s).`
       );
     }
 
@@ -72,7 +93,7 @@ export class Dnd5eCompendiumItemResolver {
 
   async resolve(name, { sourceBook } = {}) {
     if (!sourceBook) {
-      throw new Error("D&D5e SRD Item resolution requires an explicit sourceBook.");
+      throw new Error("D&D5e Item resolution requires an explicit sourceBook.");
     }
 
     if (!this._bySourceBook.size) {
@@ -229,4 +250,6 @@ export class Dnd5eCompendiumItemResolver {
   }
 }
 
-export { SRD_ITEM_PACKS };
+// Compatibility alias retained for callers written before PHB support.
+export const SRD_ITEM_PACKS = DND5E_ITEM_PACKS;
+export { DND5E_ITEM_PACKS };

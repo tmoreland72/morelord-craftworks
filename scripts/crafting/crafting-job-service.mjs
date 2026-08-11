@@ -265,6 +265,60 @@ export class CraftingJobService {
     );
   }
 
+  async completeWithoutCheck(
+    recipeId,
+    crafter,
+    inventoryActorUuid = null
+  ) {
+    const jobs = this.#jobs(crafter);
+    const key = this.#key(recipeId);
+    const existing = this.get(
+      recipeId,
+      crafter,
+      inventoryActorUuid
+    );
+
+    if (!existing) {
+      throw new Error("Crafting job not found.");
+    }
+
+    if (existing.outputAwarded) {
+      throw new Error("This crafting job is already complete.");
+    }
+
+    const job = {
+      ...existing,
+      successes: 1,
+      attempts: 0,
+      updatedAt: Date.now()
+    };
+
+    jobs[key] = job;
+    this.#removeLegacyKeys(jobs, recipeId);
+    this.#cacheJob(crafter, job);
+
+    await crafter.setFlag(
+      MODULE_ID,
+      FLAG_KEY,
+      jobs
+    );
+
+    const progress = this.getProgress(
+      recipeId,
+      crafter,
+      inventoryActorUuid
+    );
+
+    return {
+      ...progress,
+      requiredSuccesses: 1,
+      successes: 1,
+      progressHours: Math.max(0, Number(existing.hoursRequired ?? 0)),
+      timeSpentHours: Math.max(0, Number(existing.hoursRequired ?? 0)),
+      complete: true
+    };
+  }
+
   async markOutputAwarded(
     recipeId,
     crafter,

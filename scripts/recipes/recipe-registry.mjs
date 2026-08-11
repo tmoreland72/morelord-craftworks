@@ -41,15 +41,21 @@ export class RecipeRegistry {
           packId: raw.packId ?? packId
         };
 
+        const exactDnd5eSourceBooks = {
+          "srd-5.2": "SRD 5.2",
+          "srd-5.1": "SRD 5.1",
+          "phb": "Player's Handbook",
+          "dmg": "Dungeon Master's Guide",
+          "monsters-of-drakkenheim": "Monsters of Drakkenheim"
+        };
+
         if (
-          ["srd-5.2", "srd-5.1"].includes(preparedRaw.packId)
+          exactDnd5eSourceBooks[preparedRaw.packId]
           && preparedRaw.output?.type === "catalog-item"
         ) {
-          const sourceBook = preparedRaw.packId === "srd-5.2"
-            ? "SRD 5.2"
-            : "SRD 5.1";
+          const sourceBook = exactDnd5eSourceBooks[preparedRaw.packId];
 
-          preparedRaw = await this.#resolveSrdCatalogOutput(
+          preparedRaw = await this.#resolveDnd5eCatalogOutput(
             preparedRaw,
             sourceBook
           );
@@ -70,7 +76,7 @@ export class RecipeRegistry {
       if (excludedUnmatchedStandardItems > 0) {
         console.log(
           `Morelord Craftworks | Excluded ${excludedUnmatchedStandardItems} `
-          + `${packId} Kibbles recipe candidate(s) whose output is not present in that exact SRD Item pack.`
+          + `${packId} Kibbles recipe candidate(s) whose output is not present in that exact D&D5e Item pack.`
         );
       }
     }
@@ -174,7 +180,7 @@ export class RecipeRegistry {
     return recipe;
   }
 
-  async #resolveSrdCatalogOutput(raw, sourceBook) {
+  async #resolveDnd5eCatalogOutput(raw, sourceBook) {
     const output = raw.output ?? {};
     const parsed = this.dnd5eItemResolver?.extractQuantityAndName
       ? this.dnd5eItemResolver.extractQuantityAndName(
@@ -270,6 +276,11 @@ export class RecipeRegistry {
       description: String(raw.description ?? ""),
       category: String(raw.category ?? "general"),
       kind: String(raw.kind ?? "crafting"),
+      rarity: raw.rarity
+        ? String(raw.rarity)
+        : raw.output?.rarity
+          ? String(raw.output.rarity)
+          : null,
       tags: Array.isArray(raw.tags) ? raw.tags.map(String) : [],
       source: raw.source ?? null,
       craft: this.#normalizeCraft(raw.craft),
@@ -319,7 +330,10 @@ export class RecipeRegistry {
       dc,
       noToolDc,
       hoursRequired,
-      requiredSuccesses: craftingSuccessesRequired(hoursRequired)
+      checkRequired: raw.checkRequired !== false,
+      requiredSuccesses: raw.checkRequired === false
+        ? 1
+        : craftingSuccessesRequired(hoursRequired)
     };
   }
 

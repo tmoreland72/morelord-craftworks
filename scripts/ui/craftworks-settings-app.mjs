@@ -1,12 +1,19 @@
 import { MODULE_ID, MODULE_TITLE } from "../constants.mjs";
 import {
   SETTINGS,
-  getSetting
+  getSetting,
+  getGatherDcOverrides,
+  setGatherDcOverrides
 } from "../core/settings.mjs";
 import {
   CONTENT_PACKS,
   getContentPackSettingKey
 } from "../../data/content-packs.mjs";
+import { getContentPackManifest } from "../../data/packs/manifests.mjs";
+import { EntitlementService } from "../services/entitlement-service.mjs";
+import {
+  getGatherProfiles
+} from "../acquisition/gather-profiles.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -36,7 +43,23 @@ export class CraftworksSettingsApp extends HandlebarsApplicationMixin(Applicatio
     const context = await super._prepareContext(options);
     const craftworks = this.constructor.craftworks;
 
-    await craftworks?.coreAccess?.refresh();
+    // Match Marketplace: settings entitlement state talks directly to Core and
+    // does not depend on the rest of Craftworks having completed startup.
+    await EntitlementService.refresh({ quiet: true });
+    const entitlementStatus = EntitlementService.status();
+    const tier = String(entitlementStatus.tier ?? "standard").toLowerCase();
+    const core = {
+      ...entitlementStatus,
+      available: entitlementStatus.coreActive,
+      tierLabel: tier === "champion"
+        ? "Tools Champion"
+        : tier === "premium"
+          ? "Tools Premium"
+          : "Standard",
+      validatedAtLabel: entitlementStatus.validatedAt
+        ? new Date(entitlementStatus.validatedAt).toLocaleString()
+        : null
+    };
 
     const groups = game.actors
       .filter(actor => actor.type === "group")
@@ -51,12 +74,17 @@ export class CraftworksSettingsApp extends HandlebarsApplicationMixin(Applicatio
       .sort((a,b) => Number(a.sort ?? 0) - Number(b.sort ?? 0))
       .map(pack => {
         const state = craftworks?.contentPacks?.describe(pack.id);
-        const hasAccess = state?.hasAccess ?? (craftworks?.coreAccess?.hasAccess(pack) ?? !pack.premium);
+        const requiredFeatures = Array.isArray(pack.requiredFeatures) ? pack.requiredFeatures : [];
+        const hasAccess = state?.hasAccess ?? (
+          requiredFeatures.length
+            ? requiredFeatures.every(feature => EntitlementService.hasFeature(feature))
+            : !pack.premium
+        );
         const enabled = state?.configured ?? Boolean(
           game.settings.get(MODULE_ID, getContentPackSettingKey(pack.id))
         );
 
-        const manifest = craftworks?.contentPacks?.manifest(pack.id);
+        const manifest = craftworks?.contentPacks?.manifest(pack.id) ?? getContentPackManifest(pack.id);
 
         return {
           ...pack,
@@ -73,17 +101,58 @@ export class CraftworksSettingsApp extends HandlebarsApplicationMixin(Applicatio
             loot: manifest?.lootTiers?.length ?? 0,
             encounter: manifest?.encounterLootProfiles?.length ?? 0
           },
-          statusLabel: pack.premium
-            ? (hasAccess ? "Premium" : "Premium — Access Required")
-            : "Free"
+          requiredFeature:
+            Array.isArray(pack.requiredFeatures)
+              ? pack.requiredFeatures[0] ?? null
+              : null,
+          statusLabel: hasAccess
+            ? (pack.premium ? "Premium" : "Available")
+            : "Access Required"
         };
       });
 
+    const gatherOverrides = getGatherDcOverrides();
+    const activeGatherPackIds = new Set(
+      packs
+        .filter(pack => pack.active)
+        .map(pack => pack.id)
+    );
+
+    const gatherTerrains = getGatherProfiles({
+      activePackIds: [...activeGatherPackIds]
+    })
+      .map(profile => {
+        const hasOverride = Object.prototype.hasOwnProperty.call(
+          gatherOverrides,
+          profile.id
+        );
+
+        const sourcePack = packs.find(
+          pack => pack.id === profile.packId
+        );
+
+        return {
+          id: profile.id,
+          name: profile.name,
+          packId: profile.packId,
+          packLabel:
+            sourcePack?.shortLabel
+            ?? sourcePack?.label
+            ?? profile.packId,
+          defaultDc: Number(profile.dc ?? 10),
+          dc: hasOverride
+            ? Number(gatherOverrides[profile.id])
+            : Number(profile.dc ?? 10),
+          overridden: hasOverride
+        };
+      })
+      .sort((a, b) =>
+        a.name.localeCompare(b.name)
+        || a.packLabel.localeCompare(b.packLabel)
+      );
+
     return foundry.utils.mergeObject(context, {
-      core: craftworks?.coreAccess?.snapshot() ?? {
-        available:false,
-        entitlements:[]
-      },
+      core,
 
       packs,
       groups,
@@ -96,8 +165,12 @@ export class CraftworksSettingsApp extends HandlebarsApplicationMixin(Applicatio
         harvestChoicesMin: getSetting(SETTINGS.HARVEST_CHOICES_MIN),
         harvestChoicesMax: getSetting(SETTINGS.HARVEST_CHOICES_MAX),
         harvestRareBias: getSetting(SETTINGS.HARVEST_RARE_BIAS),
+        harvestNat20DoubleClaim: getSetting(
+          SETTINGS.HARVEST_NAT20_DOUBLE_CLAIM
+        ),
 
         gatherDcModifier: getSetting(SETTINGS.GATHER_DC_MODIFIER),
+        gatherTerrains,
         gatherQuantityMultiplier: getSetting(SETTINGS.GATHER_QUANTITY_MULTIPLIER),
         gatherRareBias: getSetting(SETTINGS.GATHER_RARE_BIAS),
 
@@ -113,7 +186,7 @@ export class CraftworksSettingsApp extends HandlebarsApplicationMixin(Applicatio
 
       recipeCount: craftworks?.recipes?.all()?.length ?? 0,
       premiumCraftingAvailable:
-        craftworks?.coreAccess?.hasPremiumAccess() ?? false
+        EntitlementService.hasFeature("craftworks.advanced-crafting")
     }, { inplace:false });
   }
 
@@ -123,11 +196,24 @@ export class CraftworksSettingsApp extends HandlebarsApplicationMixin(Applicatio
     this.element.querySelector("[data-action='save']")
       ?.addEventListener("click", event => this.#save(event));
 
+    this.element.querySelector("[data-action='manage-account']")
+      ?.addEventListener("click", event => {
+        event.preventDefault();
+        EntitlementService.openAccount();
+      });
+
     this.element.querySelector("[data-action='refresh-core']")
       ?.addEventListener("click", async event => {
         event.preventDefault();
-        await this.constructor.craftworks?.coreAccess?.refresh();
-        await this.render();
+        const target = event.currentTarget;
+        target.disabled = true;
+
+        try {
+          await EntitlementService.refresh({ quiet: false });
+          await this.render({ force: true });
+        } finally {
+          target.disabled = false;
+        }
       });
   }
 
@@ -150,6 +236,10 @@ export class CraftworksSettingsApp extends HandlebarsApplicationMixin(Applicatio
       [SETTINGS.HARVEST_CHOICES_MIN, number("harvestChoicesMin")],
       [SETTINGS.HARVEST_CHOICES_MAX, number("harvestChoicesMax")],
       [SETTINGS.HARVEST_RARE_BIAS, number("harvestRareBias")],
+      [
+        SETTINGS.HARVEST_NAT20_DOUBLE_CLAIM,
+        bool("harvestNat20DoubleClaim")
+      ],
 
       [SETTINGS.GATHER_DC_MODIFIER, number("gatherDcModifier")],
       [SETTINGS.GATHER_QUANTITY_MULTIPLIER, number("gatherQuantityMultiplier")],
@@ -169,11 +259,32 @@ export class CraftworksSettingsApp extends HandlebarsApplicationMixin(Applicatio
       await game.settings.set(MODULE_ID, key, value);
     }
 
+    const gatherDcOverrides = {};
+
+    for (const [name, value] of data.entries()) {
+      if (!String(name).startsWith("gatherDc:")) continue;
+
+      const profileId = String(name).slice("gatherDc:".length);
+      const numeric = Number(value);
+
+      if (!profileId || !Number.isFinite(numeric)) continue;
+
+      gatherDcOverrides[profileId] = Math.max(
+        1,
+        Math.round(numeric)
+      );
+    }
+
+    await setGatherDcOverrides(gatherDcOverrides);
+
     for (const pack of CONTENT_PACKS) {
       const key = getContentPackSettingKey(pack.id);
-      const hasAccess =
-        this.constructor.craftworks?.coreAccess?.hasAccess(pack)
-        ?? !pack.premium;
+      const requiredFeatures = Array.isArray(pack.requiredFeatures)
+        ? pack.requiredFeatures
+        : [];
+      const hasAccess = requiredFeatures.length
+        ? requiredFeatures.every(feature => EntitlementService.hasFeature(feature))
+        : !pack.premium;
 
       const requested = bool(`pack:${pack.id}`);
       const enabled = pack.premium && !hasAccess ? false : requested;

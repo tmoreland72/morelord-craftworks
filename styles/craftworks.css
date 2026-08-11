@@ -2538,3 +2538,1336 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* =========================================================
+   Morelord Core / Content Access — matches Marketplace
+   ========================================================= */
+.morelord-craftworks .mcw-premium-access {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+  padding: 0.85rem;
+  border: 1px solid rgba(226, 168, 46, 0.55);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(226, 168, 46, 0.12), rgba(110, 23, 23, 0.12));
+}
+.morelord-craftworks .mcw-premium-access.is-locked {
+  border-color: var(--color-border-light-primary);
+  background: rgba(0, 0, 0, 0.12);
+}
+.morelord-craftworks .mcw-premium-access-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(226, 168, 46, 0.18);
+  font-size: 1.2rem;
+}
+.morelord-craftworks .mcw-premium-access-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.morelord-craftworks .mcw-premium-access-copy small { opacity: 0.7; }
+.morelord-craftworks .mcw-premium-access-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+
+/* Harvest UI migrated from Morelord Drakkenheim Harvesting */
+#morelord-drakkenheim-harvesting-app,
+.mcw-harvest-modern {
+    --mlh-border: rgba(0, 0, 0, 0.35);
+    --mlh-soft-border: rgba(255, 255, 255, 0.12);
+    --mlh-panel: rgba(20, 20, 20, 0.32);
+    --mlh-panel-dark: rgba(10, 10, 10, 0.45);
+    --mlh-highlight: #b99452;
+    --mlh-success: #4fa66c;
+    --mlh-danger: #a94b4b;
+    --mlh-muted: rgba(255, 255, 255, 0.58);
+}
+
+
+/*
+ * APPLICATION WINDOW
+ */
+
+.mcw-harvest-modern .window-content,
+.mcw-harvest-modern .window-content {
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+    min-height: 0;
+}
+
+
+.mcw-harvest-modern .mlh-shell,
+.mcw-harvest-modern .mlh-shell {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    height: 100%;
+
+    min-width: 0;
+    min-height: 0;
+
+    overflow: hidden;
+}
+
+
+/*
+ * HEADER
+ */
+
+.mcw-harvest-modern .mlh-header,
+.mcw-harvest-modern .mlh-header {
+    flex: 0 0 auto;
+
+    padding: 12px 16px;
+
+    border-bottom: 1px solid var(--mlh-border);
+
+    background: var(--mlh-panel-dark);
+}
+
+
+.mcw-harvest-modern .mlh-title,
+.mcw-harvest-modern .mlh-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+
+.mcw-harvest-modern .mlh-title h1,
+.mcw-harvest-modern .mlh-title h1 {
+    margin: 0;
+
+    font-size: 24px;
+    line-height: 1.1;
+}
+
+
+.mcw-harvest-modern .mlh-title h1 i,
+.mcw-harvest-modern .mlh-title h1 i {
+    margin-right: 6px;
+}
+
+
+.mcw-harvest-modern .mlh-scene,
+.mcw-harvest-modern .mlh-scene {
+    margin-top: 3px;
+
+    font-size: 12px;
+
+    opacity: 0.7;
+}
+
+
+.mcw-harvest-modern .mlh-refresh,
+.mcw-harvest-modern .mlh-refresh {
+    flex: 0 0 34px;
+
+    width: 34px;
+    height: 34px;
+
+    margin: 0;
+    padding: 0;
+}
+
+
+/*
+ * CURRENT USER
+ */
+
+.mcw-harvest-modern .mlh-user,
+.mcw-harvest-modern .mlh-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-top: 8px;
+}
+
+
+.mcw-harvest-modern .mlh-user img,
+.mcw-harvest-modern .mlh-user img {
+    flex: 0 0 36px;
+
+    width: 36px !important;
+    height: 36px !important;
+
+    max-width: 36px !important;
+    max-height: 36px !important;
+
+    object-fit: cover;
+
+    border: 1px solid var(--mlh-border);
+    border-radius: 50%;
+}
+
+
+.mcw-harvest-modern .mlh-user div,
+.mcw-harvest-modern .mlh-user div {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.mcw-harvest-modern .mlh-user span,
+.mcw-harvest-modern .mlh-user span {
+    font-size: 11px;
+    opacity: 0.65;
+}
+
+
+.mcw-harvest-modern .mlh-instructions,
+.mcw-harvest-modern .mlh-instructions {
+    margin-top: 8px;
+
+    font-size: 12px;
+
+    opacity: 0.78;
+}
+
+
+.mcw-harvest-modern .mlh-summary,
+.mcw-harvest-modern .mlh-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+
+    margin-top: 8px;
+
+    font-size: 12px;
+}
+
+
+.mcw-harvest-modern .mlh-summary span,
+.mcw-harvest-modern .mlh-summary span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+
+/*
+ * SCROLLABLE CREATURE AREA
+ */
+
+.mcw-harvest-modern .mlh-creatures,
+.mcw-harvest-modern .mlh-creatures {
+    flex: 1 1 auto;
+
+    min-height: 0;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    padding: 12px;
+}
+
+
+/*
+ * CREATURE
+ */
+
+.mcw-harvest-modern .mlh-creature,
+.mcw-harvest-modern .mlh-creature {
+    margin: 0 0 14px;
+
+    overflow: hidden;
+
+    border: 1px solid var(--mlh-border);
+    border-radius: 6px;
+
+    background: var(--mlh-panel);
+}
+
+
+.mcw-harvest-modern .mlh-creature:last-child,
+.mcw-harvest-modern .mlh-creature:last-child {
+    margin-bottom: 0;
+}
+
+
+.mcw-harvest-modern .mlh-creature-header,
+.mcw-harvest-modern .mlh-creature-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    min-height: 64px;
+
+    padding: 8px 10px;
+
+    background: var(--mlh-panel-dark);
+
+    border-bottom: 1px solid var(--mlh-border);
+}
+
+
+.mcw-harvest-modern .mlh-creature-image,
+.mcw-harvest-modern .mlh-creature-image {
+    flex: 0 0 52px;
+
+    width: 52px !important;
+    height: 52px !important;
+
+    min-width: 52px;
+    max-width: 52px !important;
+
+    min-height: 52px;
+    max-height: 52px !important;
+
+    object-fit: cover;
+
+    border: 1px solid var(--mlh-border);
+    border-radius: 4px;
+}
+
+
+.mcw-harvest-modern .mlh-creature-info,
+.mcw-harvest-modern .mlh-creature-info {
+    flex: 1 1 auto;
+
+    min-width: 0;
+}
+
+
+.mcw-harvest-modern .mlh-creature-info h2,
+.mcw-harvest-modern .mlh-creature-info h2 {
+    margin: 0;
+
+    font-size: 18px;
+    line-height: 1.2;
+}
+
+
+.mcw-harvest-modern .mlh-creature-meta,
+.mcw-harvest-modern .mlh-creature-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    margin-top: 3px;
+
+    font-size: 11px;
+
+    opacity: 0.78;
+}
+
+
+.mcw-harvest-modern .mlh-rarity,
+.mcw-harvest-modern .mlh-rarity {
+    font-weight: 700;
+}
+
+
+.mcw-harvest-modern .mlh-has-claim,
+.mcw-harvest-modern .mlh-has-claim {
+    color: var(--mlh-success);
+}
+
+
+/*
+ * COMPONENT ROWS
+ */
+
+.mcw-harvest-modern .mlh-components,
+.mcw-harvest-modern .mlh-components {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.mcw-harvest-modern .mlh-component,
+.mcw-harvest-modern .mlh-component {
+    display: grid;
+
+    grid-template-columns:
+        42px
+        minmax(0, 1fr)
+        135px;
+
+    align-items: center;
+
+    gap: 10px;
+
+    min-height: 56px;
+
+    padding: 7px 10px;
+
+    border-bottom:
+        1px solid var(--mlh-soft-border);
+}
+
+
+.mcw-harvest-modern .mlh-component:last-child,
+.mcw-harvest-modern .mlh-component:last-child {
+    border-bottom: 0;
+}
+
+
+/*
+ * COMPONENT IMAGE
+ */
+
+.mcw-harvest-modern .mlh-component-image,
+.mcw-harvest-modern .mlh-component-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 42px;
+    height: 42px;
+
+    overflow: hidden;
+}
+
+
+.mcw-harvest-modern .mlh-component-image img,
+.mcw-harvest-modern .mlh-component-image img {
+    width: 38px !important;
+    height: 38px !important;
+
+    max-width: 38px !important;
+    max-height: 38px !important;
+
+    object-fit: cover;
+
+    border-radius: 3px;
+}
+
+
+.mcw-harvest-modern .mlh-component-image > i,
+.mcw-harvest-modern .mlh-component-image > i {
+    font-size: 21px;
+
+    opacity: 0.45;
+}
+
+
+/*
+ * COMPONENT TEXT
+ */
+
+.mcw-harvest-modern .mlh-component-body,
+.mcw-harvest-modern .mlh-component-body {
+    min-width: 0;
+}
+
+
+.mcw-harvest-modern .mlh-component-name,
+.mcw-harvest-modern .mlh-component-name {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+
+.mcw-harvest-modern .mlh-component-category,
+.mcw-harvest-modern .mlh-component-category {
+    margin-top: 2px;
+
+    font-size: 10px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.04em;
+
+    opacity: 0.55;
+}
+
+
+.mcw-harvest-modern .mlh-ingredient-name,
+.mcw-harvest-modern .mlh-ingredient-name {
+    margin-top: 3px;
+
+    overflow: hidden;
+
+    font-size: 11px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    opacity: 0.72;
+}
+
+
+.mcw-harvest-modern .mlh-ingredient-name i,
+.mcw-harvest-modern .mlh-ingredient-name i {
+    margin-right: 3px;
+
+    opacity: 0.6;
+}
+
+
+/*
+ * ACTIONS
+ */
+
+.mcw-harvest-modern .mlh-component-action,
+.mcw-harvest-modern .mlh-component-action {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+
+    min-width: 0;
+}
+
+
+.mcw-harvest-modern .mlh-component-action button,
+.mcw-harvest-modern .mlh-component-action button {
+    width: 100%;
+
+    margin: 0;
+
+    min-height: 28px;
+}
+
+
+.mcw-harvest-modern .mlh-claim,
+.mcw-harvest-modern .mlh-claim {
+    font-weight: 700;
+}
+
+
+.mcw-harvest-modern .mlh-release,
+.mcw-harvest-modern .mlh-release {
+    font-size: 11px;
+}
+
+
+/*
+ * STATUS
+ */
+
+.mcw-harvest-modern .mlh-claim-status,
+.mcw-harvest-modern .mlh-claim-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 5px;
+
+    min-height: 28px;
+
+    padding: 4px 6px;
+
+    text-align: center;
+
+    border-radius: 3px;
+
+    font-size: 11px;
+}
+
+
+.mcw-harvest-modern .mlh-mine,
+.mcw-harvest-modern .mlh-mine {
+    color: var(--mlh-success);
+
+    font-weight: 700;
+}
+
+
+.mcw-harvest-modern .mlh-taken,
+.mcw-harvest-modern .mlh-taken {
+    opacity: 0.72;
+}
+
+
+.mcw-harvest-modern .mlh-locked,
+.mcw-harvest-modern .mlh-unavailable,
+.mcw-harvest-modern .mlh-locked,
+.mcw-harvest-modern .mlh-unavailable {
+    opacity: 0.45;
+}
+
+
+.mcw-harvest-modern .mlh-component-mine,
+.mcw-harvest-modern .mlh-component-mine {
+    box-shadow:
+        inset 3px 0 0 var(--mlh-success);
+}
+
+
+.mcw-harvest-modern .mlh-component-claimed,
+.mcw-harvest-modern .mlh-component-locked,
+.mcw-harvest-modern .mlh-component-claimed,
+.mcw-harvest-modern .mlh-component-locked {
+    opacity: 0.62;
+}
+
+
+.mcw-harvest-modern .mlh-component-unavailable,
+.mcw-harvest-modern .mlh-component-unavailable {
+    opacity: 0.4;
+}
+
+
+/*
+ * EMPTY STATE
+ */
+
+.mcw-harvest-modern .mlh-empty,
+.mcw-harvest-modern .mlh-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    height: 100%;
+
+    padding: 30px;
+
+    text-align: center;
+}
+
+
+.mcw-harvest-modern .mlh-empty > i,
+.mcw-harvest-modern .mlh-empty > i {
+    font-size: 42px;
+
+    opacity: 0.45;
+}
+
+
+.mcw-harvest-modern .mlh-empty h2,
+.mcw-harvest-modern .mlh-empty h2 {
+    margin: 0;
+}
+
+
+.mcw-harvest-modern .mlh-empty p,
+.mcw-harvest-modern .mlh-empty p {
+    margin: 0;
+
+    opacity: 0.7;
+}
+
+/*
+ * EXPAND / COLLAPSE
+ */
+
+.mcw-harvest-modern .mlh-creature-toggle,
+.mcw-harvest-modern .mlh-creature-toggle {
+    flex: 0 0 34px;
+
+    width: 34px;
+    height: 34px;
+
+    margin: 0;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.mcw-harvest-modern .mlh-creature-toggle i,
+.mcw-harvest-modern .mlh-creature-toggle i {
+    margin: 0;
+}
+
+
+.mcw-harvest-modern .mlh-creature-collapsed,
+.mcw-harvest-modern .mlh-creature-collapsed {
+    margin-bottom: 8px;
+}
+
+
+#morelord-drakkenheim-harvesting-app
+    .mlh-creature-collapsed
+    .mlh-creature-header,
+.morelord-harvest-app
+    .mlh-creature-collapsed
+    .mlh-creature-header {
+    border-bottom: 0;
+}
+
+/*
+ * FINALIZE FOOTER
+ */
+
+.mcw-harvest-modern .mlh-footer,
+.mcw-harvest-modern .mlh-footer {
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    min-height: 48px;
+
+    padding: 8px 12px;
+
+    border-top: 1px solid var(--mlh-border);
+
+    background: var(--mlh-panel-dark);
+}
+
+
+.mcw-harvest-modern .mlh-footer-status,
+.mcw-harvest-modern .mlh-footer-status {
+    font-size: 12px;
+
+    opacity: 0.75;
+}
+
+
+.mcw-harvest-modern .mlh-finalized,
+.mcw-harvest-modern .mlh-finalized {
+    color: var(--mlh-success);
+
+    font-weight: 700;
+
+    opacity: 1;
+}
+
+
+.mcw-harvest-modern .mlh-finalize,
+.mcw-harvest-modern .mlh-finalize {
+    flex: 0 0 auto;
+
+    width: auto;
+
+    min-width: 170px;
+
+    margin: 0;
+
+    font-weight: 700;
+}
+
+
+.mcw-harvest-modern .mlh-finalize:disabled,
+.mcw-harvest-modern .mlh-finalize:disabled {
+    cursor: not-allowed;
+
+    opacity: 0.45;
+}
+
+/* GM-managed Standard workflow */
+.mcw-harvest-modern .mlh-gm-managed,
+.mcw-harvest-modern .mlh-gm-managed {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--mlh-soft-border);
+    border-radius: 6px;
+    background: var(--mlh-panel);
+}
+
+.mcw-harvest-modern .mlh-mode-heading,
+.mcw-harvest-modern .mlh-mode-heading {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: var(--mlh-highlight);
+}
+
+.mcw-harvest-modern .mlh-gm-managed label,
+.mcw-harvest-modern .mlh-gm-managed label {
+    display: grid;
+    grid-template-columns: max-content minmax(220px, 1fr);
+    align-items: center;
+    gap: 10px;
+}
+
+.mcw-harvest-modern .mlh-gm-managed select,
+.mcw-harvest-modern .mlh-gm-managed select {
+    width: 100%;
+    margin: 0;
+}
+
+.mcw-harvest-modern .mlh-gm-managed p,
+.mcw-harvest-modern .mlh-gm-managed p {
+    margin: 7px 0 0;
+    font-size: 11px;
+    opacity: 0.72;
+}
+
+
+/* Craftworks additions for the migrated Drakkenheim harvesting interface. */
+.mcw-harvest-modern .mlh-check-panel { padding: 14px 12px; border-top: 1px solid var(--mlh-soft-border); }
+.mcw-harvest-modern .mlh-check-title { font-weight: 700; margin-bottom: 8px; }
+.mcw-harvest-modern .mlh-skill-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.mcw-harvest-modern .mlh-skill-row button { flex: 1 1 130px; margin: 0; }
+.mcw-harvest-modern .mlh-harvest-message { padding: 14px 12px; border-top: 1px solid var(--mlh-soft-border); }
+.mcw-harvest-modern .mlh-preview-components { opacity: .92; }
+.mcw-harvest-modern .mcw-actions { display:flex; gap:8px; align-items:center; }
+.mcw-harvest-modern .mcw-progress-user { display:flex; flex-direction:column; gap:3px; padding:5px 0; }
+
+/* Harvest scan-state dead creature list. Keep token artwork compact. */
+.mcw-harvest-modern .mcw-dead-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 8px;
+    margin: 8px 0 0;
+}
+
+.mcw-harvest-modern .mcw-dead-list span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    padding: 7px 9px;
+    border: 1px solid var(--mlh-soft-border);
+    border-radius: 5px;
+    background: var(--mlh-panel-dark);
+}
+
+.mcw-harvest-modern .mcw-dead-list img {
+    flex: 0 0 40px;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px;
+    max-width: 40px !important;
+    min-height: 40px;
+    max-height: 40px !important;
+    object-fit: cover;
+    border: 1px solid var(--mlh-border);
+    border-radius: 4px;
+}
+
+/* Harvest creature collapse/expand control */
+.mcw-harvest-modern .mlh-creature-toggle {
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  margin: 0;
+  padding: 0;
+}
+
+.mcw-harvest-modern .mlh-creature-collapsed .mlh-creature-header {
+  border-bottom: 0;
+}
+
+.mcw-harvest-modern .mlh-harvest-message {
+  padding: 10px 12px;
+  border-top: 1px solid var(--mlh-soft-border, rgba(255, 255, 255, 0.12));
+  font-size: 12px;
+  opacity: 0.82;
+}
+
+/* Harvest skill selector: compact and right-aligned above component rows. */
+.mcw-harvest-modern .mlh-check-panel {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 9px 12px;
+}
+
+.mcw-harvest-modern .mlh-check-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  width: min(100%, 430px);
+  margin-left: auto;
+}
+
+.mcw-harvest-modern .mlh-check-controls select {
+  flex: 1 1 260px;
+  min-width: 180px;
+  margin: 0;
+}
+
+.mcw-harvest-modern .mlh-check-controls button {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 92px;
+  margin: 0;
+}
+
+.mcw-harvest-modern .mlh-component-unavailable .mlh-claim:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+/* Realtime Harvest claimed-component history */
+.mcw-harvest-modern .mlh-claimed-section {
+  margin-top: 16px;
+  border: 1px solid rgba(197, 160, 91, 0.35);
+  border-radius: 10px;
+  background: rgba(10, 10, 16, 0.55);
+  overflow: hidden;
+}
+
+.mcw-harvest-modern .mlh-claimed-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 14px;
+  border-bottom: 1px solid rgba(197, 160, 91, 0.25);
+  background: rgba(197, 160, 91, 0.08);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.mcw-harvest-modern .mlh-claimed-heading > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mcw-harvest-modern .mlh-claimed-count {
+  min-width: 28px;
+  padding: 2px 8px;
+  border: 1px solid rgba(197, 160, 91, 0.35);
+  border-radius: 999px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.mcw-harvest-modern .mlh-claimed-list {
+  display: grid;
+  gap: 1px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.mcw-harvest-modern .mlh-claimed-item {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 66px;
+  padding: 8px 12px;
+  background: rgba(9, 9, 14, 0.96);
+}
+
+.mcw-harvest-modern .mlh-claimed-image-link {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(197, 160, 91, 0.28);
+  border-radius: 7px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.mcw-harvest-modern .mlh-claimed-image-link:not(:disabled) {
+  cursor: pointer;
+}
+
+.mcw-harvest-modern .mlh-claimed-image-link:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.mcw-harvest-modern .mlh-claimed-image-link img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 0;
+}
+
+.mcw-harvest-modern .mlh-claimed-body {
+  min-width: 0;
+}
+
+.mcw-harvest-modern .mlh-claimed-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.mcw-harvest-modern .mlh-claimed-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 10px;
+  margin-top: 3px;
+  font-size: 11px;
+  opacity: .78;
+}
+
+.mcw-harvest-modern .mlh-claimed-rarity {
+  text-transform: capitalize;
+  font-weight: 700;
+  color: var(--color-text-hyperlink, #d2a85f);
+}
+
+.mcw-harvest-modern .mlh-claimed-roll {
+  display: grid;
+  justify-items: end;
+  gap: 1px;
+  min-width: 76px;
+  padding-left: 12px;
+  border-left: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.mcw-harvest-modern .mlh-claimed-roll span {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  opacity: .62;
+}
+
+.mcw-harvest-modern .mlh-claimed-roll strong {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.mcw-harvest-modern .mlh-claimed-empty {
+  padding: 14px;
+  text-align: center;
+  opacity: .62;
+  font-size: 12px;
+}
+
+@media (max-width: 640px) {
+  .mcw-harvest-modern .mlh-claimed-item {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+
+  .mcw-harvest-modern .mlh-claimed-image-link {
+    width: 40px;
+    height: 40px;
+  }
+
+  .mcw-harvest-modern .mlh-claimed-roll {
+    grid-column: 2;
+    display: flex;
+    justify-content: flex-start;
+    gap: 7px;
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .mcw-harvest-modern .mlh-claimed-roll strong {
+    font-size: 14px;
+  }
+}
+
+/* GM Harvest: authoritative claimed component state */
+.mcw-harvest-modern .mlh-component:has(.mlh-claim-status.mlh-taken) {
+  opacity: .72;
+}
+
+.mcw-harvest-modern .mlh-claim-status.mlh-taken {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Harvest creature separation and marked-recipe material cues */
+.mcw-harvest-modern .mlh-creature {
+  border-color: rgba(197, 160, 91, 0.34);
+  background: rgba(7, 7, 12, 0.82);
+}
+
+.mcw-harvest-modern .mlh-creature > .mlh-components,
+.mcw-harvest-modern .mlh-creature > .mlh-check-panel,
+.mcw-harvest-modern .mlh-creature > .mlh-harvest-message {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(197, 160, 91, 0.085),
+      rgba(197, 160, 91, 0.025)
+    );
+}
+
+.mcw-harvest-modern .mlh-creature > .mlh-components {
+  border-top: 1px solid rgba(197, 160, 91, 0.24);
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.mcw-harvest-modern .mlh-creature + .mlh-creature {
+  margin-top: 14px;
+}
+
+.mcw-harvest-modern .mlh-component-needed {
+  position: relative;
+  box-shadow:
+    inset 3px 0 0 rgba(218, 178, 74, 0.95),
+    inset 0 0 28px rgba(218, 178, 74, 0.07);
+}
+
+.mcw-harvest-modern .mlh-needed-badge,
+.mcw-harvest-modern .mlh-needed-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #e4bd55;
+  font-weight: 700;
+}
+
+.mcw-harvest-modern .mlh-needed-badge {
+  width: fit-content;
+  margin-top: 5px;
+  padding: 2px 7px;
+  border: 1px solid rgba(218, 178, 74, 0.38);
+  border-radius: 999px;
+  background: rgba(218, 178, 74, 0.09);
+  font-size: 10px;
+  letter-spacing: .02em;
+}
+
+.mcw-harvest-modern .mlh-needed-inline {
+  margin-left: 7px;
+  font-size: 10px;
+  vertical-align: middle;
+}
+
+.mcw-harvest-modern .mlh-claimed-needed {
+  box-shadow: inset 3px 0 0 rgba(218, 178, 74, 0.8);
+}
+
+/* Shared public award chat cards */
+.chat-message .mcw-award-card {
+  overflow: hidden;
+  margin: 2px 0;
+  border: 1px solid rgba(197, 160, 91, 0.5);
+  border-radius: 8px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(197, 160, 91, 0.12),
+      rgba(197, 160, 91, 0.025)
+    );
+}
+
+.chat-message .mcw-award-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 11px;
+  border-bottom: 1px solid rgba(197, 160, 91, 0.28);
+}
+
+.chat-message .mcw-award-card-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(197, 160, 91, 0.38);
+  border-radius: 50%;
+  color: #d5ae58;
+  background: rgba(197, 160, 91, 0.1);
+}
+
+.chat-message .mcw-award-card-heading {
+  min-width: 0;
+}
+
+.chat-message .mcw-award-card-title {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.chat-message .mcw-award-card-recipient {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.chat-message .mcw-award-card-subtitle {
+  margin-top: 2px;
+  font-size: 11px;
+  opacity: .72;
+}
+
+.chat-message .mcw-award-card-items {
+  display: grid;
+  gap: 1px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.chat-message .mcw-award-card-item {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  min-height: 46px;
+  padding: 5px 9px;
+  background: rgba(8, 8, 13, 0.72);
+}
+
+.chat-message .mcw-award-card-item-image {
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  border: 1px solid rgba(197, 160, 91, 0.25);
+  border-radius: 5px;
+  object-fit: cover;
+}
+
+.chat-message .mcw-award-card-item-body {
+  min-width: 0;
+}
+
+.chat-message .mcw-award-card-item-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.chat-message .mcw-award-card-item-name .content-link {
+  font-weight: 700;
+}
+
+.chat-message .mcw-award-card-item-rarity {
+  margin-top: 1px;
+  font-size: 10px;
+  text-transform: capitalize;
+  opacity: .7;
+}
+
+.chat-message .mcw-award-card-item-quantity {
+  min-width: 34px;
+  text-align: right;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.chat-message .mcw-award-card-coins {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 11px;
+  border-top: 1px solid rgba(197, 160, 91, 0.2);
+  font-weight: 700;
+}
+
+.chat-message .mcw-award-card-coins i {
+  color: #d5ae58;
+}
+
+.chat-message .mcw-award-card-footer {
+  padding: 4px 9px;
+  border-top: 1px solid rgba(197, 160, 91, 0.16);
+  text-align: right;
+  font-size: 9px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  opacity: .5;
+}
+
+/* GM Harvest cancellation */
+.mcw-harvest-modern .mlh-cancel-harvest {
+  border-color: rgba(190, 67, 67, 0.65);
+  color: #e79797;
+}
+
+.mcw-harvest-modern .mlh-cancel-harvest:hover {
+  border-color: rgba(220, 82, 82, 0.9);
+  background: rgba(170, 45, 45, 0.14);
+}
+
+/* Award Card dark-row text contrast */
+.chat-message .mcw-award-card-item,
+.chat-message .mcw-award-card-item-name,
+.chat-message .mcw-award-card-item-name .content-link,
+.chat-message .mcw-award-card-item-name a,
+.chat-message .mcw-award-card-item-quantity {
+  color: #f2eee6;
+}
+
+.chat-message .mcw-award-card-item-name .content-link:hover,
+.chat-message .mcw-award-card-item-name a:hover {
+  color: #ffffff;
+}
+
+.chat-message .mcw-award-card-item-rarity {
+  color: rgba(242, 238, 230, 0.72);
+}
+
+/* Configurable Gathering terrain DCs */
+.mcw-gather-dc-settings {
+  margin-top: 14px;
+  border: 1px solid rgba(197, 160, 91, 0.25);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.mcw-gather-dc-heading {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(197, 160, 91, 0.2);
+  background: rgba(197, 160, 91, 0.06);
+}
+
+.mcw-gather-dc-heading strong,
+.mcw-gather-dc-heading small {
+  display: block;
+}
+
+.mcw-gather-dc-heading small {
+  margin-top: 3px;
+  opacity: .72;
+}
+
+.mcw-gather-dc-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mcw-gather-dc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  padding: 9px 11px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mcw-gather-dc-row:nth-child(odd) {
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mcw-gather-dc-copy {
+  min-width: 0;
+}
+
+.mcw-gather-dc-copy strong,
+.mcw-gather-dc-copy small {
+  display: block;
+}
+
+.mcw-gather-dc-copy small {
+  margin-top: 2px;
+  opacity: .68;
+}
+
+.mcw-gather-dc-row input {
+  flex: 0 0 64px;
+  width: 64px;
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .mcw-gather-dc-list {
+    grid-template-columns: 1fr;
+  }
+
+  .mcw-gather-dc-row:nth-child(odd) {
+    border-right: 0;
+  }
+}

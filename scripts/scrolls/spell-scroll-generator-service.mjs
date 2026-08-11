@@ -1,3 +1,4 @@
+import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
 export class SpellScrollGeneratorService {
   constructor({
     coreAccess = null,
@@ -209,6 +210,18 @@ export class SpellScrollGeneratorService {
       temporary,
       1
     );
+
+    await AwardChatCardService.post({
+      recipient,
+      items: [{
+        document: created,
+        uuid: created.uuid,
+        quantity: 1,
+        rarity: created.system?.rarity
+      }],
+      title: "Spell Scroll Received",
+      subtitle: spell.name
+    });
 
     return {
       item: created,

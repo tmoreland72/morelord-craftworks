@@ -1,3 +1,4 @@
+import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
 import { SETTINGS, getSetting } from "../core/settings.mjs";
 import { getHoardProfile } from "./hoard-profiles.mjs";
 import { tierForCreatureCR } from "./loot-profiles.mjs";
@@ -99,10 +100,17 @@ export class HoardService {
               sourceLabel:
                 resolved.sourceLabel
                 ?? "Unknown Source",
-              tableName: resolved.tableName
+              rarity: resolved.rarity ?? null,
+              tableName: null
             });
           } else {
-            failures.push(resolved?.detail ?? "No awardable Item was resolved.");
+            const detail =
+              resolved?.detail
+              ?? "No awardable Item was resolved.";
+
+            if (!failures.includes(detail)) failures.push(detail);
+
+            if (resolved?.status === "missing-source") break;
           }
         }
 
@@ -136,22 +144,69 @@ export class HoardService {
     const recipient = await this.recipientResolver.resolve(fallback);
     if (!recipient) throw new Error("No valid recipient is available for the hoard.");
 
+    const awardedItems = [];
+
     for (const material of result.materials ?? []) {
-      const source = await this.materialRegistry.resolveItem(material.materialId);
-      await this.adapter.addItemToActor(recipient, source, material.quantity);
+      const source = await this.materialRegistry.resolveItem(
+        material.materialId
+      );
+
+      await this.adapter.addItemToActor(
+        recipient,
+        source,
+        material.quantity
+      );
+
+      awardedItems.push({
+        document: source,
+        uuid: source.uuid,
+        quantity: material.quantity,
+        rarity: source.system?.rarity
+      });
     }
 
     if (result.coinCopper > 0) {
-      await this.adapter.adjustCurrencyCopper(recipient, result.coinCopper);
+      await this.adapter.adjustCurrencyCopper(
+        recipient,
+        result.coinCopper
+      );
     }
 
     for (const specialItem of result.special?.items ?? []) {
       const item = await fromUuid(specialItem.itemUuid);
+
       if (!item || item.documentName !== "Item") {
-        throw new Error(`Special treasure Item could not be resolved: ${specialItem.itemName ?? specialItem.itemUuid}`);
+        throw new Error(
+          `Special treasure Item could not be resolved: ${
+            specialItem.itemName ?? specialItem.itemUuid
+          }`
+        );
       }
-      await this.adapter.addItemToActor(recipient, item, 1);
+
+      await this.adapter.addItemToActor(
+        recipient,
+        item,
+        1
+      );
+
+      awardedItems.push({
+        document: item,
+        uuid: item.uuid,
+        quantity: 1,
+        rarity: item.system?.rarity
+      });
     }
+
+    await AwardChatCardService.post({
+      recipient,
+      items: awardedItems,
+      coinLabel:
+        result.coinCopper > 0
+          ? result.coinLabel
+          : null,
+      title: "Treasure Hoard Received",
+      subtitle: result.profileLabel ?? null
+    });
 
     result.awarded = true;
     result.recipientUuid = recipient.uuid;
