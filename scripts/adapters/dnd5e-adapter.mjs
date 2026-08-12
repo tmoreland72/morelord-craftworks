@@ -47,7 +47,15 @@ export class Dnd5eAdapter extends SystemAdapter {
     return placeables.filter(token => this.isDeadCreatureToken(token));
   }
 
-  async rollSkill(actor, skillId, { dc, flavor } = {}) {
+  async rollSkill(
+    actor,
+    skillId,
+    {
+      dc,
+      flavor,
+      configure = true
+    } = {}
+  ) {
     if (!actor) {
       throw new Error(
         "No actor available for the skill check."
@@ -67,7 +75,8 @@ export class Dnd5eAdapter extends SystemAdapter {
           target: dc
         },
         {
-          configure: true,
+          configure:
+            Boolean(configure),
           title: flavor
         },
         {

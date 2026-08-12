@@ -1,6 +1,6 @@
 {
   "name": "morelord-craftworks",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": true,
   "type": "module",
   "description": "Development tooling for the Morelord Craftworks Foundry VTT module.",

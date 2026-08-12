@@ -10,7 +10,7 @@ export class HarvestPlayerApp extends HandlebarsApplicationMixin(ApplicationV2) 
     this.states = {};
     this.focusedCreatureTokenUuid = null;
     this.collapsedCreatures = new Set();
-    this.selectedSkills = new Map();
+    this.selectedHarvestSkill = "";
 
     // A Harvest session may already contain authoritative participant state
     // before the player window opens (for example when the GM selected
@@ -56,24 +56,34 @@ export class HarvestPlayerApp extends HandlebarsApplicationMixin(ApplicationV2) 
   };
 
   async setSession(session, { preserveFocus = false } = {}) {
+    const scrollState = this.#captureScrollState();
+
     this.session = session;
 
     // Keep local per-creature state synchronized with the authoritative
     // session sent by the GM.
     for (const creature of session?.creatures ?? []) {
       const state =
-        session.participants?.[`${game.user.id}:${creature.tokenUuid}`]
+        session.participants?.[
+          `${game.user.id}:${creature.tokenUuid}`
+        ]
         ?? null;
 
-      if (state) {
-        this.states[creature.tokenUuid] =
-          foundry.utils.deepClone(state);
+      if (!state) continue;
 
-        if (state.status === "claimed") {
-          this.collapsedCreatures.add(
-            creature.tokenUuid
-          );
-        }
+      this.states[creature.tokenUuid] =
+        foundry.utils.deepClone(state);
+
+      // A creature must remain expanded while the player still has something
+      // to do. Only collapse it after that player's claim sequence is complete.
+      if (state.status === "awaiting-claim") {
+        this.collapsedCreatures.delete(
+          creature.tokenUuid
+        );
+      } else if (state.status === "claimed") {
+        this.collapsedCreatures.add(
+          creature.tokenUuid
+        );
       }
     }
 
@@ -82,19 +92,33 @@ export class HarvestPlayerApp extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     await this.render();
-
-    if (preserveFocus && this.focusedCreatureTokenUuid) {
-      this.#focusCreature(this.focusedCreatureTokenUuid);
-    }
+    this.#restoreScrollState(scrollState);
 
     return this;
   }
 
   async setState(creatureTokenUuid, state) {
-    this.states[creatureTokenUuid] = state;
-    this.focusedCreatureTokenUuid = creatureTokenUuid;
+    const scrollState = this.#captureScrollState();
+
+    this.states[creatureTokenUuid] =
+      foundry.utils.deepClone(state);
+
+    this.focusedCreatureTokenUuid =
+      creatureTokenUuid;
+
+    // Successful checks must leave the creature open so the player can claim.
+    if (state?.status === "awaiting-claim") {
+      this.collapsedCreatures.delete(
+        creatureTokenUuid
+      );
+    } else if (state?.status === "claimed") {
+      this.collapsedCreatures.add(
+        creatureTokenUuid
+      );
+    }
+
     await this.render();
-    this.#focusCreature(creatureTokenUuid);
+    this.#restoreScrollState(scrollState);
   }
 
   async _prepareContext(options) {
@@ -126,14 +150,6 @@ export class HarvestPlayerApp extends HandlebarsApplicationMixin(ApplicationV2) 
         : null;
       const state = this.states[creature.tokenUuid] ?? null;
 
-      if (state?.skillId && !this.selectedSkills.has(creature.tokenUuid)) {
-        this.selectedSkills.set(creature.tokenUuid, state.skillId);
-      }
-
-      const selectedSkill =
-        this.selectedSkills.get(creature.tokenUuid)
-        ?? state?.skillId
-        ?? "";
 
       const choiceComponentIds = new Set(
         (state?.choices ?? [])
@@ -213,26 +229,42 @@ export class HarvestPlayerApp extends HandlebarsApplicationMixin(ApplicationV2) 
         state,
         alreadyHarvested: Boolean(priorHarvest) && !state,
         isCollapsed: this.collapsedCreatures.has(creature.tokenUuid),
-        selectedSkill,
-        checkLocked: Boolean(priorHarvest || state?.status),
-        canRoll: Boolean(
+        requiresSkillCheck: Boolean(
           actor
-          && selectedSkill
           && !priorHarvest
           && !state?.status
         ),
-        skillOptions: this.craftworks.harvest.getSkillOptions().map(skill => ({
-          ...skill,
-          selected: skill.id === selectedSkill
-        })),
         displayComponents: components
       });
     }
 
+    const availableSkillCheckCount =
+      creatures.filter(
+        creature =>
+          creature.requiresSkillCheck
+      ).length;
+
+    const skillOptions =
+      this.craftworks.harvest
+        .getSkillOptions()
+        .map(skill => ({
+          ...skill,
+          selected:
+            skill.id ===
+            this.selectedHarvestSkill
+        }));
+
     return foundry.utils.mergeObject(context, {
       session: this.session,
       actor: actor ? { name: actor.name, img: actor.img, uuid: actor.uuid } : null,
-      skills: this.craftworks.harvest.getSkillOptions(),
+      skills: skillOptions,
+      selectedHarvestSkill: this.selectedHarvestSkill,
+      availableSkillCheckCount,
+      canRollHarvestChecks: Boolean(
+        actor
+        && this.selectedHarvestSkill
+        && availableSkillCheckCount > 0
+      ),
       creatures,
       claimedItems: (this.session.results ?? [])
         .map(result => {
@@ -291,23 +323,48 @@ export class HarvestPlayerApp extends HandlebarsApplicationMixin(ApplicationV2) 
   async _onRender(context, options) {
     await super._onRender(context, options);
 
-    this.element.querySelectorAll("[data-action='select-skill']")
-      .forEach(select => select.addEventListener("change", event => {
-        const creatureTokenUuid = event.currentTarget.dataset.creature;
-        const skillId = String(event.currentTarget.value ?? "");
+    this.element
+      .querySelector(
+        "[data-action='select-harvest-skill']"
+      )
+      ?.addEventListener(
+        "change",
+        event => {
+          this.selectedHarvestSkill =
+            String(
+              event.currentTarget.value
+              ?? ""
+            );
 
-        if (skillId) this.selectedSkills.set(creatureTokenUuid, skillId);
-        else this.selectedSkills.delete(creatureTokenUuid);
+          const rollButton =
+            this.element.querySelector(
+              "[data-action='roll-harvest-checks']"
+            );
 
-        const rollButton = this.element.querySelector(
-          `[data-action="roll"][data-creature="${CSS.escape(creatureTokenUuid)}"]`
-        );
+          if (rollButton) {
+            const available =
+              Number(
+                rollButton.dataset
+                  .availableCount
+                ?? 0
+              );
 
-        if (rollButton) rollButton.disabled = !skillId;
-      }));
+            rollButton.disabled =
+              !this.selectedHarvestSkill
+              || available <= 0;
+          }
+        }
+      );
 
-    this.element.querySelectorAll("[data-action='roll']")
-      .forEach(button => button.addEventListener("click", event => this.#roll(event)));
+    this.element
+      .querySelector(
+        "[data-action='roll-harvest-checks']"
+      )
+      ?.addEventListener(
+        "click",
+        event =>
+          this.#rollHarvestChecks(event)
+      );
 
     this.element.querySelectorAll("[data-action='claim']")
       .forEach(button => button.addEventListener("click", event => this.#claim(event)));
@@ -315,11 +372,23 @@ export class HarvestPlayerApp extends HandlebarsApplicationMixin(ApplicationV2) 
     this.element.querySelectorAll("[data-action='toggle-creature']")
       .forEach(button => button.addEventListener("click", async event => {
         event.preventDefault();
+
         const id = button.dataset.creature;
         if (!id) return;
-        if (this.collapsedCreatures.has(id)) this.collapsedCreatures.delete(id);
-        else this.collapsedCreatures.add(id);
+
+        const scrollState =
+          this.#captureScrollState();
+
+        if (this.collapsedCreatures.has(id)) {
+          this.collapsedCreatures.delete(id);
+        } else {
+          this.collapsedCreatures.add(id);
+        }
+
         await this.render();
+        this.#restoreScrollState(
+          scrollState
+        );
       }));
 
     this.element.querySelectorAll("[data-action='open-claimed-item']")
@@ -347,9 +416,6 @@ export class HarvestPlayerApp extends HandlebarsApplicationMixin(ApplicationV2) 
         await this.close();
       }));
 
-    if (this.focusedCreatureTokenUuid) {
-      this.#focusCreature(this.focusedCreatureTokenUuid);
-    }
   }
 
   #recipeCanUseMaterial(recipe, material) {
@@ -428,68 +494,276 @@ export class HarvestPlayerApp extends HandlebarsApplicationMixin(ApplicationV2) 
     return true;
   }
 
-  async #roll(event) {
-    const button = event.currentTarget;
-    const creatureTokenUuid = button.dataset.creature;
-    const skillId = this.selectedSkills.get(creatureTokenUuid) ?? "";
-    const creature = this.session.creatures.find(c => c.tokenUuid === creatureTokenUuid);
+  async #rollHarvestChecks(event) {
+    const button =
+      event.currentTarget;
+
+    const skillId =
+      this.selectedHarvestSkill;
 
     if (!skillId) {
-      return ui.notifications.warn("Choose a harvest skill before rolling.");
+      ui.notifications.warn(
+        "Choose a Harvest skill before rolling."
+      );
+      return;
     }
-    const actor = this.craftworks.adapter.getActorForUser(game.user);
+
+    const actor =
+      this.craftworks.adapter
+        .getActorForUser(game.user);
 
     if (!actor) {
-      return ui.notifications.error("Select a token you own or configure a user character first.");
+      ui.notifications.error(
+        "Select a token you own or configure a user character first."
+      );
+      return;
     }
 
-    if (await this.craftworks.harvest.hasHarvested(creatureTokenUuid, actor.uuid)) {
-      return ui.notifications.warn(`${actor.name} has already attempted to harvest this creature.`);
+    const availableCreatures = [];
+
+    for (
+      const creature of
+      this.session.creatures ?? []
+    ) {
+      const state =
+        this.states[
+          creature.tokenUuid
+        ]
+        ?? null;
+
+      if (state?.status) {
+        continue;
+      }
+
+      const priorHarvest =
+        await this.craftworks.harvest
+          .getHarvestRecord(
+            creature.tokenUuid,
+            actor.uuid
+          );
+
+      if (priorHarvest) {
+        continue;
+      }
+
+      availableCreatures.push(
+        creature
+      );
+    }
+
+    if (!availableCreatures.length) {
+      ui.notifications.info(
+        "There are no unresolved Harvest checks for this character."
+      );
+      return;
     }
 
     button.disabled = true;
-    try {
-      const roll = await this.craftworks.adapter.rollSkill(actor, skillId, {
-        dc: creature.dc,
-        flavor: `Harvest ${creature.name} — DC ${creature.dc}`
-      });
 
-      if (roll?.cancelled) {
-        button.disabled = false;
+    const originalLabel =
+      button.innerHTML;
+
+    try {
+      const attempts = [];
+
+      for (
+        let index = 0;
+        index < availableCreatures.length;
+        index += 1
+      ) {
+        const creature =
+          availableCreatures[index];
+
+        button.innerHTML =
+          `<i class="fa-solid fa-dice-d20 fa-spin"></i> `
+          + `Rolling ${index + 1} of ${availableCreatures.length}`;
+
+        const roll =
+          await this.craftworks.adapter
+            .rollSkill(
+              actor,
+              skillId,
+              {
+                dc: creature.dc,
+                flavor:
+                  `Harvest ${creature.name} — DC ${creature.dc}`,
+                configure: false
+              }
+            );
+
+        if (roll?.cancelled) {
+          continue;
+        }
+
+        attempts.push({
+          sessionId:
+            this.session.id,
+          creatureTokenUuid:
+            creature.tokenUuid,
+          userId:
+            game.user.id,
+          actorUuid:
+            actor.uuid,
+          skillId,
+          total:
+            roll.total,
+          naturalD20:
+            roll.naturalD20
+        });
+
+        this.states[
+          creature.tokenUuid
+        ] = {
+          status: "pending",
+          total: roll.total,
+          skillId,
+          naturalD20:
+            roll.naturalD20
+        };
+
+        // Every creature being resolved remains expanded so successful checks
+        // immediately expose their available claim choices.
+        this.collapsedCreatures.delete(
+          creature.tokenUuid
+        );
+      }
+
+      if (!attempts.length) {
+        ui.notifications.warn(
+          "No Harvest checks were rolled."
+        );
         return;
       }
 
-      this.states[creatureTokenUuid] = {
-        status: "pending",
-        total: roll.total,
-        skillId
-      };
-      this.focusedCreatureTokenUuid = creatureTokenUuid;
-      await this.render();
-      this.#focusCreature(creatureTokenUuid);
-
-      await this.craftworks.socket.emit("harvest.attempt", {
-        sessionId: this.session.id,
-        creatureTokenUuid,
-        userId: game.user.id,
-        actorUuid: actor.uuid,
-        skillId,
-        total: roll.total,
-        naturalD20: roll.naturalD20
-      });
+      await this.craftworks.socket.emit(
+        "harvest.batch-attempt",
+        {
+          sessionId:
+            this.session.id,
+          userId:
+            game.user.id,
+          attempts
+        }
+      );
     } catch (err) {
-      ui.notifications.error(err.message);
+      ui.notifications.error(
+        err.message
+      );
+
       button.disabled = false;
+      button.innerHTML =
+        originalLabel;
     }
   }
 
-  #focusCreature(creatureTokenUuid) {
-    if (!creatureTokenUuid || !this.element) return;
+  #captureScrollState() {
+    if (!this.element) {
+      return {
+        scrollTop: 0,
+        anchorCreatureUuid: null,
+        anchorOffset: null
+      };
+    }
+
+    const scroller =
+      this.element.querySelector(
+        ".mlh-creatures"
+      );
+
+    if (!scroller) {
+      return {
+        scrollTop: 0,
+        anchorCreatureUuid: null,
+        anchorOffset: null
+      };
+    }
+
+    const scrollerRect =
+      scroller.getBoundingClientRect();
+
+    const cards =
+      Array.from(
+        scroller.querySelectorAll(
+          "[data-creature-token]"
+        )
+      );
+
+    const anchor =
+      cards.find(card => {
+        const rect =
+          card.getBoundingClientRect();
+
+        return (
+          rect.bottom >
+          scrollerRect.top
+        );
+      })
+      ?? null;
+
+    return {
+      scrollTop:
+        scroller.scrollTop,
+      anchorCreatureUuid:
+        anchor?.dataset
+          ?.creatureToken
+        ?? null,
+      anchorOffset:
+        anchor
+          ? anchor.getBoundingClientRect().top
+            - scrollerRect.top
+          : null
+    };
+  }
+
+  #restoreScrollState(state) {
+    if (!state || !this.element) return;
 
     requestAnimationFrame(() => {
-      const selector = `[data-creature-token="${CSS.escape(creatureTokenUuid)}"]`;
-      const card = this.element.querySelector(selector);
-      card?.scrollIntoView({ block: "nearest", behavior: "instant" });
+      const scroller =
+        this.element.querySelector(
+          ".mlh-creatures"
+        );
+
+      if (!scroller) return;
+
+      // Prefer an anchor because expanding/collapsing cards above the viewport
+      // can change their total height during an authoritative session render.
+      if (
+        state.anchorCreatureUuid
+        && state.anchorOffset != null
+      ) {
+        const selector =
+          `[data-creature-token="${
+            CSS.escape(
+              state.anchorCreatureUuid
+            )
+          }"]`;
+
+        const anchor =
+          scroller.querySelector(
+            selector
+          );
+
+        if (anchor) {
+          const scrollerRect =
+            scroller.getBoundingClientRect();
+
+          const nextOffset =
+            anchor
+              .getBoundingClientRect()
+              .top
+            - scrollerRect.top;
+
+          scroller.scrollTop +=
+            nextOffset
+            - state.anchorOffset;
+
+          return;
+        }
+      }
+
+      scroller.scrollTop =
+        state.scrollTop ?? 0;
     });
   }
 

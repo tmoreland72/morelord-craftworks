@@ -36,3 +36,8 @@ Morelord Craftworks 0.2.1 improves Harvest session control and adds new GM-facin
 - Foundry VTT v14 and D&D5e 5.3+ are required by the current Craftworks module manifest.
 - Morelord Core is required for account-based entitlement checks and entitled content packs.
 - Monsters of Drakkenheim harvesting enhancements require the appropriate Craftworks content entitlement and installed Drakkenheim source content.
+- Fixed large Harvest sessions where a player's expanded creature could collapse or appear to disappear after resolving a skill check before the player had claimed a component.
+- Harvest now preserves the player's exact scroll/viewport position across pending rolls, resolved checks, realtime claim synchronization, and manual creature expand/collapse actions. Long Harvest lists no longer jump back to the top after each interaction.
+- Redesigned player Harvest skill checks for large encounters. Players now select one Harvest skill at the top of the window and click **Roll Harvest Checks** once; Craftworks automatically makes a separate check against every unresolved creature using that skill.
+- Batch Harvest checks retain each creature's individual DC, roll total, success/failure state, and natural-20 two-claim behavior while updating the player window in one authoritative batch instead of rerendering after every creature.
+- Removed the repeated per-creature skill selectors and Roll buttons from player Harvest cards.

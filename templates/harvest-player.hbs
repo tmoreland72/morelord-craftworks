@@ -12,7 +12,10 @@
         {{#if actor.img}}<img src="{{actor.img}}" alt="{{actor.name}}">{{/if}}
         <div><strong>{{actor.name}}</strong><span>{{game.user.name}}</span></div>
       </div>
-      <div class="mlh-instructions">Make one harvest attempt per creature. On a successful check, choose one available component.</div>
+      <div class="mlh-instructions">
+        Choose one Harvest skill and roll all unresolved creature checks at once.
+        Successful creatures will immediately show their claimable components.
+      </div>
     {{else}}
       <div class="mlh-instructions mcw-warning">No character is available. Select a token you own or configure a user character.</div>
     {{/if}}
@@ -22,6 +25,49 @@
       <span><i class="fa-solid fa-check"></i> {{summary.completed}} Resolved</span>
       {{#if summary.drakkenheim}}<span><i class="fa-solid fa-radiation"></i> {{summary.drakkenheim}} Drakkenheim</span>{{/if}}
     </div>
+
+    {{#if actor}}
+      <section class="mlh-batch-check">
+        <div class="mlh-batch-check-copy">
+          <strong>Harvest Skill Check</strong>
+          {{#if availableSkillCheckCount}}
+            <small>
+              {{availableSkillCheckCount}} unresolved creature check(s) will be rolled.
+            </small>
+          {{else}}
+            <small>All creature checks are already resolved or skipped.</small>
+          {{/if}}
+        </div>
+
+        <div class="mlh-batch-check-controls">
+          <select
+            data-action="select-harvest-skill"
+            aria-label="Harvest skill"
+            {{#unless availableSkillCheckCount}}disabled{{/unless}}
+          >
+            <option value="">Choose skill...</option>
+            {{#each skills}}
+              <option
+                value="{{id}}"
+                {{#if selected}}selected{{/if}}
+              >
+                {{label}}
+              </option>
+            {{/each}}
+          </select>
+
+          <button
+            type="button"
+            data-action="roll-harvest-checks"
+            data-available-count="{{availableSkillCheckCount}}"
+            {{#unless canRollHarvestChecks}}disabled{{/unless}}
+          >
+            <i class="fa-solid fa-dice-d20"></i>
+            Roll Harvest Checks
+          </button>
+        </div>
+      </section>
+    {{/if}}
   </header>
 
   <main class="mlh-creatures">
@@ -44,33 +90,6 @@
         </header>
 
         {{#unless isCollapsed}}
-          {{#unless state.automaticSuccess}}
-            <div class="mlh-check-panel">
-              <div class="mlh-check-controls">
-                <select
-                  data-action="select-skill"
-                  data-creature="{{tokenUuid}}"
-                  aria-label="Harvest skill"
-                  {{#if checkLocked}}disabled{{/if}}
-                >
-                  <option value="">Choose skill...</option>
-                  {{#each skillOptions}}
-                    <option value="{{id}}" {{#if selected}}selected{{/if}}>{{label}}</option>
-                  {{/each}}
-                </select>
-
-                <button
-                  type="button"
-                  data-action="roll"
-                  data-creature="{{tokenUuid}}"
-                  {{#unless canRoll}}disabled{{/unless}}
-                >
-                  <i class="fa-solid fa-dice-d20"></i> Roll
-                </button>
-              </div>
-            </div>
-          {{/unless}}
-
           {{#if alreadyHarvested}}
             <div class="mlh-harvest-message mlh-locked">
               <i class="fa-solid fa-lock"></i>

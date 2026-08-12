@@ -231,13 +231,30 @@ This is useful when:
 
 ---
 
-## 10. Normal Harvest Checks
+## 10. Harvest Skill Checks
 
-When a character is not set to Skip Skill Checks, the player selects an available Harvest skill and rolls using the normal D&D5e configured roll dialog.
+When a character is not set to **Skip Skill Checks**, the player uses the single **Harvest Skill Check** control at the top of the Harvest window.
 
-A successful check unlocks that player's eligible components.
+1. Choose the Harvest skill to use.
+2. Click **Roll Harvest Checks**.
+3. Craftworks automatically rolls that skill separately against every unresolved creature available to that character.
+4. Each creature resolves against its own Harvest DC.
+5. Successful creatures immediately expose their claimable components.
+6. Failed creatures show their failed result and consume that character's Harvest attempt for that creature.
 
-A failed check consumes that character's Harvest attempt for that creature.
+Creatures already attempted, already resolved, or automatically succeeded through **Skip Skill Checks** are not rolled again.
+
+### Large Encounters
+
+This batch workflow is specifically designed for combats with many defeated creatures. A player does not need to repeat the same skill selection and Roll action for every corpse.
+
+Craftworks still preserves an individual result for each creature, including:
+
+- roll total
+- success or failure
+- Harvest DC
+- natural d20 result
+- natural-20 bonus claim eligibility
 
 ### Natural 20
 
@@ -247,7 +264,6 @@ This behavior is enabled by default and can be disabled in Craftworks Settings u
 
 The bonus uses the actual active d20 result, not a modified total of 20.
 
----
 
 ## 11. Claiming Harvest Components
 
@@ -622,11 +638,11 @@ Without the Drakkenheim enhancement path, Craftworks intentionally falls back to
 - **Materials:** browse Craftworks materials
 - **Recipes:** browse and mark recipes for crafting
 - **Craft:** work on marked recipes
-- **Harvest:** make a check or claim directly when the GM skips checks
+- **Harvest:** choose one skill and roll all unresolved creature checks, or claim directly when the GM skips checks
 - **Gather:** make the scene's Gathering attempt when the GM starts a session
 
 ---
 
 ## Version
 
-This guide describes Morelord Craftworks **0.2.1**.
+This guide describes Morelord Craftworks **0.2.2**.

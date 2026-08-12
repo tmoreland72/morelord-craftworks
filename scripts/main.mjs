@@ -411,6 +411,50 @@ Hooks.once("ready", async () => {
     gmHarvestApp?.setSession(sessions.get(data.sessionId));
   });
 
+  socket.on(
+    "harvest.batch-attempt",
+    async ({
+      sessionId,
+      userId,
+      attempts = []
+    }) => {
+      if (!game.user.isGM) return;
+
+      const session =
+        sessions.get(sessionId);
+
+      if (!session) {
+        throw new Error(
+          "Harvest session not found."
+        );
+      }
+
+      for (const attempt of attempts) {
+        await harvest.recordAttempt({
+          ...attempt,
+          sessionId,
+          userId
+        });
+      }
+
+      const authoritative =
+        sessions.get(sessionId);
+
+      // One session broadcast updates every creature result together. This
+      // avoids a cascade of player rerenders during large Harvest batches.
+      await socket.emit(
+        "harvest.session",
+        {
+          session: authoritative
+        }
+      );
+
+      gmHarvestApp?.setSession(
+        authoritative
+      );
+    }
+  );
+
   socket.on("harvest.claim", async data => {
     if (!game.user.isGM) return;
 

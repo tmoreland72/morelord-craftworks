@@ -4199,3 +4199,65 @@
   justify-content: flex-end;
   text-align: right;
 }
+
+/* Player Harvest batch skill check */
+.mcw-harvest-modern .mlh-batch-check {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+
+  margin-top: 10px;
+  padding: 10px 12px;
+
+  border: 1px solid var(--mlh-soft-border);
+  border-radius: 6px;
+
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.mcw-harvest-modern .mlh-batch-check-copy {
+  min-width: 0;
+}
+
+.mcw-harvest-modern .mlh-batch-check-copy strong,
+.mcw-harvest-modern .mlh-batch-check-copy small {
+  display: block;
+}
+
+.mcw-harvest-modern .mlh-batch-check-copy small {
+  margin-top: 2px;
+  opacity: 0.72;
+}
+
+.mcw-harvest-modern .mlh-batch-check-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.mcw-harvest-modern .mlh-batch-check-controls select {
+  min-width: 160px;
+}
+
+.mcw-harvest-modern .mlh-batch-check-controls button {
+  min-width: 175px;
+}
+
+@media (max-width: 680px) {
+  .mcw-harvest-modern .mlh-batch-check {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .mcw-harvest-modern .mlh-batch-check-controls {
+    width: 100%;
+  }
+
+  .mcw-harvest-modern .mlh-batch-check-controls select,
+  .mcw-harvest-modern .mlh-batch-check-controls button {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
