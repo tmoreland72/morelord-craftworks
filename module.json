@@ -2,7 +2,7 @@
   "id": "morelord-craftworks",
   "title": "Morelord Craftworks",
   "description": "System-agnostic gathering, harvesting, looting, selling, materials, recipes, and premium crafting workflows for Foundry VTT.",
-  "version": "0.2.3-dev.1",
+  "version": "0.3.0",
   "authors": [
     {
       "name": "Morelord Gaming"

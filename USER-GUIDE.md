@@ -1,5 +1,7 @@
 # Morelord Craftworks User Guide
 
+**Version 0.3.0**
+
 Morelord Craftworks brings harvesting, gathering, encounter loot, treasure hoards, crafting materials, recipes, crafting workflows, and GM treasure-generation tools into one Foundry VTT module.
 
 This guide is written for Game Masters and players using Craftworks in a D&D5e world.
@@ -137,6 +139,8 @@ The Materials and Recipes browsers use the same long-list filtering pattern and 
 
 Recipes also include **Known** and **Unknown** knowledge filters.
 
+The Recipes **Rarity** filter uses the public rarity of the recipe/output item. It remains usable even when a recipe is Unknown and does not reveal hidden ingredient rarity.
+
 
 The list itself is only rendered when the current search and filters reduce the catalog to **100 or fewer results**. Above 100, the results pane shows the current match count and asks you to refine the filters. Search text and filter-state changes update this count immediately.
 
@@ -165,6 +169,16 @@ Materials are reference data. Crafting does not occur from the Materials browser
 # Recipes and Crafting
 
 ## 6. Recipes Browser
+
+### Recipe Knowledge
+
+A recipe can be **Known** or **Unknown**:
+
+- **Known** — the recipe and its ingredient requirements are visible.
+- **Unknown** — the recipe remains searchable and may be marked as a crafting goal, but its ingredient requirements are concealed.
+
+Game Masters control this state from the Recipes browser. **Mark Context Known** and **Mark Context Unknown** affect only recipes matching the current search and filter context.
+
 
 Open **Recipes** to search and review available recipes.
 
