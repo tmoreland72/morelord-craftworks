@@ -1,9 +1,13 @@
 import { MODULE_TITLE } from "../constants.mjs";
 import { HOARD_PROFILES } from "../acquisition/hoard-profiles.mjs";
 
+import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
+
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-export class HoardApp extends HandlebarsApplicationMixin(ApplicationV2) {
+export class HoardApp extends ScrollPreservingApplicationMixin(
+  HandlebarsApplicationMixin(ApplicationV2)
+) {
   constructor(craftworks, options = {}) {
     super(options);
     this.craftworks = craftworks;

@@ -5,15 +5,21 @@ import {
 } from "../core/settings.mjs";
 import { bindMultiselectBehavior } from "./multiselect-behavior.mjs";
 
+import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
+
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) {
+export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
+  HandlebarsApplicationMixin(ApplicationV2)
+) {
   constructor(craftworks, options = {}) {
     super(options);
     this.craftworks = craftworks;
     this.search = "";
     this.selectedPackIds = [];
+    this.excludedPackIds = [];
     this.selectedCategories = [];
+    this.excludedCategories = [];
     this.actorUuid = null;
     this.crafterUuid = null;
     this.searchRenderTimer = null;
@@ -22,8 +28,12 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
     this.displayedRecipeIds = [];
     this.searchSelectionStart = null;
     this.searchSelectionEnd = null;
-    this.selectedIngredientRarities = [];
+    this.selectedRecipeRarities = [];
+    this.excludedRecipeRarities = [];
     this.selectedIngredientTags = [];
+    this.excludedIngredientTags = [];
+    this.knownFilterState = 0;
+    this.unknownFilterState = 0;
     this.onlyCraftable = false;
     this.openFilterKey = null;
   }
@@ -78,14 +88,32 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
 
     this.selectedPackIds = this.selectedPackIds
       .filter(packId => validPackIds.has(packId));
+    this.excludedPackIds = this.excludedPackIds
+      .filter(packId => validPackIds.has(packId));
 
-    const ingredientRarities = this.#ingredientRarities();
-    const ingredientTags = this.#ingredientTags();
+    const rarityFilters =
+      this.#buildRarityFilters();
 
-    const raritySet = new Set(ingredientRarities);
-    this.selectedIngredientRarities =
-      this.selectedIngredientRarities.filter(rarity =>
-        raritySet.has(rarity)
+    const ingredientTags =
+      this.#ingredientTags();
+
+    const raritySet =
+      new Set(
+        rarityFilters.map(
+          rarity => rarity.id
+        )
+      );
+
+    this.selectedRecipeRarities =
+      this.selectedRecipeRarities.filter(
+        rarity =>
+          raritySet.has(rarity)
+      );
+
+    this.excludedRecipeRarities =
+      this.excludedRecipeRarities.filter(
+        rarity =>
+          raritySet.has(rarity)
       );
 
     const tagSet = new Set(ingredientTags);
@@ -93,18 +121,17 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
       this.selectedIngredientTags.filter(tag =>
         tagSet.has(tag)
       );
+    this.excludedIngredientTags =
+      this.excludedIngredientTags.filter(tag =>
+        tagSet.has(tag)
+      );
 
     const matchingRecipes = this.#matchingRecipes(actor);
 
     const hiddenRecipeIds = getHiddenRecipeIds();
 
-    const totalRecipeCount = game.user.isGM
-      ? this.craftworks.recipes.all().length
-      : this.craftworks.recipes.all()
-          .filter(recipe =>
-            !hiddenRecipeIds.has(recipe.id)
-          )
-          .length;
+    const totalRecipeCount =
+      this.craftworks.recipes.all().length;
     const prospectiveCount = matchingRecipes.length;
     const prospectiveCountLabel = prospectiveCount > 500
       ? "500+"
@@ -112,25 +139,23 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
     const hasSearchCriteria = Boolean(
       this.search.trim()
       || this.selectedPackIds.length
+      || this.excludedPackIds.length
       || this.selectedCategories.length
-      || this.selectedIngredientRarities.length
+      || this.excludedCategories.length
+      || this.selectedRecipeRarities.length
+      || this.excludedRecipeRarities.length
       || this.selectedIngredientTags.length
+      || this.excludedIngredientTags.length
+      || this.knownFilterState !== 0
+      || this.unknownFilterState !== 0
     );
 
     const autoShowResults =
-      matchingRecipes.length <= 50;
+      matchingRecipes.length <= 100;
 
-    const recipes = autoShowResults
-      ? matchingRecipes
-      : this.searchExecuted
-        ? this.displayedRecipeIds
-            .map(recipeId =>
-              this.craftworks.recipes.get(
-                recipeId,
-                { includeDisabled: true }
-              )
-            )
-            .filter(Boolean)
+    const recipes =
+      autoShowResults
+        ? matchingRecipes
         : [];
 
     const preparedRecipes = await Promise.all(recipes.map(async recipe => {
@@ -200,15 +225,19 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
           markedRecipeIds.has(recipe.id)
             ? "Marked"
             : "Mark for Crafting",
-        isHidden: hiddenRecipeIds.has(recipe.id),
-        visibilityAction:
+        isUnknown:
+          hiddenRecipeIds.has(recipe.id),
+        requirementsKnown:
+          game.user.isGM
+          || !hiddenRecipeIds.has(recipe.id),
+        knowledgeAction:
           hiddenRecipeIds.has(recipe.id)
-            ? "show"
-            : "hide",
-        visibilityLabel:
+            ? "known"
+            : "unknown",
+        knowledgeLabel:
           hiddenRecipeIds.has(recipe.id)
-            ? "Show"
-            : "Hide",
+            ? "Unknown"
+            : "Known",
         outputTypeLabel: recipe.output?.type === "foundry-item"
           ? "Foundry Item"
           : recipe.output?.type === "catalog-item"
@@ -241,36 +270,59 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
           recipe.output?.type === "craftworks-material"
             ? recipe.output.materialId
             : null,
-        requirementGroupRows: recipe.requirementGroups.map((group, groupIndex) => ({
+        requirementGroupRows:
+          (
+            game.user.isGM
+            || !hiddenRecipeIds.has(recipe.id)
+          )
+            ? recipe.requirementGroups.map((group, groupIndex) => ({
           ...group,
           ready: readiness.requirementGroups?.[groupIndex]?.ready ?? null,
           requirementRows: group.requirements.map((requirement, requirementIndex) => {
             const inventory =
               readiness.requirementGroups?.[groupIndex]?.requirements?.[requirementIndex]
               ?? null;
-            const materialId = requirement.match?.materialId ?? null;
-            const material = materialId
-              ? this.craftworks.materials.get(materialId)
-              : null;
+            const materialView =
+              this.#resolveRequirementMaterial(
+                requirement.match
+              );
 
             return {
               ...requirement,
-              materialId,
-              materialImg: material?.img ?? null,
+              materialId:
+                materialView.materialId,
+              materialImg:
+                materialView.img,
               tooltip: requirement.display,
+              displayLabel:
+                materialView.label
+                ?? requirement.display,
+              displayRarity:
+                materialView.rarity
+                ?? requirement.match?.rarity
+                ?? null,
               inventory,
               alternativeRows: requirement.type === "alternatives"
                 ? requirement.alternatives.map((alternative, altIndex) => {
-                    const altMaterialId = alternative.match?.materialId ?? null;
-                    const altMaterial = altMaterialId
-                      ? this.craftworks.materials.get(altMaterialId)
-                      : null;
+                    const altMaterialView =
+                      this.#resolveRequirementMaterial(
+                        alternative.match
+                      );
 
                     return {
                       ...alternative,
-                      materialId: altMaterialId,
-                      materialImg: altMaterial?.img ?? null,
+                      materialId:
+                        altMaterialView.materialId,
+                      materialImg:
+                        altMaterialView.img,
                       tooltip: alternative.display,
+                      displayLabel:
+                        altMaterialView.label
+                        ?? alternative.display,
+                      displayRarity:
+                        altMaterialView.rarity
+                        ?? alternative.match?.rarity
+                        ?? null,
                       inventory: inventory?.alternatives?.[altIndex] ?? null
                     };
                   })
@@ -278,6 +330,7 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
             };
           })
         }))
+            : []
       };
     }));
 
@@ -305,7 +358,7 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
       canMarkRecipes: Boolean(crafter),
       selectedPackIds: this.selectedPackIds,
       selectedCategories: this.selectedCategories,
-      selectedIngredientRarities: this.selectedIngredientRarities,
+      selectedRecipeRarities: this.selectedRecipeRarities,
       selectedIngredientTags: this.selectedIngredientTags,
       onlyCraftable: this.onlyCraftable,
       canFilterCraftable: Boolean(actor),
@@ -316,8 +369,8 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
       categoryFilterLabel: this.selectedCategories.length
         ? `${this.selectedCategories.length} selected`
         : "All Categories",
-      rarityFilterLabel: this.selectedIngredientRarities.length
-        ? `${this.selectedIngredientRarities.length} selected`
+      rarityFilterLabel: this.selectedRecipeRarities.length
+        ? `${this.selectedRecipeRarities.length} selected`
         : "All Rarities",
       tagFilterLabel: this.selectedIngredientTags.length
         ? `${this.selectedIngredientTags.length} selected`
@@ -328,11 +381,49 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
       rarityFilterOpen: this.openFilterKey === "ingredient-rarity",
       tagFilterOpen: this.openFilterKey === "ingredient-tag",
 
-      ingredientRarities: ingredientRarities.map(rarity => ({
-        id: rarity,
-        label: rarity.charAt(0).toUpperCase() + rarity.slice(1),
-        selected: this.selectedIngredientRarities.includes(rarity)
-      })),
+      // Keep both context names during the 0.2.x UI migration. Foundry can
+      // retain an imported ApplicationV2 module in the browser module cache
+      // while loading a newer Handlebars template from disk. Exposing both
+      // names prevents the Rarity section from becoming empty in that mixed
+      // runtime state.
+      rarityFilters: rarityFilters.map(
+        rarity => ({
+          ...rarity,
+          state:
+            this.selectedRecipeRarities
+              .includes(rarity.id)
+              ? 1
+              : this.excludedRecipeRarities
+                  .includes(rarity.id)
+                ? -1
+                : 0,
+          included:
+            this.selectedRecipeRarities
+              .includes(rarity.id),
+          excluded:
+            this.excludedRecipeRarities
+              .includes(rarity.id)
+        })
+      ),
+      ingredientRarities: rarityFilters.map(
+        rarity => ({
+          ...rarity,
+          state:
+            this.selectedRecipeRarities
+              .includes(rarity.id)
+              ? 1
+              : this.excludedRecipeRarities
+                  .includes(rarity.id)
+                ? -1
+                : 0,
+          included:
+            this.selectedRecipeRarities
+              .includes(rarity.id),
+          excluded:
+            this.excludedRecipeRarities
+              .includes(rarity.id)
+        })
+      ),
 
       ingredientTags: ingredientTags.map(tag => ({
         id: tag,
@@ -340,7 +431,16 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
           .split("-")
           .map(part => part.charAt(0).toUpperCase() + part.slice(1))
           .join(" "),
-        selected: this.selectedIngredientTags.includes(tag)
+        state:
+          this.selectedIngredientTags.includes(tag)
+            ? 1
+            : this.excludedIngredientTags.includes(tag)
+              ? -1
+              : 0,
+        included:
+          this.selectedIngredientTags.includes(tag),
+        excluded:
+          this.excludedIngredientTags.includes(tag)
       })),
 
       categories: Array.from(
@@ -357,12 +457,52 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
             .split("-")
             .map(part => part.charAt(0).toUpperCase() + part.slice(1))
             .join(" "),
-          selected: this.selectedCategories.includes(category)
+          state:
+            this.selectedCategories.includes(category)
+              ? 1
+              : this.excludedCategories.includes(category)
+                ? -1
+                : 0,
+          included:
+            this.selectedCategories.includes(category),
+          excluded:
+            this.excludedCategories.includes(category)
         })),
 
+      knowledgeFilters: [
+        {
+          id: "known",
+          label: "Known",
+          state:
+            this.knownFilterState,
+          included:
+            this.knownFilterState === 1,
+          excluded:
+            this.knownFilterState === -1
+        },
+        {
+          id: "unknown",
+          label: "Unknown",
+          state:
+            this.unknownFilterState,
+          included:
+            this.unknownFilterState === 1,
+          excluded:
+            this.unknownFilterState === -1
+        }
+      ],
       packs: effectiveRecipePacks.map(pack => ({
         ...pack,
-        selected: this.selectedPackIds.includes(pack.id)
+        state:
+          this.selectedPackIds.includes(pack.id)
+            ? 1
+            : this.excludedPackIds.includes(pack.id)
+              ? -1
+              : 0,
+        included:
+          this.selectedPackIds.includes(pack.id),
+        excluded:
+          this.excludedPackIds.includes(pack.id)
       })),
       hasEnabledRecipes: this.craftworks.recipes.all().length > 0,
       totalRecipeCount,
@@ -370,13 +510,260 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
       prospectiveCountLabel,
       hasSearchCriteria,
       searchExecuted:
-        this.searchExecuted || autoShowResults,
+        autoShowResults,
       autoShowResults,
+      overDisplayLimit:
+        prospectiveCount > 100,
+      displayLimit: 100,
       recipeGroups,
       hasRecipes: preparedRecipes.length > 0,
       canManageRecipeVisibility: game.user.isGM,
-      hiddenRecipeCount: hiddenRecipeIds.size
+      unknownRecipeCount: hiddenRecipeIds.size
     }, { inplace: false });
+  }
+
+  #resolveRequirementMaterial(match) {
+    if (!match) {
+      return {
+        materialId: null,
+        img: null,
+        label: null,
+        rarity: null
+      };
+    }
+
+    if (match.materialId) {
+      const material =
+        this.craftworks.materials.get(
+          match.materialId
+        );
+
+      return {
+        materialId:
+          material?.materialId
+          ?? match.materialId,
+        img:
+          material?.img
+          ?? null,
+        label:
+          material?.name
+          ?? this.#friendlyRequirementLabel(
+            match
+          ),
+        rarity:
+          material?.rarity
+          ?? match.rarity
+          ?? null
+      };
+    }
+
+    const requiredTags =
+      (match.tags ?? [])
+        .map(tag =>
+          String(tag).toLowerCase()
+        );
+
+    const matches =
+      this.craftworks.materials
+        .all()
+        .filter(material => {
+          if (
+            match.rarity
+            && String(
+              material.rarity ?? ""
+            ).toLowerCase()
+              !== String(
+                match.rarity
+              ).toLowerCase()
+          ) {
+            return false;
+          }
+
+          if (
+            match.category
+            && String(
+              material.category ?? ""
+            ).toLowerCase()
+              !== String(
+                match.category
+              ).toLowerCase()
+          ) {
+            return false;
+          }
+
+          if (
+            match.stage
+            && String(
+              material.stage ?? ""
+            ).toLowerCase()
+              !== String(
+                match.stage
+              ).toLowerCase()
+          ) {
+            return false;
+          }
+
+          if (requiredTags.length) {
+            const materialTags =
+              new Set(
+                (material.tags ?? [])
+                  .map(tag =>
+                    String(tag)
+                      .toLowerCase()
+                  )
+              );
+
+            if (
+              !requiredTags.every(
+                tag =>
+                  materialTags.has(tag)
+              )
+            ) {
+              return false;
+            }
+          }
+
+          return true;
+        });
+
+    if (!matches.length) {
+      return {
+        materialId: null,
+        img: null,
+        label:
+          this.#friendlyRequirementLabel(
+            match
+          ),
+        rarity:
+          match.rarity
+          ?? null
+      };
+    }
+
+    if (matches.length === 1) {
+      return {
+        materialId:
+          matches[0].materialId,
+        img:
+          matches[0].img
+          ?? null,
+        label:
+          matches[0].name
+          ?? this.#friendlyRequirementLabel(
+            match
+          ),
+        rarity:
+          matches[0].rarity
+          ?? match.rarity
+          ?? null
+      };
+    }
+
+    const images =
+      [
+        ...new Set(
+          matches
+            .map(material =>
+              material.img
+            )
+            .filter(Boolean)
+        )
+      ];
+
+    // Generic tag requirements can intentionally match several materials.
+    // If they all share the same category art, show that art without linking
+    // to an arbitrary specific material.
+    return {
+      materialId: null,
+      img:
+        images.length === 1
+          ? images[0]
+          : null,
+      label:
+        this.#friendlyRequirementLabel(
+          match
+        ),
+      rarity:
+        match.rarity
+        ?? null
+    };
+  }
+
+  #friendlyRequirementLabel(match) {
+    if (!match) return "Material";
+
+    const tag =
+      (match.tags ?? [])
+        .map(String)
+        .find(value =>
+          value.startsWith(
+            "drakkenheim-component-"
+          )
+        )
+      ?? (match.tags ?? [])[0]
+      ?? match.category
+      ?? match.stage
+      ?? null;
+
+    if (!tag) {
+      return "Material";
+    }
+
+    let value =
+      String(tag)
+        .replace(
+          /^drakkenheim-component-/,
+          ""
+        )
+        .replace(
+          /^kibbles-/,
+          ""
+        )
+        .replace(/[_-]+/g, " ")
+        .trim();
+
+    // The Drakkenheim taxonomy prefixes many specific components with their
+    // broad category. For display, retain only the specific component when
+    // one is present (e.g. fluid-sap -> Sap, hide-plates -> Plates).
+    const categoryPrefixes = [
+      "animus",
+      "bones",
+      "dust",
+      "fluid",
+      "hair",
+      "hide",
+      "natural weapons",
+      "organs"
+    ];
+
+    const lower =
+      value.toLowerCase();
+
+    for (
+      const prefix of
+      categoryPrefixes
+    ) {
+      if (
+        lower.startsWith(
+          `${prefix} `
+        )
+      ) {
+        value =
+          value.slice(
+            prefix.length + 1
+          );
+        break;
+      }
+    }
+
+    return value
+      .split(/\s+/)
+      .filter(Boolean)
+      .map(word =>
+        word.charAt(0).toUpperCase()
+        + word.slice(1)
+      )
+      .join(" ");
   }
 
   async _onRender(context, options) {
@@ -388,8 +775,10 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
 
     if (searchInput) {
       searchInput.addEventListener("input", event => {
-        this.search = event.currentTarget.value ?? "";
-        this.#updateLiveQueryState();
+        this.search =
+          event.currentTarget.value
+          ?? "";
+        this.render();
       });
 
     }
@@ -409,46 +798,48 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
         this.render();
       });
 
-    const bindMultiSelect = (name, stateKey, filterKey) => {
-      this.element.querySelectorAll(`[name='${name}']`)
-        .forEach(element => {
-          element.addEventListener("change", event => {
-            const value = event.currentTarget.value;
-            const selected = new Set(this[stateKey]);
+    this.element
+      .querySelectorAll("[data-tristate-filter]")
+      .forEach(button => {
+        button.addEventListener(
+          "click",
+          event => {
+            event.preventDefault();
 
-            if (event.currentTarget.checked) selected.add(value);
-            else selected.delete(value);
+            this.#cycleTriState(
+              event.currentTarget
+                .dataset.filterGroup,
+              event.currentTarget
+                .dataset.filterValue
+            );
 
-            this[stateKey] = [...selected];
-            this.openFilterKey = filterKey;
+            this.displayedRecipeIds =
+              this.#matchingRecipes(
+                this.#currentInventoryActor()
+              ).map(recipe => recipe.id);
+
+            this.searchExecuted = true;
+            this.openFilterKey = null;
             this.render();
-          });
-        });
-    };
+          }
+        );
+      });
 
-    bindMultiSelect(
-      "recipe-pack-filter",
-      "selectedPackIds",
-      "recipe-pack"
-    );
-
-    bindMultiSelect(
-      "recipe-category-filter",
-      "selectedCategories",
-      "recipe-category"
-    );
-
-    bindMultiSelect(
-      "ingredient-rarity-filter",
-      "selectedIngredientRarities",
-      "ingredient-rarity"
-    );
-
-    bindMultiSelect(
-      "ingredient-tag-filter",
-      "selectedIngredientTags",
-      "ingredient-tag"
-    );
+    this.element
+      .querySelector(
+        "[data-action='clear-recipe-filters']"
+      )
+      ?.addEventListener(
+        "click",
+        event => {
+          event.preventDefault();
+          this.#clearTriStateFilters();
+          this.search = "";
+          this.displayedRecipeIds = [];
+          this.searchExecuted = false;
+          this.render();
+        }
+      );
 
     this.element.querySelector("[name='only-craftable']")
       ?.addEventListener("change", event => {
@@ -500,67 +891,36 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
         });
       });
 
-    this.element.querySelector("[data-action='search-recipes']")
-      ?.addEventListener("click", event => {
+    this.element.querySelector("[data-action='mark-all-recipes-unknown']")
+      ?.addEventListener("click", async event => {
         event.preventDefault();
 
-        if (
-          !this.search.trim()
-          && !this.selectedPackIds.length
-          && !this.selectedCategories.length
-          && !this.selectedIngredientRarities.length
-          && !this.selectedIngredientTags.length
-          && !this.onlyCraftable
-        ) {
-          ui.notifications.warn(
-            "Set at least one recipe search filter before searching."
+        if (!game.user.isGM) return;
+
+        this.openFilterKey = null;
+
+        const hidden =
+          getHiddenRecipeIds();
+
+        const contextRecipes =
+          this.#matchingRecipes(
+            this.#currentInventoryActor()
           );
-          return;
+
+        for (const recipe of contextRecipes) {
+          hidden.add(recipe.id);
         }
 
-        if (this.searchRenderTimer) {
-          clearTimeout(this.searchRenderTimer);
-          this.searchRenderTimer = null;
-        }
+        await setHiddenRecipeIds(hidden);
 
-        this.restoreSearchFocus = false;
-        this.openFilterKey = null;
-        this.displayedRecipeIds = this.#matchingRecipes(
-          this.#currentInventoryActor()
-        ).map(recipe => recipe.id);
-        this.searchExecuted = true;
-        this.render();
+        ui.notifications.info(
+          `${contextRecipes.length} recipe(s) in the current context are now Unknown.`
+        );
+
+        await this.render();
       });
 
-    this.element.querySelector("[name='search']")
-      ?.addEventListener("keydown", event => {
-        if (event.key !== "Enter") return;
-        event.preventDefault();
-
-        if (
-          !this.search.trim()
-          && !this.selectedPackIds.length
-          && !this.selectedCategories.length
-          && !this.selectedIngredientRarities.length
-          && !this.selectedIngredientTags.length
-          && !this.onlyCraftable
-        ) return;
-
-        if (this.searchRenderTimer) {
-          clearTimeout(this.searchRenderTimer);
-          this.searchRenderTimer = null;
-        }
-
-        this.restoreSearchFocus = false;
-        this.openFilterKey = null;
-        this.displayedRecipeIds = this.#matchingRecipes(
-          this.#currentInventoryActor()
-        ).map(recipe => recipe.id);
-        this.searchExecuted = true;
-        this.render();
-      });
-
-    this.element.querySelector("[data-action='hide-all-recipes']")
+    this.element.querySelector("[data-action='mark-all-recipes-known']")
       ?.addEventListener("click", async event => {
         event.preventDefault();
 
@@ -568,35 +928,28 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
 
         this.openFilterKey = null;
 
-        await setHiddenRecipeIds(
-          this.craftworks.recipes.all()
-            .map(recipe => recipe.id)
-        );
+        const hidden =
+          getHiddenRecipeIds();
+
+        const contextRecipes =
+          this.#matchingRecipes(
+            this.#currentInventoryActor()
+          );
+
+        for (const recipe of contextRecipes) {
+          hidden.delete(recipe.id);
+        }
+
+        await setHiddenRecipeIds(hidden);
 
         ui.notifications.info(
-          "All recipes are hidden from players."
+          `${contextRecipes.length} recipe(s) in the current context are now Known.`
         );
 
         await this.render();
       });
 
-    this.element.querySelector("[data-action='unhide-all-recipes']")
-      ?.addEventListener("click", async event => {
-        event.preventDefault();
-
-        if (!game.user.isGM) return;
-
-        this.openFilterKey = null;
-        await setHiddenRecipeIds([]);
-
-        ui.notifications.info(
-          "All recipes are visible to players."
-        );
-
-        await this.render();
-      });
-
-    this.element.querySelectorAll("[data-recipe-visibility]")
+    this.element.querySelectorAll("[data-recipe-knowledge]")
       .forEach(element => {
         element.addEventListener("click", async event => {
           event.preventDefault();
@@ -743,6 +1096,15 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
   }
 
   #ingredientMaterialsForRecipe(recipe) {
+    if (
+      !game.user.isGM
+      && getHiddenRecipeIds().has(
+        recipe.id
+      )
+    ) {
+      return [];
+    }
+
     const materialIds = new Set();
 
     for (const group of recipe.requirementGroups ?? []) {
@@ -766,44 +1128,168 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
       .filter(Boolean);
   }
 
-  #ingredientRarities() {
-    return Array.from(
-      new Set(
-        this.craftworks.recipes.all()
-          .flatMap(recipe => this.#raritiesForRecipe(recipe))
-          .filter(Boolean)
-      )
-    ).sort();
+  #buildRarityFilters() {
+    const standardRarities = [
+      {
+        id: "common",
+        label: "Common"
+      },
+      {
+        id: "uncommon",
+        label: "Uncommon"
+      },
+      {
+        id: "rare",
+        label: "Rare"
+      },
+      {
+        id: "very rare",
+        label: "Very Rare"
+      },
+      {
+        id: "legendary",
+        label: "Legendary"
+      },
+      {
+        id: "artifact",
+        label: "Artifact"
+      }
+    ];
+
+    const counts =
+      new Map(
+        standardRarities.map(
+          rarity => [
+            rarity.id,
+            0
+          ]
+        )
+      );
+
+    for (
+      const recipe of
+      this.craftworks.recipes.all()
+    ) {
+      const rarity =
+        this.#recipeRarity(recipe);
+
+      if (!rarity) continue;
+
+      counts.set(
+        rarity,
+        (counts.get(rarity) ?? 0)
+        + 1
+      );
+    }
+
+    const rows =
+      standardRarities.map(
+        rarity => ({
+          ...rarity,
+          count:
+            counts.get(rarity.id)
+            ?? 0
+        })
+      );
+
+    // Preserve any non-standard public rarities supplied by a content pack.
+    for (
+      const [id, count] of
+      counts.entries()
+    ) {
+      if (
+        standardRarities.some(
+          rarity =>
+            rarity.id === id
+        )
+      ) {
+        continue;
+      }
+
+      rows.push({
+        id,
+        label:
+          id
+            .split(" ")
+            .map(part =>
+              part.charAt(0)
+              .toUpperCase()
+              + part.slice(1)
+            )
+            .join(" "),
+        count
+      });
+    }
+
+    return rows;
   }
 
-  #raritiesForRecipe(recipe) {
-    const rarities = new Set();
+  #recipeRarity(recipe) {
+    const direct =
+      recipe?.rarity
+      ?? recipe?.output?.rarity
+      ?? null;
 
-    if (recipe.rarity) {
-      rarities.add(String(recipe.rarity).toLowerCase());
+    const normalizedDirect =
+      this.#normalizeRarity(
+        direct
+      );
+
+    if (normalizedDirect) {
+      return normalizedDirect;
     }
 
-    for (const material of this.#ingredientMaterialsForRecipe(recipe)) {
-      if (material?.rarity) {
-        rarities.add(String(material.rarity).toLowerCase());
+    // Recipe tags are public metadata and Drakkenheim recipes already carry
+    // their rarity there. This fallback keeps player filtering independent of
+    // hidden ingredient requirements.
+    for (
+      const tag of
+      recipe?.tags ?? []
+    ) {
+      const normalizedTag =
+        this.#normalizeRarity(
+          tag
+        );
+
+      if (normalizedTag) {
+        return normalizedTag;
       }
     }
 
-    for (const group of recipe.requirementGroups ?? []) {
-      for (const requirement of group.requirements ?? []) {
-        if (requirement.match?.rarity) {
-          rarities.add(String(requirement.match.rarity).toLowerCase());
-        }
+    return null;
+  }
 
-        for (const alternative of requirement.alternatives ?? []) {
-          if (alternative.match?.rarity) {
-            rarities.add(String(alternative.match.rarity).toLowerCase());
-          }
-        }
-      }
-    }
+  #normalizeRarity(value) {
+    const raw =
+      String(value ?? "")
+        .trim()
+        .toLowerCase()
+        .replace(/[_-]+/g, " ")
+        .replace(/\s+/g, " ");
 
-    return Array.from(rarities);
+    const aliases = new Map([
+      ["common", "common"],
+      ["uncommon", "uncommon"],
+      ["rare", "rare"],
+      ["very rare", "very rare"],
+      ["veryrare", "very rare"],
+      ["legendary", "legendary"],
+      ["artifact", "artifact"],
+      ["varies", "varies"],
+      ["variable", "varies"]
+    ]);
+
+    return aliases.get(raw)
+      ?? null;
+  }
+
+  #recipeRaritiesForFilter(recipe) {
+    const rarity =
+      this.#recipeRarity(recipe);
+
+    return rarity
+      ? [rarity]
+      : [];
   }
 
   #ingredientTags() {
@@ -820,13 +1306,136 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
     ).sort();
   }
 
-  #matchingRecipes(actor = this.#currentInventoryActor()) {
-    let recipes = this.craftworks.recipes.search(this.search);
+  #cycleTriState(group, value) {
+    const definitions = {
+      pack: [
+        "selectedPackIds",
+        "excludedPackIds"
+      ],
+      category: [
+        "selectedCategories",
+        "excludedCategories"
+      ],
+      rarity: [
+        "selectedRecipeRarities",
+        "excludedRecipeRarities"
+      ],
+      tag: [
+        "selectedIngredientTags",
+        "excludedIngredientTags"
+      ]
+    };
 
-    if (!game.user.isGM) {
-      const hidden = getHiddenRecipeIds();
+    if (group === "knowledge") {
+      const key =
+        value === "known"
+          ? "knownFilterState"
+          : value === "unknown"
+            ? "unknownFilterState"
+            : null;
+
+      if (!key) return;
+
+      this[key] =
+        this[key] === 0
+          ? 1
+          : this[key] === 1
+            ? -1
+            : 0;
+
+      return;
+    }
+
+    const keys =
+      definitions[group];
+
+    if (!keys || !value) return;
+
+    const [includedKey, excludedKey] =
+      keys;
+
+    const included =
+      new Set(this[includedKey]);
+    const excluded =
+      new Set(this[excludedKey]);
+
+    if (included.has(value)) {
+      included.delete(value);
+      excluded.add(value);
+    } else if (excluded.has(value)) {
+      excluded.delete(value);
+    } else {
+      included.add(value);
+    }
+
+    this[includedKey] = [...included];
+    this[excludedKey] = [...excluded];
+  }
+
+  #clearTriStateFilters() {
+    this.selectedPackIds = [];
+    this.excludedPackIds = [];
+    this.selectedCategories = [];
+    this.excludedCategories = [];
+    this.selectedRecipeRarities = [];
+    this.excludedRecipeRarities = [];
+    this.selectedIngredientTags = [];
+    this.excludedIngredientTags = [];
+    this.knownFilterState = 0;
+    this.unknownFilterState = 0;
+  }
+
+  #matchesPublicRecipeText(
+    recipe,
+    query
+  ) {
+    const needle =
+      String(query ?? "")
+        .trim()
+        .toLowerCase();
+
+    if (!needle) return true;
+
+    const haystack = [
+      recipe.id,
+      recipe.name,
+      recipe.category,
+      recipe.kind,
+      recipe.description,
+      recipe.output?.label,
+      recipe.packLabel,
+      recipe.rulesVersion,
+      recipe.source?.title,
+      ...(recipe.tags ?? [])
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+
+    return haystack.includes(
+      needle
+    );
+  }
+
+  #matchingRecipes(actor = this.#currentInventoryActor()) {
+    let recipes =
+      this.craftworks.recipes.search(
+        this.search
+      );
+
+    if (
+      !game.user.isGM
+      && this.search.trim()
+    ) {
+      const unknown =
+        getHiddenRecipeIds();
+
       recipes = recipes.filter(recipe =>
-        !hidden.has(recipe.id)
+        !unknown.has(recipe.id)
+        || this.#matchesPublicRecipeText(
+          recipe,
+          this.search
+        )
       );
     }
 
@@ -837,6 +1446,13 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
       );
     }
 
+    if (this.excludedPackIds.length) {
+      const excluded = new Set(this.excludedPackIds);
+      recipes = recipes.filter(recipe =>
+        !excluded.has(recipe.packId)
+      );
+    }
+
     if (this.selectedCategories.length) {
       const selected = new Set(this.selectedCategories);
       recipes = recipes.filter(recipe =>
@@ -844,14 +1460,37 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
       );
     }
 
-    if (this.selectedIngredientRarities.length) {
-      const selected = new Set(
-        this.selectedIngredientRarities
+    if (this.excludedCategories.length) {
+      const excluded = new Set(
+        this.excludedCategories
       );
 
       recipes = recipes.filter(recipe =>
-        this.#raritiesForRecipe(recipe)
+        !excluded.has(recipe.category)
+      );
+    }
+
+    if (this.selectedRecipeRarities.length) {
+      const selected = new Set(
+        this.selectedRecipeRarities
+      );
+
+      recipes = recipes.filter(recipe =>
+        this.#recipeRaritiesForFilter(recipe)
           .some(rarity => selected.has(rarity))
+      );
+    }
+
+    if (this.excludedRecipeRarities.length) {
+      const excluded = new Set(
+        this.excludedRecipeRarities
+      );
+
+      recipes = recipes.filter(recipe =>
+        !this.#recipeRaritiesForFilter(recipe)
+          .some(rarity =>
+            excluded.has(rarity)
+          )
       );
     }
 
@@ -867,6 +1506,44 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
               selected.has(String(tag).toLowerCase())
             )
           )
+      );
+    }
+
+    if (this.excludedIngredientTags.length) {
+      const excluded = new Set(
+        this.excludedIngredientTags
+      );
+
+      recipes = recipes.filter(recipe =>
+        !this.#ingredientMaterialsForRecipe(recipe)
+          .some(material =>
+            (material.tags ?? []).some(tag =>
+              excluded.has(
+                String(tag).toLowerCase()
+              )
+            )
+          )
+      );
+    }
+
+    const unknown =
+      getHiddenRecipeIds();
+
+    if (
+      this.knownFilterState === 1
+      || this.unknownFilterState === -1
+    ) {
+      recipes = recipes.filter(recipe =>
+        !unknown.has(recipe.id)
+      );
+    }
+
+    if (
+      this.unknownFilterState === 1
+      || this.knownFilterState === -1
+    ) {
+      recipes = recipes.filter(recipe =>
+        unknown.has(recipe.id)
       );
     }
 
@@ -890,9 +1567,15 @@ export class RecipeBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) 
     const hasCriteria = Boolean(
       this.search.trim()
       || this.selectedPackIds.length
+      || this.excludedPackIds.length
       || this.selectedCategories.length
-      || this.selectedIngredientRarities.length
+      || this.excludedCategories.length
+      || this.selectedRecipeRarities.length
+      || this.excludedRecipeRarities.length
       || this.selectedIngredientTags.length
+      || this.excludedIngredientTags.length
+      || this.knownFilterState !== 0
+      || this.unknownFilterState !== 0
       || this.onlyCraftable
     );
 

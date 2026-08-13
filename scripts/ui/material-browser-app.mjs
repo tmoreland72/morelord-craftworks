@@ -1,16 +1,23 @@
 import { MODULE_ID, MODULE_TITLE } from "../constants.mjs";
 import { bindMultiselectBehavior } from "./multiselect-behavior.mjs";
 
+import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
+
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2) {
+export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
+  HandlebarsApplicationMixin(ApplicationV2)
+) {
   constructor(craftworks, options = {}) {
     super(options);
     this.craftworks = craftworks;
     this.search = "";
     this.selectedPackIds = [];
+    this.excludedPackIds = [];
     this.selectedRarities = [];
+    this.excludedRarities = [];
     this.selectedTags = [];
+    this.excludedTags = [];
     this.actorUuid = null;
     this.focusMaterialId = null;
     this.searchExecuted = false;
@@ -47,8 +54,11 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
     this.selectedPackIds = material.packId
       ? [material.packId]
       : [];
+    this.excludedPackIds = [];
     this.selectedRarities = [];
+    this.excludedRarities = [];
     this.selectedTags = [];
+    this.excludedTags = [];
     this.searchExecuted = true;
     this.displayedMaterialIds = [material.materialId];
     return true;
@@ -95,6 +105,8 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
     const validPackIds = new Set(enabledPacks.map(pack => pack.id));
     this.selectedPackIds = this.selectedPackIds
       .filter(packId => validPackIds.has(packId));
+    this.excludedPackIds = this.excludedPackIds
+      .filter(packId => validPackIds.has(packId));
 
     const rarities = Array.from(
       new Set(
@@ -120,10 +132,18 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
       this.selectedRarities.filter(rarity =>
         raritySet.has(rarity)
       );
+    this.excludedRarities =
+      this.excludedRarities.filter(rarity =>
+        raritySet.has(rarity)
+      );
 
     const tagSet = new Set(tags);
     this.selectedTags =
       this.selectedTags.filter(tag =>
+        tagSet.has(tag)
+      );
+    this.excludedTags =
+      this.excludedTags.filter(tag =>
         tagSet.has(tag)
       );
 
@@ -137,21 +157,19 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
     const hasSearchCriteria = Boolean(
       this.search.trim()
       || this.selectedPackIds.length
+      || this.excludedPackIds.length
       || this.selectedRarities.length
+      || this.excludedRarities.length
       || this.selectedTags.length
+      || this.excludedTags.length
     );
 
     const autoShowResults =
-      matchingMaterials.length <= 50;
+      matchingMaterials.length <= 100;
 
-    const displayedMaterials = autoShowResults
-      ? matchingMaterials
-      : this.searchExecuted
-        ? this.displayedMaterialIds
-            .map(materialId =>
-              this.craftworks.materials.get(materialId)
-            )
-            .filter(Boolean)
+    const displayedMaterials =
+      autoShowResults
+        ? matchingMaterials
         : [];
 
     const materials = displayedMaterials
@@ -223,8 +241,16 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
             + part.slice(1)
           )
           .join(" "),
-        selected:
+        state:
           this.selectedRarities.includes(rarity)
+            ? 1
+            : this.excludedRarities.includes(rarity)
+              ? -1
+              : 0,
+        included:
+          this.selectedRarities.includes(rarity),
+        excluded:
+          this.excludedRarities.includes(rarity)
       })),
       tags: tags.map(tag => ({
         id: tag,
@@ -235,21 +261,41 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
             + part.slice(1)
           )
           .join(" "),
-        selected:
+        state:
           this.selectedTags.includes(tag)
+            ? 1
+            : this.excludedTags.includes(tag)
+              ? -1
+              : 0,
+        included:
+          this.selectedTags.includes(tag),
+        excluded:
+          this.excludedTags.includes(tag)
       })),
       packs: enabledPacks.map(pack => ({
         id: pack.id,
         label: pack.label,
         materialCount: pack.materialCount,
-        selected: this.selectedPackIds.includes(pack.id)
+        state:
+          this.selectedPackIds.includes(pack.id)
+            ? 1
+            : this.excludedPackIds.includes(pack.id)
+              ? -1
+              : 0,
+        included:
+          this.selectedPackIds.includes(pack.id),
+        excluded:
+          this.excludedPackIds.includes(pack.id)
       })),
       totalMaterialCount,
       prospectiveCount,
       prospectiveCountLabel,
       hasSearchCriteria,
       searchExecuted:
-        this.searchExecuted || autoShowResults,
+        autoShowResults,
+      overDisplayLimit:
+        prospectiveCount > 100,
+      displayLimit: 100,
       autoShowResults,
       materialCount: materials.length,
       ownedMaterialCount: materials.filter(material => material.owned).length,
@@ -270,9 +316,11 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
 
     if (searchInput) {
       searchInput.addEventListener("input", event => {
-        this.search = event.currentTarget.value ?? "";
+        this.search =
+          event.currentTarget.value
+          ?? "";
         this.focusMaterialId = null;
-        this.#updateLiveQueryState();
+        this.render();
       });
 
     }
@@ -284,97 +332,107 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
         this.render();
       });
 
-    const bindMultiSelect = (
-      name,
-      stateKey,
-      filterKey
-    ) => {
-      this.element.querySelectorAll(
-        `[name='${name}']`
-      ).forEach(element => {
-        element.addEventListener("change", event => {
-          const selected = new Set(
-            this[stateKey]
-          );
+    this.element
+      .querySelectorAll("[data-tristate-filter]")
+      .forEach(button => {
+        button.addEventListener(
+          "click",
+          event => {
+            event.preventDefault();
 
-          const value =
-            event.currentTarget.value;
+            const group =
+              event.currentTarget
+                .dataset.filterGroup;
+            const value =
+              event.currentTarget
+                .dataset.filterValue;
 
-          if (event.currentTarget.checked) {
-            selected.add(value);
-          } else {
-            selected.delete(value);
+            this.#cycleTriState(
+              group,
+              value
+            );
+
+            this.focusMaterialId = null;
+            this.displayedMaterialIds =
+              this.#matchingMaterials()
+                .map(material =>
+                  material.materialId
+                );
+            this.searchExecuted = true;
+            this.render();
           }
+        );
+      });
 
-          this[stateKey] = [...selected];
-          this.openFilterKey = filterKey;
+    this.element
+      .querySelector(
+        "[data-action='clear-material-filters']"
+      )
+      ?.addEventListener(
+        "click",
+        event => {
+          event.preventDefault();
+          this.#clearTriStateFilters();
+          this.search = "";
+          this.displayedMaterialIds = [];
+          this.searchExecuted = false;
           this.focusMaterialId = null;
           this.render();
-        });
-      });
+        }
+      );
+
+
+  }
+
+  #cycleTriState(group, value) {
+    const definitions = {
+      pack: [
+        "selectedPackIds",
+        "excludedPackIds"
+      ],
+      rarity: [
+        "selectedRarities",
+        "excludedRarities"
+      ],
+      tag: [
+        "selectedTags",
+        "excludedTags"
+      ]
     };
 
-    bindMultiSelect(
-      "material-pack-filter",
-      "selectedPackIds",
-      "material-pack"
-    );
+    const keys =
+      definitions[group];
 
-    bindMultiSelect(
-      "material-rarity-filter",
-      "selectedRarities",
-      "material-rarity"
-    );
+    if (!keys || !value) return;
 
-    bindMultiSelect(
-      "material-tag-filter",
-      "selectedTags",
-      "material-tag"
-    );
+    const [includedKey, excludedKey] =
+      keys;
 
-    this.element.querySelector("[data-action='search-materials']")
-      ?.addEventListener("click", event => {
-        event.preventDefault();
+    const included =
+      new Set(this[includedKey]);
+    const excluded =
+      new Set(this[excludedKey]);
 
-        if (
-          !this.search.trim()
-          && !this.selectedPackIds.length
-          && !this.selectedRarities.length
-          && !this.selectedTags.length
-        ) {
-          ui.notifications.warn(
-            "Set at least one material search filter before searching."
-          );
-          return;
-        }
+    if (included.has(value)) {
+      included.delete(value);
+      excluded.add(value);
+    } else if (excluded.has(value)) {
+      excluded.delete(value);
+    } else {
+      included.add(value);
+    }
 
-        clearTimeout(this._searchTimer);
-        this.openFilterKey = null;
-        this.displayedMaterialIds = this.#matchingMaterials()
-          .map(material => material.materialId);
-        this.searchExecuted = true;
-        this.render();
-      });
+    this[includedKey] = [...included];
+    this[excludedKey] = [...excluded];
+  }
 
-    this.element.querySelector("[name='search']")
-      ?.addEventListener("keydown", event => {
-        if (event.key !== "Enter") return;
-        event.preventDefault();
-
-        if (
-          !this.search.trim()
-          && !this.selectedPackIds.length
-          && !this.selectedRarities.length
-          && !this.selectedTags.length
-        ) return;
-
-        clearTimeout(this._searchTimer);
-        this.openFilterKey = null;
-        this.displayedMaterialIds = this.#matchingMaterials()
-          .map(material => material.materialId);
-        this.searchExecuted = true;
-        this.render();
-      });
+  #clearTriStateFilters() {
+    this.selectedPackIds = [];
+    this.excludedPackIds = [];
+    this.selectedRarities = [];
+    this.excludedRarities = [];
+    this.selectedTags = [];
+    this.excludedTags = [];
   }
 
   #matchingMaterials() {
@@ -386,6 +444,13 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
       const selected = new Set(this.selectedPackIds);
       materials = materials.filter(material =>
         selected.has(material.packId)
+      );
+    }
+
+    if (this.excludedPackIds.length) {
+      const excluded = new Set(this.excludedPackIds);
+      materials = materials.filter(material =>
+        !excluded.has(material.packId)
       );
     }
 
@@ -401,6 +466,18 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
       );
     }
 
+    if (this.excludedRarities.length) {
+      const excluded = new Set(
+        this.excludedRarities
+      );
+
+      materials = materials.filter(material =>
+        !excluded.has(
+          String(material.rarity ?? "").toLowerCase()
+        )
+      );
+    }
+
     if (this.selectedTags.length) {
       const selected = new Set(
         this.selectedTags
@@ -409,6 +486,20 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
       materials = materials.filter(material =>
         (material.tags ?? []).some(tag =>
           selected.has(
+            String(tag).toLowerCase()
+          )
+        )
+      );
+    }
+
+    if (this.excludedTags.length) {
+      const excluded = new Set(
+        this.excludedTags
+      );
+
+      materials = materials.filter(material =>
+        !(material.tags ?? []).some(tag =>
+          excluded.has(
             String(tag).toLowerCase()
           )
         )
@@ -447,8 +538,11 @@ export class MaterialBrowserApp extends HandlebarsApplicationMixin(ApplicationV2
     const hasCriteria = Boolean(
       term
       || this.selectedPackIds.length
+      || this.excludedPackIds.length
       || this.selectedRarities.length
+      || this.excludedRarities.length
       || this.selectedTags.length
+      || this.excludedTags.length
     );
 
     const countLabel = materials.length > 500

@@ -1,8 +1,12 @@
 import { MODULE_ID, MODULE_TITLE } from "../constants.mjs";
 
+import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
+
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-export class PartyRecipientSettingsApp extends HandlebarsApplicationMixin(ApplicationV2) {
+export class PartyRecipientSettingsApp extends ScrollPreservingApplicationMixin(
+  HandlebarsApplicationMixin(ApplicationV2)
+) {
   static DEFAULT_OPTIONS = {
     id: "morelord-craftworks-party-recipient-settings",
     classes: ["morelord-craftworks", "mcw-window"],

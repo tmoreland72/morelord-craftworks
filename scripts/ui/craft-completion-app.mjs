@@ -1,12 +1,16 @@
 import { MODULE_TITLE } from "../constants.mjs";
 
+import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
+
 const {
   ApplicationV2,
   HandlebarsApplicationMixin
 } = foundry.applications.api;
 
 export class CraftCompletionApp
-  extends HandlebarsApplicationMixin(ApplicationV2) {
+  extends ScrollPreservingApplicationMixin(
+  HandlebarsApplicationMixin(ApplicationV2)
+) {
 
   constructor(
     craftworks,

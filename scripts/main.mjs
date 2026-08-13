@@ -31,6 +31,7 @@ import { ToolInspector } from "./recipes/tool-inspector.mjs";
 import { MorelordCoreAccessService } from "./core/morelord-core-access-service.mjs";
 import { Dnd5eSourceFilterService } from "./core/dnd5e-source-filter-service.mjs";
 import { ContentPackService } from "./core/content-pack-service.mjs";
+import { ContentSyncService } from "./core/content-sync-service.mjs";
 import { CraftingJobService } from "./crafting/crafting-job-service.mjs";
 import { CraftingMaterialService } from "./crafting/crafting-material-service.mjs";
 import { CrafterContextService } from "./crafting/crafter-context-service.mjs";
@@ -93,26 +94,66 @@ Hooks.once("ready", async () => {
 
   const materials = new MaterialRegistry({ contentPacks });
 
-  // Standard material Items are world compendium documents. Synchronize them
-  // from Craftworks' own static material seed before indexing so existing
-  // worlds receive current names, metadata, and icon paths.
-  const startupMaterialInstaller = new ContentPackMaterialInstaller({
-    registry: materials,
-    contentPacks
-  });
+  const startupMaterialInstaller =
+    new ContentPackMaterialInstaller({
+      registry: materials,
+      contentPacks
+    });
 
-  if (game.user.isGM) {
+  const contentSync =
+    new ContentSyncService({
+      materialInstaller:
+        startupMaterialInstaller,
+      materialRegistry:
+        materials
+    });
+
+  // Only one connected GM should perform world-compendium writes. Other GMs
+  // and players simply index the already-synchronized world packs.
+  const activeGms =
+    game.users
+      .filter(user =>
+        user.active
+        && user.isGM
+      )
+      .sort((a, b) =>
+        a.id.localeCompare(b.id)
+      );
+
+  const isSyncCoordinator =
+    game.user.isGM
+    && (
+      !activeGms.length
+      || activeGms[0].id
+        === game.user.id
+    );
+
+  if (
+    isSyncCoordinator
+    && contentSync.needsSync()
+  ) {
     try {
-      await startupMaterialInstaller.installAll();
+      const result =
+        await contentSync.sync({
+          reason: "startup"
+        });
+
+      console.log(
+        "Morelord Craftworks | Automatic content synchronization completed.",
+        result
+      );
     } catch (error) {
       console.warn(
-        "Morelord Craftworks | Automatic content-pack material synchronization failed.",
+        "Morelord Craftworks | Automatic content synchronization failed.",
         error
       );
-      await materials.indexConfiguredPacks();
+
+      await materials
+        .indexConfiguredPacks();
     }
   } else {
-    await materials.indexConfiguredPacks();
+    await materials
+      .indexConfiguredPacks();
   }
 
   const recipientResolver = new RecipientResolver();
@@ -141,6 +182,12 @@ Hooks.once("ready", async () => {
     dnd5eItemResolver
   });
   await recipes.loadStandardSeed();
+
+  contentSync.setRuntimeServices({
+    dnd5eItemResolver,
+    recipeRegistry: recipes
+  });
+
   const recipeEvaluator = new RecipeEvaluator({ materialRegistry: materials });
   const recipePlanner = new RecipePlanner({
     recipeRegistry: recipes,
@@ -220,6 +267,14 @@ Hooks.once("ready", async () => {
     spellbookGenerator,
     coreAccess,
     contentPacks,
+    contentSync,
+    syncContent: options =>
+      contentSync.sync({
+        force: true,
+        reason:
+          options?.reason
+          ?? "api"
+      }),
     recipeEvaluator,
     recipePlanner,
     toolInspector,
@@ -235,8 +290,17 @@ Hooks.once("ready", async () => {
       getMaterialId: getCraftworksMaterialId
     },
     dev: {
-      installStandardMaterials: () => startupMaterialInstaller.installAll(),
-      syncContentPackMaterials: () => startupMaterialInstaller.installAll(),
+      // Compatibility aliases. Production callers should use syncContent().
+      installStandardMaterials: () =>
+        contentSync.sync({
+          force: true,
+          reason: "legacy-install"
+        }),
+      syncContentPackMaterials: () =>
+        contentSync.sync({
+          force: true,
+          reason: "legacy-sync"
+        }),
       socketPing: targetUserId => socket.ping(targetUserId)
     },
     openHarvest: () => {

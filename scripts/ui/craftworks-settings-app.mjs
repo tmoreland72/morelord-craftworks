@@ -15,9 +15,13 @@ import {
   getGatherProfiles
 } from "../acquisition/gather-profiles.mjs";
 
+import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
+
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-export class CraftworksSettingsApp extends HandlebarsApplicationMixin(ApplicationV2) {
+export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
+  HandlebarsApplicationMixin(ApplicationV2)
+) {
   static craftworks = null;
 
   static DEFAULT_OPTIONS = {
@@ -151,8 +155,32 @@ export class CraftworksSettingsApp extends HandlebarsApplicationMixin(Applicatio
         || a.packLabel.localeCompare(b.packLabel)
       );
 
+    const lastContentSync =
+      String(
+        getSetting(
+          SETTINGS.CONTENT_SYNC_LAST_AT
+        ) ?? ""
+      );
+
+    const contentSyncStatus = {
+      lastAt:
+        lastContentSync || null,
+      lastAtLabel:
+        lastContentSync
+          ? new Date(
+              lastContentSync
+            ).toLocaleString()
+          : "Never",
+      needsSync:
+        Boolean(
+          craftworks?.contentSync
+            ?.needsSync?.()
+        )
+    };
+
     return foundry.utils.mergeObject(context, {
       core,
+      contentSyncStatus,
 
       packs,
       groups,
@@ -215,6 +243,64 @@ export class CraftworksSettingsApp extends HandlebarsApplicationMixin(Applicatio
           target.disabled = false;
         }
       });
+
+    this.element
+      .querySelector(
+        "[data-action='sync-content']"
+      )
+      ?.addEventListener(
+        "click",
+        async event => {
+          event.preventDefault();
+
+          const target =
+            event.currentTarget;
+
+          target.disabled = true;
+
+          const originalHtml =
+            target.innerHTML;
+
+          target.innerHTML =
+            '<i class="fa-solid fa-arrows-rotate fa-spin"></i> Syncing…';
+
+          try {
+            const result =
+              await craftworks
+                .syncContent({
+                  reason:
+                    "settings"
+                });
+
+            ui.notifications.info(
+              "Craftworks sync complete: "
+              + `${result.materialCreates} material(s) created, `
+              + `${result.materialUpdates} updated, `
+              + `${result.materialDeletes} removed, `
+              + `${result.recipeCount ?? 0} recipe(s) indexed.`
+            );
+
+            await this.render({
+              force: true
+            });
+          } catch (error) {
+            console.error(
+              "Morelord Craftworks | Manual content synchronization failed.",
+              error
+            );
+
+            ui.notifications.error(
+              `Craftworks sync failed: ${error.message}`
+            );
+          } finally {
+            if (target?.isConnected) {
+              target.disabled = false;
+              target.innerHTML =
+                originalHtml;
+            }
+          }
+        }
+      );
   }
 
   async #save(event) {

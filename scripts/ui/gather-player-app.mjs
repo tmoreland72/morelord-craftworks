@@ -1,8 +1,12 @@
 import { MODULE_TITLE } from "../constants.mjs";
 
+import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
+
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-export class GatherPlayerApp extends HandlebarsApplicationMixin(ApplicationV2) {
+export class GatherPlayerApp extends ScrollPreservingApplicationMixin(
+  HandlebarsApplicationMixin(ApplicationV2)
+) {
   constructor(craftworks, session, options = {}) {
     super(options);
     this.craftworks = craftworks;

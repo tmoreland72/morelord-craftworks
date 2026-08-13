@@ -1,4 +1,4 @@
-<section class="mcw app-shell mcw-browser-shell">
+<section class="mcw app-shell mcw-browser-shell mcw-marketplace-browser">
   <header class="mcw-header">
     <div>
       <h2>Materials</h2>
@@ -6,115 +6,113 @@
     </div>
   </header>
 
-  <div class="mcw-panel mcw-material-toolbar">
-    <div class="mcw-material-field mcw-material-search-field">
-      <label for="mcw-material-search">Search Materials</label>
-      <input
-        id="mcw-material-search"
-        type="search"
-        name="search"
-        value="{{search}}"
-        placeholder="Material, tag, category, source…"
-      >
-    </div>
+  <div class="mcw-marketplace-browser-body">
+    <aside class="mcw-filter-rail">
+      <div class="mcw-market-filter-title">
+        <strong>Filters</strong>
+        <button type="button"
+                class="mcw-icon-button"
+                data-action="clear-material-filters"
+                title="Clear all filters">
+          <i class="fa-solid fa-filter-circle-xmark"></i>
+        </button>
+      </div>
 
-    <div class="mcw-material-field mcw-material-pack-field">
-      <span class="mcw-material-field-label">Content Pack</span>
-      <details class="mcw-multiselect mcw-material-multiselect"
-               data-filter="material-pack"
-               {{#if packFilterOpen}}open{{/if}}>
-        <summary>{{packFilterLabel}}</summary>
-        <div class="mcw-multiselect-menu">
+      <label class="mcw-filter-search">
+        <span>Search</span>
+        <input type="search"
+               name="search"
+               value="{{search}}"
+               placeholder="Material, tag, category, source…">
+      </label>
+
+      <div class="mcw-market-filter-mode-legend">
+        <span><i class="fa-regular fa-square"></i> Any</span>
+        <span><i class="fa-solid fa-square-check"></i> Include</span>
+        <span><i class="fa-solid fa-square-minus"></i> Exclude</span>
+      </div>
+
+      <section class="mcw-filter-group">
+        <h3>Content Pack</h3>
+        <div class="mcw-tristate-list">
           {{#each packs}}
-            <label class="mcw-multiselect-option">
-              <input type="checkbox"
-                     name="material-pack-filter"
-                     value="{{id}}"
-                     {{#if selected}}checked{{/if}}>
-              <span>{{label}} ({{materialCount}})</span>
-            </label>
+            <button type="button"
+                    class="mcw-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
+                    data-tristate-filter
+                    data-filter-group="pack"
+                    data-filter-value="{{id}}"
+                    title="Click: include → exclude → neutral">
+              <span>{{label}}</span>
+              <small>{{materialCount}}</small>
+              <i class="fa-solid {{#if included}}fa-plus{{else if excluded}}fa-minus{{else}}fa-circle{{/if}}"></i>
+            </button>
           {{/each}}
         </div>
-      </details>
-    </div>
+      </section>
 
-    <div class="mcw-material-field mcw-material-rarity-field">
-      <span class="mcw-material-field-label">Rarity</span>
-      <details class="mcw-multiselect mcw-material-multiselect"
-               data-filter="material-rarity"
-               {{#if rarityFilterOpen}}open{{/if}}>
-        <summary>{{rarityFilterLabel}}</summary>
-        <div class="mcw-multiselect-menu">
+      <section class="mcw-filter-group">
+        <h3>Rarity</h3>
+        <div class="mcw-tristate-list">
           {{#each rarities}}
-            <label class="mcw-multiselect-option">
-              <input type="checkbox"
-                     name="material-rarity-filter"
-                     value="{{id}}"
-                     {{#if selected}}checked{{/if}}>
+            <button type="button"
+                    class="mcw-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
+                    data-tristate-filter
+                    data-filter-group="rarity"
+                    data-filter-value="{{id}}">
               <span>{{label}}</span>
-            </label>
+              <i class="fa-solid {{#if included}}fa-plus{{else if excluded}}fa-minus{{else}}fa-circle{{/if}}"></i>
+            </button>
           {{/each}}
         </div>
-      </details>
-    </div>
+      </section>
 
-    <div class="mcw-material-field mcw-material-tag-field">
-      <span class="mcw-material-field-label">Tag</span>
-      <details class="mcw-multiselect mcw-material-multiselect"
-               data-filter="material-tag"
-               {{#if tagFilterOpen}}open{{/if}}>
-        <summary>{{tagFilterLabel}}</summary>
-        <div class="mcw-multiselect-menu">
+      <section class="mcw-filter-group">
+        <h3>Tags</h3>
+        <div class="mcw-tristate-list">
           {{#each tags}}
-            <label class="mcw-multiselect-option">
-              <input type="checkbox"
-                     name="material-tag-filter"
-                     value="{{id}}"
-                     {{#if selected}}checked{{/if}}>
+            <button type="button"
+                    class="mcw-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
+                    data-tristate-filter
+                    data-filter-group="tag"
+                    data-filter-value="{{id}}">
               <span>{{label}}</span>
-            </label>
+              <i class="fa-solid {{#if included}}fa-plus{{else if excluded}}fa-minus{{else}}fa-circle{{/if}}"></i>
+            </button>
           {{/each}}
         </div>
-      </details>
-    </div>
+      </section>
 
-    <div class="mcw-material-field mcw-material-inventory-field">
-      <label for="mcw-material-actor">Check Inventory</label>
-      <select id="mcw-material-actor" name="actor">
-        <option value="">No inventory selected</option>
-        {{#each actors}}
-          <option value="{{uuid}}" {{#if selected}}selected{{/if}}>
-            {{name}}
-          </option>
-        {{/each}}
-      </select>
-    </div>
+      <label class="mcw-filter-search">
+        <span>Check Inventory</span>
+        <select name="actor">
+          <option value="">No inventory selected</option>
+          {{#each actors}}
+            <option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>
+          {{/each}}
+        </select>
+      </label>
+</aside>
 
-    <div class="mcw-material-search-action">
-      <button type="button"
-              class="mcw-browser-search-button"
-              data-action="search-materials"
-              {{#unless hasSearchCriteria}}disabled{{/unless}}>
-        <i class="fa-solid fa-magnifying-glass"></i>
-        Search
-      </button>
-    </div>
-  </div>
+    <main class="mcw-marketplace-results">
+      <div class="mcw-market-results-heading">
+        <h2>Materials</h2>
+        <span>{{prospectiveCount}} matches</span>
+      </div>
 
-  <div class="mcw-material-summary mcw-browser-query-summary">
-    <span><strong>{{totalMaterialCount}}</strong> total materials</span>
-    <span data-query-result-summary>
-      {{#if hasSearchCriteria}}
-        Search will return <strong>{{prospectiveCountLabel}}</strong> record(s).
+      {{#if overDisplayLimit}}
+        <div class="mcw-market-limit-message">
+          <i class="fa-solid fa-filter"></i>
+          <div>
+            <strong>{{prospectiveCount}} materials match the current filters.</strong>
+            <span>
+              Refine the filters or search until there are
+              <strong>{{displayLimit}} or fewer</strong> results before items are displayed.
+            </span>
+          </div>
+        </div>
       {{else}}
-        Set at least one filter to search the catalog.
-      {{/if}}
-    </span>
-  </div>
-
-  <div class="mcw-reference-list mcw-browser-results">
-    {{#if searchExecuted}}
-    {{#each materials}}
+        <div class="mcw-reference-list mcw-browser-results">
+          {{#each materials}}
       <article class="mcw-reference-card mcw-material-card {{#if owned}}mcw-material-owned{{/if}} {{#if focused}}mcw-material-focused{{/if}}">
         <img src="{{img}}" alt="{{name}}">
 
@@ -160,15 +158,13 @@
           {{/if}}
         </div>
       </article>
-    {{else}}
-      <div class="mcw-panel">
-        <p>No materials match the current search or Content Pack filter.</p>
-      </div>
-    {{/each}}
-    {{else}}
-      <div class="mcw-panel mcw-browser-empty-state">
-        <p>Choose your filters, review the result count above, then click <strong>Search</strong>.</p>
-      </div>
-    {{/if}}
+          {{else}}
+            <div class="mcw-panel">
+              <p>No materials match the current filters.</p>
+            </div>
+          {{/each}}
+        </div>
+      {{/if}}
+    </main>
   </div>
 </section>

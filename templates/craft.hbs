@@ -152,8 +152,9 @@
   <div class="mcw-craft-card-body">
     <section>
       <h4>Requirements</h4>
-      <div class="mcw-craft-requirements">
-        {{#each requirementGroupRows}}
+      {{#if requirementsKnown}}
+        <div class="mcw-craft-requirements">
+          {{#each requirementGroupRows}}
           <div class="mcw-craft-requirement-group">
             {{#each requirementRows}}
               {{#if alternativeRows.length}}
@@ -162,13 +163,24 @@
                   {{#each alternativeRows}}
                     <div class="mcw-craft-requirement-row {{#if inventory.ready}}mcw-ready{{else}}mcw-missing{{/if}}">
                       {{#if materialImg}}
-                        <button type="button"
-                                data-material-id="{{materialId}}"
-                                class="mcw-material-icon-link">
-                          <img src="{{materialImg}}" alt="">
-                        </button>
+                        {{#if materialId}}
+                          <button type="button"
+                                  data-material-id="{{materialId}}"
+                                  class="mcw-material-icon-link">
+                            <img src="{{materialImg}}" alt="">
+                          </button>
+                        {{else}}
+                          <span class="mcw-material-icon-link mcw-material-icon-display">
+                            <img src="{{materialImg}}" alt="">
+                          </span>
+                        {{/if}}
                       {{/if}}
-                      <span>{{display}}</span>
+                      <span class="mcw-requirement-copy">
+          <strong>{{displayLabel}}</strong>
+          {{#if displayRarity}}
+            <small class="mcw-requirement-rarity">{{displayRarity}}</small>
+          {{/if}}
+        </span>
                       {{#if inventory}}
                         <strong>{{inventory.available}} / {{inventory.required}}</strong>
                       {{/if}}
@@ -178,13 +190,24 @@
               {{else}}
                 <div class="mcw-craft-requirement-row {{#if inventory.ready}}mcw-ready{{else}}mcw-missing{{/if}}">
                   {{#if materialImg}}
-                    <button type="button"
-                            data-material-id="{{materialId}}"
-                            class="mcw-material-icon-link">
-                      <img src="{{materialImg}}" alt="">
-                    </button>
+                    {{#if materialId}}
+                      <button type="button"
+                              data-material-id="{{materialId}}"
+                              class="mcw-material-icon-link">
+                        <img src="{{materialImg}}" alt="">
+                      </button>
+                    {{else}}
+                      <span class="mcw-material-icon-link mcw-material-icon-display">
+                        <img src="{{materialImg}}" alt="">
+                      </span>
+                    {{/if}}
                   {{/if}}
-                  <span>{{display}}</span>
+                  <span class="mcw-requirement-copy">
+          <strong>{{displayLabel}}</strong>
+          {{#if displayRarity}}
+            <small class="mcw-requirement-rarity">{{displayRarity}}</small>
+          {{/if}}
+        </span>
                   {{#if inventory}}
                     <strong>{{inventory.available}} / {{inventory.required}}</strong>
                   {{/if}}
@@ -193,8 +216,17 @@
             {{/each}}
           </div>
           {{#unless @last}}<div class="mcw-requirement-group-or">OR</div>{{/unless}}
-        {{/each}}
-      </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class="mcw-recipe-unknown-requirements">
+          <i class="fa-solid fa-circle-question"></i>
+          <div>
+            <strong>Ingredients Unknown</strong>
+            <span>Discover this recipe's ingredients before crafting can begin.</span>
+          </div>
+        </div>
+      {{/if}}
     </section>
 
     <section class="mcw-craft-output-panel">
@@ -242,6 +274,7 @@
           Cancel
         </button>
       {{else}}
+        {{#if requirementsKnown}}
         {{#if readiness.ready}}
           <span class="mcw-craft-ready-label">
             <i class="fa-solid fa-circle-check"></i>
@@ -259,6 +292,12 @@
             Missing Requirements
           </span>
         {{/if}}
+      {{else}}
+        <span class="mcw-craft-missing-label">
+          <i class="fa-solid fa-circle-question"></i>
+          Ingredients Unknown
+        </span>
+      {{/if}}
       {{/if}}
     {{/if}}
   </footer>
@@ -361,8 +400,9 @@
   <div class="mcw-craft-card-body">
     <section>
       <h4>Requirements</h4>
-      <div class="mcw-craft-requirements">
-        {{#each requirementGroupRows}}
+      {{#if requirementsKnown}}
+        <div class="mcw-craft-requirements">
+          {{#each requirementGroupRows}}
           <div class="mcw-craft-requirement-group">
             {{#each requirementRows}}
               {{#if alternativeRows.length}}
@@ -371,13 +411,24 @@
                   {{#each alternativeRows}}
                     <div class="mcw-craft-requirement-row {{#if inventory.ready}}mcw-ready{{else}}mcw-missing{{/if}}">
                       {{#if materialImg}}
-                        <button type="button"
-                                data-material-id="{{materialId}}"
-                                class="mcw-material-icon-link">
-                          <img src="{{materialImg}}" alt="">
-                        </button>
+                        {{#if materialId}}
+                          <button type="button"
+                                  data-material-id="{{materialId}}"
+                                  class="mcw-material-icon-link">
+                            <img src="{{materialImg}}" alt="">
+                          </button>
+                        {{else}}
+                          <span class="mcw-material-icon-link mcw-material-icon-display">
+                            <img src="{{materialImg}}" alt="">
+                          </span>
+                        {{/if}}
                       {{/if}}
-                      <span>{{display}}</span>
+                      <span class="mcw-requirement-copy">
+          <strong>{{displayLabel}}</strong>
+          {{#if displayRarity}}
+            <small class="mcw-requirement-rarity">{{displayRarity}}</small>
+          {{/if}}
+        </span>
                       {{#if inventory}}
                         <strong>{{inventory.available}} / {{inventory.required}}</strong>
                       {{/if}}
@@ -387,13 +438,24 @@
               {{else}}
                 <div class="mcw-craft-requirement-row {{#if inventory.ready}}mcw-ready{{else}}mcw-missing{{/if}}">
                   {{#if materialImg}}
-                    <button type="button"
-                            data-material-id="{{materialId}}"
-                            class="mcw-material-icon-link">
-                      <img src="{{materialImg}}" alt="">
-                    </button>
+                    {{#if materialId}}
+                      <button type="button"
+                              data-material-id="{{materialId}}"
+                              class="mcw-material-icon-link">
+                        <img src="{{materialImg}}" alt="">
+                      </button>
+                    {{else}}
+                      <span class="mcw-material-icon-link mcw-material-icon-display">
+                        <img src="{{materialImg}}" alt="">
+                      </span>
+                    {{/if}}
                   {{/if}}
-                  <span>{{display}}</span>
+                  <span class="mcw-requirement-copy">
+          <strong>{{displayLabel}}</strong>
+          {{#if displayRarity}}
+            <small class="mcw-requirement-rarity">{{displayRarity}}</small>
+          {{/if}}
+        </span>
                   {{#if inventory}}
                     <strong>{{inventory.available}} / {{inventory.required}}</strong>
                   {{/if}}
@@ -402,8 +464,17 @@
             {{/each}}
           </div>
           {{#unless @last}}<div class="mcw-requirement-group-or">OR</div>{{/unless}}
-        {{/each}}
-      </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class="mcw-recipe-unknown-requirements">
+          <i class="fa-solid fa-circle-question"></i>
+          <div>
+            <strong>Ingredients Unknown</strong>
+            <span>Discover this recipe's ingredients before crafting can begin.</span>
+          </div>
+        </div>
+      {{/if}}
     </section>
 
     <section class="mcw-craft-output-panel">
@@ -451,6 +522,7 @@
           Cancel
         </button>
       {{else}}
+        {{#if requirementsKnown}}
         {{#if readiness.ready}}
           <span class="mcw-craft-ready-label">
             <i class="fa-solid fa-circle-check"></i>
@@ -468,6 +540,12 @@
             Missing Requirements
           </span>
         {{/if}}
+      {{else}}
+        <span class="mcw-craft-missing-label">
+          <i class="fa-solid fa-circle-question"></i>
+          Ingredients Unknown
+        </span>
+      {{/if}}
       {{/if}}
     {{/if}}
   </footer>
@@ -572,8 +650,9 @@
   <div class="mcw-craft-card-body">
     <section>
       <h4>Requirements</h4>
-      <div class="mcw-craft-requirements">
-        {{#each requirementGroupRows}}
+      {{#if requirementsKnown}}
+        <div class="mcw-craft-requirements">
+          {{#each requirementGroupRows}}
           <div class="mcw-craft-requirement-group">
             {{#each requirementRows}}
               {{#if alternativeRows.length}}
@@ -582,13 +661,24 @@
                   {{#each alternativeRows}}
                     <div class="mcw-craft-requirement-row {{#if inventory.ready}}mcw-ready{{else}}mcw-missing{{/if}}">
                       {{#if materialImg}}
-                        <button type="button"
-                                data-material-id="{{materialId}}"
-                                class="mcw-material-icon-link">
-                          <img src="{{materialImg}}" alt="">
-                        </button>
+                        {{#if materialId}}
+                          <button type="button"
+                                  data-material-id="{{materialId}}"
+                                  class="mcw-material-icon-link">
+                            <img src="{{materialImg}}" alt="">
+                          </button>
+                        {{else}}
+                          <span class="mcw-material-icon-link mcw-material-icon-display">
+                            <img src="{{materialImg}}" alt="">
+                          </span>
+                        {{/if}}
                       {{/if}}
-                      <span>{{display}}</span>
+                      <span class="mcw-requirement-copy">
+          <strong>{{displayLabel}}</strong>
+          {{#if displayRarity}}
+            <small class="mcw-requirement-rarity">{{displayRarity}}</small>
+          {{/if}}
+        </span>
                       {{#if inventory}}
                         <strong>{{inventory.available}} / {{inventory.required}}</strong>
                       {{/if}}
@@ -598,13 +688,24 @@
               {{else}}
                 <div class="mcw-craft-requirement-row {{#if inventory.ready}}mcw-ready{{else}}mcw-missing{{/if}}">
                   {{#if materialImg}}
-                    <button type="button"
-                            data-material-id="{{materialId}}"
-                            class="mcw-material-icon-link">
-                      <img src="{{materialImg}}" alt="">
-                    </button>
+                    {{#if materialId}}
+                      <button type="button"
+                              data-material-id="{{materialId}}"
+                              class="mcw-material-icon-link">
+                        <img src="{{materialImg}}" alt="">
+                      </button>
+                    {{else}}
+                      <span class="mcw-material-icon-link mcw-material-icon-display">
+                        <img src="{{materialImg}}" alt="">
+                      </span>
+                    {{/if}}
                   {{/if}}
-                  <span>{{display}}</span>
+                  <span class="mcw-requirement-copy">
+          <strong>{{displayLabel}}</strong>
+          {{#if displayRarity}}
+            <small class="mcw-requirement-rarity">{{displayRarity}}</small>
+          {{/if}}
+        </span>
                   {{#if inventory}}
                     <strong>{{inventory.available}} / {{inventory.required}}</strong>
                   {{/if}}
@@ -613,8 +714,17 @@
             {{/each}}
           </div>
           {{#unless @last}}<div class="mcw-requirement-group-or">OR</div>{{/unless}}
-        {{/each}}
-      </div>
+          {{/each}}
+        </div>
+      {{else}}
+        <div class="mcw-recipe-unknown-requirements">
+          <i class="fa-solid fa-circle-question"></i>
+          <div>
+            <strong>Ingredients Unknown</strong>
+            <span>Discover this recipe's ingredients before crafting can begin.</span>
+          </div>
+        </div>
+      {{/if}}
     </section>
 
     <section class="mcw-craft-output-panel">
@@ -662,6 +772,7 @@
           Cancel
         </button>
       {{else}}
+        {{#if requirementsKnown}}
         {{#if readiness.ready}}
           <span class="mcw-craft-ready-label">
             <i class="fa-solid fa-circle-check"></i>
@@ -679,6 +790,12 @@
             Missing Requirements
           </span>
         {{/if}}
+      {{else}}
+        <span class="mcw-craft-missing-label">
+          <i class="fa-solid fa-circle-question"></i>
+          Ingredients Unknown
+        </span>
+      {{/if}}
       {{/if}}
     {{/if}}
   </footer>

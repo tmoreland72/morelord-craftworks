@@ -1,8 +1,12 @@
 import { MODULE_TITLE } from "../constants.mjs";
 
+import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
+
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-export class HarvestPlayerApp extends HandlebarsApplicationMixin(ApplicationV2) {
+export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
+  HandlebarsApplicationMixin(ApplicationV2)
+) {
   constructor(craftworks, session, options = {}) {
     super(options);
     this.craftworks = craftworks;
@@ -56,8 +60,6 @@ export class HarvestPlayerApp extends HandlebarsApplicationMixin(ApplicationV2) 
   };
 
   async setSession(session, { preserveFocus = false } = {}) {
-    const scrollState = this.#captureScrollState();
-
     this.session = session;
 
     // Keep local per-creature state synchronized with the authoritative
@@ -92,14 +94,11 @@ export class HarvestPlayerApp extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     await this.render();
-    this.#restoreScrollState(scrollState);
 
     return this;
   }
 
   async setState(creatureTokenUuid, state) {
-    const scrollState = this.#captureScrollState();
-
     this.states[creatureTokenUuid] =
       foundry.utils.deepClone(state);
 
@@ -118,7 +117,6 @@ export class HarvestPlayerApp extends HandlebarsApplicationMixin(ApplicationV2) 
     }
 
     await this.render();
-    this.#restoreScrollState(scrollState);
   }
 
   async _prepareContext(options) {
@@ -376,9 +374,6 @@ export class HarvestPlayerApp extends HandlebarsApplicationMixin(ApplicationV2) 
         const id = button.dataset.creature;
         if (!id) return;
 
-        const scrollState =
-          this.#captureScrollState();
-
         if (this.collapsedCreatures.has(id)) {
           this.collapsedCreatures.delete(id);
         } else {
@@ -386,9 +381,6 @@ export class HarvestPlayerApp extends HandlebarsApplicationMixin(ApplicationV2) 
         }
 
         await this.render();
-        this.#restoreScrollState(
-          scrollState
-        );
       }));
 
     this.element.querySelectorAll("[data-action='open-claimed-item']")
@@ -654,117 +646,6 @@ export class HarvestPlayerApp extends HandlebarsApplicationMixin(ApplicationV2) 
       button.innerHTML =
         originalLabel;
     }
-  }
-
-  #captureScrollState() {
-    if (!this.element) {
-      return {
-        scrollTop: 0,
-        anchorCreatureUuid: null,
-        anchorOffset: null
-      };
-    }
-
-    const scroller =
-      this.element.querySelector(
-        ".mlh-creatures"
-      );
-
-    if (!scroller) {
-      return {
-        scrollTop: 0,
-        anchorCreatureUuid: null,
-        anchorOffset: null
-      };
-    }
-
-    const scrollerRect =
-      scroller.getBoundingClientRect();
-
-    const cards =
-      Array.from(
-        scroller.querySelectorAll(
-          "[data-creature-token]"
-        )
-      );
-
-    const anchor =
-      cards.find(card => {
-        const rect =
-          card.getBoundingClientRect();
-
-        return (
-          rect.bottom >
-          scrollerRect.top
-        );
-      })
-      ?? null;
-
-    return {
-      scrollTop:
-        scroller.scrollTop,
-      anchorCreatureUuid:
-        anchor?.dataset
-          ?.creatureToken
-        ?? null,
-      anchorOffset:
-        anchor
-          ? anchor.getBoundingClientRect().top
-            - scrollerRect.top
-          : null
-    };
-  }
-
-  #restoreScrollState(state) {
-    if (!state || !this.element) return;
-
-    requestAnimationFrame(() => {
-      const scroller =
-        this.element.querySelector(
-          ".mlh-creatures"
-        );
-
-      if (!scroller) return;
-
-      // Prefer an anchor because expanding/collapsing cards above the viewport
-      // can change their total height during an authoritative session render.
-      if (
-        state.anchorCreatureUuid
-        && state.anchorOffset != null
-      ) {
-        const selector =
-          `[data-creature-token="${
-            CSS.escape(
-              state.anchorCreatureUuid
-            )
-          }"]`;
-
-        const anchor =
-          scroller.querySelector(
-            selector
-          );
-
-        if (anchor) {
-          const scrollerRect =
-            scroller.getBoundingClientRect();
-
-          const nextOffset =
-            anchor
-              .getBoundingClientRect()
-              .top
-            - scrollerRect.top;
-
-          scroller.scrollTop +=
-            nextOffset
-            - state.anchorOffset;
-
-          return;
-        }
-      }
-
-      scroller.scrollTop =
-        state.scrollTop ?? 0;
-    });
   }
 
   async #claim(event) {

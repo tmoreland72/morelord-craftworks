@@ -1,5 +1,8 @@
 import { MODULE_TITLE } from "../constants.mjs";
 import { CraftCompletionApp } from "./craft-completion-app.mjs";
+import { isRecipeHidden } from "../core/settings.mjs";
+
+import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 
 const {
   ApplicationV2,
@@ -7,7 +10,9 @@ const {
 } = foundry.applications.api;
 
 export class CraftApp
-  extends HandlebarsApplicationMixin(ApplicationV2) {
+  extends ScrollPreservingApplicationMixin(
+  HandlebarsApplicationMixin(ApplicationV2)
+) {
 
   constructor(craftworks, options = {}) {
     super(options);
@@ -391,6 +396,250 @@ export class CraftApp
       });
   }
 
+  #resolveRequirementMaterial(match) {
+    if (!match) {
+      return {
+        materialId: null,
+        img: null,
+        label: null,
+        rarity: null
+      };
+    }
+
+    if (match.materialId) {
+      const material =
+        this.craftworks.materials.get(
+          match.materialId
+        );
+
+      return {
+        materialId:
+          material?.materialId
+          ?? match.materialId,
+        img:
+          material?.img
+          ?? null,
+        label:
+          material?.name
+          ?? this.#friendlyRequirementLabel(
+            match
+          ),
+        rarity:
+          material?.rarity
+          ?? match.rarity
+          ?? null
+      };
+    }
+
+    const requiredTags =
+      (match.tags ?? [])
+        .map(tag =>
+          String(tag).toLowerCase()
+        );
+
+    const matches =
+      this.craftworks.materials
+        .all()
+        .filter(material => {
+          if (
+            match.rarity
+            && String(
+              material.rarity ?? ""
+            ).toLowerCase()
+              !== String(
+                match.rarity
+              ).toLowerCase()
+          ) {
+            return false;
+          }
+
+          if (
+            match.category
+            && String(
+              material.category ?? ""
+            ).toLowerCase()
+              !== String(
+                match.category
+              ).toLowerCase()
+          ) {
+            return false;
+          }
+
+          if (
+            match.stage
+            && String(
+              material.stage ?? ""
+            ).toLowerCase()
+              !== String(
+                match.stage
+              ).toLowerCase()
+          ) {
+            return false;
+          }
+
+          if (requiredTags.length) {
+            const materialTags =
+              new Set(
+                (material.tags ?? [])
+                  .map(tag =>
+                    String(tag)
+                      .toLowerCase()
+                  )
+              );
+
+            if (
+              !requiredTags.every(
+                tag =>
+                  materialTags.has(tag)
+              )
+            ) {
+              return false;
+            }
+          }
+
+          return true;
+        });
+
+    if (!matches.length) {
+      return {
+        materialId: null,
+        img: null,
+        label:
+          this.#friendlyRequirementLabel(
+            match
+          ),
+        rarity:
+          match.rarity
+          ?? null
+      };
+    }
+
+    if (matches.length === 1) {
+      return {
+        materialId:
+          matches[0].materialId,
+        img:
+          matches[0].img
+          ?? null,
+        label:
+          matches[0].name
+          ?? this.#friendlyRequirementLabel(
+            match
+          ),
+        rarity:
+          matches[0].rarity
+          ?? match.rarity
+          ?? null
+      };
+    }
+
+    const images =
+      [
+        ...new Set(
+          matches
+            .map(material =>
+              material.img
+            )
+            .filter(Boolean)
+        )
+      ];
+
+    // Generic tag requirements can intentionally match several materials.
+    // If they all share the same category art, show that art without linking
+    // to an arbitrary specific material.
+    return {
+      materialId: null,
+      img:
+        images.length === 1
+          ? images[0]
+          : null,
+      label:
+        this.#friendlyRequirementLabel(
+          match
+        ),
+      rarity:
+        match.rarity
+        ?? null
+    };
+  }
+
+  #friendlyRequirementLabel(match) {
+    if (!match) return "Material";
+
+    const tag =
+      (match.tags ?? [])
+        .map(String)
+        .find(value =>
+          value.startsWith(
+            "drakkenheim-component-"
+          )
+        )
+      ?? (match.tags ?? [])[0]
+      ?? match.category
+      ?? match.stage
+      ?? null;
+
+    if (!tag) {
+      return "Material";
+    }
+
+    let value =
+      String(tag)
+        .replace(
+          /^drakkenheim-component-/,
+          ""
+        )
+        .replace(
+          /^kibbles-/,
+          ""
+        )
+        .replace(/[_-]+/g, " ")
+        .trim();
+
+    // The Drakkenheim taxonomy prefixes many specific components with their
+    // broad category. For display, retain only the specific component when
+    // one is present (e.g. fluid-sap -> Sap, hide-plates -> Plates).
+    const categoryPrefixes = [
+      "animus",
+      "bones",
+      "dust",
+      "fluid",
+      "hair",
+      "hide",
+      "natural weapons",
+      "organs"
+    ];
+
+    const lower =
+      value.toLowerCase();
+
+    for (
+      const prefix of
+      categoryPrefixes
+    ) {
+      if (
+        lower.startsWith(
+          `${prefix} `
+        )
+      ) {
+        value =
+          value.slice(
+            prefix.length + 1
+          );
+        break;
+      }
+    }
+
+    return value
+      .split(/\s+/)
+      .filter(Boolean)
+      .map(word =>
+        word.charAt(0).toUpperCase()
+        + word.slice(1)
+      )
+      .join(" ");
+  }
+
   async #prepareRecipeCard(
     recipe,
     crafter,
@@ -408,11 +657,28 @@ export class CraftApp
         ?? inventoryActor;
     }
 
-    const readiness =
+    const recipeUnknown =
+      isRecipeHidden(recipe.id);
+
+    const requirementsKnown =
+      game.user.isGM
+      || !recipeUnknown
+      || Boolean(job);
+
+    const plannedReadiness =
       this.craftworks.recipePlanner.plan(
         recipe,
         effectiveInventory
       );
+
+    const readiness =
+      requirementsKnown
+        ? plannedReadiness
+        : {
+            ready: false,
+            status: "unknown",
+            requirementGroups: []
+          };
 
     const progress =
       this.craftworks.craftingJobs
@@ -465,7 +731,8 @@ export class CraftApp
       );
 
     const requirementGroupRows =
-      recipe.requirementGroups.map(
+      requirementsKnown
+        ? recipe.requirementGroups.map(
         (group, groupIndex) => ({
           ...group,
           ready:
@@ -482,20 +749,17 @@ export class CraftApp
                     ?.[requirementIndex]
                   ?? null;
 
-                const materialId =
-                  requirement.match?.materialId
-                  ?? null;
-
-                const material = materialId
-                  ? this.craftworks.materials
-                      .get(materialId)
-                  : null;
+                const materialView =
+                  this.#resolveRequirementMaterial(
+                    requirement.match
+                  );
 
                 return {
                   ...requirement,
-                  materialId,
+                  materialId:
+                    materialView.materialId,
                   materialImg:
-                    material?.img ?? null,
+                    materialView.img,
                   inventory,
                   alternativeRows:
                     requirement.type
@@ -503,25 +767,17 @@ export class CraftApp
                       ? requirement.alternatives
                           .map(
                             (alternative, altIndex) => {
-                              const altMaterialId =
-                                alternative.match
-                                  ?.materialId
-                                ?? null;
-
-                              const altMaterial =
-                                altMaterialId
-                                  ? this.craftworks
-                                      .materials
-                                      .get(altMaterialId)
-                                  : null;
+                              const altMaterialView =
+                                this.#resolveRequirementMaterial(
+                                  alternative.match
+                                );
 
                               return {
                                 ...alternative,
                                 materialId:
-                                  altMaterialId,
+                                  altMaterialView.materialId,
                                 materialImg:
-                                  altMaterial?.img
-                                  ?? null,
+                                  altMaterialView.img,
                                 inventory:
                                   inventory
                                     ?.alternatives
@@ -535,12 +791,16 @@ export class CraftApp
               }
             )
         })
-      );
+      )
+        : [];
 
     return {
       ...recipe,
       output,
       outputDocumentUuid,
+      isUnknown:
+        recipeUnknown,
+      requirementsKnown,
       sourceLabel:
         sourcePack?.label
         ?? recipe.packLabel
@@ -612,6 +872,17 @@ export class CraftApp
         crafter,
         inventoryActor.uuid
       );
+
+    if (
+      !game.user.isGM
+      && !job
+      && isRecipeHidden(recipe.id)
+    ) {
+      ui.notifications.warn(
+        "The required ingredients for this recipe are still unknown."
+      );
+      return;
+    }
 
     if (job?.outputAwarded) {
       await this.craftworks.craftingJobs.clear(

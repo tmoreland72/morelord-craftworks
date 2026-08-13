@@ -28,7 +28,9 @@ const SETTINGS = Object.freeze({
 
   USE_PARTY_RECIPIENT: "usePartyRecipient",
   PARTY_ACTOR_UUID: "partyActorUuid",
-  HIDDEN_RECIPE_IDS: "hiddenRecipeIds"
+  HIDDEN_RECIPE_IDS: "hiddenRecipeIds",
+  CONTENT_SYNC_SIGNATURE: "contentSyncSignature",
+  CONTENT_SYNC_LAST_AT: "contentSyncLastAt"
 });
 
 export function registerSettings() {
@@ -59,6 +61,18 @@ export function registerSettings() {
     SETTINGS.HIDDEN_RECIPE_IDS,
     "Hidden Recipe IDs",
     "[]"
+  );
+
+  registerString(
+    SETTINGS.CONTENT_SYNC_SIGNATURE,
+    "Content Sync Signature",
+    ""
+  );
+
+  registerString(
+    SETTINGS.CONTENT_SYNC_LAST_AT,
+    "Content Sync Last Completed",
+    ""
   );
 
   registerNumber(SETTINGS.HARVEST_DC_MODIFIER, "Harvest DC Modifier", 0);

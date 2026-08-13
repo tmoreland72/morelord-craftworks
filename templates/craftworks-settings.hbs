@@ -52,6 +52,34 @@
         </div>
       </section>
 
+      <div class="mcw-setting-card mcw-content-sync-card">
+        <div>
+          <strong>
+            <i class="fa-solid fa-database"></i>
+            Compendium Synchronization
+          </strong>
+          <p>
+            Craftworks automatically synchronizes when its version, enabled
+            Content Packs, D&D5e version, or available Item compendiums change.
+            Use this button to force an immediate rescan.
+          </p>
+          <small>
+            Last sync: {{contentSyncStatus.lastAtLabel}}
+            {{#if contentSyncStatus.needsSync}}
+              · Changes detected — sync recommended
+            {{/if}}
+          </small>
+        </div>
+
+        <button
+          type="button"
+          data-action="sync-content"
+        >
+          <i class="fa-solid fa-arrows-rotate"></i>
+          Sync with Compendiums
+        </button>
+      </div>
+
       <div class="mcw-content-pack-list">
         {{#each packs}}
           <article class="mcw-setting-card mcw-content-pack">

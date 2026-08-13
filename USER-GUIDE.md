@@ -72,6 +72,29 @@ Craftworks may offer content such as:
 
 Only packs that are enabled and available to the connected account participate in Craftworks.
 
+
+### Sync with Compendiums
+
+Craftworks keeps its world material compendiums and external D&D5e content
+references synchronized automatically.
+
+When the first active GM enters a world, Craftworks compares the current content
+environment with the last successful synchronization. A new sync runs only when
+something relevant changed, including:
+
+- the Craftworks version
+- the D&D5e system version
+- enabled Craftworks Content Packs
+- available Item compendiums
+- versions of active modules that provide Item compendiums
+
+This avoids rewriting Craftworks material compendiums on every world load while
+still detecting newly installed source content.
+
+The GM can force a rescan at any time from **Craftworks Settings → Content Packs →
+Sync with Compendiums**. A manual sync updates Craftworks material compendiums,
+refreshes external D&D5e Item-compendium discovery, and reloads the recipe index.
+
 ### Morelord Account Access
 
 The top of Craftworks Settings shows the current Morelord Core connection and access tier.
@@ -102,6 +125,22 @@ When enabled, supported acquisition workflows route their awarded Craftworks mat
 ---
 
 # Materials
+
+
+### Three-State Filters
+
+The Materials and Recipes browsers use the same long-list filtering pattern and layout as Morelord Marketplace. Filters appear in a left sidebar. Clicking a filter cycles through:
+
+1. **Neutral** — the filter does not affect results.
+2. **Include (+)** — results must match the selected value.
+3. **Exclude (−)** — results matching the selected value are removed.
+
+Recipes also include **Known** and **Unknown** knowledge filters.
+
+
+The list itself is only rendered when the current search and filters reduce the catalog to **100 or fewer results**. Above 100, the results pane shows the current match count and asks you to refine the filters. Search text and filter-state changes update this count immediately.
+
+For Game Masters, **Mark Context Known** and **Mark Context Unknown** apply only to recipes matching the current search and filter context. They do not change recipes outside the current result set.
 
 ## 5. Materials Browser
 
