@@ -156,10 +156,39 @@ export class SpellScrollGeneratorService {
       );
     }
 
-    const data = scrollTemplate.toObject();
-    delete data._id;
+    const ItemClass = CONFIG.Item.documentClass ?? Item;
 
-    data.name = `Spell Scroll: ${spell.name}`;
+    if (typeof ItemClass.createScrollFromSpell !== "function") {
+      throw new Error(
+        "The installed D&D5e system cannot create spell scrolls."
+      );
+    }
+
+    // D&D5e's native factory performs the important part of scroll creation:
+    // it copies the spell's activities and effects, adds item-use consumption,
+    // applies the scroll attack/save values, and records its spell level. A
+    // compendium-backed spell normally takes D&D5e's UUID-reference shortcut;
+    // use a detached copy so the resulting scroll remains fully functional
+    // even when the source pack is unavailable to the receiving player.
+    const detachedSpell = new ItemClass(spell.toObject());
+    const scroll = await ItemClass.createScrollFromSpell(
+      detachedSpell,
+      {},
+      {
+        dialog: false,
+        explanation: "reference",
+        level: Number(level)
+      }
+    );
+
+    if (!scroll) {
+      throw new Error(
+        `D&D5e could not create a spell scroll for ${spell.name}.`
+      );
+    }
+
+    const data = scroll.toObject();
+    delete data._id;
 
     const spellSourceLabel =
       this.sourceFilter?.sourceLabelForPack(
@@ -181,28 +210,6 @@ export class SpellScrollGeneratorService {
       }
     );
 
-    const existingDescription = String(
-      foundry.utils.getProperty(
-        data,
-        "system.description.value"
-      ) ?? ""
-    );
-
-    const spellLink = `@UUID[${spell.uuid}]{${spell.name}}`;
-
-    foundry.utils.setProperty(
-      data,
-      "system.description.value",
-      `
-        <p><strong>Contained Spell:</strong> ${spellLink}</p>
-        <p><strong>Source:</strong> ${spellSourceLabel}</p>
-        ${existingDescription}
-      `
-    );
-
-    // Preserve the official scroll's mechanics, pricing, uses, and image while
-    // giving the resulting Item the actual selected spell identity.
-    const ItemClass = CONFIG.Item.documentClass ?? Item;
     const temporary = new ItemClass(data);
 
     const created = await this.adapter.addItemToActor(

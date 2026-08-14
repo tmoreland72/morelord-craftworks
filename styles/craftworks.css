@@ -4678,3 +4678,35 @@
   display: grid;
   gap: 7px;
 }
+
+/* Harvest preflight creature selection */
+.mcw-harvest-modern .mlh-preflight-selection-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
+.mcw-harvest-modern .mlh-preflight-selection-actions button {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+.mcw-harvest-modern .mlh-preflight-creature {
+  position: relative;
+}
+
+.mcw-harvest-modern .mlh-preflight-creature-select {
+  display: grid;
+  place-items: center;
+  align-self: stretch;
+  padding: 0 2px 0 0;
+  cursor: pointer;
+}
+
+.mcw-harvest-modern .mlh-preflight-creature-select input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  cursor: pointer;
+}

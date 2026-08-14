@@ -29,9 +29,11 @@ export class Dnd5eAdapter extends SystemAdapter {
     const actor = token?.actor;
     if (!actor) return false;
 
-    // Craftworks harvesting is intended for defeated creatures/NPCs, not
-    // player characters who happen to be at 0 HP.
-    if (actor.type === "character") return false;
+    // D&D5e represents monsters, ordinary NPCs, and many hazards with the
+    // same `npc` Actor type. Restrict automatic candidates to NPC Actors,
+    // then let the GM make the authoritative harvestability choice during
+    // Harvest preflight instead of relying on unreliable name/type heuristics.
+    if (actor.type !== "npc") return false;
 
     const hp = Number(actor.system?.attributes?.hp?.value);
     const hpDead = Number.isFinite(hp) && hp <= 0;

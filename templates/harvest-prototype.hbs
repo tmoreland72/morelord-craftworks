@@ -197,12 +197,37 @@
         <section class="mlh-gm-managed mlh-harvest-preflight">
           <div class="mlh-mode-heading">
             <i class="fa-solid fa-skull"></i>
-            {{deadCreatures.length}} dead creature(s) found
+            {{deadCreatures.length}} defeated NPC token(s) found
+          </div>
+
+          <p class="mlh-preflight-help">
+            Foundry cannot reliably distinguish a monster from a shopkeeper,
+            trap, or other NPC-based token. Select only the creatures that can
+            actually be harvested.
+          </p>
+
+          <div class="mlh-preflight-selection-actions">
+            <button type="button" data-action="select-all-harvest-creatures">
+              <i class="fa-solid fa-check-double"></i>
+              Select All
+            </button>
+            <button type="button" data-action="clear-all-harvest-creatures">
+              <i class="fa-solid fa-xmark"></i>
+              Clear All
+            </button>
           </div>
 
           <div class="mlh-preflight-creatures">
             {{#each deadCreatures}}
               <article class="mlh-preflight-creature">
+                <label class="mlh-preflight-creature-select" title="Include {{name}} in this Harvest session">
+                  <input
+                    type="checkbox"
+                    data-harvest-creature-select
+                    data-token-uuid="{{tokenUuid}}"
+                    {{checked selectedForHarvest}}
+                  >
+                </label>
                 <img src="{{img}}" alt="{{name}}">
                 <div class="mlh-preflight-creature-copy">
                   <strong>{{name}}</strong>
@@ -280,7 +305,7 @@
         <section class="mlh-empty">
           <i class="fa-solid fa-scalpel"></i>
           <h2>No Dead Creatures</h2>
-          <p>No dead creatures were found on the current scene.</p>
+          <p>No defeated NPC tokens were found on the current scene.</p>
         </section>
       {{/if}}
     {{/if}}

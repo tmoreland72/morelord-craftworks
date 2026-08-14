@@ -13,6 +13,7 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
     this.session = null;
     this.collapsedCreatures = new Set();
     this.preflightCreatures = null;
+    this.selectedPreflightCreatureUuids = new Set();
   }
 
   static DEFAULT_OPTIONS = {
@@ -67,20 +68,58 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
           .getDeadCreatureTokens()
           .filter(token => token.actor);
 
-      this.preflightCreatures = [];
+      const previousTokenUuids = new Set(
+        (this.preflightCreatures ?? [])
+          .map(creature => creature.tokenUuid)
+      );
+
+      const nextPreflightCreatures = [];
 
       for (const token of deadTokens) {
-        this.preflightCreatures.push(
+        const creature =
           await this.craftworks.harvest
-            .buildCreatureContext(token)
-        );
+            .buildCreatureContext(token);
+
+        nextPreflightCreatures.push(creature);
+
+        // Newly discovered defeated tokens default to selected. Existing
+        // tokens retain whatever choice the GM already made in this preflight.
+        if (!previousTokenUuids.has(creature.tokenUuid)) {
+          this.selectedPreflightCreatureUuids.add(
+            creature.tokenUuid
+          );
+        }
       }
+
+      const currentTokenUuids = new Set(
+        nextPreflightCreatures
+          .map(creature => creature.tokenUuid)
+      );
+
+      for (
+        const tokenUuid of
+        Array.from(this.selectedPreflightCreatureUuids)
+      ) {
+        if (!currentTokenUuids.has(tokenUuid)) {
+          this.selectedPreflightCreatureUuids.delete(
+            tokenUuid
+          );
+        }
+      }
+
+      this.preflightCreatures =
+        nextPreflightCreatures;
     }
 
     const deadCreatures =
       foundry.utils.deepClone(
         this.preflightCreatures ?? []
-      );
+      ).map(creature => ({
+        ...creature,
+        selectedForHarvest:
+          this.selectedPreflightCreatureUuids
+            .has(creature.tokenUuid)
+      }));
 
     const playerCharacters = [];
     const seenActors = new Set();
@@ -265,6 +304,54 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
         }
       }));
 
+    this.element.querySelectorAll("[data-harvest-creature-select]")
+      .forEach(input => input.addEventListener("change", event => {
+        const tokenUuid =
+          event.currentTarget.dataset.tokenUuid;
+
+        if (!tokenUuid) return;
+
+        if (event.currentTarget.checked) {
+          this.selectedPreflightCreatureUuids.add(
+            tokenUuid
+          );
+        } else {
+          this.selectedPreflightCreatureUuids.delete(
+            tokenUuid
+          );
+        }
+      }));
+
+    this.element.querySelector("[data-action='select-all-harvest-creatures']")
+      ?.addEventListener("click", event => {
+        event.preventDefault();
+
+        this.element
+          .querySelectorAll("[data-harvest-creature-select]")
+          .forEach(input => {
+            input.checked = true;
+            const tokenUuid = input.dataset.tokenUuid;
+            if (tokenUuid) {
+              this.selectedPreflightCreatureUuids.add(
+                tokenUuid
+              );
+            }
+          });
+      });
+
+    this.element.querySelector("[data-action='clear-all-harvest-creatures']")
+      ?.addEventListener("click", event => {
+        event.preventDefault();
+
+        this.element
+          .querySelectorAll("[data-harvest-creature-select]")
+          .forEach(input => {
+            input.checked = false;
+          });
+
+        this.selectedPreflightCreatureUuids.clear();
+      });
+
     this.element.querySelectorAll("[data-action='toggle-creature']")
       .forEach(button => button.addEventListener("click", async event => {
         event.preventDefault();
@@ -310,10 +397,37 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
             input.dataset.userId
         }));
 
+      const selectedCreatureUuids =
+        new Set(
+          Array.from(
+            this.element.querySelectorAll(
+              "[data-harvest-creature-select]:checked"
+            )
+          ).map(input =>
+            input.dataset.tokenUuid
+          ).filter(Boolean)
+        );
+
+      this.selectedPreflightCreatureUuids =
+        selectedCreatureUuids;
+
+      const creatureContexts =
+        (this.preflightCreatures ?? [])
+          .filter(creature =>
+            selectedCreatureUuids.has(
+              creature.tokenUuid
+            )
+          );
+
+      if (!creatureContexts.length) {
+        throw new Error(
+          "Select at least one creature to harvest."
+        );
+      }
+
       this.session =
         await this.craftworks.harvest.start({
-          creatureContexts:
-            this.preflightCreatures,
+          creatureContexts,
           skipSkillChecks
         });
 
