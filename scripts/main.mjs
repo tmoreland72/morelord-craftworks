@@ -1,6 +1,10 @@
 import { MODULE_ID } from "./constants.mjs";
 import { log } from "./core/logger.mjs";
-import { registerSettings, exposePartyActorSetting } from "./core/settings.mjs";
+import {
+  registerSettings,
+  exposePartyActorSetting,
+  ensureStandardContentEnabled
+} from "./core/settings.mjs";
 import { RecipientResolver } from "./core/recipient-resolver.mjs";
 import { createSystemAdapter } from "./core/adapter-registry.mjs";
 import { MaterialRegistry } from "./materials/material-registry.mjs";
@@ -128,34 +132,6 @@ Hooks.once("ready", async () => {
         === game.user.id
     );
 
-  if (
-    isSyncCoordinator
-    && contentSync.needsSync()
-  ) {
-    try {
-      const result =
-        await contentSync.sync({
-          reason: "startup"
-        });
-
-      console.log(
-        "Morelord Craftworks | Automatic content synchronization completed.",
-        result
-      );
-    } catch (error) {
-      console.warn(
-        "Morelord Craftworks | Automatic content synchronization failed.",
-        error
-      );
-
-      await materials
-        .indexConfiguredPacks();
-    }
-  } else {
-    await materials
-      .indexConfiguredPacks();
-  }
-
   const recipientResolver = new RecipientResolver();
   const materialService = new MaterialService({ registry: materials, adapter, recipientResolver });
   const dnd5eItemResolver = new Dnd5eCompendiumItemResolver();
@@ -181,12 +157,42 @@ Hooks.once("ready", async () => {
     contentPacks,
     dnd5eItemResolver
   });
-  await recipes.loadStandardSeed();
-
   contentSync.setRuntimeServices({
     dnd5eItemResolver,
     recipeRegistry: recipes
   });
+
+  if (isSyncCoordinator) {
+    await ensureStandardContentEnabled();
+  }
+
+  if (
+    isSyncCoordinator
+    && contentSync.needsSync()
+  ) {
+    try {
+      const result =
+        await contentSync.sync({
+          reason: "startup"
+        });
+
+      console.log(
+        "Morelord Craftworks | Automatic content synchronization completed.",
+        result
+      );
+    } catch (error) {
+      console.warn(
+        "Morelord Craftworks | Automatic content synchronization failed.",
+        error
+      );
+
+      await materials.indexConfiguredPacks();
+      await recipes.loadStandardSeed();
+    }
+  } else {
+    await materials.indexConfiguredPacks();
+    await recipes.loadStandardSeed();
+  }
 
   const recipeEvaluator = new RecipeEvaluator({ materialRegistry: materials });
   const recipePlanner = new RecipePlanner({

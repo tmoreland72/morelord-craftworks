@@ -30,7 +30,8 @@ const SETTINGS = Object.freeze({
   PARTY_ACTOR_UUID: "partyActorUuid",
   HIDDEN_RECIPE_IDS: "hiddenRecipeIds",
   CONTENT_SYNC_SIGNATURE: "contentSyncSignature",
-  CONTENT_SYNC_LAST_AT: "contentSyncLastAt"
+  CONTENT_SYNC_LAST_AT: "contentSyncLastAt",
+  STANDARD_CONTENT_BOOTSTRAPPED: "standardContentBootstrapped"
 });
 
 export function registerSettings() {
@@ -73,6 +74,12 @@ export function registerSettings() {
     SETTINGS.CONTENT_SYNC_LAST_AT,
     "Content Sync Last Completed",
     ""
+  );
+
+  registerBoolean(
+    SETTINGS.STANDARD_CONTENT_BOOTSTRAPPED,
+    "Standard Content Bootstrapped",
+    false
   );
 
   registerNumber(SETTINGS.HARVEST_DC_MODIFIER, "Harvest DC Modifier", 0);
@@ -253,6 +260,30 @@ export async function setGatherDcOverrides(overrides = {}) {
 
 export function getSetting(key) {
   return game.settings.get(MODULE_ID, key);
+}
+
+export async function ensureStandardContentEnabled() {
+  if (!game.user.isGM) return false;
+
+  if (getSetting(SETTINGS.STANDARD_CONTENT_BOOTSTRAPPED)) {
+    return false;
+  }
+
+  for (const packId of ["standard-core", "srd-5.2"]) {
+    await game.settings.set(
+      MODULE_ID,
+      getContentPackSettingKey(packId),
+      true
+    );
+  }
+
+  await game.settings.set(
+    MODULE_ID,
+    SETTINGS.STANDARD_CONTENT_BOOTSTRAPPED,
+    true
+  );
+
+  return true;
 }
 
 export { SETTINGS };
