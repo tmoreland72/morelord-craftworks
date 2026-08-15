@@ -7,7 +7,6 @@ export const CONTENT_PACKS = [
     description: "Shared Kibbles-defined crafting materials and Craftworks acquisition/reference infrastructure.",
     premium: false,
     requiredEntitlements: [],
-    requiredFeatures: ["craftworks.standard"],
     enabledByDefault: true,
     sort: 0,
     capabilities: ["materials", "harvest", "gathering", "loot"]
@@ -20,7 +19,6 @@ export const CONTENT_PACKS = [
     description: "Kibbles crafting recipes whose finished output exists in the D&D5e SRD 5.2 Equipment compendium.",
     premium: false,
     requiredEntitlements: [],
-    requiredFeatures: ["craftworks.content-srd52"],
     enabledByDefault: true,
     sort: 10,
     capabilities: ["materials", "recipes", "harvest", "gathering", "loot"]

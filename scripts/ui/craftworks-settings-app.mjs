@@ -80,9 +80,11 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
         const state = craftworks?.contentPacks?.describe(pack.id);
         const requiredFeatures = Array.isArray(pack.requiredFeatures) ? pack.requiredFeatures : [];
         const hasAccess = state?.hasAccess ?? (
-          requiredFeatures.length
+          !pack.premium
+            ? true
+            : requiredFeatures.length
             ? requiredFeatures.every(feature => EntitlementService.hasFeature(feature))
-            : !pack.premium
+            : false
         );
         const enabled = state?.configured ?? Boolean(
           game.settings.get(MODULE_ID, getContentPackSettingKey(pack.id))

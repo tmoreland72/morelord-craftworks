@@ -31,13 +31,16 @@ export class MorelordCoreAccessService {
   }
 
   hasAccess(pack) {
+    // Standard content is available locally and must not require a connected
+    // Morelord account. Entitlement checks apply only to premium packs.
+    if (!pack?.premium) return true;
+
     const features = Array.isArray(pack?.requiredFeatures) ? pack.requiredFeatures : [];
     if (features.length) return features.every(feature => this.hasFeature(feature));
 
     const entitlements = Array.isArray(pack?.requiredEntitlements) ? pack.requiredEntitlements : [];
     if (entitlements.length) return entitlements.every(id => this.hasEntitlement(id));
 
-    if (!pack?.premium) return true;
     return this.hasPremiumAccess();
   }
 
