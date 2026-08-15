@@ -220,6 +220,7 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
 
   async _onRender(context, options) {
     await super._onRender(context, options);
+    const craftworks = this.constructor.craftworks;
 
     this.element.querySelector("[data-action='save']")
       ?.addEventListener("click", event => this.#save(event));
