@@ -49,7 +49,10 @@ export class SpellScrollGeneratorService {
       let index;
       try {
         index = await pack.getIndex({
-          fields: ["name", "img", "type", "system.level"]
+          fields: [
+            "name", "img", "type", "system.level",
+            "system.source.book", "system.source.custom"
+          ]
         });
       } catch (error) {
         console.warn(
@@ -76,22 +79,18 @@ export class SpellScrollGeneratorService {
         if (seen.has(key)) continue;
         seen.add(key);
 
+        const sourceLabel = this.sourceFilter
+          ? await this.sourceFilter.sourceLabelForCompendiumItem(row, { pack })
+          : "Craftworks";
+
         spells.push({
           name: row.name,
           img: row.img ?? "icons/svg/book.svg",
           level: spellLevel,
           uuid: `Compendium.${pack.collection}.Item.${row._id}`,
           packId: pack.collection,
-          sourceLabel:
-            this.sourceFilter?.sourceLabelForPack(pack)
-            ?? pack.metadata?.label
-            ?? pack.title
-            ?? pack.collection,
-          packLabel:
-            this.sourceFilter?.sourceLabelForPack(pack)
-            ?? pack.metadata?.label
-            ?? pack.title
-            ?? pack.collection
+          sourceLabel,
+          packLabel: sourceLabel
         });
       }
     }
@@ -111,10 +110,48 @@ export class SpellScrollGeneratorService {
     ];
   }
 
+  async generate(counts = {}) {
+    if (!this.hasAccess) {
+      throw new Error(
+        "Spell Scroll Generator requires premium access."
+      );
+    }
+
+    const allSpells = await this.availableSpells();
+    const generated = [];
+
+    for (let level = 0; level <= 9; level += 1) {
+      const requested = Math.max(
+        0,
+        Math.floor(Number(counts[level] ?? 0))
+      );
+      if (!requested) continue;
+
+      const pool = allSpells.filter(spell =>
+        Number(spell.level ?? 0) === level
+      );
+
+      if (!pool.length) {
+        throw new Error(
+          `No ${level === 0 ? "cantrips" : `level ${level} spells`} are available from enabled D&D5e compendium sources.`
+        );
+      }
+
+      for (let index = 0; index < requested; index += 1) {
+        generated.push(foundry.utils.deepClone(
+          pool[Math.floor(Math.random() * pool.length)]
+        ));
+      }
+    }
+
+    return generated;
+  }
+
   async createAndAwardScroll({
     spellUuid,
     level,
-    fallbackActorUuid = null
+    fallbackActorUuid = null,
+    postChatCard = true
   } = {}) {
     if (!this.hasAccess) {
       throw new Error(
@@ -190,12 +227,7 @@ export class SpellScrollGeneratorService {
     const data = scroll.toObject();
     delete data._id;
 
-    const spellSourceLabel =
-      this.sourceFilter?.sourceLabelForPack(
-        spell.pack
-      )
-      ?? spell.pack
-      ?? "World";
+    const spellSourceLabel = spell.sourceLabel ?? "Craftworks";
 
     foundry.utils.setProperty(
       data,
@@ -218,17 +250,19 @@ export class SpellScrollGeneratorService {
       1
     );
 
-    await AwardChatCardService.post({
-      recipient,
-      items: [{
-        document: created,
-        uuid: created.uuid,
-        quantity: 1,
-        rarity: created.system?.rarity
-      }],
-      title: "Spell Scroll Received",
-      subtitle: spell.name
-    });
+    if (postChatCard) {
+      await AwardChatCardService.post({
+        recipient,
+        items: [{
+          document: created,
+          uuid: created.uuid,
+          quantity: 1,
+          rarity: created.system?.rarity
+        }],
+        title: "Spell Scroll Received",
+        subtitle: spell.name
+      });
+    }
 
     return {
       item: created,
@@ -237,6 +271,48 @@ export class SpellScrollGeneratorService {
       sourceLabel: spellSourceLabel,
       scrollTemplate
     };
+  }
+
+  async createAndAwardScrolls({
+    spells = [],
+    fallbackActorUuid = null
+  } = {}) {
+    if (!spells.length) {
+      throw new Error(
+        "Generate at least one spell scroll before awarding the results."
+      );
+    }
+
+    const awarded = [];
+    let recipient = null;
+
+    for (const spell of spells) {
+      const result = await this.createAndAwardScroll({
+        spellUuid: spell.uuid,
+        level: Number(spell.level ?? 0),
+        fallbackActorUuid:
+          recipient?.uuid
+          ?? fallbackActorUuid,
+        postChatCard: false
+      });
+
+      recipient = result.recipient;
+      awarded.push(result);
+    }
+
+    await AwardChatCardService.post({
+      recipient,
+      items: awarded.map(result => ({
+        document: result.item,
+        uuid: result.item.uuid,
+        quantity: 1,
+        rarity: result.item.system?.rarity
+      })),
+      title: "Spell Scrolls Received",
+      subtitle: `${awarded.length} scroll${awarded.length === 1 ? "" : "s"} generated`
+    });
+
+    return { recipient, items: awarded, spells };
   }
 
   async #resolveScrollTemplate(level) {

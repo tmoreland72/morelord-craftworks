@@ -4694,13 +4694,278 @@
 
 .mcw-harvest-modern .mlh-preflight-creature {
   position: relative;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.mcw-harvest-modern .mlh-preflight-creature-copy,
+.mcw-harvest-modern .mlh-preflight-creature-copy > *,
+.mcw-harvest-modern .mlh-skip-skill-row,
+.mcw-harvest-modern .mlh-skip-character,
+.mcw-harvest-modern .mlh-skip-character > *,
+.mcw-harvest-modern .mlh-creature-info,
+.mcw-harvest-modern .mlh-component-body,
+.mcw-harvest-modern .mlh-claimed-body {
+  text-align: left;
+}
+
+.mcw-harvest-modern .mlh-skill-check-bypassed {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  border-color: rgba(218, 178, 74, 0.58);
+  background: rgba(218, 178, 74, 0.12);
+  text-align: left;
+}
+
+.mcw-harvest-modern .mlh-skill-check-bypassed > i {
+  color: #e4bd55;
+  font-size: 24px;
+}
+
+.mcw-harvest-modern .mlh-skill-check-bypassed strong,
+.mcw-harvest-modern .mlh-skill-check-bypassed small {
+  display: block;
+}
+
+.mcw-harvest-modern .mlh-player-progress-list {
+  display: grid;
+  gap: 7px;
+  padding: 10px;
+}
+
+.mcw-harvest-modern .mlh-player-progress-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border: 1px solid rgba(197, 160, 91, 0.2);
+  border-radius: 7px;
+  text-align: left;
+}
+
+.mcw-harvest-modern .mlh-player-progress-row button {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+/* Potion generator */
+.mcw-potion-generator {
+  display: grid;
+  gap: 12px;
+  text-align: left;
+}
+
+.mcw-potion-rarity-grid,
+.mcw-potion-result-list {
+  display: grid;
+  gap: 8px;
+}
+
+.mcw-potion-rarity-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 9px 10px;
+  border: 1px solid rgba(197, 160, 91, 0.22);
+  border-radius: 7px;
+  text-align: left;
+}
+
+.mcw-potion-rarity-row span,
+.mcw-potion-result span {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.mcw-potion-rarity-row strong,
+.mcw-potion-rarity-row small,
+.mcw-potion-result strong,
+.mcw-potion-result small {
+  display: block;
+}
+
+.mcw-potion-rarity-row input {
+  width: 90px;
+}
+
+.mcw-potion-results-scroll {
+  display: grid;
+  gap: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.mcw-potion-result-group {
+  display: grid;
+  gap: 7px;
+}
+
+.mcw-potion-result {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 8px;
+  border: 1px solid rgba(197, 160, 91, 0.18);
+  border-radius: 7px;
+  text-align: left;
+}
+
+.mcw-potion-result img {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.mcw-potion-result button {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+}
+
+/* Generator windows use one outer scrollbar; result lists never scroll independently. */
+.morelord-craftworks.mcw-window.mcw-spellbook-generator-window .window-content,
+.morelord-craftworks.mcw-window.mcw-potion-generator-window .window-content,
+.morelord-craftworks.mcw-window.mcw-spell-scroll-generator-window .window-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto !important;
+  scrollbar-gutter: stable;
+}
+
+.mcw-spellbook-generator,
+.mcw-potion-generator,
+.mcw-spell-scroll-generator {
+  height: auto;
+  min-height: 100%;
+  overflow: visible;
+}
+
+.mcw-spellbook-preview {
+  display: block;
+  min-height: 0;
+  max-height: none;
+  overflow: visible;
+}
+
+.mcw-spellbook-results-scroll,
+.mcw-potion-results-scroll,
+.mcw-generator-results {
+  display: grid;
+  gap: 12px;
+  min-height: 0;
+  max-height: none;
+  overflow: visible;
+  padding-right: 0;
+}
+
+.mcw-generator-count-grid,
+.mcw-generator-result-list {
+  display: grid;
+  gap: 8px;
+}
+
+.mcw-generator-count-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 9px 10px;
+  border: 1px solid rgba(197, 160, 91, 0.22);
+  border-radius: 7px;
+  text-align: left;
+}
+
+.mcw-generator-count-row span,
+.mcw-generator-result-row span {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.mcw-generator-count-row strong,
+.mcw-generator-count-row small,
+.mcw-generator-result-row strong,
+.mcw-generator-result-row small {
+  display: block;
+}
+
+.mcw-generator-count-row input {
+  width: 90px;
+}
+
+.mcw-generator-result-group {
+  display: grid;
+  gap: 7px;
+}
+
+.mcw-generator-result-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 8px;
+  border: 1px solid rgba(197, 160, 91, 0.18);
+  border-radius: 7px;
+  text-align: left;
+}
+
+.mcw-generator-result-row img {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.mcw-generator-result-row button {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+}
+
+.mcw-loot-selection-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.mcw-loot-selection-actions button {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+.mcw .mcw-loot-creature-select {
+  justify-content: flex-start;
+  text-align: left;
+  cursor: pointer;
+}
+
+.mcw .mcw-loot-creature-select > input {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  margin: 0;
 }
 
 .mcw-harvest-modern .mlh-preflight-creature-select {
   display: grid;
   place-items: center;
+  flex: 0 0 26px;
+  width: 26px;
+  min-width: 26px;
+  max-width: 26px;
   align-self: stretch;
   padding: 0 2px 0 0;
+  margin: 0;
   cursor: pointer;
 }
 

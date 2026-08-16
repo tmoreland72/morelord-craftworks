@@ -1,55 +1,57 @@
 import { MODULE_TITLE } from "../constants.mjs";
+import { POTION_RARITIES } from "../potions/potion-generator-service.mjs";
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
-export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
+export class PotionGeneratorApp extends ScrollPreservingApplicationMixin(
   HandlebarsApplicationMixin(ApplicationV2)
 ) {
   constructor(craftworks, options = {}) {
     super(options);
     this.craftworks = craftworks;
-    this.counts = Object.fromEntries(Array.from({ length: 10 }, (_, level) => [level, 0]));
+    this.counts = Object.fromEntries(POTION_RARITIES.map(rarity => [rarity.id, 0]));
     this.result = [];
   }
 
   static DEFAULT_OPTIONS = {
-    id: "morelord-craftworks-spell-scroll-generator",
-    classes: ["morelord-craftworks", "mcw-window", "mcw-generator-window", "mcw-spell-scroll-generator-window"],
+    id: "morelord-craftworks-potion-generator",
+    classes: ["morelord-craftworks", "mcw-window", "mcw-potion-generator-window"],
     position: { width: 680, height: 760 },
-    window: { title: `${MODULE_TITLE} — Spell Scroll Generator`, resizable: true }
+    window: { title: `${MODULE_TITLE} — Potion Generator`, resizable: true }
   };
 
   static PARTS = {
-    content: { template: "modules/morelord-craftworks/templates/spell-scroll-generator.hbs" }
+    content: { template: "modules/morelord-craftworks/templates/potion-generator.hbs" }
   };
 
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
-    const service = this.craftworks.spellScrollGenerator;
-    const allSpells = service?.hasAccess ? await service.availableSpells() : [];
+    const service = this.craftworks.potionGenerator;
+    const availableCounts = service?.hasAccess ? await service.availableCounts() : {};
     const partyInfo = await this.craftworks.materialService.getPartyRecipientInfo();
     const actors = game.actors
       .filter(actor => actor.type === "character" || actor.type === "group")
       .map(actor => ({ uuid: actor.uuid, name: actor.name }))
       .sort((a, b) => a.name.localeCompare(b.name));
-    const levels = Array.from({ length: 10 }, (_, level) => ({
-      level,
-      label: level === 0 ? "Cantrips" : `Level ${level}`,
-      count: Number(this.counts[level] ?? 0),
-      available: allSpells.filter(spell => Number(spell.level ?? 0) === level).length
+
+    const rarities = POTION_RARITIES.map(rarity => ({
+      ...rarity,
+      count: Number(this.counts[rarity.id] ?? 0),
+      available: Number(availableCounts[rarity.id] ?? 0)
     }));
-    const resultGroups = levels.map(entry => ({
-      ...entry,
-      spells: this.result.filter(spell => Number(spell.level ?? 0) === entry.level)
-    })).filter(group => group.spells.length);
+
+    const resultGroups = POTION_RARITIES.map(rarity => ({
+      ...rarity,
+      potions: this.result.filter(potion => potion.rarity === rarity.id)
+    })).filter(group => group.potions.length);
 
     return foundry.utils.mergeObject(context, {
       hasAccess: Boolean(service?.hasAccess),
-      levels,
+      rarities,
       resultGroups,
-      resultCount: this.result.length,
       hasResult: this.result.length > 0,
+      resultCount: this.result.length,
       partyInfo,
       actors
     }, { inplace: false });
@@ -57,29 +59,35 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
 
   async _onRender(context, options) {
     await super._onRender(context, options);
-    this.element.querySelectorAll("[data-scroll-level]").forEach(input =>
+
+    this.element.querySelectorAll("[data-potion-rarity]").forEach(input =>
       input.addEventListener("change", event => {
-        this.counts[Number(event.currentTarget.dataset.scrollLevel)] = Math.max(0, Math.floor(Number(event.currentTarget.value ?? 0)));
+        this.counts[event.currentTarget.dataset.potionRarity] = Math.max(
+          0,
+          Math.floor(Number(event.currentTarget.value ?? 0))
+        );
         this.result = [];
       })
     );
-    this.element.querySelector("[data-action='generate-scrolls']")
+
+    this.element.querySelector("[data-action='generate-potions']")
       ?.addEventListener("click", event => this.#generate(event));
-    this.element.querySelector("[data-action='reroll-scrolls']")
+    this.element.querySelector("[data-action='reroll-potions']")
       ?.addEventListener("click", event => this.#generate(event));
-    this.element.querySelector("[data-action='award-scrolls']")
+    this.element.querySelector("[data-action='award-potions']")
       ?.addEventListener("click", event => this.#award(event));
-    this.element.querySelectorAll("[data-spell-uuid]").forEach(button =>
+
+    this.element.querySelectorAll("[data-potion-uuid]").forEach(button =>
       button.addEventListener("click", async event => {
-        const document = await fromUuid(event.currentTarget.dataset.spellUuid);
-        document?.sheet?.render(true);
+        const item = await fromUuid(event.currentTarget.dataset.potionUuid);
+        item?.sheet?.render(true);
       })
     );
   }
 
   #readCounts() {
-    this.element.querySelectorAll("[data-scroll-level]").forEach(input => {
-      this.counts[Number(input.dataset.scrollLevel)] = Math.max(0, Math.floor(Number(input.value ?? 0)));
+    this.element.querySelectorAll("[data-potion-rarity]").forEach(input => {
+      this.counts[input.dataset.potionRarity] = Math.max(0, Math.floor(Number(input.value ?? 0)));
     });
   }
 
@@ -87,11 +95,12 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
     event.preventDefault();
     this.#readCounts();
     if (!Object.values(this.counts).some(value => value > 0)) {
-      ui.notifications.warn("Choose at least one spell scroll before generating results.");
+      ui.notifications.warn("Choose at least one potion before generating results.");
       return;
     }
+
     try {
-      this.result = await this.craftworks.spellScrollGenerator.generate(this.counts);
+      this.result = await this.craftworks.potionGenerator.generate(this.counts);
       await this.render({ force: true });
     } catch (error) {
       ui.notifications.error(error.message);
@@ -101,9 +110,10 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
   async #award(event) {
     event.preventDefault();
     if (!this.result.length) {
-      ui.notifications.warn("Generate spell scrolls before awarding them.");
+      ui.notifications.warn("Generate potions before awarding them.");
       return;
     }
+
     const partyInfo = await this.craftworks.materialService.getPartyRecipientInfo();
     let fallbackActorUuid = null;
     if (!partyInfo.enabled || !partyInfo.valid) {
@@ -113,15 +123,15 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
         return;
       }
     }
+
     try {
-      const awarded = await this.craftworks.spellScrollGenerator.createAndAwardScrolls({
-        spells: this.result,
+      const result = await this.craftworks.potionGenerator.createAndAward({
+        potions: this.result,
         fallbackActorUuid
       });
-      ui.notifications.info(`${this.result.length} spell scroll(s) added to ${awarded.recipient.name}.`);
+      ui.notifications.info(`${this.result.length} potion(s) added to ${result.recipient.name}.`);
       await this.close();
     } catch (error) {
-      console.error("Morelord Craftworks | Spell scroll award failed.", error);
       ui.notifications.error(error.message);
     }
   }

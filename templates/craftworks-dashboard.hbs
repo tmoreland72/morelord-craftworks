@@ -143,6 +143,23 @@
           </span>
           <i class="fa-solid fa-chevron-right"></i>
         </button>
+
+        <button type="button"
+                class="mcw-dashboard-card"
+                data-action="potion-generator">
+          <i class="fa-solid fa-flask"></i>
+          <span class="mcw-dashboard-card-copy">
+            <strong>Potion Generator</strong>
+            <small>
+              {{#if potionGeneratorPremium}}
+                Generate random potions by rarity from enabled Item compendiums
+              {{else}}
+                Premium · Generate random potions by rarity
+              {{/if}}
+            </small>
+          </span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
       </div>
     </section>
 

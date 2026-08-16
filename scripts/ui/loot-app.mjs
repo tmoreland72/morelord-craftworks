@@ -11,6 +11,8 @@ export class LootApp extends ScrollPreservingApplicationMixin(
     super(options);
     this.craftworks = craftworks;
     this.session = null;
+    this.preflightCreatures = null;
+    this.selectedPreflightCreatureUuids = new Set();
   }
 
   static DEFAULT_OPTIONS = {
@@ -34,14 +36,42 @@ export class LootApp extends ScrollPreservingApplicationMixin(
       )
       .map(actor => ({ uuid: actor.uuid, name: actor.name, img: actor.img }));
 
-    const allCreatures = this.session?.creatures ?? this.craftworks.loot.getDeadCreatureSummary();
+    if (!this.session) {
+      const previousUuids = new Set(
+        (this.preflightCreatures ?? []).map(creature => creature.tokenUuid)
+      );
+      this.preflightCreatures = this.craftworks.loot.getDeadCreatureSummary();
+      const currentUuids = new Set(
+        this.preflightCreatures.map(creature => creature.tokenUuid)
+      );
+
+      for (const creature of this.preflightCreatures) {
+        if (!previousUuids.has(creature.tokenUuid)) {
+          this.selectedPreflightCreatureUuids.add(creature.tokenUuid);
+        }
+      }
+      for (const uuid of Array.from(this.selectedPreflightCreatureUuids)) {
+        if (!currentUuids.has(uuid)) this.selectedPreflightCreatureUuids.delete(uuid);
+      }
+    }
+
+    const allCreatures = this.session?.creatures ?? this.preflightCreatures ?? [];
     const creatures = [];
     let resolvedCount = 0;
 
     for (const creature of allCreatures) {
       const resolved = await this.craftworks.loot.isLootResolved(creature.tokenUuid);
-      if (resolved) resolvedCount += 1;
-      creatures.push({ ...creature, resolved });
+      if (resolved) {
+        resolvedCount += 1;
+        this.selectedPreflightCreatureUuids.delete(creature.tokenUuid);
+      }
+      creatures.push({
+        ...creature,
+        resolved,
+        selectedForLoot:
+          !resolved
+          && this.selectedPreflightCreatureUuids.has(creature.tokenUuid)
+      });
     }
 
     const partyInfo = await this.craftworks.materialService.getPartyRecipientInfo();
@@ -69,11 +99,50 @@ export class LootApp extends ScrollPreservingApplicationMixin(
 
     this.element.querySelector("[data-action='reset-loot']")
       ?.addEventListener("click", () => this.#resetLoot());
+
+    this.element.querySelectorAll("[data-loot-creature-select]")
+      .forEach(input => input.addEventListener("change", event => {
+        const uuid = event.currentTarget.dataset.tokenUuid;
+        if (!uuid) return;
+        if (event.currentTarget.checked) this.selectedPreflightCreatureUuids.add(uuid);
+        else this.selectedPreflightCreatureUuids.delete(uuid);
+      }));
+
+    this.element.querySelector("[data-action='select-all-loot-creatures']")
+      ?.addEventListener("click", event => {
+        event.preventDefault();
+        this.element.querySelectorAll("[data-loot-creature-select]:not(:disabled)").forEach(input => {
+          input.checked = true;
+          if (input.dataset.tokenUuid) this.selectedPreflightCreatureUuids.add(input.dataset.tokenUuid);
+        });
+      });
+
+    this.element.querySelector("[data-action='clear-all-loot-creatures']")
+      ?.addEventListener("click", event => {
+        event.preventDefault();
+        this.element.querySelectorAll("[data-loot-creature-select]").forEach(input => {
+          input.checked = false;
+        });
+        this.selectedPreflightCreatureUuids.clear();
+      });
   }
 
   async #roll() {
     try {
-      this.session = await this.craftworks.loot.start();
+      const selectedUuids = new Set(
+        Array.from(this.element.querySelectorAll("[data-loot-creature-select]:checked:not(:disabled)"))
+          .map(input => input.dataset.tokenUuid)
+          .filter(Boolean)
+      );
+      const creatureContexts = (this.preflightCreatures ?? [])
+        .filter(creature => selectedUuids.has(creature.tokenUuid));
+
+      if (!creatureContexts.length) {
+        throw new Error("Select at least one defeated NPC token to loot.");
+      }
+
+      this.selectedPreflightCreatureUuids = selectedUuids;
+      this.session = await this.craftworks.loot.start({ creatureContexts });
       await this.craftworks.loot.roll(this.session.id);
       await this.render();
     } catch (err) {

@@ -49,6 +49,7 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
 
     const progress = this.session
       ? users.map(user => ({
+          userId: user.id,
           user: user.name,
           perCreature: this.session.creatures.map(creature => {
             const state = this.session.participants?.[`${user.id}:${creature.tokenUuid}`];
@@ -286,6 +287,11 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
     this.element.querySelector("[data-action='cancel-harvest']")
       ?.addEventListener("click", () => this.#cancelHarvest());
 
+    this.element.querySelectorAll("[data-action='reopen-harvest']")
+      .forEach(button => button.addEventListener("click", event =>
+        this.#reopenHarvest(event)
+      ));
+
     this.element.querySelectorAll("[data-action='open-claimed-item']")
       .forEach(button => button.addEventListener("click", async event => {
         event.preventDefault();
@@ -482,6 +488,30 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
     } catch (err) {
       ui.notifications.error(err.message);
     }
+  }
+
+  async #reopenHarvest(event) {
+    event.preventDefault();
+
+    const userId = event.currentTarget.dataset.userId;
+    const user = userId ? game.users.get(userId) : null;
+
+    if (!this.session?.id || !user?.active) {
+      ui.notifications.warn(
+        "That player is no longer connected to this Harvest session."
+      );
+      return;
+    }
+
+    await this.craftworks.socket.emit(
+      "harvest.open",
+      { session: this.session },
+      { targetUserId: user.id }
+    );
+
+    ui.notifications.info(
+      `Reopened the active Harvest window for ${user.name}.`
+    );
   }
 
   async #cancelHarvest() {

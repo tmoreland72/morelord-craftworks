@@ -291,9 +291,17 @@ export class HarvestService {
         rareBias
       );
 
+    const activePartySize = Math.max(
+      1,
+      game.users.filter(user => user.active && !user.isGM).length
+    );
+
     return weightedDistinctSample(
       weightedCandidates,
-      getHarvestChoiceCount()
+      Math.max(
+        getHarvestChoiceCount(),
+        activePartySize
+      )
     )
       .map(result => {
         const material =

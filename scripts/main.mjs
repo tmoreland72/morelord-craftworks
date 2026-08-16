@@ -29,6 +29,8 @@ import { SpellScrollGeneratorService } from "./scrolls/spell-scroll-generator-se
 import { SpellScrollGeneratorApp } from "./ui/spell-scroll-generator-app.mjs";
 import { SpellbookGeneratorService } from "./spellbooks/spellbook-generator-service.mjs";
 import { SpellbookGeneratorApp } from "./ui/spellbook-generator-app.mjs";
+import { PotionGeneratorService } from "./potions/potion-generator-service.mjs";
+import { PotionGeneratorApp } from "./ui/potion-generator-app.mjs";
 import { RecipeEvaluator } from "./recipes/recipe-evaluator.mjs";
 import { RecipePlanner } from "./recipes/recipe-planner.mjs";
 import { ToolInspector } from "./recipes/tool-inspector.mjs";
@@ -151,6 +153,13 @@ Hooks.once("ready", async () => {
     recipientResolver
   });
 
+  const potionGenerator = new PotionGeneratorService({
+    coreAccess,
+    sourceFilter,
+    adapter,
+    recipientResolver
+  });
+
   const recipes = new RecipeRegistry({
     materialRegistry: materials,
     coreAccess,
@@ -252,6 +261,7 @@ Hooks.once("ready", async () => {
   let recipeBrowserApp = null;
   let spellScrollGeneratorApp = null;
   let spellbookGeneratorApp = null;
+  let potionGeneratorApp = null;
   let craftworksApp = null;
   let craftApp = null;
 
@@ -271,6 +281,7 @@ Hooks.once("ready", async () => {
     sourceFilter,
     spellScrollGenerator,
     spellbookGenerator,
+    potionGenerator,
     coreAccess,
     contentPacks,
     contentSync,
@@ -428,6 +439,21 @@ Hooks.once("ready", async () => {
       return spellbookGeneratorApp.render({
         force: true
       });
+    },
+    openPotionGenerator: async () => {
+      if (!game.user.isGM) {
+        throw new Error(
+          "Only the GM can use the Potion Generator."
+        );
+      }
+
+      if (potionGeneratorApp?.rendered) {
+        potionGeneratorApp.bringToFront();
+        return potionGeneratorApp;
+      }
+
+      potionGeneratorApp = new PotionGeneratorApp(api);
+      return potionGeneratorApp.render({ force: true });
     }
   };
 

@@ -27,7 +27,19 @@
     </div>
 
     {{#if actor}}
-      <section class="mlh-batch-check">
+      {{#if skillChecksBypassed}}
+        <section class="mlh-batch-check mlh-skill-check-bypassed">
+          <i class="fa-solid fa-forward"></i>
+          <div>
+            <strong>Skill Checks Bypassed</strong>
+            <small>
+              The GM granted {{actor.name}} automatic success. No Harvest
+              rolls are required; choose from the highlighted components below.
+            </small>
+          </div>
+        </section>
+      {{else}}
+        <section class="mlh-batch-check">
         <div class="mlh-batch-check-copy">
           <strong>Harvest Skill Check</strong>
           {{#if availableSkillCheckCount}}
@@ -66,7 +78,8 @@
             Roll Harvest Checks
           </button>
         </div>
-      </section>
+        </section>
+      {{/if}}
     {{/if}}
   </header>
 

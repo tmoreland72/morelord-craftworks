@@ -252,11 +252,20 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
             this.selectedHarvestSkill
         }));
 
+    const skillChecksBypassed = Boolean(
+      actor
+      && (this.session.skipSkillChecks ?? []).some(entry =>
+        entry?.userId === game.user.id
+        && entry?.actorUuid === actor.uuid
+      )
+    );
+
     return foundry.utils.mergeObject(context, {
       session: this.session,
       actor: actor ? { name: actor.name, img: actor.img, uuid: actor.uuid } : null,
       skills: skillOptions,
       selectedHarvestSkill: this.selectedHarvestSkill,
+      skillChecksBypassed,
       availableSkillCheckCount,
       canRollHarvestChecks: Boolean(
         actor

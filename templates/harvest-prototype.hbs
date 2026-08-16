@@ -9,6 +9,32 @@
 
   <main class="mlh-creatures">
     {{#if session}}
+      <section class="mlh-gm-managed mlh-player-progress">
+        <div class="mlh-mode-heading">
+          <i class="fa-solid fa-users"></i>
+          Player Windows
+        </div>
+        <p class="mlh-preflight-help">
+          Reopening a player's window restores this active session and keeps
+          every roll and claimed component intact.
+        </p>
+        <div class="mlh-player-progress-list">
+          {{#each progress}}
+            <div class="mlh-player-progress-row">
+              <strong>{{user}}</strong>
+              <button
+                type="button"
+                data-action="reopen-harvest"
+                data-user-id="{{userId}}"
+              >
+                <i class="fa-solid fa-window-restore"></i>
+                Reopen Window
+              </button>
+            </div>
+          {{/each}}
+        </div>
+      </section>
+
       {{#each session.creatures}}
         <section class="mlh-creature {{#if isCollapsed}}mlh-creature-collapsed{{/if}}" data-creature-token="{{tokenUuid}}">
           <header class="mlh-creature-header">

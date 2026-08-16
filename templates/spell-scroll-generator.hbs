@@ -1,87 +1,72 @@
-<section class="mcw app-shell">
+<section class="mcw app-shell mcw-spell-scroll-generator">
   <header class="mcw-header">
     <div>
       <h2>Spell Scroll Generator</h2>
-      <p>Generate a spell for a scroll using the spell compendiums currently available to this world.</p>
+      <p>Choose how many scrolls of each spell level to generate from enabled D&amp;D5e compendium sources. Each draw is random and duplicates are allowed.</p>
     </div>
   </header>
 
   {{#if hasAccess}}
-    <div class="mcw-panel mcw-scroll-generator-controls">
-      <label>
-        Scroll Level
-        <select name="scroll-level">
-          {{#each levels}}
-            <option value="{{value}}" {{#if selected}}selected{{/if}}>
-              {{label}}
-            </option>
+    {{#unless hasResult}}
+    <section class="mcw-panel">
+      <div class="mcw-generator-count-grid">
+        {{#each levels}}
+          <label class="mcw-generator-count-row">
+            <span><strong>{{label}}</strong><small>{{available}} available</small></span>
+            <input type="number" min="0" step="1" value="{{count}}" data-scroll-level="{{level}}">
+          </label>
+        {{/each}}
+      </div>
+      <div class="mcw-actions">
+        <button type="button" data-action="generate-scrolls"><i class="fa-solid fa-dice"></i> Generate</button>
+      </div>
+    </section>
+    {{/unless}}
+
+    {{#if hasResult}}
+      <section class="mcw-panel mcw-generator-preview">
+        <h3><i class="fa-solid fa-scroll"></i> {{resultCount}} Generated Spell Scrolls</h3>
+        <div class="mcw-generator-results">
+          {{#each resultGroups}}
+            <div class="mcw-generator-result-group">
+              <strong>{{label}}</strong>
+              <div class="mcw-generator-result-list">
+                {{#each spells}}
+                  <div class="mcw-generator-result-row">
+                    <img src="{{img}}" alt="{{name}}">
+                    <span><strong>{{name}}</strong><small>{{sourceLabel}}</small></span>
+                    <button type="button" data-spell-uuid="{{uuid}}" title="Open {{name}}"><i class="fa-solid fa-up-right-from-square"></i></button>
+                  </div>
+                {{/each}}
+              </div>
+            </div>
           {{/each}}
-        </select>
-      </label>
-
-      <div class="mcw-scroll-generator-count">
-        {{spellCount}} available spell(s)
-      </div>
-
-      <button type="button" data-action="generate-scroll">
-        <i class="fa-solid fa-wand-magic-sparkles"></i>
-        Generate
-      </button>
-    </div>
-
-    {{#if result}}
-      <div class="mcw-panel mcw-scroll-generator-result">
-        <img src="{{result.img}}" alt="">
-        <div>
-          <strong>{{result.name}}</strong>
-          <span>
-            {{#if result.level}}
-              Level {{result.level}}
-            {{else}}
-              Cantrip
-            {{/if}}
-            · {{result.sourceLabel}}
-          </span>
         </div>
-        <button type="button"
-                data-spell-uuid="{{result.uuid}}"
-                title="Open spell">
-          <i class="fa-solid fa-up-right-from-square"></i>
-        </button>
-      </div>
+      </section>
 
-      <div class="mcw-panel">
+      <section class="mcw-panel">
         <h3>Recipient</h3>
         {{#if partyInfo.enabled}}
           {{#if partyInfo.valid}}
-            <p>Spell scroll will be awarded to <strong>{{partyInfo.actorName}}</strong>.</p>
+            <p>Spell scrolls will be awarded to <strong>{{partyInfo.actorName}}</strong>.</p>
           {{else}}
             <p class="mcw-warning">Party Recipient is enabled but no valid Party/Group actor is configured.</p>
           {{/if}}
         {{else}}
-          <label>
-            Recipient
+          <label>Recipient
             <select name="recipient">
               <option value="">Choose character…</option>
-              {{#each actors}}
-                <option value="{{uuid}}">{{name}}</option>
-              {{/each}}
+              {{#each actors}}<option value="{{uuid}}">{{name}}</option>{{/each}}
             </select>
           </label>
         {{/if}}
-
-        <button type="button"
-                data-action="award-scroll">
-          <i class="fa-solid fa-scroll"></i>
-          Create & Award Spell Scroll
-        </button>
-      </div>
+        <div class="mcw-actions">
+          <button type="button" data-action="reroll-scrolls"><i class="fa-solid fa-arrows-rotate"></i> Reroll</button>
+          <button type="button" data-action="award-scrolls"><i class="fa-solid fa-scroll"></i> Award Generated Spell Scrolls</button>
+        </div>
+      </section>
     {{/if}}
   {{else}}
-    <div class="mcw-panel">
-      <p class="mcw-warning">
-        Spell Scroll Generator is a premium Craftworks feature.
-      </p>
-    </div>
+    <div class="mcw-panel"><p class="mcw-warning">Spell Scroll Generator is a premium Craftworks feature.</p></div>
   {{/if}}
 </section>

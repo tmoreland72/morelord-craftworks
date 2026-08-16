@@ -8,15 +8,27 @@
     <div class="mcw-panel">
       <h3>Dead Creatures</h3>
       {{#if creatures.length}}
+        <p>Select only the defeated NPC tokens that should contribute to this Encounter Loot roll.</p>
+        <div class="mcw-loot-selection-actions">
+          <button type="button" data-action="select-all-loot-creatures"><i class="fa-solid fa-check-double"></i> Select All</button>
+          <button type="button" data-action="clear-all-loot-creatures"><i class="fa-solid fa-xmark"></i> Clear All</button>
+        </div>
         <div class="mcw-loot-creatures">
           {{#each creatures}}
-            <div class="mcw-creature">
+            <label class="mcw-creature mcw-loot-creature-select">
+              <input
+                type="checkbox"
+                data-loot-creature-select
+                data-token-uuid="{{tokenUuid}}"
+                {{checked selectedForLoot}}
+                {{#if resolved}}disabled{{/if}}
+              >
               <img src="{{img}}" alt="{{name}}">
               <div>
                 <strong>{{name}}</strong>
                 <div>CR {{cr}}{{#if resolved}} • Already resolved{{/if}}</div>
               </div>
-            </div>
+            </label>
           {{/each}}
         </div>
 

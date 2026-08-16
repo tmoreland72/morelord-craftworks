@@ -10,6 +10,7 @@
   </header>
 
   {{#if hasAccess}}
+    {{#unless hasResult}}
     <section class="mcw-panel">
       <label class="mcw-spellbook-name">
         <span>Spellbook Name</span>
@@ -48,17 +49,9 @@
           Generate
         </button>
 
-        {{#if hasResult}}
-          <button
-            type="button"
-            data-action="reroll-spellbook"
-          >
-            <i class="fa-solid fa-arrows-rotate"></i>
-            Reroll
-          </button>
-        {{/if}}
       </div>
     </section>
+    {{/unless}}
 
     {{#if hasResult}}
       <section class="mcw-panel mcw-spellbook-preview">
@@ -130,13 +123,19 @@
           </label>
         {{/if}}
 
-        <button
-          type="button"
-          data-action="award-spellbook"
-        >
-          <i class="fa-solid fa-book"></i>
-          Create & Award Spellbook
-        </button>
+        <div class="mcw-actions">
+          <button type="button" data-action="reroll-spellbook">
+            <i class="fa-solid fa-arrows-rotate"></i>
+            Reroll
+          </button>
+          <button
+            type="button"
+            data-action="award-spellbook"
+          >
+            <i class="fa-solid fa-book"></i>
+            Create & Award Spellbook
+          </button>
+        </div>
       </section>
     {{/if}}
   {{else}}

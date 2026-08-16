@@ -1,0 +1,76 @@
+<section class="mcw app-shell mcw-potion-generator">
+  <header class="mcw-header">
+    <div>
+      <h2>Potion Generator</h2>
+      <p>Choose how many potions of each rarity to generate from enabled Item compendiums. Each draw is random and duplicates are allowed.</p>
+    </div>
+  </header>
+
+  {{#if hasAccess}}
+    {{#unless hasResult}}
+    <section class="mcw-panel">
+      <div class="mcw-potion-rarity-grid">
+        {{#each rarities}}
+          <label class="mcw-potion-rarity-row">
+            <span>
+              <strong>{{label}}</strong>
+              <small>{{available}} available</small>
+            </span>
+            <input type="number" min="0" step="1" value="{{count}}" data-potion-rarity="{{id}}">
+          </label>
+        {{/each}}
+      </div>
+
+      <div class="mcw-actions">
+        <button type="button" data-action="generate-potions"><i class="fa-solid fa-dice"></i> Generate</button>
+      </div>
+    </section>
+    {{/unless}}
+
+    {{#if hasResult}}
+      <section class="mcw-panel mcw-potion-preview">
+        <h3><i class="fa-solid fa-flask"></i> {{resultCount}} Generated Potions</h3>
+        <div class="mcw-potion-results-scroll">
+          {{#each resultGroups}}
+            <div class="mcw-potion-result-group">
+              <strong>{{label}}</strong>
+              <div class="mcw-potion-result-list">
+                {{#each potions}}
+                  <div class="mcw-potion-result">
+                    <img src="{{img}}" alt="{{name}}">
+                    <span><strong>{{name}}</strong><small>{{sourceLabel}}</small></span>
+                    <button type="button" data-potion-uuid="{{uuid}}" title="Open {{name}}"><i class="fa-solid fa-up-right-from-square"></i></button>
+                  </div>
+                {{/each}}
+              </div>
+            </div>
+          {{/each}}
+        </div>
+      </section>
+
+      <section class="mcw-panel">
+        <h3>Recipient</h3>
+        {{#if partyInfo.enabled}}
+          {{#if partyInfo.valid}}
+            <p>Potions will be awarded to <strong>{{partyInfo.actorName}}</strong>.</p>
+          {{else}}
+            <p class="mcw-warning">Party Recipient is enabled but no valid Party/Group actor is configured.</p>
+          {{/if}}
+        {{else}}
+          <label>Recipient
+            <select name="recipient">
+              <option value="">Choose character…</option>
+              {{#each actors}}<option value="{{uuid}}">{{name}}</option>{{/each}}
+            </select>
+          </label>
+        {{/if}}
+        <div class="mcw-actions">
+          <button type="button" data-action="reroll-potions"><i class="fa-solid fa-arrows-rotate"></i> Reroll</button>
+          <button type="button" data-action="award-potions"><i class="fa-solid fa-flask"></i> Award Generated Potions</button>
+        </div>
+      </section>
+    {{/if}}
+  {{else}}
+    <div class="mcw-panel"><p class="mcw-warning">Potion Generator requires premium Craftworks access.</p></div>
+  {{/if}}
+</section>

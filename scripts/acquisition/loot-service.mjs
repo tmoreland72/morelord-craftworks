@@ -46,8 +46,10 @@ export class LootService {
     return tokens.length;
   }
 
-  async start() {
-    const allCreatures = this.getDeadCreatureSummary();
+  async start({ creatureContexts = null } = {}) {
+    const allCreatures = Array.isArray(creatureContexts)
+      ? foundry.utils.deepClone(creatureContexts)
+      : this.getDeadCreatureSummary();
     if (!allCreatures.length) throw new Error("No dead creatures were found on the current scene.");
 
     const creatures = [];

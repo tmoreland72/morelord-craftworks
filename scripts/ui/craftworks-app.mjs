@@ -59,6 +59,8 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
         Boolean(this.craftworks.spellScrollGenerator?.hasAccess),
       spellbookGeneratorPremium:
         Boolean(this.craftworks.spellbookGenerator?.hasAccess),
+      potionGeneratorPremium:
+        Boolean(this.craftworks.potionGenerator?.hasAccess),
       partyInfo
     }, { inplace: false });
   }
@@ -100,6 +102,14 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
         "click",
         () => this.#gmAction(
           () => this.craftworks.openSpellbookGenerator()
+        )
+      );
+
+    this.element.querySelector("[data-action='potion-generator']")
+      ?.addEventListener(
+        "click",
+        () => this.#gmAction(
+          () => this.craftworks.openPotionGenerator()
         )
       );
 
