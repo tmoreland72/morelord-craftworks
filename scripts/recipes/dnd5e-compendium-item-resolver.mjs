@@ -18,7 +18,8 @@ const DND5E_ITEM_PACKS = Object.freeze({
 });
 
 export class Dnd5eCompendiumItemResolver {
-  constructor() {
+  constructor({ sourceFilter = null } = {}) {
+    this.sourceFilter = sourceFilter;
     this._bySourceBook = new Map();
     this._indexedPacks = new Map();
   }
@@ -46,6 +47,7 @@ export class Dnd5eCompendiumItemResolver {
       for (const collection of collections) {
         const pack = game.packs.get(collection);
         if (!pack || pack.documentName !== "Item") continue;
+        if (this.sourceFilter && !this.sourceFilter.isPackEnabled(pack)) continue;
 
         let index;
         try {
@@ -81,10 +83,6 @@ export class Dnd5eCompendiumItemResolver {
       this._bySourceBook.set(sourceBook, byName);
       this._indexedPacks.set(sourceBook, indexed);
 
-      console.log(
-        `Morelord Craftworks | Indexed ${byName.size} ${sourceBook} craftable Item candidate(s) `
-        + `from ${indexed.length} exact D&D5e Item pack(s).`
-      );
     }
 
     return Array.from(this._bySourceBook.values())
@@ -108,7 +106,13 @@ export class Dnd5eCompendiumItemResolver {
       if (!key) continue;
 
       const match = sourceIndex.get(key);
-      if (match) return match;
+      if (
+        match
+        && (
+          !this.sourceFilter
+          || this.sourceFilter.isPackEnabled(match.packId)
+        )
+      ) return match;
     }
 
     return null;
@@ -131,7 +135,11 @@ export class Dnd5eCompendiumItemResolver {
   }
 
   packsFor(sourceBook) {
-    return [...(this._indexedPacks.get(sourceBook) ?? [])];
+    return [...(this._indexedPacks.get(sourceBook) ?? [])]
+      .filter(collection =>
+        !this.sourceFilter
+        || this.sourceFilter.isPackEnabled(collection)
+      );
   }
 
   candidateNames(value) {

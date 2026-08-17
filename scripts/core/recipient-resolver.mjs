@@ -30,7 +30,10 @@ export class RecipientResolver {
   }
 
   async resolve(fallbackActor = null) {
-    if (!this.isPartyEnabled()) return fallbackActor;
+    // An explicitly selected recipient always wins. The configured Party
+    // actor is a default for award forms, not a lock on their destination.
+    if (fallbackActor) return fallbackActor;
+    if (!this.isPartyEnabled()) return null;
 
     const party = await this.getPartyActor();
     if (party) return party;

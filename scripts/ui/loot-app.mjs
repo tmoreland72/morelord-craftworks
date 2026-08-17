@@ -34,7 +34,11 @@ export class LootApp extends ScrollPreservingApplicationMixin(
         actor.type === "character"
         || actor.type === "group"
       )
-      .map(actor => ({ uuid: actor.uuid, name: actor.name, img: actor.img }));
+      .map(actor => ({
+        uuid: actor.uuid,
+        name: actor.name,
+        img: actor.img
+      }));
 
     if (!this.session) {
       const previousUuids = new Set(
@@ -75,6 +79,7 @@ export class LootApp extends ScrollPreservingApplicationMixin(
     }
 
     const partyInfo = await this.craftworks.materialService.getPartyRecipientInfo();
+    for (const actor of actors) actor.selected = actor.uuid === partyInfo.actorUuid;
 
     return foundry.utils.mergeObject(context, {
       session: this.session,
@@ -99,6 +104,9 @@ export class LootApp extends ScrollPreservingApplicationMixin(
 
     this.element.querySelector("[data-action='reset-loot']")
       ?.addEventListener("click", () => this.#resetLoot());
+
+    this.element.querySelector("[data-action='reroll-loot']")
+      ?.addEventListener("click", () => this.#rerollLoot());
 
     this.element.querySelectorAll("[data-loot-creature-select]")
       .forEach(input => input.addEventListener("change", event => {
@@ -151,13 +159,8 @@ export class LootApp extends ScrollPreservingApplicationMixin(
   }
 
   async #award() {
-    let actorUuid = null;
-
-    const partyInfo = await this.craftworks.materialService.getPartyRecipientInfo();
-    if (!partyInfo.enabled || !partyInfo.valid) {
-      actorUuid = this.element.querySelector("[name='recipient']")?.value ?? null;
-      if (!actorUuid) return ui.notifications.warn("Choose a character to carry the encounter loot.");
-    }
+    const actorUuid = this.element.querySelector("[name='recipient']")?.value ?? null;
+    if (!actorUuid) return ui.notifications.warn("Choose a recipient for the encounter loot.");
 
     try {
       const result = await this.craftworks.loot.award(this.session.id, actorUuid);
@@ -165,6 +168,8 @@ export class LootApp extends ScrollPreservingApplicationMixin(
       const materialSummary = result.materials.map(m => `${m.name} ×${m.quantity}`).join(", ");
       const parts = [];
       if (materialSummary) parts.push(materialSummary);
+      if (result.potions?.length) parts.push(`${result.potions.length} potion${result.potions.length === 1 ? "" : "s"}`);
+      if (result.spellScrolls?.length) parts.push(`${result.spellScrolls.length} spell scroll${result.spellScrolls.length === 1 ? "" : "s"}`);
       if (result.coinTotalCopper > 0) parts.push(result.coinLabel);
       if (result.special?.itemName) parts.push(result.special.itemName);
 
@@ -173,6 +178,8 @@ export class LootApp extends ScrollPreservingApplicationMixin(
       await this.craftworks.socket.emit("loot.complete", {
         found: result.found,
         materials: result.materials,
+        potions: result.potions,
+        spellScrolls: result.spellScrolls,
         coinLabel: result.coinLabel,
         coinTotalCopper: result.coinTotalCopper,
         special: result.special,
@@ -190,6 +197,17 @@ export class LootApp extends ScrollPreservingApplicationMixin(
       const count = await this.craftworks.loot.resetSceneLooting();
       ui.notifications.info(`Reset encounter-loot records for ${count} dead creature token${count === 1 ? "" : "s"} on this scene.`);
       this.session = null;
+      await this.render();
+    } catch (err) {
+      ui.notifications.error(err.message);
+    }
+  }
+
+  async #rerollLoot() {
+    if (!this.session) return;
+    try {
+      await this.craftworks.loot.reroll(this.session.id);
+      ui.notifications.info("Encounter loot rerolled.");
       await this.render();
     } catch (err) {
       ui.notifications.error(err.message);

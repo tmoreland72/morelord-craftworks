@@ -98,10 +98,11 @@
         </div>
       </section>
 
-      <section class="mcw-filter-group">
-        <h3>Ingredient Tags</h3>
+      {{#each ingredientTagGroups}}
+      <section class="mcw-filter-group mcw-filter-subsection">
+        <h3>{{label}}</h3>
         <div class="mcw-tristate-list">
-          {{#each ingredientTags}}
+          {{#each options}}
             <button type="button"
                     class="mcw-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
                     data-tristate-filter
@@ -113,6 +114,7 @@
           {{/each}}
         </div>
       </section>
+      {{/each}}
 </aside>
 
     <main class="mcw-marketplace-results">
@@ -144,12 +146,12 @@
           <div>
             <strong>{{prospectiveCount}} recipes match the current filters.</strong>
             <span>
-              Refine the filters or search until there are
-              <strong>{{displayLimit}} or fewer</strong> results before recipes are displayed.
+              Showing the first <strong>{{displayLimit}}</strong>. Filter totals continue
+              to reflect all available matching recipes.
             </span>
           </div>
         </div>
-      {{else}}
+      {{/if}}
   <div class="mcw-panel mcw-recipe-mark-context">
     <i class="fa-solid fa-bookmark"></i>
     {{#if canMarkRecipes}}
@@ -256,7 +258,7 @@
                                 {{#if alternativeRows.length}}
                                   <div class="mcw-requirement-alternatives">
                                     {{#each alternativeRows}}
-                                      <div class="mcw-requirement-row">
+                                      <div class="mcw-requirement-row" data-document-uuid="{{materialUuid}}">
                                         {{#if materialImg}}
                                           {{#if materialId}}
                                             <button type="button"
@@ -281,7 +283,7 @@
                                     {{/each}}
                                   </div>
                                 {{else}}
-                                  <div class="mcw-requirement-row">
+                                  <div class="mcw-requirement-row" data-document-uuid="{{materialUuid}}">
                                     {{#if materialImg}}
                                       {{#if materialId}}
                                         <button type="button"
@@ -324,7 +326,7 @@
 
                     <section class="mcw-recipe-block">
                       <h4>Produces</h4>
-                      <div class="mcw-recipe-output-card mcw-recipe-output-compact">
+                      <div class="mcw-recipe-output-card mcw-recipe-output-compact" data-document-uuid="{{outputDocumentUuid}}">
                         {{#if output.img}}
                           {{#if outputMaterialId}}
                             <button type="button"
@@ -369,5 +371,3 @@
     </main>
   </div>
 </section>
-
-      {{/if}}

@@ -29,13 +29,19 @@
         {{#if result.materials.length}}
           <div class="mcw-loot-summary-grid">
             {{#each result.materials}}
-              <div class="mcw-result">
+              <div class="mcw-result" data-document-uuid="{{uuid}}">
                 <img src="{{img}}" alt="{{name}}">
                 <strong>{{name}} ×{{quantity}}</strong>
               </div>
             {{/each}}
           </div>
         {{/if}}
+
+        <h4>Potions</h4>
+        <div class="mcw-loot-summary-grid">{{#each result.potions}}<div class="mcw-result" data-document-uuid="{{uuid}}"><img src="{{img}}" alt="{{name}}"><strong>{{name}}</strong></div>{{/each}}</div>
+
+        <h4>Spell Scrolls</h4>
+        <div class="mcw-loot-summary-grid">{{#each result.spellScrolls}}<div class="mcw-result" data-document-uuid="{{uuid}}"><img src="{{img}}" alt="{{name}}"><strong>Spell Scroll: {{name}}</strong></div>{{/each}}</div>
 
         {{#if result.coinCopper}}
           <p><i class="fa-solid fa-coins"></i> <strong>{{result.coinLabel}}</strong></p>
@@ -53,7 +59,7 @@
               {{#if result.special.items.length}}
                 <div class="mcw-special-items">
                   {{#each result.special.items}}
-                    <div class="mcw-result mcw-special-result">
+                    <div class="mcw-result mcw-special-result" data-document-uuid="{{itemUuid}}">
                       <img src="{{itemImg}}" alt="{{itemName}}">
                       <div class="mcw-special-item-copy">
                         <strong>{{itemName}}</strong>
@@ -84,23 +90,16 @@
       <div class="mcw-panel">
         <h3>Recipient</h3>
 
-        {{#if partyInfo.enabled}}
-          {{#if partyInfo.valid}}
-            <p>Hoard will be sent to <strong>{{partyInfo.actorName}}</strong>.</p>
-          {{else}}
-            <p class="mcw-warning">Party Recipient is enabled but no valid Party/Group actor is configured.</p>
-          {{/if}}
-        {{else}}
-          <label>
-            Party Carrier
-            <select name="recipient">
-              <option value="">Choose character…</option>
-              {{#each actors}}
-                <option value="{{uuid}}">{{name}}</option>
-              {{/each}}
-            </select>
-          </label>
-        {{/if}}
+        <label>
+          Reward Recipient
+          <select name="recipient">
+            <option value="">Choose character or group…</option>
+            {{#each actors}}
+              <option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>
+            {{/each}}
+          </select>
+        </label>
+        {{#if partyInfo.valid}}<p class="mcw-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
 
         <div class="mcw-actions">
           <button type="button" data-action="send-chat">

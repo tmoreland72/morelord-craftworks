@@ -32,7 +32,11 @@ export class PotionGeneratorApp extends ScrollPreservingApplicationMixin(
     const partyInfo = await this.craftworks.materialService.getPartyRecipientInfo();
     const actors = game.actors
       .filter(actor => actor.type === "character" || actor.type === "group")
-      .map(actor => ({ uuid: actor.uuid, name: actor.name }))
+      .map(actor => ({
+        uuid: actor.uuid,
+        name: actor.name,
+        selected: actor.uuid === partyInfo.actorUuid
+      }))
       .sort((a, b) => a.name.localeCompare(b.name));
 
     const rarities = POTION_RARITIES.map(rarity => ({
@@ -114,14 +118,10 @@ export class PotionGeneratorApp extends ScrollPreservingApplicationMixin(
       return;
     }
 
-    const partyInfo = await this.craftworks.materialService.getPartyRecipientInfo();
-    let fallbackActorUuid = null;
-    if (!partyInfo.enabled || !partyInfo.valid) {
-      fallbackActorUuid = this.element.querySelector("[name='recipient']")?.value ?? null;
-      if (!fallbackActorUuid) {
-        ui.notifications.warn("Choose a recipient.");
-        return;
-      }
+    const fallbackActorUuid = this.element.querySelector("[name='recipient']")?.value ?? null;
+    if (!fallbackActorUuid) {
+      ui.notifications.warn("Choose a recipient.");
+      return;
     }
 
     try {

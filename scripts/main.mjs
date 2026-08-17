@@ -64,6 +64,31 @@ Hooks.once("init", () => {
   log("Initializing.");
 });
 
+Hooks.once("ready", () => {
+  document.addEventListener("click", async event => {
+    const row = event.target.closest?.("[data-mcw-link-target]");
+    if (!row) return;
+
+    // Let Foundry handle its native UUID link so the normal document preview,
+    // pinning, and click behavior remain available on the linked item name.
+    if (event.target.closest?.(".content-link")) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const uuid = row.dataset.mcwLinkTarget;
+    if (!uuid) return;
+
+    try {
+      const document = await fromUuid(uuid);
+      if (!document) throw new Error("Document not found");
+      document.sheet?.render(true);
+    } catch {
+      ui.notifications.warn("The source Item could not be opened.");
+    }
+  });
+});
+
 Hooks.on("getSceneControlButtons", controls => {
   const tokenTools = controls?.tokens?.tools;
   if (!tokenTools) return;
@@ -91,14 +116,14 @@ Hooks.on("getSceneControlButtons", controls => {
 
 Hooks.once("ready", async () => {
   exposePartyActorSetting();
-  const adapter = createSystemAdapter();
   const sourceFilter = new Dnd5eSourceFilterService();
+  const adapter = createSystemAdapter({ sourceFilter });
   const coreAccess = new MorelordCoreAccessService();
   await coreAccess.refresh();
   const contentPacks = new ContentPackService({ coreAccess });
   contentPacks.validateManifests();
 
-  const materials = new MaterialRegistry({ contentPacks });
+  const materials = new MaterialRegistry({ contentPacks, sourceFilter });
 
   const startupMaterialInstaller =
     new ContentPackMaterialInstaller({
@@ -136,7 +161,7 @@ Hooks.once("ready", async () => {
 
   const recipientResolver = new RecipientResolver();
   const materialService = new MaterialService({ registry: materials, adapter, recipientResolver });
-  const dnd5eItemResolver = new Dnd5eCompendiumItemResolver();
+  const dnd5eItemResolver = new Dnd5eCompendiumItemResolver({ sourceFilter });
   await dnd5eItemResolver.refresh();
 
   const spellScrollGenerator = new SpellScrollGeneratorService({
@@ -180,15 +205,9 @@ Hooks.once("ready", async () => {
     && contentSync.needsSync()
   ) {
     try {
-      const result =
-        await contentSync.sync({
+      await contentSync.sync({
           reason: "startup"
         });
-
-      console.log(
-        "Morelord Craftworks | Automatic content synchronization completed.",
-        result
-      );
     } catch (error) {
       console.warn(
         "Morelord Craftworks | Automatic content synchronization failed.",
@@ -242,14 +261,18 @@ Hooks.once("ready", async () => {
     sessions,
     recipientResolver,
     specialTreasure,
-    contentPacks
+    contentPacks,
+    potionGenerator,
+    spellScrollGenerator
   });
 
   const hoard = new HoardService({
     adapter,
     materialRegistry: materials,
     recipientResolver,
-    specialTreasure
+    specialTreasure,
+    potionGenerator,
+    spellScrollGenerator
   });
   let gmHarvestApp = null;
   let playerHarvestApp = null;
@@ -635,6 +658,8 @@ Hooks.once("ready", async () => {
       const parts = [];
       const materials = (data.materials ?? []).map(m => `${m.name} ×${m.quantity}`).join(", ");
       if (materials) parts.push(materials);
+      if (data.potions?.length) parts.push(`${data.potions.length} potion${data.potions.length === 1 ? "" : "s"}`);
+      if (data.spellScrolls?.length) parts.push(`${data.spellScrolls.length} spell scroll${data.spellScrolls.length === 1 ? "" : "s"}`);
       if (data.coinTotalCopper > 0) parts.push(data.coinLabel);
       if (data.special?.itemName) parts.push(data.special.itemName);
       ui.notifications.info(`The party recovered ${parts.join("; ")}. Sent to ${data.actorName}.`);

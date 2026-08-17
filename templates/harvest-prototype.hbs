@@ -120,7 +120,7 @@
             {{else}}
               <div class="mlh-components mlh-preview-components">
                 {{#each components}}
-                  <article class="mlh-component">
+                  <article class="mlh-component" data-document-uuid="{{itemUuid}}">
                     <div class="mlh-component-image">
                       {{#if img}}
                         <img src="{{img}}" alt="{{name}}">
@@ -180,7 +180,7 @@
         {{#if claimedItems.length}}
           <div class="mlh-claimed-list">
             {{#each claimedItems}}
-              <article class="mlh-claimed-item">
+              <article class="mlh-claimed-item" data-document-uuid="{{linkUuid}}">
                 <button
                   type="button"
                   class="mlh-claimed-image-link"

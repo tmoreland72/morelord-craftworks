@@ -66,10 +66,11 @@
         </div>
       </section>
 
-      <section class="mcw-filter-group">
-        <h3>Tags</h3>
+      {{#each tagGroups}}
+      <section class="mcw-filter-group mcw-filter-subsection">
+        <h3>{{label}}</h3>
         <div class="mcw-tristate-list">
-          {{#each tags}}
+          {{#each options}}
             <button type="button"
                     class="mcw-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
                     data-tristate-filter
@@ -81,6 +82,7 @@
           {{/each}}
         </div>
       </section>
+      {{/each}}
 
       <label class="mcw-filter-search">
         <span>Check Inventory</span>
@@ -105,15 +107,15 @@
           <div>
             <strong>{{prospectiveCount}} materials match the current filters.</strong>
             <span>
-              Refine the filters or search until there are
-              <strong>{{displayLimit}} or fewer</strong> results before items are displayed.
+              Showing the first <strong>{{displayLimit}}</strong>. Filter totals continue
+              to reflect all available matching materials.
             </span>
           </div>
         </div>
-      {{else}}
+      {{/if}}
         <div class="mcw-reference-list mcw-browser-results">
           {{#each materials}}
-      <article class="mcw-reference-card mcw-material-card {{#if owned}}mcw-material-owned{{/if}} {{#if focused}}mcw-material-focused{{/if}}">
+      <article class="mcw-reference-card mcw-material-card {{#if owned}}mcw-material-owned{{/if}} {{#if focused}}mcw-material-focused{{/if}}" data-document-uuid="{{uuid}}">
         <img src="{{img}}" alt="{{name}}">
 
         <div class="mcw-reference-main">
@@ -164,7 +166,6 @@
             </div>
           {{/each}}
         </div>
-      {{/if}}
     </main>
   </div>
 </section>

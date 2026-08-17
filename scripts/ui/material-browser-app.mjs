@@ -1,5 +1,6 @@
 import { MODULE_ID, MODULE_TITLE } from "../constants.mjs";
 import { bindMultiselectBehavior } from "./multiselect-behavior.mjs";
+import { buildMaterialTagGroups } from "./material-filter-groups.mjs";
 
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 
@@ -118,7 +119,7 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
       )
     ).sort();
 
-    const tags = Array.from(
+    const rawTags = Array.from(
       new Set(
         allMaterials
           .flatMap(material => material.tags ?? [])
@@ -137,6 +138,11 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
         raritySet.has(rarity)
       );
 
+    const tagGroups = buildMaterialTagGroups(rawTags, {
+      included: this.selectedTags,
+      excluded: this.excludedTags
+    });
+    const tags = tagGroups.flatMap(group => group.options.map(option => option.id));
     const tagSet = new Set(tags);
     this.selectedTags =
       this.selectedTags.filter(tag =>
@@ -151,9 +157,7 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
 
     const totalMaterialCount = allMaterials.length;
     const prospectiveCount = matchingMaterials.length;
-    const prospectiveCountLabel = prospectiveCount > 500
-      ? "500+"
-      : String(prospectiveCount);
+    const prospectiveCountLabel = String(prospectiveCount);
     const hasSearchCriteria = Boolean(
       this.search.trim()
       || this.selectedPackIds.length
@@ -164,16 +168,13 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
       || this.excludedTags.length
     );
 
-    const autoShowResults =
-      matchingMaterials.length <= 100;
-
-    const displayedMaterials =
-      autoShowResults
-        ? matchingMaterials
-        : [];
+    const displayLimit = 300;
+    const autoShowResults = true;
+    const displayedMaterials = [...matchingMaterials]
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .slice(0, displayLimit);
 
     const materials = displayedMaterials
-          .sort((a,b) => a.name.localeCompare(b.name))
           .map(material => {
             const pack = this.craftworks.contentPacks?.get(material.packId);
             const quantity = inventory.get(material.materialId) ?? 0;
@@ -252,26 +253,7 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
         excluded:
           this.excludedRarities.includes(rarity)
       })),
-      tags: tags.map(tag => ({
-        id: tag,
-        label: tag
-          .split("-")
-          .map(part =>
-            part.charAt(0).toUpperCase()
-            + part.slice(1)
-          )
-          .join(" "),
-        state:
-          this.selectedTags.includes(tag)
-            ? 1
-            : this.excludedTags.includes(tag)
-              ? -1
-              : 0,
-        included:
-          this.selectedTags.includes(tag),
-        excluded:
-          this.excludedTags.includes(tag)
-      })),
+      tagGroups,
       packs: enabledPacks.map(pack => ({
         id: pack.id,
         label: pack.label,
@@ -294,8 +276,8 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
       searchExecuted:
         autoShowResults,
       overDisplayLimit:
-        prospectiveCount > 100,
-      displayLimit: 100,
+        prospectiveCount > displayLimit,
+      displayLimit,
       autoShowResults,
       materialCount: materials.length,
       ownedMaterialCount: materials.filter(material => material.owned).length,

@@ -65,18 +65,6 @@ export class KibblesMaterialImageResolver {
       }
     }
 
-    if (this._packs.length) {
-      console.log(
-        `Morelord Craftworks | Indexed ${this._byName.size} Kibbles Item image mapping(s) `
-        + `from ${this._packs.length} candidate compendium pack(s).`
-      );
-    } else {
-      console.log(
-        "Morelord Craftworks | No installed Kibbles crafting Item compendium was found; "
-        + "packaged material images will be used as fallbacks."
-      );
-    }
-
     return this.size;
   }
 

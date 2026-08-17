@@ -5,11 +5,13 @@ import { tierForCreatureCR } from "./loot-profiles.mjs";
 import { randomInt, weightedPick } from "./random-choice.mjs";
 
 export class HoardService {
-  constructor({ adapter, materialRegistry, recipientResolver, specialTreasure }) {
+  constructor({ adapter, materialRegistry, recipientResolver, specialTreasure, potionGenerator, spellScrollGenerator }) {
     this.adapter = adapter;
     this.materialRegistry = materialRegistry;
     this.recipientResolver = recipientResolver;
     this.specialTreasure = specialTreasure;
+    this.potionGenerator = potionGenerator;
+    this.spellScrollGenerator = spellScrollGenerator;
   }
 
   async roll(profileId) {
@@ -20,7 +22,27 @@ export class HoardService {
     const specialEnabled = Boolean(getSetting(SETTINGS.LOOT_ENABLE_SPECIAL));
 
     const materials = [];
+    const potions = [];
+    const spellScrolls = [];
     let coinCopper = 0;
+
+    const potionPool = await this.potionGenerator?.availablePotions?.() ?? [];
+    const spellPool = await this.spellScrollGenerator?.availableSpells?.() ?? [];
+    if (!potionPool.length) {
+      throw new Error("A treasure hoard requires potions, but no potions are available from enabled Item sources.");
+    }
+    if (!spellPool.length) {
+      throw new Error("A treasure hoard requires spell scrolls, but no spells are available from enabled Item sources.");
+    }
+
+    const potionCount = randomInt(profile.potionRolls.min, profile.potionRolls.max);
+    const spellScrollCount = randomInt(profile.spellScrollRolls.min, profile.spellScrollRolls.max);
+    for (let i = 0; i < potionCount; i += 1) {
+      potions.push(this.#pickPotion(potionPool, profile.representativeCR));
+    }
+    for (let i = 0; i < spellScrollCount; i += 1) {
+      spellScrolls.push(this.#pickSpellScroll(spellPool, profile.representativeCR));
+    }
 
     if (materialsEnabled) {
       const tier = tierForCreatureCR(profile.representativeCR);
@@ -46,6 +68,7 @@ export class HoardService {
             materialId: picked.materialId,
             name: material?.name ?? picked.materialId,
             img: material?.img ?? "",
+            uuid: material?.uuid ?? null,
             quantity
           });
         }
@@ -128,10 +151,13 @@ export class HoardService {
       profileId: profile.id,
       profileLabel: profile.label,
       materials,
+      potions,
+      spellScrolls,
       coinCopper,
       coinLabel: this.adapter.formatCopper(coinCopper),
       special,
-      found: materials.length > 0 || coinCopper > 0 || Boolean(special.items?.length),
+      found: materials.length > 0 || potions.length > 0 || spellScrolls.length > 0
+        || coinCopper > 0 || Boolean(special.items?.length),
       awarded: false
     };
   }
@@ -163,6 +189,19 @@ export class HoardService {
         quantity: material.quantity,
         rarity: source.system?.rarity
       });
+    }
+
+    for (const potion of result.potions ?? []) {
+      const source = await fromUuid(potion.uuid);
+      if (!source) throw new Error(`Potion could not be resolved: ${potion.name}`);
+      const created = await this.adapter.addItemToActor(recipient, source, 1);
+      awardedItems.push({ document: created, linkUuid: potion.uuid, quantity: 1, rarity: created.system?.rarity });
+    }
+
+    for (const spell of result.spellScrolls ?? []) {
+      const generated = await this.spellScrollGenerator.createScrollItem({ spellUuid: spell.uuid, level: spell.level });
+      const created = await this.adapter.addItemToActor(recipient, generated.item, 1);
+      awardedItems.push({ document: created, linkUuid: spell.uuid, quantity: 1, rarity: created.system?.rarity });
     }
 
     if (result.coinCopper > 0) {
@@ -212,5 +251,25 @@ export class HoardService {
     result.recipientUuid = recipient.uuid;
     result.recipientName = recipient.name;
     return result;
+  }
+
+  #pickPotion(pool, cr) {
+    const allowed = cr >= 17
+      ? ["rare", "veryRare", "legendary"]
+      : cr >= 11
+        ? ["uncommon", "rare", "veryRare"]
+        : cr >= 5
+          ? ["common", "uncommon", "rare"]
+          : ["common", "uncommon"];
+    const candidates = pool.filter(potion => allowed.includes(potion.rarity));
+    const source = candidates.length ? candidates : pool;
+    return foundry.utils.deepClone(source[Math.floor(Math.random() * source.length)]);
+  }
+
+  #pickSpellScroll(pool, cr) {
+    const [min, max] = cr >= 17 ? [5, 9] : cr >= 11 ? [3, 6] : cr >= 5 ? [1, 4] : [0, 2];
+    const candidates = pool.filter(spell => Number(spell.level) >= min && Number(spell.level) <= max);
+    const source = candidates.length ? candidates : pool;
+    return foundry.utils.deepClone(source[Math.floor(Math.random() * source.length)]);
   }
 }

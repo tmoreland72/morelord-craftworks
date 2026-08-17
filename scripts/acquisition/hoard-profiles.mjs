@@ -4,6 +4,8 @@ export const HOARD_PROFILES = Object.freeze({
     label: "Challenge 0–4",
     coinGp: { min: 40, max: 180 },
     materialRolls: { min: 1, max: 3 },
+    potionRolls: { min: 1, max: 2 },
+    spellScrollRolls: { min: 1, max: 1 },
     representativeCR: 2,
     specialChance: 18
   },
@@ -12,6 +14,8 @@ export const HOARD_PROFILES = Object.freeze({
     label: "Challenge 5–10",
     coinGp: { min: 250, max: 900 },
     materialRolls: { min: 2, max: 4 },
+    potionRolls: { min: 2, max: 3 },
+    spellScrollRolls: { min: 1, max: 2 },
     representativeCR: 7,
     specialChance: 35
   },
@@ -20,6 +24,8 @@ export const HOARD_PROFILES = Object.freeze({
     label: "Challenge 11–16",
     coinGp: { min: 1200, max: 4500 },
     materialRolls: { min: 3, max: 5 },
+    potionRolls: { min: 3, max: 5 },
+    spellScrollRolls: { min: 2, max: 3 },
     representativeCR: 13,
     specialChance: 55
   },
@@ -28,6 +34,8 @@ export const HOARD_PROFILES = Object.freeze({
     label: "Challenge 17+",
     coinGp: { min: 5000, max: 18000 },
     materialRolls: { min: 4, max: 6 },
+    potionRolls: { min: 4, max: 6 },
+    spellScrollRolls: { min: 3, max: 4 },
     representativeCR: 18,
     specialChance: 75
   }

@@ -33,8 +33,6 @@ export class RecipeRegistry {
         throw new Error(`Packaged recipe source '${packId}' is not an array.`);
       }
 
-      let excludedUnmatchedStandardItems = 0;
-
       for (const raw of entries) {
         let preparedRaw = {
           ...raw,
@@ -61,7 +59,6 @@ export class RecipeRegistry {
           );
 
           if (!preparedRaw) {
-            excludedUnmatchedStandardItems += 1;
             continue;
           }
         }
@@ -73,21 +70,9 @@ export class RecipeRegistry {
         this._recipes.set(recipe.id, recipe);
       }
 
-      if (excludedUnmatchedStandardItems > 0) {
-        console.log(
-          `Morelord Craftworks | Excluded ${excludedUnmatchedStandardItems} `
-          + `${packId} Kibbles recipe candidate(s) whose output is not present in that exact D&D5e Item pack.`
-        );
-      }
     }
 
     this.#validateUniqueMaterialOutputs();
-
-    console.log(
-      `Morelord Craftworks | Indexed ${this._recipes.size} recipe definitions `
-      + `across ${CONTENT_PACKS.length} recipe packs `
-      + `(${this.all().length} currently enabled).`
-    );
 
     return this._recipes.size;
   }

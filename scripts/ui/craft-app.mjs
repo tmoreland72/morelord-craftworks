@@ -20,12 +20,11 @@ export class CraftApp
     this.crafterActorUuid = null;
     this.inventoryActorUuid = null;
     this.sessionLog = [];
-    this.sectionState = {
-      inProcess: true,
-      craftable: true,
-      notCraftable: false,
-      log: true
-    };
+    this.search = "";
+    this.categoryFilter = "all";
+    this.statusFilter = "all";
+    this.searchRenderTimer = null;
+    this.restoreSearchFocus = false;
   }
 
   static DEFAULT_OPTIONS = {
@@ -36,8 +35,8 @@ export class CraftApp
       "mcw-craft-window"
     ],
     position: {
-      width: 980,
-      height: 850
+      width: 1120,
+      height: 820
     },
     window: {
       title: `${MODULE_TITLE} — Craft`,
@@ -51,6 +50,14 @@ export class CraftApp
         "modules/morelord-craftworks/templates/craft.hbs"
     }
   };
+
+  async _onClose(options) {
+    if (this.searchRenderTimer) {
+      clearTimeout(this.searchRenderTimer);
+      this.searchRenderTimer = null;
+    }
+    await super._onClose(options);
+  }
 
   async _prepareContext(options) {
     const context =
@@ -116,7 +123,6 @@ export class CraftApp
           sessionLog: this.sessionLog,
           hasSessionLog:
             this.sessionLog.length > 0,
-          sections: this.sectionState,
           canChooseCrafter:
             game.user.isGM
             || crafterActors.length > 1
@@ -139,75 +145,83 @@ export class CraftApp
         ? await fromUuid(this.inventoryActorUuid)
         : null;
 
-    const markedIds =
-      this.craftworks.markedRecipes.list(crafter);
-
     const activeJobs =
       this.craftworks.craftingJobs.list(
         crafter,
         { activeOnly: true }
       );
 
-    const activeIds = new Set(
-      activeJobs.map(job => job.recipeId)
+    const markedIds =
+      this.craftworks.markedRecipes.list(crafter);
+
+    const activeJobsByRecipe = new Map(
+      activeJobs.map(job => [job.recipeId, job])
+    );
+    const queuedRecipeIds = [...new Set([
+      ...markedIds,
+      ...activeJobs.map(job => job.recipeId)
+    ])];
+    const allRecipes = queuedRecipeIds
+      .map(recipeId => this.craftworks.recipes.get(recipeId, { includeDisabled: true }))
+      .filter(Boolean);
+    const allCards = await Promise.all(
+      allRecipes.map(recipe => {
+        const job = activeJobsByRecipe.get(recipe.id) ?? null;
+        return this.#prepareRecipeCard(
+          recipe,
+          crafter,
+          inventoryActor,
+          job ? { job, forceInventoryUuid: job.inventoryActorUuid } : {}
+        );
+      })
     );
 
-    const inProcess = [];
-
-    for (const job of activeJobs) {
-      const recipe = this.craftworks.recipes.get(
-        job.recipeId,
-        { includeDisabled: true }
-      );
-
-      if (!recipe) continue;
-
-      const card = await this.#prepareRecipeCard(
-        recipe,
-        crafter,
-        inventoryActor,
-        {
-          job,
-          forceInventoryUuid:
-            job.inventoryActorUuid
-        }
-      );
-
-      inProcess.push(card);
+    for (const card of allCards) {
+      card.statusKey = card.isActive
+        ? "active"
+        : card.readiness.ready
+          ? "ready"
+          : "missing";
+      card.statusLabel = card.isActive
+        ? "In Progress"
+        : card.readiness.ready
+          ? "Ready"
+          : card.requirementsKnown
+            ? "Missing Materials"
+            : "Ingredients Unknown";
     }
 
-    const craftable = [];
-    const notCraftable = [];
+    const search = this.search.trim().toLowerCase();
+    const recipes = allCards
+      .filter(card => this.categoryFilter === "all" || card.category === this.categoryFilter)
+      .filter(card => this.statusFilter === "all" || card.statusKey === this.statusFilter)
+      .filter(card => !search || [
+        card.name,
+        card.output?.label,
+        card.sourceLabel,
+        card.category,
+        card.craftMeta?.tool,
+        ...(card.tags ?? [])
+      ].filter(Boolean).join(" ").toLowerCase().includes(search))
+      .sort((a, b) => {
+        const order = { active: 0, ready: 1, missing: 2 };
+        return (order[a.statusKey] - order[b.statusKey]) || a.name.localeCompare(b.name);
+      });
 
-    for (const recipeId of markedIds) {
-      if (activeIds.has(recipeId)) continue;
-
-      const recipe = this.craftworks.recipes.get(
-        recipeId,
-        { includeDisabled: true }
-      );
-
-      if (!recipe) continue;
-
-      const card = await this.#prepareRecipeCard(
-        recipe,
-        crafter,
-        inventoryActor
-      );
-
-      if (card.readiness.ready) {
-        craftable.push(card);
-      } else {
-        notCraftable.push(card);
-      }
-    }
-
-    const sortByName = (a, b) =>
-      a.name.localeCompare(b.name);
-
-    craftable.sort(sortByName);
-    notCraftable.sort(sortByName);
-    inProcess.sort(sortByName);
+    const categories = [...new Set(allCards.map(card => card.category).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b))
+      .map(category => ({
+        key: category,
+        label: category,
+        count: allCards.filter(card => card.category === category).length,
+        selected: this.categoryFilter === category
+      }));
+    const statusOptions = [
+      { key: "all", label: "All Recipes", count: allCards.length },
+      { key: "active", label: "In Progress", count: allCards.filter(card => card.statusKey === "active").length },
+      { key: "ready", label: "Ready to Craft", count: allCards.filter(card => card.statusKey === "ready").length },
+      { key: "missing", label: "Missing Requirements", count: allCards.filter(card => card.statusKey === "missing").length }
+    ].map(option => ({ ...option, selected: this.statusFilter === option.key }));
 
     return foundry.utils.mergeObject(
       context,
@@ -242,20 +256,18 @@ export class CraftApp
               actor.uuid
               === this.inventoryActorUuid
           })),
-        inProcess,
-        craftable,
-        notCraftable,
-        hasInProcess: inProcess.length > 0,
-        hasCraftable: craftable.length > 0,
-        hasNotCraftable:
-          notCraftable.length > 0,
-        hasMarked:
-          markedIds.length > 0
-          || inProcess.length > 0,
+        recipes,
+        hasRecipes: recipes.length > 0,
+        recipeCount: recipes.length,
+        totalRecipeCount: allCards.length,
+        search: this.search,
+        categories,
+        allCategoriesSelected: this.categoryFilter === "all",
+        statusOptions,
         sessionLog: this.sessionLog,
         hasSessionLog:
           this.sessionLog.length > 0,
-        sections: this.sectionState
+        hasActiveFilters: Boolean(this.search || this.categoryFilter !== "all" || this.statusFilter !== "all")
       },
       { inplace: false }
     );
@@ -304,22 +316,41 @@ export class CraftApp
         }
       );
 
-    this.element
-      .querySelectorAll("[data-section-toggle]")
-      .forEach(element => {
-        element.addEventListener(
-          "click",
-          event => {
-            const key =
-              event.currentTarget
-                .dataset.sectionToggle;
-            if (!(key in this.sectionState)) return;
-            this.sectionState[key] =
-              !this.sectionState[key];
-            this.render();
-          }
-        );
+    const searchInput = this.element.querySelector("[name='craft-search']");
+    if (searchInput) {
+      if (this.restoreSearchFocus) {
+        searchInput.focus();
+        searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
+        this.restoreSearchFocus = false;
+      }
+      searchInput.addEventListener("input", event => {
+        this.search = event.currentTarget.value;
+        this.restoreSearchFocus = true;
+        clearTimeout(this.searchRenderTimer);
+        this.searchRenderTimer = setTimeout(() => this.render(), 180);
       });
+    }
+
+    this.element.querySelectorAll("[data-craft-category]").forEach(element => {
+      element.addEventListener("click", event => {
+        this.categoryFilter = event.currentTarget.dataset.craftCategory || "all";
+        this.render();
+      });
+    });
+
+    this.element.querySelectorAll("[data-craft-status]").forEach(element => {
+      element.addEventListener("click", event => {
+        this.statusFilter = event.currentTarget.dataset.craftStatus || "all";
+        this.render();
+      });
+    });
+
+    this.element.querySelector("[data-action='clear-craft-filters']")?.addEventListener("click", () => {
+      this.search = "";
+      this.categoryFilter = "all";
+      this.statusFilter = "all";
+      this.render();
+    });
 
     this.element
       .querySelectorAll("[data-action='craft']")
@@ -418,6 +449,9 @@ export class CraftApp
           ?? match.materialId,
         img:
           material?.img
+          ?? null,
+        uuid:
+          material?.uuid
           ?? null,
         label:
           material?.name
@@ -760,6 +794,8 @@ export class CraftApp
                     materialView.materialId,
                   materialImg:
                     materialView.img,
+                  materialUuid:
+                    materialView.uuid,
                   inventory,
                   alternativeRows:
                     requirement.type
@@ -778,6 +814,8 @@ export class CraftApp
                                   altMaterialView.materialId,
                                 materialImg:
                                   altMaterialView.img,
+                                materialUuid:
+                                  altMaterialView.uuid,
                                 inventory:
                                   inventory
                                     ?.alternatives

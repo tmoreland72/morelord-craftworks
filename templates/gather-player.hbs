@@ -21,7 +21,7 @@
       {{/if}}
       {{#if (eq state.status "succeeded")}}
         <p><strong>Gathering succeeded.</strong> Your check total was {{state.total}}.</p>
-        <div class="mcw-result"><img src="{{state.result.img}}" alt="{{state.result.name}}"> {{state.result.name}} ×{{state.result.quantity}}</div>
+        <div class="mcw-result" data-document-uuid="{{state.result.itemUuid}}"><img src="{{state.result.img}}" alt="{{state.result.name}}"> {{state.result.name}} ×{{state.result.quantity}}</div>
         {{#if state.result.recipientName}}<p>Sent to <strong>{{state.result.recipientName}}</strong>.</p>{{/if}}
         <p>This character has now used their gathering opportunity for this scene.</p>
       {{/if}}

@@ -133,12 +133,15 @@ export class AwardChatCardService {
   }
 
   static #renderItem(item) {
+    const linkAttribute = item.uuid
+      ? ` data-mcw-link-target="${this.#escapeAttribute(item.uuid)}"`
+      : "";
     const label = item.uuid
       ? `@UUID[${item.uuid}]{${this.#escape(item.name)}}`
       : this.#escape(item.name);
 
     return `
-      <article class="mcw-award-card-item">
+      <article class="mcw-award-card-item"${linkAttribute}>
         <img
           class="mcw-award-card-item-image"
           src="${this.#escapeAttribute(item.img)}"

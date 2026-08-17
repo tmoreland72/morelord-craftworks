@@ -208,9 +208,13 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
                 const claim =
                   creatureClaims.get(component.id)
                   ?? null;
+                const material = component.materialId
+                  ? this.craftworks.materials.get(component.materialId)
+                  : null;
 
                 return {
                   ...component,
+                  itemUuid: material?.uuid ?? null,
                   claimed: Boolean(claim),
                   claimantName:
                     claim?.actorName

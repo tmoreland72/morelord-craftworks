@@ -4,8 +4,9 @@ import { log, warn } from "../core/logger.mjs";
 export class MaterialRegistry {
   #byId = new Map();
 
-  constructor({ contentPacks = null } = {}) {
+  constructor({ contentPacks = null, sourceFilter = null } = {}) {
     this.contentPacks = contentPacks;
+    this.sourceFilter = sourceFilter;
   }
 
   get size() { return this.#byId.size; }
@@ -29,7 +30,9 @@ export class MaterialRegistry {
 
   async indexConfiguredPacks() {
     this.clear();
-    const packs = game.packs.filter(pack => pack.documentName === "Item");
+    const packs = game.packs
+      .filter(pack => pack.documentName === "Item")
+      .filter(pack => this.sourceFilter?.isPackEnabled(pack) ?? true);
 
     for (const pack of packs) {
       const index = await pack.getIndex({ fields: [

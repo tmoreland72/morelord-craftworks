@@ -40,7 +40,12 @@ export class HoardApp extends ScrollPreservingApplicationMixin(
         actor.type === "character"
         || actor.type === "group"
       )
-      .map(actor => ({ uuid: actor.uuid, name: actor.name, img: actor.img }));
+      .map(actor => ({
+        uuid: actor.uuid,
+        name: actor.name,
+        img: actor.img,
+        selected: actor.uuid === partyInfo.actorUuid
+      }));
 
     return foundry.utils.mergeObject(context, {
       result: this.result,
@@ -158,6 +163,14 @@ export class HoardApp extends ScrollPreservingApplicationMixin(
 
     const materials = materialRows.join("");
 
+    const potions = (this.result.potions ?? []).map(potion => `
+      <li class="mcw-chat-result"><img src="${escape(potion.img ?? "")}" alt=""><span><strong>@UUID[${potion.uuid}]{${escape(potion.name)}}</strong><small>${escape(potion.rarity ?? "")}</small></span></li>
+    `).join("");
+
+    const spellScrolls = (this.result.spellScrolls ?? []).map(spell => `
+      <li class="mcw-chat-result"><img src="${escape(spell.img ?? "")}" alt=""><span><strong>@UUID[${spell.uuid}]{Spell Scroll: ${escape(spell.name)}}</strong><small>Level ${Number(spell.level ?? 0)}</small></span></li>
+    `).join("");
+
     const specialItems = (this.result.special?.items ?? [])
       .map(item => {
         const itemName = item.itemName ?? "Special Treasure";
@@ -236,6 +249,9 @@ export class HoardApp extends ScrollPreservingApplicationMixin(
             : ""
         }
 
+        <section class="mcw-chat-section"><h4>Potions</h4><ul class="mcw-chat-results">${potions}</ul></section>
+        <section class="mcw-chat-section"><h4>Spell Scrolls</h4><ul class="mcw-chat-results">${spellScrolls}</ul></section>
+
         ${specialText}
       </div>
     `;
@@ -259,13 +275,8 @@ export class HoardApp extends ScrollPreservingApplicationMixin(
   }
 
   async #award() {
-    let actorUuid = null;
-    const partyInfo = await this.craftworks.materialService.getPartyRecipientInfo();
-
-    if (!partyInfo.enabled || !partyInfo.valid) {
-      actorUuid = this.element.querySelector("[name='recipient']")?.value ?? null;
-      if (!actorUuid) return ui.notifications.warn("Choose a character to carry the hoard.");
-    }
+    const actorUuid = this.element.querySelector("[name='recipient']")?.value ?? null;
+    if (!actorUuid) return ui.notifications.warn("Choose a recipient for the hoard.");
 
     try {
       const awarded = await this.craftworks.hoard.award(this.result, actorUuid);

@@ -159,7 +159,7 @@
 
           <div class="mlh-components">
             {{#each displayComponents}}
-              <article class="mlh-component {{#if claimable}}mlh-component-available{{else}}mlh-component-unavailable{{/if}} {{#if neededForCrafting}}mlh-component-needed{{/if}}">
+              <article class="mlh-component {{#if claimable}}mlh-component-available{{else}}mlh-component-unavailable{{/if}} {{#if neededForCrafting}}mlh-component-needed{{/if}}" data-document-uuid="{{itemUuid}}">
                 <div class="mlh-component-image">
                   {{#if img}}
                     <img src="{{img}}" alt="{{name}}">
@@ -244,7 +244,7 @@
       {{#if claimedItems.length}}
         <div class="mlh-claimed-list">
           {{#each claimedItems}}
-            <article class="mlh-claimed-item {{#if neededForCrafting}}mlh-claimed-needed{{/if}}">
+            <article class="mlh-claimed-item {{#if neededForCrafting}}mlh-claimed-needed{{/if}}" data-document-uuid="{{linkUuid}}">
               <button
                 type="button"
                 class="mlh-claimed-image-link"

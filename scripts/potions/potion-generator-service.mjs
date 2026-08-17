@@ -138,7 +138,12 @@ export class PotionGeneratorService {
       const source = await fromUuid(potion.uuid);
       if (!source) throw new Error(`Potion could not be resolved: ${potion.name}`);
       const created = await this.adapter.addItemToActor(recipient, source, quantity);
-      awarded.push({ document: created, uuid: created.uuid, quantity, rarity: created.system?.rarity });
+      awarded.push({
+        document: created,
+        linkUuid: potion.uuid,
+        quantity,
+        rarity: created.system?.rarity
+      });
     }
 
     await AwardChatCardService.post({

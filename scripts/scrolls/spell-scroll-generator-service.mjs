@@ -159,16 +159,6 @@ export class SpellScrollGeneratorService {
       );
     }
 
-    const spell = spellUuid
-      ? await fromUuid(spellUuid)
-      : null;
-
-    if (!spell || spell.documentName !== "Item" || spell.type !== "spell") {
-      throw new Error(
-        "The selected spell could not be resolved."
-      );
-    }
-
     const fallback = fallbackActorUuid
       ? await fromUuid(fallbackActorUuid)
       : null;
@@ -183,66 +173,8 @@ export class SpellScrollGeneratorService {
       );
     }
 
-    const scrollTemplate = await this.#resolveScrollTemplate(level);
-
-    if (!scrollTemplate) {
-      throw new Error(
-        `No enabled D&D5e source provides a spell scroll template for ${
-          Number(level) === 0 ? "Cantrip" : `Level ${Number(level)}`
-        }.`
-      );
-    }
-
-    const ItemClass = CONFIG.Item.documentClass ?? Item;
-
-    if (typeof ItemClass.createScrollFromSpell !== "function") {
-      throw new Error(
-        "The installed D&D5e system cannot create spell scrolls."
-      );
-    }
-
-    // D&D5e's native factory performs the important part of scroll creation:
-    // it copies the spell's activities and effects, adds item-use consumption,
-    // applies the scroll attack/save values, and records its spell level. A
-    // compendium-backed spell normally takes D&D5e's UUID-reference shortcut;
-    // use a detached copy so the resulting scroll remains fully functional
-    // even when the source pack is unavailable to the receiving player.
-    const detachedSpell = new ItemClass(spell.toObject());
-    const scroll = await ItemClass.createScrollFromSpell(
-      detachedSpell,
-      {},
-      {
-        dialog: false,
-        explanation: "reference",
-        level: Number(level)
-      }
-    );
-
-    if (!scroll) {
-      throw new Error(
-        `D&D5e could not create a spell scroll for ${spell.name}.`
-      );
-    }
-
-    const data = scroll.toObject();
-    delete data._id;
-
-    const spellSourceLabel = spell.sourceLabel ?? "Craftworks";
-
-    foundry.utils.setProperty(
-      data,
-      "flags.morelord-craftworks.spellScrollGenerator",
-      {
-        spellUuid: spell.uuid,
-        spellName: spell.name,
-        spellLevel: Number(level),
-        sourcePackId: spell.pack ?? null,
-        sourceLabel: spellSourceLabel,
-        scrollTemplateUuid: scrollTemplate.uuid
-      }
-    );
-
-    const temporary = new ItemClass(data);
+    const { item: temporary, spell, sourceLabel: spellSourceLabel } =
+      await this.createScrollItem({ spellUuid, level });
 
     const created = await this.adapter.addItemToActor(
       recipient,
@@ -255,7 +187,7 @@ export class SpellScrollGeneratorService {
         recipient,
         items: [{
           document: created,
-          uuid: created.uuid,
+          linkUuid: spell.uuid,
           quantity: 1,
           rarity: created.system?.rarity
         }],
@@ -268,8 +200,48 @@ export class SpellScrollGeneratorService {
       item: created,
       recipient,
       spell,
-      sourceLabel: spellSourceLabel,
-      scrollTemplate
+      sourceLabel: spellSourceLabel
+    };
+  }
+
+  async createScrollItem({ spellUuid, level } = {}) {
+    const spell = spellUuid ? await fromUuid(spellUuid) : null;
+    if (!spell || spell.documentName !== "Item" || spell.type !== "spell") {
+      throw new Error("The selected spell could not be resolved.");
+    }
+
+    const ItemClass = CONFIG.Item.documentClass ?? Item;
+    if (typeof ItemClass.createScrollFromSpell !== "function") {
+      throw new Error("The installed D&D5e system cannot create spell scrolls.");
+    }
+
+    const numericLevel = Number(level ?? spell.system?.level ?? 0);
+    const scroll = await ItemClass.createScrollFromSpell(spell, {}, {
+      dialog: false,
+      explanation: "reference",
+      level: numericLevel
+    });
+    if (!scroll) throw new Error(`D&D5e could not create a spell scroll for ${spell.name}.`);
+
+    const data = scroll.toObject();
+    delete data._id;
+    const sourcePack = spell.pack ? game.packs.get(spell.pack) : null;
+    const sourceLabel = this.sourceFilter
+      ? this.sourceFilter.sourceLabelForItem(spell, { pack: sourcePack })
+      : "Unknown Source";
+    foundry.utils.setProperty(data, "flags.morelord-craftworks.spellScrollGenerator", {
+      spellUuid: spell.uuid,
+      spellName: spell.name,
+      spellLevel: numericLevel,
+      sourcePackId: spell.pack ?? null,
+      sourceLabel,
+      nativeScrollBaseId: CONFIG.DND5E?.spellScrollIds?.[numericLevel] ?? null
+    });
+
+    return {
+      item: new ItemClass(data),
+      spell,
+      sourceLabel
     };
   }
 
@@ -304,7 +276,7 @@ export class SpellScrollGeneratorService {
       recipient,
       items: awarded.map(result => ({
         document: result.item,
-        uuid: result.item.uuid,
+        linkUuid: result.spell.uuid,
         quantity: 1,
         rarity: result.item.system?.rarity
       })),
@@ -313,75 +285,6 @@ export class SpellScrollGeneratorService {
     });
 
     return { recipient, items: awarded, spells };
-  }
-
-  async #resolveScrollTemplate(level) {
-    const numericLevel = Number(level ?? 0);
-    const names = numericLevel === 0
-      ? [
-          "Spell Scroll, Cantrip",
-          "Spell Scroll (Cantrip)"
-        ]
-      : [
-          `Spell Scroll, Level ${numericLevel}`,
-          `Spell Scroll (${numericLevel}${
-            numericLevel === 1
-              ? "st"
-              : numericLevel === 2
-                ? "nd"
-                : numericLevel === 3
-                  ? "rd"
-                  : "th"
-          } Level)`
-        ];
-
-    const eligiblePacks = Array.from(game.packs ?? [])
-      .filter(pack =>
-        pack.documentName === "Item"
-        && this.#packEnabled(pack)
-        && (
-          !this.sourceFilter
-          || this.sourceFilter.isPackEnabled(pack)
-        )
-      );
-
-    const packs = this.sourceFilter
-      ? this.sourceFilter.sortPacks(eligiblePacks)
-      : eligiblePacks;
-
-    for (const pack of packs) {
-
-      let index;
-
-      try {
-        index = await pack.getIndex({
-          fields: ["name", "img", "type"]
-        });
-      } catch {
-        continue;
-      }
-
-      for (const name of names) {
-        const target = this.#normalizeName(name);
-        const row = index.find(entry =>
-          this.#normalizeName(entry.name) === target
-        );
-
-        if (!row) continue;
-
-        const item = await pack.getDocument(row._id);
-        if (item?.documentName === "Item") return item;
-      }
-    }
-
-    return null;
-  }
-
-  #normalizeName(value) {
-    return String(value ?? "")
-      .normalize("NFKD")
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, "");
   }
 
   #packEnabled(pack) {

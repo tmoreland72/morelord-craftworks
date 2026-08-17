@@ -3,10 +3,8 @@ import { weightedPick } from "./random-choice.mjs";
 /**
  * Special treasure is intentionally self-contained.
  *
- * It never requires add-on RollTables or any add-on module.
- * Eligible items come from:
- *   1. World Items with a D&D5e rarity; and
- *   2. Item compendiums shipped by the active game system itself.
+ * It never requires add-on RollTables. Eligible magic items come only from
+ * visible Item compendiums enabled by D&D5e Configure Sources.
  */
 
 const RARITY_PROFILES_BY_CR = [
@@ -57,9 +55,9 @@ const RARITY_ORDER = [
 
 export class SpecialTreasureService {
   constructor({ sourceFilter = null } = {}) {
-    // Retained for API compatibility with existing construction code.
     this.sourceFilter = sourceFilter;
     this._itemPool = null;
+    this._sourceSignature = null;
   }
 
   async rollForEncounter(maxCR) {
@@ -168,8 +166,10 @@ export class SpecialTreasureService {
   }
 
   async #getItemPool() {
-    if (!this._itemPool) {
+    const sourceSignature = JSON.stringify(this.sourceFilter?.configuration ?? {});
+    if (!this._itemPool || this._sourceSignature !== sourceSignature) {
       this._itemPool = await this.#buildItemPool();
+      this._sourceSignature = sourceSignature;
     }
     return this._itemPool;
   }
@@ -178,31 +178,12 @@ export class SpecialTreasureService {
     const entries = [];
     const seen = new Set();
 
-    for (const item of Array.from(game.items ?? [])) {
-      if (!this.#isEligibleItem(item)) continue;
-
-      const rarity = this.#normalizeRarity(item.system?.rarity);
-      if (!rarity) continue;
-
-      const key = this.#key(item.name, rarity);
-      if (seen.has(key)) continue;
-      seen.add(key);
-
-      entries.push({
-        id: item.id,
-        uuid: item.uuid,
-        name: item.name,
-        img: item.img ?? "",
-        rarity,
-        sourceLabel: "World"
-      });
-    }
-
-    const systemPacks = Array.from(game.packs ?? [])
+    const eligiblePacks = Array.from(game.packs ?? [])
       .filter(pack => pack.documentName === "Item")
-      .filter(pack => this.#isSystemPack(pack));
+      .filter(pack => pack.visible !== false)
+      .filter(pack => this.sourceFilter?.isPackEnabled(pack) ?? true);
 
-    for (const pack of systemPacks) {
+    for (const pack of eligiblePacks) {
       try {
         const index = await pack.getIndex({
           fields: [
@@ -210,6 +191,8 @@ export class SpecialTreasureService {
             "img",
             "type",
             "system.rarity",
+            "system.source.book",
+            "system.source.custom",
             "flags.morelord-craftworks.materialId"
           ]
         });
@@ -230,14 +213,9 @@ export class SpecialTreasureService {
             name: row.name,
             img: row.img ?? "",
             rarity,
-            sourceLabel:
-              pack.collection === "dnd5e.equipment24"
-                ? "D&D 5e SRD 5.2"
-                : String(
-                    pack.metadata?.label
-                    ?? pack.title
-                    ?? "D&D 5e System"
-                  )
+            sourceLabel: this.sourceFilter
+              ?.sourceLabelForItem(row, { pack })
+              ?? "Unknown Source"
           });
         }
       } catch (error) {
@@ -248,10 +226,6 @@ export class SpecialTreasureService {
       }
     }
 
-    console.log(
-      `Morelord Craftworks | Indexed ${entries.length} self-contained special-treasure magic item(s) from World Items and system compendiums.`
-    );
-
     return entries;
   }
 
@@ -259,21 +233,6 @@ export class SpecialTreasureService {
     if (!item || item.documentName !== "Item") return false;
     if (item.getFlag?.("morelord-craftworks", "materialId")) return false;
     return Boolean(this.#normalizeRarity(item.system?.rarity));
-  }
-
-  #isSystemPack(pack) {
-    const packageType = String(pack.metadata?.packageType ?? "").toLowerCase();
-    const packageName = String(
-      pack.metadata?.packageName
-      ?? pack.metadata?.package
-      ?? ""
-    ).toLowerCase();
-    const collection = String(pack.collection ?? "").toLowerCase();
-    const systemId = String(game.system?.id ?? "").toLowerCase();
-
-    return packageType === "system"
-      || packageName === systemId
-      || collection.startsWith(`${systemId}.`);
   }
 
   #normalizeRarity(value) {

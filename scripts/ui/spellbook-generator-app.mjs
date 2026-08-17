@@ -76,7 +76,8 @@ export class SpellbookGeneratorApp
         )
         .map(actor => ({
           uuid: actor.uuid,
-          name: actor.name
+          name: actor.name,
+          selected: actor.uuid === partyInfo.actorUuid
         }))
         .sort(
           (a, b) =>
@@ -301,28 +302,17 @@ export class SpellbookGeneratorApp
       return;
     }
 
-    const partyInfo =
-      await this.craftworks.materialService
-        .getPartyRecipientInfo();
+    const fallbackActorUuid =
+      this.element.querySelector(
+        "[name='recipient']"
+      )?.value
+      ?? null;
 
-    let fallbackActorUuid = null;
-
-    if (
-      !partyInfo.enabled
-      || !partyInfo.valid
-    ) {
-      fallbackActorUuid =
-        this.element.querySelector(
-          "[name='recipient']"
-        )?.value
-        ?? null;
-
-      if (!fallbackActorUuid) {
-        ui.notifications.warn(
-          "Choose a recipient."
-        );
-        return;
-      }
+    if (!fallbackActorUuid) {
+      ui.notifications.warn(
+        "Choose a recipient."
+      );
+      return;
     }
 
     this.bookName =

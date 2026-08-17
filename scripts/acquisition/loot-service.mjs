@@ -6,6 +6,8 @@ import { randomInt, weightedPick } from "./random-choice.mjs";
 import { tierForCreatureCR } from "./loot-profiles.mjs";
 
 const LOOT_FLAG = "lootResolved";
+const MAGIC_LOOT_CHANCE = 25;
+const POTION_SHARE = 60;
 
 export class LootService {
   constructor({
@@ -15,7 +17,9 @@ export class LootService {
     sessions,
     recipientResolver,
     specialTreasure,
-    contentPacks = null
+    contentPacks = null,
+    potionGenerator = null,
+    spellScrollGenerator = null
   }) {
     this.adapter = adapter;
     this.materialRegistry = materialRegistry;
@@ -24,6 +28,8 @@ export class LootService {
     this.recipientResolver = recipientResolver;
     this.specialTreasure = specialTreasure;
     this.contentPacks = contentPacks;
+    this.potionGenerator = potionGenerator;
+    this.spellScrollGenerator = spellScrollGenerator;
   }
 
   getDeadCreatureSummary() {
@@ -44,6 +50,19 @@ export class LootService {
     const tokens = this.adapter.getDeadCreatureTokens();
     await Promise.all(tokens.map(token => token.document.unsetFlag(MODULE_ID, LOOT_FLAG)));
     return tokens.length;
+  }
+
+  async reroll(sessionId) {
+    const session = this.#requireOpen(sessionId);
+    if (session.result?.awarded) throw new Error("Awarded encounter loot cannot be rerolled.");
+
+    await Promise.all(session.creatures.map(async creature => {
+      const token = await fromUuid(creature.tokenUuid);
+      await token?.unsetFlag(MODULE_ID, LOOT_FLAG);
+    }));
+
+    session.result = null;
+    return this.roll(sessionId);
   }
 
   async start({ creatureContexts = null } = {}) {
@@ -77,8 +96,12 @@ export class LootService {
     const specialEnabled = Boolean(getSetting(SETTINGS.LOOT_ENABLE_SPECIAL));
 
     const materials = [];
+    const potions = [];
+    const spellScrolls = [];
     const coins = { pp: 0, gp: 0, ep: 0, sp: 0, cp: 0 };
     const rolls = [];
+    const potionPool = await this.potionGenerator?.availablePotions?.() ?? [];
+    const spellPool = await this.spellScrollGenerator?.availableSpells?.() ?? [];
 
     let maxCR = 0;
 
@@ -107,6 +130,17 @@ export class LootService {
 
       const materialRoll = materialsEnabled ? randomInt(1, 100) : null;
       const coinRoll = coinEnabled ? randomInt(1, 100) : null;
+      const hasMagicLoot = potionPool.length || spellPool.length;
+      const magicLootRoll = hasMagicLoot ? randomInt(1, 100) : null;
+      const magicLootTypeRoll = magicLootRoll != null && magicLootRoll <= MAGIC_LOOT_CHANCE
+        ? randomInt(1, 100)
+        : null;
+      const potionChance = potionPool.length
+        ? (spellPool.length ? MAGIC_LOOT_CHANCE * POTION_SHARE / 100 : MAGIC_LOOT_CHANCE)
+        : 0;
+      const spellScrollChance = spellPool.length
+        ? (potionPool.length ? MAGIC_LOOT_CHANCE - potionChance : MAGIC_LOOT_CHANCE)
+        : 0;
 
       const entry = {
         tokenUuid: creature.tokenUuid,
@@ -118,8 +152,14 @@ export class LootService {
         coinEnabled,
         coinChance,
         coinRoll,
+        potionChance,
+        potionRoll: magicLootRoll,
+        spellScrollChance,
+        spellScrollRoll: magicLootRoll,
         material: null,
-        coin: null
+        coin: null,
+        potion: null,
+        spellScroll: null
       };
 
       // Materials: most common outcome.
@@ -141,6 +181,7 @@ export class LootService {
             materialId: picked.materialId,
             name: material?.name ?? picked.materialId,
             img: material?.img ?? "",
+            uuid: material?.uuid ?? null,
             quantity
           };
 
@@ -160,6 +201,19 @@ export class LootService {
         this.#addCopperToCurrency(coins, copper);
       }
 
+      if (magicLootTypeRoll != null) {
+        const choosePotion = potionPool.length && (
+          !spellPool.length || magicLootTypeRoll <= POTION_SHARE
+        );
+        if (choosePotion) {
+          entry.potion = this.#pickPotion(potionPool, cr);
+          if (entry.potion) potions.push(foundry.utils.deepClone(entry.potion));
+        } else {
+          entry.spellScroll = this.#pickSpellScroll(spellPool, cr);
+          if (entry.spellScroll) spellScrolls.push(foundry.utils.deepClone(entry.spellScroll));
+        }
+      }
+
       rolls.push(entry);
 
       // Persist the per-corpse result so reopening Loot cannot farm it.
@@ -168,7 +222,9 @@ export class LootService {
         await token.setFlag(MODULE_ID, LOOT_FLAG, {
           resolvedAt: Date.now(),
           material: entry.material,
-          coin: entry.coin
+          coin: entry.coin,
+          potion: entry.potion,
+          spellScroll: entry.spellScroll
         });
       }
     }
@@ -212,8 +268,11 @@ export class LootService {
         coin: coinEnabled,
         special: specialEnabled
       },
-      found: materials.length > 0 || totalCopper > 0 || Boolean(special.itemUuid),
+      found: materials.length > 0 || potions.length > 0 || spellScrolls.length > 0
+        || totalCopper > 0 || Boolean(special.itemUuid),
       materials,
+      potions,
+      spellScrolls,
       coins,
       coinTotalCopper: totalCopper,
       coinLabel: this.adapter.formatCopper(totalCopper),
@@ -258,6 +317,22 @@ export class LootService {
         quantity: material.quantity,
         rarity: source.system?.rarity
       });
+    }
+
+    for (const potion of result.potions ?? []) {
+      const source = await fromUuid(potion.uuid);
+      if (!source) throw new Error(`Potion could not be resolved: ${potion.name}`);
+      const created = await this.adapter.addItemToActor(recipient, source, 1);
+      awardedItems.push({ document: created, linkUuid: potion.uuid, quantity: 1, rarity: created.system?.rarity });
+    }
+
+    for (const spell of result.spellScrolls ?? []) {
+      const generated = await this.spellScrollGenerator.createScrollItem({
+        spellUuid: spell.uuid,
+        level: spell.level
+      });
+      const created = await this.adapter.addItemToActor(recipient, generated.item, 1);
+      awardedItems.push({ document: created, linkUuid: spell.uuid, quantity: 1, rarity: created.system?.rarity });
     }
 
     if (result.coinTotalCopper > 0) {
@@ -327,6 +402,30 @@ export class LootService {
 
   #clampChance(value) {
     return Math.max(0, Math.min(100, Number(value ?? 0)));
+  }
+
+  #pickPotion(pool, cr) {
+    const allowed = cr >= 17
+      ? ["rare", "veryRare", "legendary"]
+      : cr >= 11
+        ? ["uncommon", "rare", "veryRare"]
+        : cr >= 5
+          ? ["common", "uncommon", "rare"]
+          : ["common", "uncommon"];
+    const candidates = pool.filter(potion => allowed.includes(potion.rarity));
+    const source = candidates.length ? candidates : pool;
+    return source.length
+      ? foundry.utils.deepClone(source[Math.floor(Math.random() * source.length)])
+      : null;
+  }
+
+  #pickSpellScroll(pool, cr) {
+    const [min, max] = cr >= 17 ? [5, 9] : cr >= 11 ? [3, 6] : cr >= 5 ? [1, 4] : [0, 2];
+    const candidates = pool.filter(spell => Number(spell.level) >= min && Number(spell.level) <= max);
+    const source = candidates.length ? candidates : pool;
+    return source.length
+      ? foundry.utils.deepClone(source[Math.floor(Math.random() * source.length)])
+      : null;
   }
 
   #rollCoinCopper({ minGp, maxGp }) {

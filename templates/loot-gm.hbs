@@ -50,6 +50,7 @@
     <div class="mcw-browser-results">
       <div class="mcw-panel">
         <h3>Corpse Results</h3>
+        <div class="mcw-loot-roll-list">
         {{#each session.result.rolls}}
           <div class="mcw-loot-roll">
             <div>
@@ -60,7 +61,7 @@
             <div class="mcw-loot-roll-result">
               {{#if materialsEnabled}}
                 {{#if material}}
-                  <span class="mcw-result">
+                  <span class="mcw-result" data-document-uuid="{{material.uuid}}">
                     <img src="{{material.img}}" alt="{{material.name}}">
                     {{material.name}} ×{{material.quantity}}
                   </span>
@@ -76,9 +77,18 @@
                   <span>No coin</span>
                 {{/if}}
               {{/if}}
+
+              {{#if potion}}
+                <span class="mcw-result" data-document-uuid="{{potion.uuid}}"><img src="{{potion.img}}" alt="{{potion.name}}">{{potion.name}}</span>
+              {{/if}}
+
+              {{#if spellScroll}}
+                <span class="mcw-result" data-document-uuid="{{spellScroll.uuid}}"><img src="{{spellScroll.img}}" alt="{{spellScroll.name}}">Spell Scroll: {{spellScroll.name}}</span>
+              {{/if}}
             </div>
           </div>
         {{/each}}
+        </div>
       </div>
 
       <div class="mcw-panel">
@@ -88,7 +98,7 @@
           {{#if session.result.materials.length}}
             <div class="mcw-loot-summary-grid">
               {{#each session.result.materials}}
-                <div class="mcw-result">
+                <div class="mcw-result" data-document-uuid="{{uuid}}">
                   <img src="{{img}}" alt="{{name}}">
                   <strong>{{name}} ×{{quantity}}</strong>
                 </div>
@@ -97,6 +107,16 @@
           {{else}}
             <p>No Craftworks materials were recovered.</p>
           {{/if}}
+        {{/if}}
+
+        {{#if session.result.potions.length}}
+          <h4>Potions</h4>
+          <div class="mcw-loot-summary-grid">{{#each session.result.potions}}<div class="mcw-result" data-document-uuid="{{uuid}}"><img src="{{img}}" alt="{{name}}"><strong>{{name}}</strong></div>{{/each}}</div>
+        {{/if}}
+
+        {{#if session.result.spellScrolls.length}}
+          <h4>Spell Scrolls</h4>
+          <div class="mcw-loot-summary-grid">{{#each session.result.spellScrolls}}<div class="mcw-result" data-document-uuid="{{uuid}}"><img src="{{img}}" alt="{{name}}"><strong>Spell Scroll: {{name}}</strong></div>{{/each}}</div>
         {{/if}}
 
         {{#if session.result.channels.coin}}
@@ -112,7 +132,7 @@
             <strong>Special Treasure</strong>
             {{#if session.result.special.triggered}}
               {{#if session.result.special.itemUuid}}
-                <div class="mcw-result mcw-special-result">
+                <div class="mcw-result mcw-special-result" data-document-uuid="{{session.result.special.itemUuid}}">
                   <img src="{{session.result.special.itemImg}}" alt="{{session.result.special.itemName}}">
                   <div>
                     <strong>{{session.result.special.itemName}}</strong>
@@ -137,25 +157,22 @@
 
       <div class="mcw-panel">
         <h3>Recipient</h3>
-        {{#if partyInfo.enabled}}
-          {{#if partyInfo.valid}}
-            <p>Encounter loot will be sent to <strong>{{partyInfo.actorName}}</strong>.</p>
-          {{else}}
-            <p class="mcw-warning">Party Recipient is enabled but no valid Party/Group actor is configured.</p>
-          {{/if}}
-        {{else}}
-          <label>
-            Party Carrier
-            <select name="recipient">
-              <option value="">Choose character…</option>
-              {{#each actors}}<option value="{{uuid}}">{{name}}</option>{{/each}}
-            </select>
-          </label>
-        {{/if}}
+        <label>
+          Reward Recipient
+          <select name="recipient">
+            <option value="">Choose character or group…</option>
+            {{#each actors}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
+          </select>
+        </label>
+        {{#if partyInfo.valid}}<p class="mcw-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
 
-        <button type="button" data-action="award" {{#unless session.result.found}}disabled{{/unless}}>
-          <i class="fa-solid fa-box-open"></i> Award Encounter Loot
-        </button>
+        <div class="mcw-actions">
+          <button type="button" data-action="reroll-loot"><i class="fa-solid fa-dice"></i> Reroll</button>
+          <button type="button" data-action="reset-loot"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+          <button type="button" data-action="award" {{#unless session.result.found}}disabled{{/unless}}>
+            <i class="fa-solid fa-box-open"></i> Award Encounter Loot
+          </button>
+        </div>
 
         {{#unless session.result.found}}
           <button type="button" data-action="finish">Finish</button>

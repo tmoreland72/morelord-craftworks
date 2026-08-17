@@ -244,6 +244,10 @@
   margin-bottom: 10px;
 }
 
+.mcw .mcw-loot-roll-list {
+  display: block;
+}
+
 .mcw .mcw-loot-roll {
   display: grid;
   grid-template-columns: minmax(140px, 0.8fr) 1.6fr;
@@ -1008,7 +1012,6 @@
   cursor: pointer;
 }
 
-.mcw .mcw-material-link:hover,
 .mcw .mcw-material-link:focus-visible {
   text-decoration-style: solid;
 }
@@ -1056,7 +1059,6 @@
   border-radius: 4px;
 }
 
-.mcw .mcw-material-icon-link:hover img,
 .mcw .mcw-material-icon-link:focus-visible img {
   outline: 1px solid var(--color-border-highlight, currentColor);
   outline-offset: 1px;
@@ -1205,7 +1207,6 @@
   cursor: pointer;
 }
 
-.mcw .mcw-foundry-output-link:hover img,
 .mcw .mcw-foundry-output-link:focus-visible img {
   outline: 1px solid var(--color-border-highlight, currentColor);
   outline-offset: 1px;
@@ -2090,7 +2091,6 @@
   text-align: left;
 }
 
-.mcw .mcw-special-item-link:hover,
 .mcw .mcw-special-item-link:focus-visible {
   border-color: var(
     --color-border-highlight,
@@ -2531,6 +2531,163 @@
 
 .mcw .mcw-craft-inventory-note {
   margin-top: 8px;
+}
+
+/* Craft browser — one independent scrollbar per column. */
+.mcw-craft-window .window-content {
+  min-height: 0;
+  overflow: hidden !important;
+}
+
+.mcw .mcw-craft-browser {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.mcw .mcw-craft-browser-header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.mcw .mcw-craft-result-count {
+  flex: 0 0 auto;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.mcw .mcw-craft-browser-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.mcw .mcw-craft-filter-rail,
+.mcw .mcw-craft-results {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.mcw .mcw-craft-actor-controls {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(197, 160, 91, 0.22);
+}
+
+.mcw .mcw-craft-actor-controls label {
+  display: grid;
+  gap: 5px;
+}
+
+.mcw .mcw-craft-actor-controls label > span,
+.mcw .mcw-craft-session-summary h3 {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  opacity: .8;
+}
+
+.mcw .mcw-craft-results-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.mcw .mcw-craft-results-heading h2,
+.mcw .mcw-craft-results-heading p {
+  margin: 0;
+}
+
+.mcw .mcw-craft-results-heading p {
+  margin-top: 3px;
+  opacity: .72;
+}
+
+.mcw .mcw-craft-browser-list {
+  margin-top: 0;
+  padding-bottom: 8px;
+}
+
+.mcw .mcw-craft-list-card {
+  border-left: 3px solid rgba(180, 180, 180, .4);
+}
+
+.mcw .mcw-craft-list-card.is-ready { border-left-color: rgba(93, 173, 112, .9); }
+.mcw .mcw-craft-list-card.is-active { border-left-color: rgba(105, 151, 220, .9); }
+.mcw .mcw-craft-list-card.is-missing { border-left-color: rgba(191, 82, 82, .72); }
+
+.mcw .mcw-craft-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .06);
+  font-size: .72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.mcw .mcw-craft-status-badge.is-ready { color: #a8dfb5; }
+.mcw .mcw-craft-status-badge.is-active { color: #b7d4ff; }
+.mcw .mcw-craft-status-badge.is-missing { color: #e3aaaa; }
+
+.mcw .mcw-craft-list-card-body {
+  display: block;
+}
+
+.mcw .mcw-craft-requirement-row > img {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.mcw .mcw-craft-requirement-row > i {
+  text-align: center;
+  opacity: .55;
+}
+
+.mcw .mcw-craft-session-summary {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(197, 160, 91, 0.22);
+}
+
+.mcw .mcw-craft-session-summary .mcw-craft-session-log {
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.mcw .mcw-craft-session-summary .mcw-craft-log-entry {
+  grid-template-columns: 1fr;
+  gap: 2px;
+  padding: 7px 0;
+  font-size: .72rem;
+}
+
+@media (max-width: 800px) {
+  .mcw .mcw-craft-browser-body {
+    grid-template-columns: 230px minmax(0, 1fr);
+  }
 }
 
 @media (max-width: 720px) {
@@ -3790,13 +3947,29 @@
   color: #f2eee6;
 }
 
-.chat-message .mcw-award-card-item-name .content-link:hover,
-.chat-message .mcw-award-card-item-name a:hover {
-  color: #ffffff;
+.mcw [data-document-uuid],
+.chat-message [data-mcw-link-target],
+.chat-message .mcw-award-card-item-name .content-link,
+.chat-message .mcw-award-card-item-name a,
+.chat-message a.mcw-award-card-item.content-link,
+.chat-message .mcw-chat-card .content-link,
+.chat-message .mcw-chat-card a {
+  cursor: pointer;
 }
 
 .chat-message .mcw-award-card-item-rarity {
   color: rgba(242, 238, 230, 0.72);
+}
+
+.chat-message .mcw-award-card-item,
+.chat-message .mcw-award-card-item:hover {
+  color: #f2eee6 !important;
+  background: rgba(8, 8, 13, 0.72) !important;
+  text-decoration: none !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transform: none !important;
 }
 
 /* Configurable Gathering terrain DCs */
@@ -4631,9 +4804,13 @@
   opacity: .75;
 }
 
-.mcw-market-limit-message strong,
-.mcw-market-limit-message span {
+.mcw-market-limit-message > div > strong,
+.mcw-market-limit-message > div > span {
   display: block;
+}
+
+.mcw-market-limit-message > div > span strong {
+  display: inline;
 }
 
 .mcw-market-limit-message span {
@@ -4882,6 +5059,49 @@
   border: 1px solid rgba(197, 160, 91, 0.22);
   border-radius: 7px;
   text-align: left;
+}
+
+/* Window scrolling policy: page content uses one outer scrollbar only. */
+.morelord-craftworks.mcw-window .window-content {
+  min-height: 0;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  scrollbar-gutter: stable;
+}
+
+.morelord-craftworks.mcw-window .mcw.app-shell,
+.morelord-craftworks.mcw-window .mcw-browser-shell,
+.morelord-craftworks.mcw-window .mcw-browser-results,
+.morelord-craftworks.mcw-window .mcw-dashboard,
+.morelord-craftworks.mcw-window .mcw-reference-list,
+.morelord-craftworks.mcw-window .mcw-harvest-creature-list,
+.morelord-craftworks.mcw-window .mcw-content-packs-shell,
+.morelord-craftworks.mcw-window .mcw-content-pack-list,
+.morelord-craftworks.mcw-window .mcw-settings-form,
+.morelord-craftworks.mcw-window .mcw-craft-browser,
+.morelord-craftworks.mcw-window .mcw-craft-browser-body,
+.morelord-craftworks.mcw-window .mcw-craft-filter-rail,
+.morelord-craftworks.mcw-window .mcw-craft-results,
+.morelord-craftworks.mcw-window .mcw-craft-completion-description,
+.morelord-craftworks.mcw-window .mcw-harvest-modern .mlh-creatures,
+.morelord-craftworks.mcw-window .mcw-spellbook-generator,
+.morelord-craftworks.mcw-window .mcw-spellbook-preview,
+.morelord-craftworks.mcw-window .mcw-spellbook-results-scroll,
+.morelord-craftworks.mcw-window .mcw-potion-generator,
+.morelord-craftworks.mcw-window .mcw-potion-results-scroll,
+.morelord-craftworks.mcw-window .mcw-spell-scroll-generator,
+.morelord-craftworks.mcw-window .mcw-generator-results,
+.morelord-craftworks.mcw-window .mcw-marketplace-browser,
+.morelord-craftworks.mcw-window .mcw-marketplace-browser-body,
+.morelord-craftworks.mcw-window .mcw-filter-rail,
+.morelord-craftworks.mcw-window .mcw-marketplace-results,
+.morelord-craftworks.mcw-window .mcw-loot-creatures,
+.morelord-craftworks.mcw-window .mcw-loot-roll-list {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  overscroll-behavior: auto !important;
+  scrollbar-gutter: auto;
 }
 
 .mcw-generator-count-row span,

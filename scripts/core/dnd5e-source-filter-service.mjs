@@ -105,16 +105,23 @@ export class Dnd5eSourceFilterService {
       return "SRD 5.1";
     }
 
-    const label = String(
-      pack?.metadata?.label
-      ?? pack?.title
-      ?? pack?.metadata?.name
-      ?? pack?.collection
-      ?? packOrCollection
-      ?? "Unknown Source"
-    ).trim();
+    const candidates = [
+      pack?.metadata?.sourceBook,
+      pack?.metadata?.book,
+      pack?.metadata?.label,
+      pack?.title,
+      pack?.metadata?.name
+    ];
 
-    return label || "Unknown Source";
+    for (const candidate of candidates) {
+      const label = this.#usableSourceLabel(candidate);
+      if (label) return label;
+    }
+
+    const packageName = pack?.metadata?.packageName ?? pack?.metadata?.package;
+    const packageTitle = game.modules?.get(packageName)?.title;
+
+    return this.#usableSourceLabel(packageTitle) ?? "Unknown Source";
   }
 
   sourceLabelForItem(itemData, { pack = null } = {}) {
@@ -122,13 +129,23 @@ export class Dnd5eSourceFilterService {
     const book = typeof source === "object" && source ? source.book : null;
     const custom = typeof source === "object" && source ? source.custom : null;
 
-    if (book) return this.#sourceBookLabel(book);
+    if (book) {
+      const label = this.#usableSourceLabel(this.#sourceBookLabel(book));
+      if (label) return label;
+    }
 
-    if (custom) return String(custom).trim();
-    if (typeof source === "string" && source.trim()) return source.trim();
+    const customLabel = this.#usableSourceLabel(custom);
+    if (customLabel) return customLabel;
+    const stringLabel = typeof source === "string"
+      ? this.#usableSourceLabel(source)
+      : null;
+    if (stringLabel) return stringLabel;
 
     const packSourceBook = pack?.metadata?.sourceBook;
-    if (packSourceBook) return this.#sourceBookLabel(packSourceBook);
+    if (packSourceBook) {
+      const label = this.#usableSourceLabel(this.#sourceBookLabel(packSourceBook));
+      if (label) return label;
+    }
 
     const collection = String(pack?.collection ?? "").toLowerCase();
     if (collection === "dnd5e.equipment24" || collection === "dnd5e.spells24") {
@@ -142,12 +159,12 @@ export class Dnd5eSourceFilterService {
       return "SRD 5.1";
     }
 
-    return "Craftworks";
+    return this.sourceLabelForPack(pack);
   }
 
   async sourceLabelForCompendiumItem(itemData, { pack = null } = {}) {
     const indexedLabel = this.sourceLabelForItem(itemData, { pack });
-    if (indexedLabel !== "Craftworks" || !pack || !itemData?._id) {
+    if (indexedLabel !== "Unknown Source" || !pack || !itemData?._id) {
       return indexedLabel;
     }
 
@@ -161,7 +178,7 @@ export class Dnd5eSourceFilterService {
       );
     }
 
-    return "Craftworks";
+    return this.sourceLabelForPack(pack);
   }
 
   #sourceBookLabel(book) {
@@ -323,5 +340,26 @@ export class Dnd5eSourceFilterService {
       .trim()
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "");
+  }
+
+  #usableSourceLabel(value) {
+    const raw = String(value ?? "").trim();
+    if (!raw) return null;
+
+    const normalized = raw
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+
+    const genericPackLabels = new Set([
+      "item", "items", "equipment", "spell", "spells", "monster", "monsters",
+      "actor", "actors", "journal", "journals", "table", "tables", "roll tables",
+      "adventure", "adventures", "class", "classes", "feature", "features"
+    ]);
+
+    if (genericPackLabels.has(normalized)) return null;
+    if (/^(?:d d|dnd)\s*5e\s*srd\s*5\s*2$/.test(normalized)) return "SRD 5.2";
+    if (/^(?:d d|dnd)\s*5e\s*srd\s*5\s*1$/.test(normalized)) return "SRD 5.1";
+    return raw;
   }
 }

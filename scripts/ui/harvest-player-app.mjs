@@ -193,6 +193,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
 
           return {
             ...component,
+            itemUuid: material?.uuid ?? null,
             componentName: component.componentName ?? component.name,
             category:
               component.category

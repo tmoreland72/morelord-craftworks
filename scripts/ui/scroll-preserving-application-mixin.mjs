@@ -4,6 +4,26 @@
  */
 export function ScrollPreservingApplicationMixin(Base) {
   return class ScrollPreservingApplication extends Base {
+    async _onRender(context, options) {
+      await super._onRender?.(context, options);
+
+      this.element?.querySelectorAll("[data-document-uuid]")
+        .forEach(element => element.addEventListener("click", async event => {
+          const nestedControl = event.target.closest("button, a, input, select, textarea");
+          if (nestedControl && nestedControl !== event.currentTarget) return;
+          event.preventDefault();
+          const uuid = event.currentTarget.dataset.documentUuid;
+          if (!uuid) return;
+          try {
+            const document = await fromUuid(uuid);
+            if (!document) throw new Error("Document not found");
+            document.sheet?.render(true);
+          } catch {
+            ui.notifications.warn("The source Item could not be opened.");
+          }
+        }));
+    }
+
     async render(options = {}) {
       const scrollState =
         captureScrollState(this.element);

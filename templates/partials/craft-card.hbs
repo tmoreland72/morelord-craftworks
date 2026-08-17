@@ -82,7 +82,7 @@
                 <div class="mcw-craft-alternative-group">
                   <strong>Choose one:</strong>
                   {{#each alternativeRows}}
-                    <div class="mcw-craft-requirement-row {{#if inventory.ready}}mcw-ready{{else}}mcw-missing{{/if}}">
+                    <div class="mcw-craft-requirement-row {{#if inventory.ready}}mcw-ready{{else}}mcw-missing{{/if}}" data-document-uuid="{{materialUuid}}">
                       {{#if materialImg}}
                         {{#if materialId}}
                           <button type="button"
@@ -109,7 +109,7 @@
                   {{/each}}
                 </div>
               {{else}}
-                <div class="mcw-craft-requirement-row {{#if inventory.ready}}mcw-ready{{else}}mcw-missing{{/if}}">
+                <div class="mcw-craft-requirement-row {{#if inventory.ready}}mcw-ready{{else}}mcw-missing{{/if}}" data-document-uuid="{{materialUuid}}">
                   {{#if materialImg}}
                     {{#if materialId}}
                       <button type="button"

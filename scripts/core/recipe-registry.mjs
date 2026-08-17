@@ -18,7 +18,6 @@ export class RecipeRegistry {
       this._recipes.set(recipe.id, recipe);
     }
 
-    console.log(`Morelord Craftworks | Indexed ${this._recipes.size} recipe definitions.`);
     return this._recipes.size;
   }
 

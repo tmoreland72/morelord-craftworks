@@ -1,6 +1,11 @@
 import { SystemAdapter } from "../core/system-adapter.mjs";
 
 export class Dnd5eAdapter extends SystemAdapter {
+  constructor({ sourceFilter = null } = {}) {
+    super();
+    this.sourceFilter = sourceFilter;
+  }
+
   getActorForUser(user) {
     const controlled = canvas?.tokens?.controlled ?? [];
     const ownedControlled = controlled.find(t => t.actor?.isOwner);
@@ -176,6 +181,16 @@ export class Dnd5eAdapter extends SystemAdapter {
 
   async addItemToActor(actor, sourceItem, quantity = 1) {
     if (!actor || !sourceItem) throw new Error("Actor and source Item are required.");
+
+    if (
+      sourceItem.pack
+      && this.sourceFilter
+      && !this.sourceFilter.isPackEnabled(sourceItem.pack)
+    ) {
+      throw new Error(
+        `${sourceItem.name} cannot be awarded because its compendium is disabled in D&D5e Configure Sources.`
+      );
+    }
 
     const materialId = sourceItem.getFlag?.("morelord-craftworks", "materialId");
     const existing = actor.items.find(item =>

@@ -4,6 +4,7 @@ import {
   setHiddenRecipeIds
 } from "../core/settings.mjs";
 import { bindMultiselectBehavior } from "./multiselect-behavior.mjs";
+import { buildMaterialTagGroups } from "./material-filter-groups.mjs";
 
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 
@@ -94,8 +95,14 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     const rarityFilters =
       this.#buildRarityFilters();
 
-    const ingredientTags =
+    const rawIngredientTags =
       this.#ingredientTags();
+    const ingredientTagGroups = buildMaterialTagGroups(rawIngredientTags, {
+      included: this.selectedIngredientTags,
+      excluded: this.excludedIngredientTags
+    });
+    const ingredientTags = ingredientTagGroups
+      .flatMap(group => group.options.map(option => option.id));
 
     const raritySet =
       new Set(
@@ -133,9 +140,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     const totalRecipeCount =
       this.craftworks.recipes.all().length;
     const prospectiveCount = matchingRecipes.length;
-    const prospectiveCountLabel = prospectiveCount > 500
-      ? "500+"
-      : String(prospectiveCount);
+    const prospectiveCountLabel = String(prospectiveCount);
     const hasSearchCriteria = Boolean(
       this.search.trim()
       || this.selectedPackIds.length
@@ -150,13 +155,14 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       || this.unknownFilterState !== 0
     );
 
-    const autoShowResults =
-      matchingRecipes.length <= 100;
-
-    const recipes =
-      autoShowResults
-        ? matchingRecipes
-        : [];
+    const displayLimit = 300;
+    const autoShowResults = true;
+    const recipes = [...matchingRecipes]
+      .sort((a, b) =>
+        String(a.category ?? "").localeCompare(String(b.category ?? ""))
+        || a.name.localeCompare(b.name)
+      )
+      .slice(0, displayLimit);
 
     const preparedRecipes = await Promise.all(recipes.map(async recipe => {
       const readiness = this.craftworks.recipePlanner.plan(recipe, actor);
@@ -293,6 +299,8 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
                 materialView.materialId,
               materialImg:
                 materialView.img,
+              materialUuid:
+                materialView.uuid,
               tooltip: requirement.display,
               displayLabel:
                 materialView.label
@@ -315,6 +323,8 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
                         altMaterialView.materialId,
                       materialImg:
                         altMaterialView.img,
+                      materialUuid:
+                        altMaterialView.uuid,
                       tooltip: alternative.display,
                       displayLabel:
                         altMaterialView.label
@@ -425,23 +435,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         })
       ),
 
-      ingredientTags: ingredientTags.map(tag => ({
-        id: tag,
-        label: tag
-          .split("-")
-          .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-          .join(" "),
-        state:
-          this.selectedIngredientTags.includes(tag)
-            ? 1
-            : this.excludedIngredientTags.includes(tag)
-              ? -1
-              : 0,
-        included:
-          this.selectedIngredientTags.includes(tag),
-        excluded:
-          this.excludedIngredientTags.includes(tag)
-      })),
+      ingredientTagGroups,
 
       categories: Array.from(
         new Set(
@@ -513,8 +507,8 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         autoShowResults,
       autoShowResults,
       overDisplayLimit:
-        prospectiveCount > 100,
-      displayLimit: 100,
+        prospectiveCount > displayLimit,
+      displayLimit,
       recipeGroups,
       hasRecipes: preparedRecipes.length > 0,
       canManageRecipeVisibility: game.user.isGM,
@@ -544,6 +538,9 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
           ?? match.materialId,
         img:
           material?.img
+          ?? null,
+        uuid:
+          material?.uuid
           ?? null,
         label:
           material?.name

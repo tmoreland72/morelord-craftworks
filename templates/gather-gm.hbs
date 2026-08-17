@@ -17,7 +17,7 @@
           <strong>{{user}}</strong>
           <span>{{status}}{{#if total}} [{{total}}]{{/if}}</span>
           {{#if result}}
-            <span class="mcw-result"><img src="{{result.img}}" alt="{{result.name}}"> {{result.name}} ×{{result.quantity}}</span>
+            <span class="mcw-result" data-document-uuid="{{result.itemUuid}}"><img src="{{result.img}}" alt="{{result.name}}"> {{result.name}} ×{{result.quantity}}</span>
             {{#if result.recipientName}}<span>Recipient: {{result.recipientName}}</span>{{/if}}
           {{/if}}
         </div>

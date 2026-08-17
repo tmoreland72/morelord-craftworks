@@ -66,7 +66,7 @@
               <strong>{{label}}</strong>
               <div class="mcw-spellbook-result-list">
                 {{#each spells}}
-                  <div class="mcw-spellbook-spell">
+                  <div class="mcw-spellbook-spell" data-document-uuid="{{uuid}}">
                     <img
                       class="mcw-spellbook-spell-image"
                       src="{{img}}"
@@ -98,30 +98,16 @@
       <section class="mcw-panel">
         <h3>Recipient</h3>
 
-        {{#if partyInfo.enabled}}
-          {{#if partyInfo.valid}}
-            <p>
-              Spellbook will be awarded to
-              <strong>{{partyInfo.actorName}}</strong>.
-            </p>
-          {{else}}
-            <p class="mcw-warning">
-              Party Recipient is enabled but no valid Party/Group actor is configured.
-            </p>
-          {{/if}}
-        {{else}}
-          <label>
-            Recipient
-            <select name="recipient">
-              <option value="">Choose character…</option>
-              {{#each actors}}
-                <option value="{{uuid}}">
-                  {{name}}
-                </option>
-              {{/each}}
-            </select>
-          </label>
-        {{/if}}
+        <label>
+          Recipient
+          <select name="recipient">
+            <option value="">Choose character or group…</option>
+            {{#each actors}}
+              <option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>
+            {{/each}}
+          </select>
+        </label>
+        {{#if partyInfo.valid}}<p class="mcw-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
 
         <div class="mcw-actions">
           <button type="button" data-action="reroll-spellbook">

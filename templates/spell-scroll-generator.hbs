@@ -32,7 +32,7 @@
               <strong>{{label}}</strong>
               <div class="mcw-generator-result-list">
                 {{#each spells}}
-                  <div class="mcw-generator-result-row">
+                  <div class="mcw-generator-result-row" data-document-uuid="{{uuid}}">
                     <img src="{{img}}" alt="{{name}}">
                     <span><strong>{{name}}</strong><small>{{sourceLabel}}</small></span>
                     <button type="button" data-spell-uuid="{{uuid}}" title="Open {{name}}"><i class="fa-solid fa-up-right-from-square"></i></button>
@@ -46,20 +46,13 @@
 
       <section class="mcw-panel">
         <h3>Recipient</h3>
-        {{#if partyInfo.enabled}}
-          {{#if partyInfo.valid}}
-            <p>Spell scrolls will be awarded to <strong>{{partyInfo.actorName}}</strong>.</p>
-          {{else}}
-            <p class="mcw-warning">Party Recipient is enabled but no valid Party/Group actor is configured.</p>
-          {{/if}}
-        {{else}}
-          <label>Recipient
-            <select name="recipient">
-              <option value="">Choose character…</option>
-              {{#each actors}}<option value="{{uuid}}">{{name}}</option>{{/each}}
-            </select>
-          </label>
-        {{/if}}
+        <label>Recipient
+          <select name="recipient">
+            <option value="">Choose character or group…</option>
+            {{#each actors}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
+          </select>
+        </label>
+        {{#if partyInfo.valid}}<p class="mcw-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
         <div class="mcw-actions">
           <button type="button" data-action="reroll-scrolls"><i class="fa-solid fa-arrows-rotate"></i> Reroll</button>
           <button type="button" data-action="award-scrolls"><i class="fa-solid fa-scroll"></i> Award Generated Spell Scrolls</button>
