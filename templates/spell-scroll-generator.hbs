@@ -9,6 +9,14 @@
   {{#if hasAccess}}
     {{#unless hasResult}}
     <section class="mcw-panel">
+      <fieldset class="mcw-generator-constraints">
+        <legend>Schools of Magic <small>(all selected by default)</small></legend>
+        <div class="mcw-generator-option-grid">
+          {{#each schools}}
+            <label><input type="checkbox" data-spell-school="{{id}}" {{#if selected}}checked{{/if}}> {{label}}</label>
+          {{/each}}
+        </div>
+      </fieldset>
       <div class="mcw-generator-count-grid">
         {{#each levels}}
           <label class="mcw-generator-count-row">

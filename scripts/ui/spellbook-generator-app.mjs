@@ -23,6 +23,7 @@ export class SpellbookGeneratorApp
     );
     this.result = [];
     this.bookName = "Recovered Spellbook";
+    this.selectedSchools = null;
   }
 
   static DEFAULT_OPTIONS = {
@@ -58,10 +59,14 @@ export class SpellbookGeneratorApp
     const service =
       this.craftworks.spellbookGenerator;
 
-    const availableCounts =
-      service?.hasAccess
-        ? await service.availableCounts()
-        : {};
+    const allSpells = service?.hasAccess
+      ? await this.craftworks.spellScrollGenerator.availableSpells()
+      : [];
+    const schools = this.#schoolOptions(allSpells);
+    this.selectedSchools ??= new Set(schools.map(school => school.id));
+    const availableCounts = service?.hasAccess
+      ? await service.availableCounts({ schools: [...this.selectedSchools] })
+      : {};
 
     const partyInfo =
       await this.craftworks.materialService
@@ -112,6 +117,7 @@ export class SpellbookGeneratorApp
           Boolean(service?.hasAccess),
         bookName: this.bookName,
         levels,
+        schools: schools.map(school => ({ ...school, selected: this.selectedSchools.has(school.id) })),
         result:
           this.result,
         hasResult:
@@ -159,6 +165,14 @@ export class SpellbookGeneratorApp
           }
         )
       );
+
+    this.element.querySelectorAll("[data-spell-school]").forEach(input =>
+      input.addEventListener("change", () => {
+        this.#readSchools();
+        this.result = [];
+        this.render({ force: true });
+      })
+    );
 
     this.element
       .querySelector(
@@ -276,11 +290,17 @@ export class SpellbookGeneratorApp
       return;
     }
 
+    this.#readSchools();
+    if (!this.selectedSchools.size) {
+      ui.notifications.warn("Choose at least one school of magic.");
+      return;
+    }
+
     try {
       this.result =
         await this.craftworks
           .spellbookGenerator
-          .generate(this.counts);
+          .generate(this.counts, { schools: [...this.selectedSchools] });
 
       await this.render({
         force: true
@@ -370,5 +390,19 @@ export class SpellbookGeneratorApp
             : `Level ${level}`,
         spells
       }));
+  }
+
+  #readSchools() {
+    this.selectedSchools = new Set(
+      [...this.element.querySelectorAll("[data-spell-school]:checked")]
+        .map(input => input.dataset.spellSchool)
+    );
+  }
+
+  #schoolOptions(spells) {
+    const labels = CONFIG.DND5E?.spellSchools ?? {};
+    return [...new Set(spells.map(spell => spell.school).filter(Boolean))]
+      .map(id => ({ id, label: game.i18n?.localize(labels[id]?.label ?? labels[id] ?? id) }))
+      .sort((a, b) => a.label.localeCompare(b.label));
   }
 }

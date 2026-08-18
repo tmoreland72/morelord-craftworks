@@ -17,10 +17,10 @@ export class SpellbookGeneratorService {
     );
   }
 
-  async availableCounts() {
+  async availableCounts({ schools = null } = {}) {
     const spells =
       await this.spellScrollGenerator
-        .availableSpells();
+        .availableSpells({ schools });
 
     const counts = {};
 
@@ -37,7 +37,7 @@ export class SpellbookGeneratorService {
     return counts;
   }
 
-  async generate(counts = {}) {
+  async generate(counts = {}, { schools = null } = {}) {
     if (!this.hasAccess) {
       throw new Error(
         "Spellbook Generator requires premium access."
@@ -46,7 +46,7 @@ export class SpellbookGeneratorService {
 
     const allSpells =
       await this.spellScrollGenerator
-        .availableSpells();
+        .availableSpells({ schools });
 
     const byLevel = new Map();
 

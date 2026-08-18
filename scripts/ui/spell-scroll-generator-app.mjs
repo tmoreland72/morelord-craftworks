@@ -11,6 +11,7 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
     this.craftworks = craftworks;
     this.counts = Object.fromEntries(Array.from({ length: 10 }, (_, level) => [level, 0]));
     this.result = [];
+    this.selectedSchools = null;
   }
 
   static DEFAULT_OPTIONS = {
@@ -28,6 +29,8 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
     const context = await super._prepareContext(options);
     const service = this.craftworks.spellScrollGenerator;
     const allSpells = service?.hasAccess ? await service.availableSpells() : [];
+    const schools = this.#schoolOptions(allSpells);
+    this.selectedSchools ??= new Set(schools.map(school => school.id));
     const partyInfo = await this.craftworks.materialService.getPartyRecipientInfo();
     const actors = game.actors
       .filter(actor => actor.type === "character" || actor.type === "group")
@@ -51,6 +54,7 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
     return foundry.utils.mergeObject(context, {
       hasAccess: Boolean(service?.hasAccess),
       levels,
+      schools: schools.map(school => ({ ...school, selected: this.selectedSchools.has(school.id) })),
       resultGroups,
       resultCount: this.result.length,
       hasResult: this.result.length > 0,
@@ -65,6 +69,13 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
       input.addEventListener("change", event => {
         this.counts[Number(event.currentTarget.dataset.scrollLevel)] = Math.max(0, Math.floor(Number(event.currentTarget.value ?? 0)));
         this.result = [];
+      })
+    );
+    this.element.querySelectorAll("[data-spell-school]").forEach(input =>
+      input.addEventListener("change", () => {
+        this.#readSchools();
+        this.result = [];
+        this.render({ force: true });
       })
     );
     this.element.querySelector("[data-action='generate-scrolls']")
@@ -87,15 +98,36 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
     });
   }
 
+  #readSchools() {
+    this.selectedSchools = new Set(
+      [...this.element.querySelectorAll("[data-spell-school]:checked")]
+        .map(input => input.dataset.spellSchool)
+    );
+  }
+
+  #schoolOptions(spells) {
+    const labels = CONFIG.DND5E?.spellSchools ?? {};
+    return [...new Set(spells.map(spell => spell.school).filter(Boolean))]
+      .map(id => ({ id, label: game.i18n?.localize(labels[id]?.label ?? labels[id] ?? id) }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }
+
   async #generate(event) {
     event.preventDefault();
     this.#readCounts();
+    this.#readSchools();
+    if (!this.selectedSchools.size) {
+      ui.notifications.warn("Choose at least one school of magic.");
+      return;
+    }
     if (!Object.values(this.counts).some(value => value > 0)) {
       ui.notifications.warn("Choose at least one spell scroll before generating results.");
       return;
     }
     try {
-      this.result = await this.craftworks.spellScrollGenerator.generate(this.counts);
+      this.result = await this.craftworks.spellScrollGenerator.generate(this.counts, {
+        schools: [...this.selectedSchools]
+      });
       await this.render({ force: true });
     } catch (error) {
       ui.notifications.error(error.message);

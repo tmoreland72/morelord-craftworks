@@ -26,7 +26,7 @@ export class SpellScrollGeneratorService {
     );
   }
 
-  async availableSpells({ level = null } = {}) {
+  async availableSpells({ level = null, schools = null } = {}) {
     const spells = [];
     const seen = new Set();
 
@@ -50,7 +50,7 @@ export class SpellScrollGeneratorService {
       try {
         index = await pack.getIndex({
           fields: [
-            "name", "img", "type", "system.level",
+            "name", "img", "type", "system.level", "system.school",
             "system.source.book", "system.source.custom"
           ]
         });
@@ -69,11 +69,15 @@ export class SpellScrollGeneratorService {
           foundry.utils.getProperty(row, "system.level")
           ?? 0
         );
+        const school = String(
+          foundry.utils.getProperty(row, "system.school") ?? ""
+        ).trim();
 
         if (
           level != null
           && Number(level) !== spellLevel
         ) continue;
+        if (schools?.length && !schools.includes(school)) continue;
 
         const key = `${spellLevel}|${String(row.name).toLowerCase()}`;
         if (seen.has(key)) continue;
@@ -87,6 +91,7 @@ export class SpellScrollGeneratorService {
           name: row.name,
           img: row.img ?? "icons/svg/book.svg",
           level: spellLevel,
+          school,
           uuid: `Compendium.${pack.collection}.Item.${row._id}`,
           packId: pack.collection,
           sourceLabel,
@@ -101,8 +106,8 @@ export class SpellScrollGeneratorService {
     );
   }
 
-  async randomSpell(level) {
-    const spells = await this.availableSpells({ level });
+  async randomSpell(level, { schools = null } = {}) {
+    const spells = await this.availableSpells({ level, schools });
     if (!spells.length) return null;
 
     return spells[
@@ -110,14 +115,14 @@ export class SpellScrollGeneratorService {
     ];
   }
 
-  async generate(counts = {}) {
+  async generate(counts = {}, { schools = null } = {}) {
     if (!this.hasAccess) {
       throw new Error(
         "Spell Scroll Generator requires premium access."
       );
     }
 
-    const allSpells = await this.availableSpells();
+    const allSpells = await this.availableSpells({ schools });
     const generated = [];
 
     for (let level = 0; level <= 9; level += 1) {
@@ -133,7 +138,7 @@ export class SpellScrollGeneratorService {
 
       if (!pool.length) {
         throw new Error(
-          `No ${level === 0 ? "cantrips" : `level ${level} spells`} are available from enabled D&D5e compendium sources.`
+          `No ${level === 0 ? "cantrips" : `level ${level} spells`} match the selected schools in enabled D&D5e compendium sources.`
         );
       }
 

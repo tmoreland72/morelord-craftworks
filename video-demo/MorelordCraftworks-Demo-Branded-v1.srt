@@ -1,0 +1,79 @@
+1
+00:00:00,500 --> 00:00:05,000
+Turn encounters, exploration, and monster trophies into a complete crafting economy.
+
+2
+00:00:05,000 --> 00:00:12,500
+Choose which Craftworks features are available and configure their acquisition rules.
+
+3
+00:00:12,500 --> 00:00:20,300
+Control the compendium sources used throughout the module.
+
+4
+00:00:20,300 --> 00:00:34,500
+Harvest creatures from the scene or create gathering opportunities for the party.
+
+5
+00:00:34,500 --> 00:00:49,500
+Craftworks calculates materials, presents checks, and tracks progress.
+
+6
+00:00:49,500 --> 00:01:04,000
+Award the results to a character or shared party inventory.
+
+7
+00:01:04,000 --> 00:01:15,000
+Encounter Loot turns a completed fight into rewards in seconds.
+
+8
+00:01:15,000 --> 00:01:25,500
+Review generated materials and treasure, then award everything through one workflow.
+
+9
+00:01:28,500 --> 00:01:43,000
+Search materials from every enabled source in one catalog.
+
+10
+00:01:43,000 --> 00:01:57,500
+Recipes connect ingredients to real compendium items.
+
+11
+00:01:57,500 --> 00:02:11,500
+Configure quantities, tools, abilities, difficulty, crafting time, and outcomes.
+
+12
+00:02:11,500 --> 00:02:25,500
+Craftworks checks the character's materials and requirements.
+
+13
+00:02:25,500 --> 00:02:40,000
+Successful work consumes ingredients, creates the item, and records the result.
+
+14
+00:02:43,000 --> 00:02:55,500
+Generate random spell scroll rewards by spell level.
+
+15
+00:02:55,500 --> 00:03:07,800
+Award usable D&D5e scroll items directly to a character or group.
+
+16
+00:03:07,800 --> 00:03:16,500
+Build rarity-based potion packages from enabled item compendiums.
+
+17
+00:03:16,500 --> 00:03:25,600
+Group and award the selected results in one action.
+
+18
+00:03:25,600 --> 00:03:39,500
+Create recovered spellbooks with any chosen mix of spell levels.
+
+19
+00:03:39,500 --> 00:03:53,000
+Reroll the collection, then create a linked spellbook for the recipient.
+
+20
+00:03:53,000 --> 00:03:59,000
+Morelord Craftworks. Make every victory matter.

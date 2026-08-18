@@ -9,6 +9,14 @@
   {{#if hasAccess}}
     {{#unless hasResult}}
     <section class="mcw-panel">
+      <fieldset class="mcw-generator-constraints">
+        <legend>Potion Categories <small>(inferred from potion names; all selected by default)</small></legend>
+        <div class="mcw-generator-option-grid">
+          {{#each categories}}
+            <label><input type="checkbox" data-potion-category="{{id}}" {{#if selected}}checked{{/if}}> {{label}}</label>
+          {{/each}}
+        </div>
+      </fieldset>
       <div class="mcw-potion-rarity-grid">
         {{#each rarities}}
           <label class="mcw-potion-rarity-row">

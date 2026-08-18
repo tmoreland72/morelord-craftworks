@@ -9,6 +9,14 @@ export const POTION_RARITIES = [
   { id: "artifact", label: "Artifact" }
 ];
 
+export const POTION_CATEGORIES = [
+  { id: "healing", label: "Healing & Recovery" },
+  { id: "protection", label: "Protection & Resistance" },
+  { id: "enhancement", label: "Physical Enhancement" },
+  { id: "mobility", label: "Mobility & Transformation" },
+  { id: "utility", label: "Utility & Other" }
+];
+
 export class PotionGeneratorService {
   constructor({ coreAccess = null, sourceFilter = null, adapter = null, recipientResolver = null } = {}) {
     this.coreAccess = coreAccess;
@@ -72,6 +80,7 @@ export class PotionGeneratorService {
           name: row.name,
           img: row.img ?? "icons/consumables/potions/potion-bottle-corked-red.webp",
           rarity,
+          category: this.#categorizePotion(row.name),
           uuid: `Compendium.${pack.collection}.Item.${row._id}`,
           sourceLabel
         });
@@ -85,15 +94,16 @@ export class PotionGeneratorService {
     );
   }
 
-  async availableCounts() {
+  async availableCounts({ categories = null } = {}) {
     const counts = Object.fromEntries(POTION_RARITIES.map(rarity => [rarity.id, 0]));
     for (const potion of await this.availablePotions()) {
+      if (categories?.length && !categories.includes(potion.category)) continue;
       counts[potion.rarity] += 1;
     }
     return counts;
   }
 
-  async generate(counts = {}) {
+  async generate(counts = {}, { categories = null } = {}) {
     if (!this.hasAccess) throw new Error("Potion Generator requires premium access.");
 
     const potions = await this.availablePotions();
@@ -103,9 +113,12 @@ export class PotionGeneratorService {
       const requested = Math.max(0, Math.floor(Number(counts[rarity.id] ?? 0)));
       if (!requested) continue;
 
-      const pool = potions.filter(potion => potion.rarity === rarity.id);
+      const pool = potions.filter(potion =>
+        potion.rarity === rarity.id
+        && (!categories?.length || categories.includes(potion.category))
+      );
       if (!pool.length) {
-        throw new Error(`No ${rarity.label.toLowerCase()} potions are available from enabled Item compendiums.`);
+        throw new Error(`No ${rarity.label.toLowerCase()} potions match the selected categories in enabled Item compendiums.`);
       }
 
       for (let index = 0; index < requested; index += 1) {
@@ -170,5 +183,14 @@ export class PotionGeneratorService {
       legendary: "legendary",
       artifact: "artifact"
     })[normalized] ?? null;
+  }
+
+  #categorizePotion(name) {
+    const value = String(name ?? "").toLowerCase();
+    if (/heal|vitality|health|restor|longevity/.test(value)) return "healing";
+    if (/resistan|invulner|defen|protect|antitoxin|proof|absorption/.test(value)) return "protection";
+    if (/strength|speed|heroism|giant|growth|diminution|vigor/.test(value)) return "enhancement";
+    if (/flying|climbing|water breathing|gaseous|polymorph|invisibility|ethereal/.test(value)) return "mobility";
+    return "utility";
   }
 }

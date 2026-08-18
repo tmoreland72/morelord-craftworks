@@ -1,5 +1,5 @@
 import { MODULE_TITLE } from "../constants.mjs";
-import { POTION_RARITIES } from "../potions/potion-generator-service.mjs";
+import { POTION_CATEGORIES, POTION_RARITIES } from "../potions/potion-generator-service.mjs";
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -12,6 +12,7 @@ export class PotionGeneratorApp extends ScrollPreservingApplicationMixin(
     this.craftworks = craftworks;
     this.counts = Object.fromEntries(POTION_RARITIES.map(rarity => [rarity.id, 0]));
     this.result = [];
+    this.selectedCategories = new Set(POTION_CATEGORIES.map(category => category.id));
   }
 
   static DEFAULT_OPTIONS = {
@@ -28,7 +29,9 @@ export class PotionGeneratorApp extends ScrollPreservingApplicationMixin(
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
     const service = this.craftworks.potionGenerator;
-    const availableCounts = service?.hasAccess ? await service.availableCounts() : {};
+    const availableCounts = service?.hasAccess
+      ? await service.availableCounts({ categories: [...this.selectedCategories] })
+      : {};
     const partyInfo = await this.craftworks.materialService.getPartyRecipientInfo();
     const actors = game.actors
       .filter(actor => actor.type === "character" || actor.type === "group")
@@ -53,6 +56,10 @@ export class PotionGeneratorApp extends ScrollPreservingApplicationMixin(
     return foundry.utils.mergeObject(context, {
       hasAccess: Boolean(service?.hasAccess),
       rarities,
+      categories: POTION_CATEGORIES.map(category => ({
+        ...category,
+        selected: this.selectedCategories.has(category.id)
+      })),
       resultGroups,
       hasResult: this.result.length > 0,
       resultCount: this.result.length,
@@ -71,6 +78,13 @@ export class PotionGeneratorApp extends ScrollPreservingApplicationMixin(
           Math.floor(Number(event.currentTarget.value ?? 0))
         );
         this.result = [];
+      })
+    );
+    this.element.querySelectorAll("[data-potion-category]").forEach(input =>
+      input.addEventListener("change", () => {
+        this.#readCategories();
+        this.result = [];
+        this.render({ force: true });
       })
     );
 
@@ -95,16 +109,30 @@ export class PotionGeneratorApp extends ScrollPreservingApplicationMixin(
     });
   }
 
+  #readCategories() {
+    this.selectedCategories = new Set(
+      [...this.element.querySelectorAll("[data-potion-category]:checked")]
+        .map(input => input.dataset.potionCategory)
+    );
+  }
+
   async #generate(event) {
     event.preventDefault();
     this.#readCounts();
+    this.#readCategories();
+    if (!this.selectedCategories.size) {
+      ui.notifications.warn("Choose at least one potion category.");
+      return;
+    }
     if (!Object.values(this.counts).some(value => value > 0)) {
       ui.notifications.warn("Choose at least one potion before generating results.");
       return;
     }
 
     try {
-      this.result = await this.craftworks.potionGenerator.generate(this.counts);
+      this.result = await this.craftworks.potionGenerator.generate(this.counts, {
+        categories: [...this.selectedCategories]
+      });
       await this.render({ force: true });
     } catch (error) {
       ui.notifications.error(error.message);
