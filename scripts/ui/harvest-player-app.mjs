@@ -589,7 +589,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
                 dc: creature.dc,
                 flavor:
                   `Harvest ${creature.name} — DC ${creature.dc}`,
-                configure: false
+                configure: true
               }
             );
 
