@@ -2171,20 +2171,32 @@
   width: auto;
 }
 
-.mcw .mcw-recipe-visibility-toggle {
+.mcw .mcw-recipe-title-button {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  width: auto;
-  min-width: 0;
+  width: 150px;
+  min-width: 150px;
   min-height: 0;
   margin: 0;
-  padding: 3px 7px;
-  font-size: .75rem;
+  padding: 3px 8px;
+  justify-content: center;
+  border: 0 !important;
+  outline: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-style: normal;
+  font-weight: 400;
+  line-height: inherit;
+  opacity: 1;
 }
 
-.mcw .mcw-recipe-visibility-toggle.mcw-recipe-hidden {
-  opacity: .72;
+.mcw .mcw-recipe-title-button:hover,
+.mcw .mcw-recipe-title-button:focus-visible {
+  background: rgba(197, 160, 91, 0.09) !important;
 }
 
 .mcw .mcw-recipe-card:has(.mcw-recipe-hidden) {
@@ -2220,21 +2232,25 @@
   gap: 8px;
 }
 
+.mcw .mcw-recipe-crafter-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mcw .mcw-recipe-crafter-selector > span {
+  white-space: nowrap;
+}
+
+.mcw .mcw-recipe-crafter-selector select {
+  min-width: 210px;
+}
+
 .mcw .mcw-recipe-title-actions {
   display: flex;
   align-items: center;
   gap: 6px;
   flex-wrap: wrap;
-}
-
-.mcw .mcw-recipe-mark-toggle {
-  width: auto;
-  min-width: 0;
-  padding: 3px 8px;
-}
-
-.mcw .mcw-recipe-mark-toggle.mcw-recipe-marked {
-  font-weight: 700;
 }
 
 .mcw-craft-window .window-content {
@@ -2375,7 +2391,40 @@
 
 .mcw .mcw-craft-alternative-group {
   display: grid;
-  gap: 4px;
+  gap: 0;
+  min-width: 0;
+  margin: 4px 0;
+  padding: 8px;
+  border: 1px solid rgba(197, 160, 91, 0.42);
+  border-radius: 7px;
+  background: rgba(197, 160, 91, 0.035);
+}
+
+.mcw .mcw-craft-alternative-group > legend {
+  padding: 0 7px;
+  color: rgba(232, 205, 151, 0.92);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.mcw .mcw-craft-alternative-or {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 8px;
+  color: #d8a64c;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+.mcw .mcw-craft-alternative-or::before,
+.mcw .mcw-craft-alternative-or::after {
+  content: "";
+  flex: 1 1 auto;
+  border-top: 1px solid rgba(216, 166, 76, 0.32);
 }
 
 .mcw .mcw-craft-output {
@@ -3788,6 +3837,65 @@
   vertical-align: middle;
 }
 
+.mcw-harvest-modern .mlh-needed-recipes {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 5px;
+  color: #e4bd55;
+}
+
+.mcw-harvest-modern .mlh-recipe-tag {
+  display: inline-flex;
+  align-items: center;
+  max-width: 190px;
+  padding: 2px 7px;
+  overflow: hidden;
+  border: 1px solid rgba(218, 178, 74, 0.38);
+  border-radius: 999px;
+  background: rgba(218, 178, 74, 0.09);
+  color: #e4bd55;
+  font-size: 10px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mcw-harvest-modern .mlh-recipe-help {
+  width: auto;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 1px 3px;
+  border: 0;
+  background: transparent;
+  color: #e58b2a;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.mcw-harvest-recipe-dialog-list {
+  display: grid;
+  gap: 7px;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.mcw-harvest-recipe-dialog-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 7px 9px;
+  border: 1px solid var(--color-border-light-2);
+  border-radius: 5px;
+}
+
+.mcw-harvest-recipe-dialog-row span {
+  opacity: .72;
+  text-align: right;
+}
+
 .mcw-harvest-modern .mlh-claimed-needed {
   box-shadow: inset 3px 0 0 rgba(218, 178, 74, 0.8);
 }
@@ -5143,6 +5251,44 @@
   overflow: visible !important;
   overscroll-behavior: auto !important;
   scrollbar-gutter: auto;
+}
+
+/* Two-pane browsers keep their page header fixed while each pane scrolls. */
+.morelord-craftworks.mcw-window .window-content:has(.mcw-marketplace-browser-body) {
+  overflow: hidden !important;
+}
+
+.morelord-craftworks.mcw-window .mcw-marketplace-browser {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0;
+  overflow: hidden !important;
+}
+
+.morelord-craftworks.mcw-window .mcw-marketplace-browser > .mcw-header {
+  flex: 0 0 auto;
+}
+
+.morelord-craftworks.mcw-window .mcw-marketplace-browser-body {
+  flex: 1 1 auto;
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0;
+  overflow: hidden !important;
+}
+
+.morelord-craftworks.mcw-window .mcw-marketplace-browser-body > .mcw-filter-rail,
+.morelord-craftworks.mcw-window .mcw-marketplace-browser-body > .mcw-marketplace-results {
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  scrollbar-gutter: stable;
 }
 
 /* Harvest is a fixed header/body/footer layout; its claim list owns scrolling. */

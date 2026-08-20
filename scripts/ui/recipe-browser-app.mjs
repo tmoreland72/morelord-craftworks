@@ -1,6 +1,8 @@
 import { MODULE_TITLE } from "../constants.mjs";
+import { materialTagsSatisfy } from "../materials/material-match-utils.mjs";
 import {
   getHiddenRecipeIds,
+  isRecipeKnownToActor,
   setHiddenRecipeIds
 } from "../core/settings.mjs";
 import { bindMultiselectBehavior } from "./multiselect-behavior.mjs";
@@ -21,6 +23,8 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     this.excludedPackIds = [];
     this.selectedCategories = [];
     this.excludedCategories = [];
+    this.selectedTools = [];
+    this.excludedTools = [];
     this.actorUuid = null;
     this.crafterUuid = null;
     this.searchRenderTimer = null;
@@ -42,7 +46,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
   static DEFAULT_OPTIONS = {
     id: "morelord-craftworks-recipes",
     classes: ["morelord-craftworks", "mcw-window"],
-    position: { width: 900, height: 780 },
+    position: { width: 1280, height: 840 },
     window: {
       title: `${MODULE_TITLE} — Recipes`,
       resizable: true
@@ -68,20 +72,82 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     const context = await super._prepareContext(options);
 
     const actor = null;
-    const crafter =
-      this.craftworks.crafterContext.resolve();
+    const crafterActors = this.craftworks.crafterContext.availableCharacters();
+    let crafter = this.#currentCrafter();
+
+    if (!crafter && crafterActors.length === 1) {
+      crafter = crafterActors[0];
+    }
 
     this.actorUuid = null;
-    this.crafterUuid = crafter?.uuid ?? null;
+    this.crafterUuid = crafter?.uuid ?? this.crafterUuid ?? null;
     this.onlyCraftable = false;
 
     const markedRecipeIds = new Set(
       this.craftworks.markedRecipes.list(crafter)
     );
 
+    const catalogRecipes = this.craftworks.recipes.all();
+    const visibleRecipes = catalogRecipes
+      .filter(recipe =>
+        game.user.isGM
+        || isRecipeKnownToActor(
+          recipe,
+          crafter,
+          this.craftworks.toolInspector
+        )
+      );
+    const visibleRecipeCountByPack = new Map();
+    for (const recipe of visibleRecipes) {
+      visibleRecipeCountByPack.set(
+        recipe.packId,
+        (visibleRecipeCountByPack.get(recipe.packId) ?? 0) + 1
+      );
+    }
+
+    const catalogTools = new Set(
+      catalogRecipes
+        .map(recipe => String(recipe.craft?.tool ?? "").trim())
+        .filter(Boolean)
+    );
+    const visibleToolCounts = new Map();
+    for (const recipe of visibleRecipes) {
+      const tool = String(recipe.craft?.tool ?? "").trim();
+      if (tool) {
+        visibleToolCounts.set(
+          tool,
+          (visibleToolCounts.get(tool) ?? 0) + 1
+        );
+      }
+    }
+    const validTools = new Set(catalogTools);
+    this.selectedTools = this.selectedTools.filter(tool => validTools.has(tool));
+    this.excludedTools = this.excludedTools.filter(tool => validTools.has(tool));
+    const toolFilters = [...catalogTools]
+      .sort((a, b) => a.localeCompare(b))
+      .map(tool => ({
+        id: tool,
+        label: tool,
+        count: visibleToolCounts.get(tool) ?? 0,
+        proficient: Boolean(
+          crafter
+          && this.craftworks.toolInspector?.inspect(crafter, tool)?.proficient
+        ),
+        state: this.selectedTools.includes(tool)
+          ? 1
+          : this.excludedTools.includes(tool)
+            ? -1
+            : 0,
+        included: this.selectedTools.includes(tool),
+        excluded: this.excludedTools.includes(tool)
+      }));
+
     const effectiveRecipePacks = this.craftworks.recipes
       .packs({ includeDisabled: false })
-      .filter(pack => Number(pack.recipeCount ?? 0) > 0);
+      .map(pack => ({
+        ...pack,
+        recipeCount: visibleRecipeCountByPack.get(pack.id) ?? 0
+      }));
 
     const validPackIds = new Set(
       effectiveRecipePacks.map(pack => pack.id)
@@ -93,10 +159,10 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       .filter(packId => validPackIds.has(packId));
 
     const rarityFilters =
-      this.#buildRarityFilters();
+      this.#buildRarityFilters(visibleRecipes);
 
     const rawIngredientTags =
-      this.#ingredientTags();
+      this.#ingredientTags(visibleRecipes);
     const ingredientTagGroups = buildMaterialTagGroups(rawIngredientTags, {
       included: this.selectedIngredientTags,
       excluded: this.excludedIngredientTags
@@ -133,12 +199,12 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         tagSet.has(tag)
       );
 
-    const matchingRecipes = this.#matchingRecipes(actor);
+    const matchingRecipes = this.#matchingRecipes(crafter);
 
     const hiddenRecipeIds = getHiddenRecipeIds();
 
     const totalRecipeCount =
-      this.craftworks.recipes.all().length;
+      visibleRecipes.length;
     const prospectiveCount = matchingRecipes.length;
     const prospectiveCountLabel = String(prospectiveCount);
     const hasSearchCriteria = Boolean(
@@ -147,6 +213,8 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       || this.excludedPackIds.length
       || this.selectedCategories.length
       || this.excludedCategories.length
+      || this.selectedTools.length
+      || this.excludedTools.length
       || this.selectedRecipeRarities.length
       || this.excludedRecipeRarities.length
       || this.selectedIngredientTags.length
@@ -173,10 +241,21 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       ].filter(Boolean);
 
       const toolStatus = {
-        hasTool: null,
-        proficient: null,
-        qualifiesForNormalDc: null
+        ...(this.craftworks.toolInspector?.inspect(
+          crafter,
+          craft.tool
+        ) ?? {
+          hasTool: null,
+          proficient: null,
+          qualifiesForNormalDc: null
+        })
       };
+
+      const knownToCrafter = isRecipeKnownToActor(
+        recipe,
+        crafter,
+        this.craftworks.toolInspector
+      );
 
       const activeDc = craft.dc;
 
@@ -216,6 +295,27 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       }
 
       const sourcePack = this.craftworks.contentPacks?.get(recipe.packId);
+      const requirementItemMatches = new Map();
+      const requirementItemNames = new Set(
+        (recipe.requirementGroups ?? [])
+          .flatMap(group => group.requirements ?? [])
+          .flatMap(requirement => [
+            requirement.match?.itemName,
+            ...(requirement.alternatives ?? [])
+              .map(alternative => alternative.match?.itemName)
+          ])
+          .map(name => String(name ?? "").trim())
+          .filter(Boolean)
+      );
+
+      for (const itemName of requirementItemNames) {
+        const item = await this.craftworks.recipes.dnd5eItemResolver
+          ?.resolve(itemName, { sourceBook: sourcePack?.label });
+
+        if (item) {
+          requirementItemMatches.set(itemName.toLowerCase(), item);
+        }
+      }
 
       return {
         ...recipe,
@@ -234,8 +334,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         isUnknown:
           hiddenRecipeIds.has(recipe.id),
         requirementsKnown:
-          game.user.isGM
-          || !hiddenRecipeIds.has(recipe.id),
+          knownToCrafter,
         knowledgeAction:
           hiddenRecipeIds.has(recipe.id)
             ? "known"
@@ -277,10 +376,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
             ? recipe.output.materialId
             : null,
         requirementGroupRows:
-          (
-            game.user.isGM
-            || !hiddenRecipeIds.has(recipe.id)
-          )
+          knownToCrafter
             ? recipe.requirementGroups.map((group, groupIndex) => ({
           ...group,
           ready: readiness.requirementGroups?.[groupIndex]?.ready ?? null,
@@ -290,7 +386,8 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
               ?? null;
             const materialView =
               this.#resolveRequirementMaterial(
-                requirement.match
+                requirement.match,
+                requirementItemMatches
               );
 
             return {
@@ -314,7 +411,8 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
                 ? requirement.alternatives.map((alternative, altIndex) => {
                     const altMaterialView =
                       this.#resolveRequirementMaterial(
-                        alternative.match
+                        alternative.match,
+                        requirementItemMatches
                       );
 
                     return {
@@ -439,7 +537,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
 
       categories: Array.from(
         new Set(
-          this.craftworks.recipes.all()
+          visibleRecipes
             .map(recipe => recipe.category)
             .filter(Boolean)
         )
@@ -462,6 +560,8 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
           excluded:
             this.excludedCategories.includes(category)
         })),
+
+      toolFilters,
 
       knowledgeFilters: [
         {
@@ -498,7 +598,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         excluded:
           this.excludedPackIds.includes(pack.id)
       })),
-      hasEnabledRecipes: this.craftworks.recipes.all().length > 0,
+      hasEnabledRecipes: visibleRecipes.length > 0,
       totalRecipeCount,
       prospectiveCount,
       prospectiveCountLabel,
@@ -511,12 +611,17 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       displayLimit,
       recipeGroups,
       hasRecipes: preparedRecipes.length > 0,
+      crafterActors: crafterActors.map(candidate => ({
+        uuid: candidate.uuid,
+        name: candidate.name,
+        selected: candidate.uuid === crafter?.uuid
+      })),
       canManageRecipeVisibility: game.user.isGM,
       unknownRecipeCount: hiddenRecipeIds.size
     }, { inplace: false });
   }
 
-  #resolveRequirementMaterial(match) {
+  #resolveRequirementMaterial(match, requirementItemMatches = new Map()) {
     if (!match) {
       return {
         materialId: null,
@@ -551,6 +656,27 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
           material?.rarity
           ?? match.rarity
           ?? null
+      };
+    }
+
+    if (match.itemName) {
+      const normalizedItemName = String(match.itemName)
+        .trim()
+        .toLowerCase();
+      const material = this.craftworks.materials
+        .all()
+        .find(entry =>
+          String(entry.name ?? "").trim().toLowerCase()
+          === normalizedItemName
+        );
+      const item = requirementItemMatches.get(normalizedItemName);
+
+      return {
+        materialId: material?.materialId ?? null,
+        img: material?.img ?? item?.img ?? null,
+        uuid: material?.uuid ?? item?.uuid ?? null,
+        label: material?.name ?? item?.name ?? String(match.itemName).trim(),
+        rarity: material?.rarity ?? match.rarity ?? null
       };
     }
 
@@ -610,12 +736,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
                   )
               );
 
-            if (
-              !requiredTags.every(
-                tag =>
-                  materialTags.has(tag)
-              )
-            ) {
+            if (!materialTagsSatisfy(requiredTags, materialTags)) {
               return false;
             }
           }
@@ -688,6 +809,10 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
 
   #friendlyRequirementLabel(match) {
     if (!match) return "Material";
+
+    if (match.itemName) {
+      return String(match.itemName).trim() || "Material";
+    }
 
     const tag =
       (match.tags ?? [])
@@ -791,6 +916,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     this.element.querySelector("[name='crafter']")
       ?.addEventListener("change", event => {
         this.crafterUuid = event.currentTarget.value || null;
+        this.craftworks.crafterContext.select(this.crafterUuid);
         this.openFilterKey = null;
         this.render();
       });
@@ -946,7 +1072,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         await this.render();
       });
 
-    this.element.querySelectorAll("[data-recipe-knowledge]")
+    this.element.querySelectorAll("[data-action='toggle-recipe-knowledge']")
       .forEach(element => {
         element.addEventListener("click", async event => {
           event.preventDefault();
@@ -969,6 +1095,13 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
 
           this.openFilterKey = null;
           await setHiddenRecipeIds(hidden);
+
+          ui.notifications.info(
+            hidden.has(recipeId)
+              ? "Recipe marked Unknown for players."
+              : "Recipe marked Known for players."
+          );
+
           await this.render();
         });
       });
@@ -979,8 +1112,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
           event.preventDefault();
           event.stopPropagation();
 
-          const crafter =
-            this.craftworks.crafterContext.resolve();
+          const crafter = this.#currentCrafter();
 
           if (!crafter) {
             ui.notifications.warn(
@@ -1007,6 +1139,18 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
           await this.render();
         });
       });
+
+    this.element.querySelectorAll(".mcw-material-icon-link[data-document-uuid]")
+      .forEach(button => button.addEventListener("click", async event => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const uuid = event.currentTarget.dataset.documentUuid;
+        if (!uuid) return;
+
+        const item = await fromUuid(uuid);
+        item?.sheet?.render(true);
+      }));
 
     this.element.querySelectorAll("[data-material-id]")
       .forEach(element => {
@@ -1095,25 +1239,66 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
   #ingredientMaterialsForRecipe(recipe) {
     if (
       !game.user.isGM
-      && getHiddenRecipeIds().has(
-        recipe.id
+      && !isRecipeKnownToActor(
+        recipe,
+        this.#currentCrafter(),
+        this.craftworks.toolInspector
       )
     ) {
       return [];
     }
 
     const materialIds = new Set();
+    const addMatches = match => {
+      if (!match) return;
+
+      if (match.materialId) {
+        materialIds.add(match.materialId);
+        return;
+      }
+
+      const itemName = String(match.itemName ?? "").trim().toLowerCase();
+      const requiredTags = (match.tags ?? [])
+        .map(tag => String(tag).toLowerCase());
+
+      for (const material of this.craftworks.materials.all()) {
+        if (
+          itemName
+          && String(material.name ?? "").trim().toLowerCase() !== itemName
+        ) continue;
+        if (
+          match.rarity
+          && String(material.rarity ?? "").toLowerCase()
+            !== String(match.rarity).toLowerCase()
+        ) continue;
+        if (
+          match.category
+          && String(material.category ?? "").toLowerCase()
+            !== String(match.category).toLowerCase()
+        ) continue;
+        if (
+          match.stage
+          && String(material.stage ?? "").toLowerCase()
+            !== String(match.stage).toLowerCase()
+        ) continue;
+
+        const materialTags = new Set(
+          (material.tags ?? []).map(tag => String(tag).toLowerCase())
+        );
+        if (!materialTagsSatisfy(requiredTags, materialTags)) continue;
+
+        if (itemName || requiredTags.length || match.rarity || match.category || match.stage) {
+          materialIds.add(material.materialId);
+        }
+      }
+    };
 
     for (const group of recipe.requirementGroups ?? []) {
       for (const requirement of group.requirements ?? []) {
-        if (requirement.match?.materialId) {
-          materialIds.add(requirement.match.materialId);
-        }
+        addMatches(requirement.match);
 
         for (const alternative of requirement.alternatives ?? []) {
-          if (alternative.match?.materialId) {
-            materialIds.add(alternative.match.materialId);
-          }
+          addMatches(alternative.match);
         }
       }
     }
@@ -1125,7 +1310,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       .filter(Boolean);
   }
 
-  #buildRarityFilters() {
+  #buildRarityFilters(recipes = this.craftworks.recipes.all()) {
     const standardRarities = [
       {
         id: "common",
@@ -1165,7 +1350,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
 
     for (
       const recipe of
-      this.craftworks.recipes.all()
+      recipes
     ) {
       const rarity =
         this.#recipeRarity(recipe);
@@ -1289,10 +1474,10 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       : [];
   }
 
-  #ingredientTags() {
+  #ingredientTags(recipes = this.craftworks.recipes.all()) {
     return Array.from(
       new Set(
-        this.craftworks.recipes.all()
+        recipes
           .flatMap(recipe =>
             this.#ingredientMaterialsForRecipe(recipe)
               .flatMap(material => material.tags ?? [])
@@ -1312,6 +1497,10 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       category: [
         "selectedCategories",
         "excludedCategories"
+      ],
+      tool: [
+        "selectedTools",
+        "excludedTools"
       ],
       rarity: [
         "selectedRecipeRarities",
@@ -1374,6 +1563,8 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     this.excludedPackIds = [];
     this.selectedCategories = [];
     this.excludedCategories = [];
+    this.selectedTools = [];
+    this.excludedTools = [];
     this.selectedRecipeRarities = [];
     this.excludedRecipeRarities = [];
     this.selectedIngredientTags = [];
@@ -1382,56 +1573,18 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     this.unknownFilterState = 0;
   }
 
-  #matchesPublicRecipeText(
-    recipe,
-    query
-  ) {
-    const needle =
-      String(query ?? "")
-        .trim()
-        .toLowerCase();
-
-    if (!needle) return true;
-
-    const haystack = [
-      recipe.id,
-      recipe.name,
-      recipe.category,
-      recipe.kind,
-      recipe.description,
-      recipe.output?.label,
-      recipe.packLabel,
-      recipe.rulesVersion,
-      recipe.source?.title,
-      ...(recipe.tags ?? [])
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .toLowerCase();
-
-    return haystack.includes(
-      needle
-    );
-  }
-
-  #matchingRecipes(actor = this.#currentInventoryActor()) {
+  #matchingRecipes(actor = this.#currentCrafter()) {
     let recipes =
       this.craftworks.recipes.search(
         this.search
       );
 
-    if (
-      !game.user.isGM
-      && this.search.trim()
-    ) {
-      const unknown =
-        getHiddenRecipeIds();
-
+    if (!game.user.isGM) {
       recipes = recipes.filter(recipe =>
-        !unknown.has(recipe.id)
-        || this.#matchesPublicRecipeText(
+        isRecipeKnownToActor(
           recipe,
-          this.search
+          actor,
+          this.craftworks.toolInspector
         )
       );
     }
@@ -1467,6 +1620,20 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       );
     }
 
+    if (this.selectedTools.length) {
+      const selected = new Set(this.selectedTools);
+      recipes = recipes.filter(recipe =>
+        selected.has(String(recipe.craft?.tool ?? "").trim())
+      );
+    }
+
+    if (this.excludedTools.length) {
+      const excluded = new Set(this.excludedTools);
+      recipes = recipes.filter(recipe =>
+        !excluded.has(String(recipe.craft?.tool ?? "").trim())
+      );
+    }
+
     if (this.selectedRecipeRarities.length) {
       const selected = new Set(
         this.selectedRecipeRarities
@@ -1492,17 +1659,11 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     }
 
     if (this.selectedIngredientTags.length) {
-      const selected = new Set(
-        this.selectedIngredientTags
-      );
-
       recipes = recipes.filter(recipe =>
-        this.#ingredientMaterialsForRecipe(recipe)
-          .some(material =>
-            (material.tags ?? []).some(tag =>
-              selected.has(String(tag).toLowerCase())
-            )
-          )
+        this.#recipeHasDistinctIngredientTags(
+          recipe,
+          this.selectedIngredientTags
+        )
       );
     }
 
@@ -1526,12 +1687,20 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     const unknown =
       getHiddenRecipeIds();
 
+    const isEffectivelyKnown = recipe => game.user.isGM
+      ? !unknown.has(recipe.id)
+      : isRecipeKnownToActor(
+          recipe,
+          actor,
+          this.craftworks.toolInspector
+        );
+
     if (
       this.knownFilterState === 1
       || this.unknownFilterState === -1
     ) {
       recipes = recipes.filter(recipe =>
-        !unknown.has(recipe.id)
+        isEffectivelyKnown(recipe)
       );
     }
 
@@ -1540,7 +1709,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       || this.knownFilterState === -1
     ) {
       recipes = recipes.filter(recipe =>
-        unknown.has(recipe.id)
+        !isEffectivelyKnown(recipe)
       );
     }
 
@@ -1558,6 +1727,91 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     return recipes;
   }
 
+  #recipeHasDistinctIngredientTags(recipe, selectedTags) {
+    const selected = [...new Set(
+      selectedTags.map(tag => String(tag).toLowerCase())
+    )];
+    const slots = [];
+
+    for (const group of recipe.requirementGroups ?? []) {
+      for (const requirement of group.requirements ?? []) {
+        const matches = requirement.type === "alternatives"
+          ? (requirement.alternatives ?? []).map(alternative => alternative.match)
+          : [requirement.match];
+        const slotTags = new Set();
+
+        for (const match of matches.filter(Boolean)) {
+          for (const material of this.#materialsMatchingIngredient(match)) {
+            for (const tag of material.tags ?? []) {
+              slotTags.add(String(tag).toLowerCase());
+            }
+          }
+        }
+
+        if (slotTags.size) slots.push(slotTags);
+      }
+    }
+
+    const assign = (tagIndex, usedSlots) => {
+      if (tagIndex >= selected.length) return true;
+
+      for (let slotIndex = 0; slotIndex < slots.length; slotIndex += 1) {
+        if (usedSlots.has(slotIndex) || !slots[slotIndex].has(selected[tagIndex])) {
+          continue;
+        }
+
+        usedSlots.add(slotIndex);
+        if (assign(tagIndex + 1, usedSlots)) return true;
+        usedSlots.delete(slotIndex);
+      }
+
+      return false;
+    };
+
+    return assign(0, new Set());
+  }
+
+  #materialsMatchingIngredient(match) {
+    if (!match) return [];
+
+    if (match.materialId) {
+      const material = this.craftworks.materials.get(match.materialId);
+      return material ? [material] : [];
+    }
+
+    const itemName = String(match.itemName ?? "").trim().toLowerCase();
+    const requiredTags = (match.tags ?? [])
+      .map(tag => String(tag).toLowerCase());
+
+    return this.craftworks.materials.all().filter(material => {
+      if (
+        itemName
+        && String(material.name ?? "").trim().toLowerCase() !== itemName
+      ) return false;
+      if (
+        match.rarity
+        && String(material.rarity ?? "").toLowerCase()
+          !== String(match.rarity).toLowerCase()
+      ) return false;
+      if (
+        match.category
+        && String(material.category ?? "").toLowerCase()
+          !== String(match.category).toLowerCase()
+      ) return false;
+      if (
+        match.stage
+        && String(material.stage ?? "").toLowerCase()
+          !== String(match.stage).toLowerCase()
+      ) return false;
+
+      const materialTags = new Set(
+        (material.tags ?? []).map(tag => String(tag).toLowerCase())
+      );
+
+      return materialTagsSatisfy(requiredTags, materialTags);
+    });
+  }
+
   #updateLiveQueryState() {
     const recipes = this.#matchingRecipes();
 
@@ -1567,6 +1821,8 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       || this.excludedPackIds.length
       || this.selectedCategories.length
       || this.excludedCategories.length
+      || this.selectedTools.length
+      || this.excludedTools.length
       || this.selectedRecipeRarities.length
       || this.excludedRecipeRarities.length
       || this.selectedIngredientTags.length
@@ -1922,6 +2178,18 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       }));
 
     return all.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  #currentCrafter() {
+    if (this.crafterUuid) {
+      const selected = this.craftworks.crafterContext
+        .availableCharacters()
+        .find(actor => actor.uuid === this.crafterUuid);
+
+      if (selected) return selected;
+    }
+
+    return this.craftworks.crafterContext.resolve();
   }
 
   #defaultCrafterUuid(characters) {

@@ -29,6 +29,7 @@ const SETTINGS = Object.freeze({
   USE_PARTY_RECIPIENT: "usePartyRecipient",
   PARTY_ACTOR_UUID: "partyActorUuid",
   HIDDEN_RECIPE_IDS: "hiddenRecipeIds",
+  SHOW_RECIPES_FOR_PREFERRED_TOOL_PROFICIENCY: "showRecipesForPreferredToolProficiency",
   CONTENT_SYNC_SIGNATURE: "contentSyncSignature",
   CONTENT_SYNC_LAST_AT: "contentSyncLastAt",
   STANDARD_CONTENT_BOOTSTRAPPED: "standardContentBootstrapped"
@@ -62,6 +63,12 @@ export function registerSettings() {
     SETTINGS.HIDDEN_RECIPE_IDS,
     "Hidden Recipe IDs",
     "[]"
+  );
+
+  registerBoolean(
+    SETTINGS.SHOW_RECIPES_FOR_PREFERRED_TOOL_PROFICIENCY,
+    "Show Recipes for Preferred Tool Proficiency",
+    true
   );
 
   registerString(
@@ -209,6 +216,13 @@ export async function setHiddenRecipeIds(ids) {
 
 export function isRecipeHidden(recipeId) {
   return getHiddenRecipeIds().has(String(recipeId));
+}
+
+export function isRecipeKnownToActor(recipe, actor, toolInspector) {
+  if (game.user.isGM || !isRecipeHidden(recipe?.id)) return true;
+  if (!actor || !recipe?.craft?.tool || !toolInspector) return false;
+  if (!getSetting(SETTINGS.SHOW_RECIPES_FOR_PREFERRED_TOOL_PROFICIENCY)) return false;
+  return Boolean(toolInspector.inspect(actor, recipe.craft.tool)?.proficient);
 }
 
 export function getGatherDcOverrides() {

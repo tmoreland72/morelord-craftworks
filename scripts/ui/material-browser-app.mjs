@@ -33,7 +33,7 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
   static DEFAULT_OPTIONS = {
     id: "morelord-craftworks-material-browser",
     classes: ["morelord-craftworks", "mcw-window"],
-    position: { width: 920, height: 780 },
+    position: { width: 1080, height: 840 },
     window: {
       title: `${MODULE_TITLE} — Materials`,
       resizable: true

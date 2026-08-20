@@ -82,6 +82,23 @@
       </section>
 
       <section class="mcw-filter-group">
+        <h3>Preferred Artisan Tool</h3>
+        <div class="mcw-tristate-list">
+          {{#each toolFilters}}
+            <button type="button"
+                    class="mcw-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
+                    data-tristate-filter
+                    data-filter-group="tool"
+                    data-filter-value="{{id}}">
+              <span>{{label}}{{#if proficient}} <i class="fa-solid fa-circle-check" title="Character is proficient"></i>{{/if}}</span>
+              <small>{{count}}</small>
+              <i class="fa-solid {{#if included}}fa-plus{{else if excluded}}fa-minus{{else}}fa-circle{{/if}}"></i>
+            </button>
+          {{/each}}
+        </div>
+      </section>
+
+      <section class="mcw-filter-group">
         <h3>Rarity</h3>
         <div class="mcw-tristate-list">
           {{#each ingredientRarities}}
@@ -154,15 +171,17 @@
       {{/if}}
   <div class="mcw-panel mcw-recipe-mark-context">
     <i class="fa-solid fa-bookmark"></i>
+    <label class="mcw-recipe-crafter-selector">
+      <span>Mark recipes for</span>
+      <select name="crafter">
+        <option value="">Choose character…</option>
+        {{#each crafterActors}}
+          <option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>
+        {{/each}}
+      </select>
+    </label>
     {{#if canMarkRecipes}}
-      <span>
-        Marked recipes will appear in <strong>{{crafterName}}'s Craft</strong> workspace.
-      </span>
-    {{else}}
-      <span>
-        Select a character token, assign a User Character, or own a single character
-        to mark recipes for crafting.
-      </span>
+      <span>Marked recipes will appear in <strong>{{crafterName}}'s Craft</strong> workspace.</span>
     {{/if}}
   </div>
 
@@ -182,8 +201,8 @@
                         <div class="mcw-recipe-title-actions">
                           {{#if ../../canManageRecipeVisibility}}
                             <button type="button"
-                                    class="mcw-recipe-visibility-toggle {{#if isUnknown}}mcw-recipe-hidden{{/if}}"
-                                    data-recipe-knowledge="{{knowledgeAction}}"
+                                    class="mcw-recipe-title-button {{#if isUnknown}}mcw-recipe-hidden{{/if}}"
+                                    data-action="toggle-recipe-knowledge"
                                     data-recipe-id="{{id}}"
                                     title="{{#if isUnknown}}Ingredients are unknown to players{{else}}Ingredients are known to players{{/if}}">
                               {{#if isUnknown}}
@@ -195,7 +214,7 @@
                           {{/if}}
 
                           <button type="button"
-                                  class="mcw-recipe-mark-toggle {{#if isMarked}}mcw-recipe-marked{{/if}}"
+                                  class="mcw-recipe-title-button {{#if isMarked}}mcw-recipe-marked{{/if}}"
                                   data-action="toggle-mark-recipe"
                                   data-recipe-id="{{id}}"
                                   {{#unless canMark}}disabled{{/unless}}>
@@ -206,18 +225,16 @@
                       </div>
 
                       <div class="mcw-recipe-meta">
-                        {{#if showPremiumBadge}}
-                          <span class="mcw-source-badge">{{sourceBadgeLabel}}</span>
-                        {{/if}}
                         <span>{{sourceLabel}}</span>
                       </div>
                     </div>
 
-                    {{#if tags.length}}
-                      <div class="mcw-pills mcw-recipe-tags">
-                        {{#each tags}}<span>{{this}}</span>{{/each}}
-                      </div>
-                    {{/if}}
+                    <div class="mcw-pills mcw-recipe-tags">
+                      {{#if showPremiumBadge}}
+                        <span class="mcw-source-badge">{{sourceBadgeLabel}}</span>
+                      {{/if}}
+                      {{#each tags}}<span>{{this}}</span>{{/each}}
+                    </div>
                   </header>
 
                   {{#if description}}
@@ -266,6 +283,12 @@
                                                     data-material-id="{{materialId}}">
                                               <img src="{{materialImg}}" alt="">
                                             </button>
+                                          {{else if materialUuid}}
+                                            <button type="button"
+                                                    class="mcw-material-icon-link"
+                                                    data-document-uuid="{{materialUuid}}">
+                                              <img src="{{materialImg}}" alt="">
+                                            </button>
                                           {{else}}
                                             <span class="mcw-material-icon-link mcw-material-icon-display">
                                               <img src="{{materialImg}}" alt="">
@@ -289,6 +312,12 @@
                                         <button type="button"
                                                 class="mcw-material-icon-link"
                                                 data-material-id="{{materialId}}">
+                                          <img src="{{materialImg}}" alt="">
+                                        </button>
+                                      {{else if materialUuid}}
+                                        <button type="button"
+                                                class="mcw-material-icon-link"
+                                                data-document-uuid="{{materialUuid}}">
                                           <img src="{{materialImg}}" alt="">
                                         </button>
                                       {{else}}

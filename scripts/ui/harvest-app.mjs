@@ -20,8 +20,8 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
     id: "morelord-craftworks-harvest",
     classes: ["morelord-craftworks", "mcw-window", "mcw", "mcw-harvest-modern"],
     position: {
-      width: 820,
-      height: 720
+      width: 960,
+      height: 800
     },
     window: {
       title: `${MODULE_TITLE} — Harvest`,

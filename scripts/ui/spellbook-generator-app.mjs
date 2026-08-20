@@ -35,8 +35,8 @@ export class SpellbookGeneratorApp
       "mcw-spellbook-generator-window"
     ],
     position: {
-      width: 680,
-      height: 760
+      width: 820,
+      height: 820
     },
     window: {
       title:

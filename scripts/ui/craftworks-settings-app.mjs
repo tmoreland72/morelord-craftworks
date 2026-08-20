@@ -28,8 +28,8 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
     id: "morelord-craftworks-settings",
     classes: ["morelord-craftworks", "mcw-window"],
     position: {
-      width: 820,
-      height: 820
+      width: 980,
+      height: 860
     },
     window: {
       title: `${MODULE_TITLE} — Settings`,
@@ -190,6 +190,9 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
       materials: {
         usePartyRecipient: getSetting(SETTINGS.USE_PARTY_RECIPIENT),
         partyActorUuid: getSetting(SETTINGS.PARTY_ACTOR_UUID),
+        showRecipesForPreferredToolProficiency: getSetting(
+          SETTINGS.SHOW_RECIPES_FOR_PREFERRED_TOOL_PROFICIENCY
+        ),
 
         harvestDcModifier: getSetting(SETTINGS.HARVEST_DC_MODIFIER),
         harvestChoicesMin: getSetting(SETTINGS.HARVEST_CHOICES_MIN),
@@ -320,6 +323,10 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
     const updates = [
       [SETTINGS.USE_PARTY_RECIPIENT, bool("usePartyRecipient")],
       [SETTINGS.PARTY_ACTOR_UUID, string("partyActorUuid")],
+      [
+        SETTINGS.SHOW_RECIPES_FOR_PREFERRED_TOOL_PROFICIENCY,
+        bool("showRecipesForPreferredToolProficiency")
+      ],
 
       [SETTINGS.HARVEST_DC_MODIFIER, number("harvestDcModifier")],
       [SETTINGS.HARVEST_CHOICES_MIN, number("harvestChoicesMin")],

@@ -1,6 +1,9 @@
 import { MODULE_TITLE } from "../constants.mjs";
 import { CraftCompletionApp } from "./craft-completion-app.mjs";
-import { isRecipeHidden } from "../core/settings.mjs";
+import {
+  isRecipeHidden,
+  isRecipeKnownToActor
+} from "../core/settings.mjs";
 
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 
@@ -35,8 +38,8 @@ export class CraftApp
       "mcw-craft-window"
     ],
     position: {
-      width: 1120,
-      height: 820
+      width: 1240,
+      height: 860
     },
     window: {
       title: `${MODULE_TITLE} — Craft`,
@@ -163,7 +166,16 @@ export class CraftApp
     ])];
     const allRecipes = queuedRecipeIds
       .map(recipeId => this.craftworks.recipes.get(recipeId, { includeDisabled: true }))
-      .filter(Boolean);
+      .filter(Boolean)
+      .filter(recipe =>
+        game.user.isGM
+        || activeJobsByRecipe.has(recipe.id)
+        || isRecipeKnownToActor(
+          recipe,
+          crafter,
+          this.craftworks.toolInspector
+        )
+      );
     const allCards = await Promise.all(
       allRecipes.map(recipe => {
         const job = activeJobsByRecipe.get(recipe.id) ?? null;
@@ -600,6 +612,10 @@ export class CraftApp
   #friendlyRequirementLabel(match) {
     if (!match) return "Material";
 
+    if (match.itemName) {
+      return String(match.itemName).trim() || "Material";
+    }
+
     const tag =
       (match.tags ?? [])
         .map(String)
@@ -694,9 +710,14 @@ export class CraftApp
     const recipeUnknown =
       isRecipeHidden(recipe.id);
 
+    const knownToCrafter = isRecipeKnownToActor(
+      recipe,
+      crafter,
+      this.craftworks.toolInspector
+    );
+
     const requirementsKnown =
-      game.user.isGM
-      || !recipeUnknown
+      knownToCrafter
       || Boolean(job);
 
     const plannedReadiness =
@@ -796,6 +817,14 @@ export class CraftApp
                     materialView.img,
                   materialUuid:
                     materialView.uuid,
+                  displayLabel:
+                    materialView.label
+                    ?? requirement.display
+                    ?? "Material",
+                  displayRarity:
+                    materialView.rarity
+                    ?? requirement.match?.rarity
+                    ?? null,
                   inventory,
                   alternativeRows:
                     requirement.type
@@ -816,6 +845,14 @@ export class CraftApp
                                   altMaterialView.img,
                                 materialUuid:
                                   altMaterialView.uuid,
+                                displayLabel:
+                                  altMaterialView.label
+                                  ?? alternative.display
+                                  ?? "Material",
+                                displayRarity:
+                                  altMaterialView.rarity
+                                  ?? alternative.match?.rarity
+                                  ?? null,
                                 inventory:
                                   inventory
                                     ?.alternatives
@@ -914,7 +951,11 @@ export class CraftApp
     if (
       !game.user.isGM
       && !job
-      && isRecipeHidden(recipe.id)
+      && !isRecipeKnownToActor(
+        recipe,
+        crafter,
+        this.craftworks.toolInspector
+      )
     ) {
       ui.notifications.warn(
         "The required ingredients for this recipe are still unknown."

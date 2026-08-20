@@ -262,10 +262,14 @@
       </div>
 
       <div class="mcw-setting-card">
-        <p>
-          No additional recipe behavior settings are currently required.
-          Recipe search, inventory readiness, and processing plans automatically use only enabled and entitled content packs.
-        </p>
+        <label class="mcw-setting-row">
+          <span>
+            <strong>Reveal Recipes from Preferred Tool Proficiency</strong>
+            <small>Always show a hidden recipe to a player whose crafting character is proficient with that recipe's preferred artisan tool.</small>
+          </span>
+          <input type="checkbox" name="showRecipesForPreferredToolProficiency" {{#if materials.showRecipesForPreferredToolProficiency}}checked{{/if}}>
+        </label>
+        <p class="mcw-muted">Recipe search and visibility continue to use only enabled and entitled content packs.</p>
       </div>
     </section>
 

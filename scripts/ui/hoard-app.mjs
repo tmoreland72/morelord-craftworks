@@ -29,7 +29,7 @@ export class HoardApp extends ScrollPreservingApplicationMixin(
   static DEFAULT_OPTIONS = {
     id: "morelord-craftworks-hoard",
     classes: ["morelord-craftworks", "mcw-window"],
-    position: { width: 720, height: 700 },
+    position: { width: 900, height: 800 },
     window: {
       title: `${MODULE_TITLE} — Hoard`,
       resizable: true

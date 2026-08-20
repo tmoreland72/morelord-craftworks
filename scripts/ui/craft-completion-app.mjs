@@ -40,8 +40,8 @@ export class CraftCompletionApp
       "mcw-craft-complete-window"
     ],
     position: {
-      width: 620,
-      height: 650
+      width: 720,
+      height: 720
     },
     window: {
       title: `${MODULE_TITLE} — Crafting Complete`,

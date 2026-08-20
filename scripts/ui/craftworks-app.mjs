@@ -1,4 +1,5 @@
 import { MODULE_TITLE } from "../constants.mjs";
+import { isRecipeKnownToActor } from "../core/settings.mjs";
 
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 
@@ -16,8 +17,8 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
     id: "morelord-craftworks",
     classes: ["morelord-craftworks", "mcw-window", "mcw-dashboard-window"],
     position: {
-      width: 760,
-      height: 680
+      width: 900,
+      height: 780
     },
     window: {
       title: MODULE_TITLE,
@@ -44,6 +45,17 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
       : {};
 
     const partyInfo = await this.craftworks.materialService.getPartyRecipientInfo();
+    const crafter = this.craftworks.crafterContext.resolve();
+    const recipesCount = this.craftworks.recipes.all()
+      .filter(recipe =>
+        game.user.isGM
+        || isRecipeKnownToActor(
+          recipe,
+          crafter,
+          this.craftworks.toolInspector
+        )
+      )
+      .length;
 
     return foundry.utils.mergeObject(context, {
       isGM: game.user.isGM,
@@ -52,7 +64,7 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
         name: scene.name
       } : null,
       materialsCount: this.craftworks.materials.size,
-      recipesCount: this.craftworks.recipes.all().length,
+      recipesCount,
       deadCreatureCount: deadCreatures.length,
       gatherRecordCount: Object.keys(gatherRecords).length,
       spellScrollGeneratorPremium:

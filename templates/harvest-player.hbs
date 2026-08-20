@@ -180,12 +180,20 @@
                   {{/if}}
 
                   {{#if neededForCrafting}}
-                    <div
-                      class="mlh-needed-badge"
-                      title="Needed for: {{neededByLabel}}"
-                    >
+                    <div class="mlh-needed-recipes">
                       <i class="fa-solid fa-hammer"></i>
-                      Needed for Crafting
+                      {{#each visibleRecipes}}
+                        <span class="mlh-recipe-tag">{{name}}</span>
+                      {{/each}}
+                      {{#if hasMoreRecipes}}
+                        <button type="button"
+                                class="mlh-recipe-help"
+                                data-action="show-matching-recipes"
+                                data-material="{{materialId}}"
+                                title="Show all {{recipeCount}} matching recipes">
+                          <i class="fa-solid fa-circle-question"></i>
+                        </button>
+                      {{/if}}
                     </div>
                   {{/if}}
                 </div>
@@ -264,12 +272,20 @@
                 <div class="mlh-claimed-name">
                   {{displayName}}
                   {{#if neededForCrafting}}
-                    <span
-                      class="mlh-needed-inline"
-                      title="Needed for: {{neededByLabel}}"
-                    >
+                    <span class="mlh-needed-inline">
                       <i class="fa-solid fa-hammer"></i>
-                      Needed
+                      {{#each visibleRecipes}}
+                        <span class="mlh-recipe-tag">{{name}}</span>
+                      {{/each}}
+                      {{#if hasMoreRecipes}}
+                        <button type="button"
+                                class="mlh-recipe-help"
+                                data-action="show-matching-recipes"
+                                data-material="{{materialId}}"
+                                title="Show all {{recipeCount}} matching recipes">
+                          <i class="fa-solid fa-circle-question"></i>
+                        </button>
+                      {{/if}}
                     </span>
                   {{/if}}
                 </div>

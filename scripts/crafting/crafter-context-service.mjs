@@ -1,4 +1,8 @@
 export class CrafterContextService {
+  constructor() {
+    this.selectedActorUuid = null;
+  }
+
   availableCharacters() {
     return game.actors
       .filter(actor => actor.type === "character")
@@ -14,6 +18,12 @@ export class CrafterContextService {
     const allowed = new Set(
       characters.map(actor => actor.uuid)
     );
+
+    const selected = characters.find(actor =>
+      actor.uuid === this.selectedActorUuid
+    );
+
+    if (selected) return selected;
 
     const controlled = canvas.tokens?.controlled
       ?.map(token => token.actor)
@@ -37,5 +47,21 @@ export class CrafterContextService {
     }
 
     return null;
+  }
+
+  select(actorUuid) {
+    const uuid = String(actorUuid ?? "").trim();
+
+    if (!uuid) {
+      this.selectedActorUuid = null;
+      return null;
+    }
+
+    const actor = this.availableCharacters().find(candidate =>
+      candidate.uuid === uuid
+    );
+
+    this.selectedActorUuid = actor?.uuid ?? null;
+    return actor ?? null;
   }
 }

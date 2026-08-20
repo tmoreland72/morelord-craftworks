@@ -403,15 +403,7 @@ export class CraftingMaterialService {
     }
 
     if (match.tags?.length) {
-      const tags = new Set(
-        entry.tags.map(tag => tag.toLowerCase())
-      );
-
-      if (
-        !match.tags.every(tag =>
-          tags.has(String(tag).toLowerCase())
-        )
-      ) {
+      if (!materialTagsSatisfy(match.tags, entry.tags)) {
         return false;
       }
     }
@@ -472,3 +464,4 @@ export class CraftingMaterialService {
     return unique;
   }
 }
+import { materialTagsSatisfy } from "../materials/material-match-utils.mjs";

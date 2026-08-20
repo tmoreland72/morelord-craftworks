@@ -1,4 +1,5 @@
 import { MODULE_TITLE } from "../constants.mjs";
+import { materialTagsSatisfy } from "../materials/material-match-utils.mjs";
 
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 
@@ -15,6 +16,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
     this.focusedCreatureTokenUuid = null;
     this.collapsedCreatures = new Set();
     this.selectedHarvestSkill = "";
+    this.recipeMatchesByMaterial = new Map();
 
     // A Harvest session may already contain authoritative participant state
     // before the player window opens (for example when the GM selected
@@ -44,8 +46,8 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
     id: "morelord-craftworks-harvest-player",
     classes: ["morelord-craftworks", "mcw-window", "mcw", "mcw-harvest-modern"],
     position: {
-      width: 820,
-      height: 720
+      width: 960,
+      height: 800
     },
     window: {
       title: `${MODULE_TITLE} — Harvest`,
@@ -141,6 +143,29 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
           .filter(Boolean)
       : [];
 
+    this.recipeMatchesByMaterial = new Map();
+    const recipeUsageFor = material => {
+      const recipes = markedRecipes
+        .filter(recipe => this.#recipeCanUseMaterial(recipe, material))
+        .map(recipe => ({
+          id: recipe.id,
+          name: recipe.name,
+          category: recipe.category ?? null,
+          tool: recipe.craft?.tool ?? null
+        }));
+
+      if (material?.materialId) {
+        this.recipeMatchesByMaterial.set(material.materialId, recipes);
+      }
+
+      return {
+        matchingRecipes: recipes,
+        visibleRecipes: recipes.slice(0, 4),
+        hasMoreRecipes: recipes.length > 4,
+        recipeCount: recipes.length
+      };
+    };
+
     const creatures = [];
     for (const creature of this.session.creatures) {
       const priorHarvest = actor
@@ -185,11 +210,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
             this.craftworks.materials.get(component.materialId)
             ?? component;
 
-          const neededByRecipes = markedRecipes
-            .filter(recipe =>
-              this.#recipeCanUseMaterial(recipe, material)
-            )
-            .map(recipe => recipe.name);
+          const recipeUsage = recipeUsageFor(material);
 
           return {
             ...component,
@@ -200,9 +221,8 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
               ?? (creature.harvestMode === "drakkenheim"
                 ? "Drakkenheim Component"
                 : "Harvest Material"),
-            neededForCrafting: neededByRecipes.length > 0,
-            neededByRecipes,
-            neededByLabel: neededByRecipes.join(", "),
+            neededForCrafting: recipeUsage.recipeCount > 0,
+            ...recipeUsage,
             claimable:
               state?.status === "awaiting-claim"
               && inChoices
@@ -280,13 +300,14 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
             this.craftworks.materials.get(result.materialId)
             ?? null;
 
-          const neededByRecipes = material
-            ? markedRecipes
-                .filter(recipe =>
-                  this.#recipeCanUseMaterial(recipe, material)
-                )
-                .map(recipe => recipe.name)
-            : [];
+          const recipeUsage = material
+            ? recipeUsageFor(material)
+            : {
+                matchingRecipes: [],
+                visibleRecipes: [],
+                hasMoreRecipes: false,
+                recipeCount: 0
+              };
 
           return {
             ...result,
@@ -311,8 +332,8 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
               result.sourceItemUuid
               ?? result.itemUuid
               ?? null,
-            neededForCrafting: neededByRecipes.length > 0,
-            neededByLabel: neededByRecipes.join(", ")
+            neededForCrafting: recipeUsage.recipeCount > 0,
+            ...recipeUsage
           };
         })
         .sort((a, b) =>
@@ -411,6 +432,13 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
         }
       }));
 
+    this.element.querySelectorAll("[data-action='show-matching-recipes']")
+      .forEach(button => button.addEventListener("click", async event => {
+        event.preventDefault();
+        event.stopPropagation();
+        await this.#showMatchingRecipes(button.dataset.material);
+      }));
+
     this.element.querySelectorAll("[data-action='close']")
       .forEach(button => button.addEventListener("click", async event => {
         event.preventDefault();
@@ -418,6 +446,37 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
         await this.close();
       }));
 
+  }
+
+  async #showMatchingRecipes(materialId) {
+    const recipes = this.recipeMatchesByMaterial.get(materialId) ?? [];
+    if (!recipes.length) return;
+
+    const escape = value => String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+    const content = `
+      <div class="mcw mcw-harvest-recipe-dialog">
+        <p>This harvested material is used by these marked recipes:</p>
+        <div class="mcw-harvest-recipe-dialog-list">
+          ${recipes.map(recipe => `
+            <div class="mcw-harvest-recipe-dialog-row">
+              <strong>${escape(recipe.name)}</strong>
+              <span>${escape([recipe.category, recipe.tool].filter(Boolean).join(" · "))}</span>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+
+    await foundry.applications.api.DialogV2.prompt({
+      window: { title: "Matching Crafting Recipes" },
+      content,
+      ok: { label: "Close" }
+    });
   }
 
   #recipeCanUseMaterial(recipe, material) {
@@ -479,16 +538,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
     }
 
     if (match.tags?.length) {
-      const tags = new Set(
-        (material.tags ?? [])
-          .map(tag => String(tag).toLowerCase())
-      );
-
-      if (
-        !match.tags.every(tag =>
-          tags.has(String(tag).toLowerCase())
-        )
-      ) {
+      if (!materialTagsSatisfy(match.tags, material.tags ?? [])) {
         return false;
       }
     }

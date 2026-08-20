@@ -71,7 +71,13 @@
                       {{#each requirementGroupRows}}
                         <div class="mcw-craft-requirement-group">{{#each requirementRows}}
                           {{#if alternativeRows.length}}
-                            <div class="mcw-craft-alternative-group"><strong>Choose one:</strong>{{#each alternativeRows}}<div class="mcw-craft-requirement-row {{#if inventory.ready}}mcw-ready{{else}}mcw-missing{{/if}}" data-document-uuid="{{materialUuid}}">{{#if materialImg}}<img src="{{materialImg}}" alt="">{{else}}<i class="fa-solid fa-cube"></i>{{/if}}<span>{{displayLabel}}</span>{{#if inventory}}<strong>{{inventory.available}} / {{inventory.required}}</strong>{{/if}}</div>{{/each}}</div>
+                            <fieldset class="mcw-craft-alternative-group">
+                              <legend><i class="fa-solid fa-code-branch"></i> Choose one</legend>
+                              {{#each alternativeRows}}
+                                <div class="mcw-craft-requirement-row {{#if inventory.ready}}mcw-ready{{else}}mcw-missing{{/if}}" data-document-uuid="{{materialUuid}}">{{#if materialImg}}<img src="{{materialImg}}" alt="">{{else}}<i class="fa-solid fa-cube"></i>{{/if}}<span>{{displayLabel}}</span>{{#if inventory}}<strong>{{inventory.available}} / {{inventory.required}}</strong>{{/if}}</div>
+                                {{#unless @last}}<div class="mcw-craft-alternative-or"><span>OR</span></div>{{/unless}}
+                              {{/each}}
+                            </fieldset>
                           {{else}}
                             <div class="mcw-craft-requirement-row {{#if inventory.ready}}mcw-ready{{else}}mcw-missing{{/if}}" data-document-uuid="{{materialUuid}}">{{#if materialImg}}<img src="{{materialImg}}" alt="">{{else}}<i class="fa-solid fa-cube"></i>{{/if}}<span>{{displayLabel}}</span>{{#if inventory}}<strong>{{inventory.available}} / {{inventory.required}}</strong>{{/if}}</div>
                           {{/if}}

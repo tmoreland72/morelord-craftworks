@@ -17,7 +17,7 @@ export class GatherPlayerApp extends ScrollPreservingApplicationMixin(
   static DEFAULT_OPTIONS = {
     id: "morelord-craftworks-gather-player",
     classes: ["morelord-craftworks", "mcw-window"],
-    position: { width: 560, height: "auto" },
+    position: { width: 680, height: "auto" },
     window: { title: `${MODULE_TITLE} — Gathering`, resizable: true }
   };
 

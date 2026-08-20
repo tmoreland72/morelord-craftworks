@@ -29,7 +29,7 @@ export class LootApp extends ScrollPreservingApplicationMixin(
   static DEFAULT_OPTIONS = {
     id: "morelord-craftworks-loot",
     classes: ["morelord-craftworks", "mcw-window"],
-    position: { width: 760, height: 760 },
+    position: { width: 920, height: 820 },
     window: { title: `${MODULE_TITLE} — Encounter Loot`, resizable: true }
   };
 

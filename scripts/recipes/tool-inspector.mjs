@@ -156,6 +156,7 @@ export class ToolInspector {
   #normalize(value) {
     return String(value ?? "")
       .toLowerCase()
+      .replace(/[’']s\b/g, "")
       .replace(/[’']/g, "")
       .replace(/\btools?\b/g, "")
       .replace(/\bsupplies\b/g, "")

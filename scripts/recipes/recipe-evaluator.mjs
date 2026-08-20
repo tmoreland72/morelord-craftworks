@@ -279,8 +279,7 @@ export class RecipeEvaluator {
     }
 
     if (match.tags?.length) {
-      const tags = new Set(entry.tags.map(tag => tag.toLowerCase()));
-      if (!match.tags.every(tag => tags.has(String(tag).toLowerCase()))) {
+      if (!materialTagsSatisfy(match.tags, entry.tags)) {
         return false;
       }
     }
@@ -288,3 +287,4 @@ export class RecipeEvaluator {
     return true;
   }
 }
+import { materialTagsSatisfy } from "../materials/material-match-utils.mjs";
