@@ -148,7 +148,12 @@ export class GatherService {
     const actor = await fromUuid(actorUuid);
     if (!actor) throw new Error("The gathering character could not be resolved.");
 
-    const { item, recipient } = await this.materialService.award(actor, result.materialId, quantity);
+    const { item, recipient } = await this.materialService.award(
+      actor,
+      result.materialId,
+      quantity,
+      { preferPartyRecipient: true }
+    );
     const material = this.materialRegistry.get(result.materialId);
 
     const state = {

@@ -4,6 +4,12 @@ const PREMIUM_TIERS = new Set(["premium", "tools-premium", "tools_premium", "cha
 
 export class MorelordCoreAccessService {
   async refresh({ quiet = true } = {}) {
+    // Morelord Core may persist refreshed entitlement state in world settings.
+    // Player clients initialize this service too, but cannot update world
+    // settings, so they must consume Core's current snapshot without forcing
+    // a refresh. The connected GM remains the authority for persistence.
+    if (!game.user?.isGM) return this.snapshot();
+
     await EntitlementService.refresh({ quiet });
     return this.snapshot();
   }

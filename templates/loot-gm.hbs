@@ -94,11 +94,43 @@
       <div class="mcw-panel">
         <h3>Encounter Haul</h3>
 
+        <div class="mcw-result-toolbar">
+          <button type="button" data-action="delete-result-items"><i class="fa-solid fa-trash"></i> Delete Marked</button>
+          <button type="button" data-action="open-item-lookup"><i class="fa-solid fa-plus"></i> Add Item</button>
+        </div>
+
+        {{#if itemLookupOpen}}
+          <div class="mcw-item-lookup">
+            <div class="mcw-item-lookup-header">
+              <div><strong>Add an Item</strong><small>Search enabled D&amp;D Item compendiums.</small></div>
+              <button type="button" class="mcw-icon-button" data-action="close-item-lookup" title="Close item lookup"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="mcw-item-lookup-search">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="search" data-item-search value="{{itemSearchQuery}}" placeholder="Type at least 2 characters…" autocomplete="off">
+            </div>
+            {{#if itemSearchResults.length}}
+              <div class="mcw-item-search-results">
+                {{#each itemSearchResults}}
+                  <button type="button" data-action="add-result-item" data-item-uuid="{{uuid}}"><img src="{{img}}" alt=""><span><strong>{{name}}</strong><small>{{sourceLabel}}{{#if type}} · {{type}}{{/if}}</small></span><i class="fa-solid fa-plus"></i></button>
+                {{/each}}
+              </div>
+            {{else}}
+              {{#if itemSearchReady}}
+                <p class="mcw-item-lookup-empty">No matching Items found in enabled sources.</p>
+              {{else}}
+                <p class="mcw-item-lookup-hint">Enter at least 2 characters to search.</p>
+              {{/if}}
+            {{/if}}
+          </div>
+        {{/if}}
+
         {{#if session.result.channels.materials}}
           {{#if session.result.materials.length}}
             <div class="mcw-loot-summary-grid">
               {{#each session.result.materials}}
-                <div class="mcw-result" data-document-uuid="{{uuid}}">
+                <div class="mcw-result mcw-editable-result" data-document-uuid="{{uuid}}">
+                  <input type="checkbox" data-result-item="materials:{{@index}}" aria-label="Mark {{name}} for deletion">
                   <img src="{{img}}" alt="{{name}}">
                   <strong>{{name}} ×{{quantity}}</strong>
                 </div>
@@ -111,20 +143,31 @@
 
         {{#if session.result.potions.length}}
           <h4>Potions</h4>
-          <div class="mcw-loot-summary-grid">{{#each session.result.potions}}<div class="mcw-result" data-document-uuid="{{uuid}}"><img src="{{img}}" alt="{{name}}"><strong>{{name}}</strong></div>{{/each}}</div>
+          <div class="mcw-loot-summary-grid">{{#each session.result.potions}}<div class="mcw-result mcw-editable-result" data-document-uuid="{{uuid}}"><input type="checkbox" data-result-item="potions:{{@index}}" aria-label="Mark {{name}} for deletion"><img src="{{img}}" alt="{{name}}"><strong>{{name}}</strong></div>{{/each}}</div>
         {{/if}}
 
         {{#if session.result.spellScrolls.length}}
           <h4>Spell Scrolls</h4>
-          <div class="mcw-loot-summary-grid">{{#each session.result.spellScrolls}}<div class="mcw-result" data-document-uuid="{{uuid}}"><img src="{{img}}" alt="{{name}}"><strong>Spell Scroll: {{name}}</strong></div>{{/each}}</div>
+          <div class="mcw-loot-summary-grid">{{#each session.result.spellScrolls}}<div class="mcw-result mcw-editable-result" data-document-uuid="{{uuid}}"><input type="checkbox" data-result-item="spellScrolls:{{@index}}" aria-label="Mark Spell Scroll: {{name}} for deletion"><img src="{{img}}" alt="{{name}}"><strong>Spell Scroll: {{name}}</strong></div>{{/each}}</div>
+        {{/if}}
+
+        {{#if session.result.customItems.length}}
+          <h4>Added Items</h4>
+          <div class="mcw-loot-summary-grid">{{#each session.result.customItems}}<div class="mcw-result mcw-editable-result" data-document-uuid="{{uuid}}"><input type="checkbox" data-result-item="customItems:{{@index}}" aria-label="Mark {{name}} for deletion"><img src="{{img}}" alt="{{name}}"><div><strong>{{name}}</strong><small>{{sourceLabel}}</small></div></div>{{/each}}</div>
         {{/if}}
 
         {{#if session.result.channels.coin}}
-          {{#if session.result.coinTotalCopper}}
-            <p><i class="fa-solid fa-coins"></i> <strong>{{session.result.coinLabel}}</strong></p>
-          {{else}}
-            <p>No coin was recovered.</p>
-          {{/if}}
+          <div class="mcw-coin-editor">
+            <div class="mcw-coin-editor-heading">
+              <strong><i class="fa-solid fa-coins"></i> Coin</strong>
+              <span>{{#if session.result.coinTotalCopper}}{{session.result.coinLabel}}{{else}}No coin{{/if}}</span>
+            </div>
+            <div class="mcw-coin-fields">
+              {{#each coinEditor}}
+                <label><span>{{label}}</span><input type="number" min="0" step="1" value="{{value}}" data-coin-denomination="{{denomination}}"></label>
+              {{/each}}
+            </div>
+          </div>
         {{/if}}
 
         {{#if session.result.channels.special}}
@@ -132,7 +175,8 @@
             <strong>Special Treasure</strong>
             {{#if session.result.special.triggered}}
               {{#if session.result.special.itemUuid}}
-                <div class="mcw-result mcw-special-result" data-document-uuid="{{session.result.special.itemUuid}}">
+                <div class="mcw-result mcw-special-result mcw-editable-result" data-document-uuid="{{session.result.special.itemUuid}}">
+                  <input type="checkbox" data-result-item="lootSpecial" aria-label="Mark {{session.result.special.itemName}} for deletion">
                   <img src="{{session.result.special.itemImg}}" alt="{{session.result.special.itemName}}">
                   <div>
                     <strong>{{session.result.special.itemName}}</strong>
@@ -153,6 +197,7 @@
             {{/if}}
           </div>
         {{/if}}
+
       </div>
 
       <div class="mcw-panel">

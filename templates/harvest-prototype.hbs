@@ -22,14 +22,21 @@
           {{#each progress}}
             <div class="mlh-player-progress-row">
               <strong>{{user}}</strong>
-              <button
-                type="button"
-                data-action="reopen-harvest"
-                data-user-id="{{userId}}"
-              >
-                <i class="fa-solid fa-window-restore"></i>
-                Reopen Window
-              </button>
+              {{#if completed}}
+                <span class="mlh-harvesting-completed">
+                  <i class="fa-solid fa-circle-check"></i>
+                  Harvesting Completed
+                </span>
+              {{else}}
+                <button
+                  type="button"
+                  data-action="reopen-harvest"
+                  data-user-id="{{userId}}"
+                >
+                  <i class="fa-solid fa-window-restore"></i>
+                  Reopen Window
+                </button>
+              {{/if}}
             </div>
           {{/each}}
         </div>

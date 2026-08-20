@@ -7,8 +7,8 @@ export class MaterialService {
     this.recipientResolver = recipientResolver;
   }
 
-  async getRecipient(fallbackActor = null) {
-    return this.recipientResolver.resolve(fallbackActor);
+  async getRecipient(fallbackActor = null, options = {}) {
+    return this.recipientResolver.resolve(fallbackActor, options);
   }
 
   async getPartyRecipientInfo() {
@@ -19,12 +19,14 @@ export class MaterialService {
     actor,
     materialId,
     quantity = 1,
-    { postChatCard = true } = {}
+    { postChatCard = true, preferPartyRecipient = false } = {}
   ) {
     const source = await this.registry.resolveItem(materialId);
     if (!source) throw new Error(`Unknown Craftworks material '${materialId}'.`);
 
-    const recipient = await this.getRecipient(actor);
+    const recipient = await this.getRecipient(actor, {
+      preferParty: preferPartyRecipient
+    });
     if (!recipient) throw new Error("No recipient Actor is available for this Craftworks material.");
 
     const item = await this.adapter.addItemToActor(

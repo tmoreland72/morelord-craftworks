@@ -4928,6 +4928,14 @@
   width: auto;
 }
 
+.mcw-harvest-modern .mlh-harvesting-completed {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--mlh-success);
+  font-weight: 700;
+}
+
 /* Potion generator */
 .mcw-generator-constraints {
   margin: 0 0 0.75rem;
@@ -5117,7 +5125,6 @@
 .morelord-craftworks.mcw-window .mcw-craft-filter-rail,
 .morelord-craftworks.mcw-window .mcw-craft-results,
 .morelord-craftworks.mcw-window .mcw-craft-completion-description,
-.morelord-craftworks.mcw-window .mcw-harvest-modern .mlh-creatures,
 .morelord-craftworks.mcw-window .mcw-spellbook-generator,
 .morelord-craftworks.mcw-window .mcw-spellbook-preview,
 .morelord-craftworks.mcw-window .mcw-spellbook-results-scroll,
@@ -5136,6 +5143,22 @@
   overflow: visible !important;
   overscroll-behavior: auto !important;
   scrollbar-gutter: auto;
+}
+
+/* Harvest is a fixed header/body/footer layout; its claim list owns scrolling. */
+.morelord-craftworks.mcw-window.mcw-harvest-modern .window-content {
+  overflow: hidden !important;
+}
+
+.morelord-craftworks.mcw-window.mcw-harvest-modern .mlh-creatures {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto !important;
+  max-height: none !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  scrollbar-gutter: stable;
 }
 
 .mcw-generator-count-row span,
@@ -5228,4 +5251,215 @@
   height: 18px;
   margin: 0;
   cursor: pointer;
+}
+
+.mcw .mcw-editable-result > input[type="checkbox"] {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  margin: 0 4px 0 0;
+  accent-color: var(--mcw-accent, #c5a05b);
+  cursor: pointer;
+}
+
+.mcw .mcw-result-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -2px 0 14px;
+}
+
+.mcw .mcw-result-toolbar > button {
+  flex: 0 0 auto;
+  width: auto;
+  min-height: 34px;
+  padding: 6px 12px;
+  white-space: nowrap;
+}
+
+.mcw .mcw-item-lookup {
+  margin: -4px 0 16px;
+  padding: 12px;
+  border: 1px solid rgba(197, 160, 91, 0.38);
+  border-radius: 8px;
+  background: rgba(197, 160, 91, 0.055);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.mcw .mcw-item-lookup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.mcw .mcw-item-lookup-header > div {
+  display: grid;
+  gap: 2px;
+}
+
+.mcw .mcw-item-lookup-header small {
+  color: var(--color-text-dark-secondary, #aaa);
+}
+
+.mcw .mcw-item-lookup-header .mcw-icon-button {
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  min-height: 30px;
+  padding: 0;
+}
+
+.mcw .mcw-item-lookup-search {
+  position: relative;
+}
+
+.mcw .mcw-item-lookup-search > i {
+  position: absolute;
+  top: 50%;
+  left: 11px;
+  z-index: 1;
+  color: rgba(197, 160, 91, 0.85);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.mcw .mcw-item-lookup-search > input {
+  width: 100%;
+  height: 38px;
+  padding-left: 34px;
+  border-color: rgba(197, 160, 91, 0.42);
+}
+
+.mcw .mcw-item-search-results {
+  display: grid;
+  gap: 5px;
+  max-height: 260px;
+  margin-top: 8px;
+  padding: 5px;
+  overflow-y: auto;
+  border: 1px solid rgba(197, 160, 91, 0.2);
+  border-radius: 7px;
+  background: rgba(0, 0, 0, 0.16);
+}
+
+.mcw .mcw-item-search-results button {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 22px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 5px 9px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.025);
+  text-align: left;
+}
+
+.mcw .mcw-item-search-results button:hover,
+.mcw .mcw-item-search-results button:focus-visible {
+  border-color: rgba(197, 160, 91, 0.5);
+  background: rgba(197, 160, 91, 0.1);
+}
+
+.mcw .mcw-item-search-results img {
+  width: 38px;
+  height: 38px;
+  object-fit: cover;
+  border: 1px solid rgba(197, 160, 91, 0.25);
+  border-radius: 5px;
+}
+
+.mcw .mcw-item-search-results span {
+  display: grid;
+  min-width: 0;
+}
+
+.mcw .mcw-item-search-results small {
+  color: var(--color-text-dark-secondary, #aaa);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mcw .mcw-item-search-results button > i {
+  justify-self: center;
+  color: rgba(197, 160, 91, 0.95);
+}
+
+.mcw .mcw-item-lookup-empty {
+  margin: 10px 0 0;
+  padding: 10px;
+  border-radius: 5px;
+  color: var(--color-text-dark-secondary, #aaa);
+  background: rgba(0, 0, 0, 0.12);
+  text-align: center;
+}
+
+.mcw .mcw-item-lookup-hint {
+  margin: 8px 2px 0;
+  color: var(--color-text-dark-secondary, #aaa);
+  font-size: 0.9em;
+}
+
+.mcw .mcw-coin-editor {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(197, 160, 91, 0.2);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.mcw .mcw-coin-editor-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mcw .mcw-coin-editor-heading > span {
+  color: rgba(197, 160, 91, 0.95);
+  font-weight: 600;
+}
+
+.mcw .mcw-coin-fields {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(58px, 1fr));
+  gap: 7px;
+}
+
+.mcw .mcw-coin-fields label {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+}
+
+.mcw .mcw-coin-fields label > span {
+  color: var(--color-text-dark-secondary, #aaa);
+  font-size: 0.78em;
+  font-weight: 700;
+}
+
+.mcw .mcw-coin-fields input {
+  width: 100%;
+  min-width: 0;
+  height: 30px;
+  padding: 3px 5px;
+  text-align: right;
+}
+
+@media (max-width: 600px) {
+  .mcw .mcw-result-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .mcw .mcw-coin-fields {
+    grid-template-columns: repeat(3, minmax(65px, 1fr));
+  }
 }

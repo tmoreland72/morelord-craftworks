@@ -29,7 +29,16 @@ export class RecipientResolver {
     return eligible.length === 1 ? eligible[0] : null;
   }
 
-  async resolve(fallbackActor = null) {
+  async resolve(fallbackActor = null, { preferParty = false } = {}) {
+    if (preferParty && this.isPartyEnabled()) {
+      const party = await this.getPartyActor();
+      if (party) return party;
+
+      throw new Error(
+        "Party Recipient is enabled, but no populated Party/Group actor is configured. Choose one in Morelord Craftworks settings."
+      );
+    }
+
     // An explicitly selected recipient always wins. The configured Party
     // actor is a default for award forms, not a lock on their destination.
     if (fallbackActor) return fallbackActor;

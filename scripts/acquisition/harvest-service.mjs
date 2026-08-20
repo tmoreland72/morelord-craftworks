@@ -565,7 +565,8 @@ export class HarvestService {
 
     const recipient =
       await this.materialService.getRecipient(
-        actor
+        actor,
+        { preferParty: true }
       );
 
     if (!recipient) {
@@ -706,6 +707,75 @@ export class HarvestService {
     };
   }
 
+  async updatePlayerCompletions(sessionId) {
+    const session = this.sessions.get(sessionId);
+    if (!session) throw new Error("Harvest session not found.");
+
+    const userIds = new Set(
+      Object.values(session.participants ?? {})
+        .map(state => state?.userId)
+        .filter(Boolean)
+    );
+    const completedUserIds = new Set(session.completedUserIds ?? []);
+    const completed = [];
+
+    for (const userId of userIds) {
+      if (completedUserIds.has(userId)) continue;
+
+      let isComplete = true;
+      for (const creature of session.creatures ?? []) {
+        const state = session.participants?.[`${userId}:${creature.tokenUuid}`];
+        if (!state?.status) {
+          isComplete = false;
+          break;
+        }
+
+        if (state.status === "awaiting-claim") {
+          const hasAvailableChoice = (state.choices ?? []).some(choice => {
+            const componentId = choice.componentId
+              ?? `${creature.tokenUuid}::${choice.materialId}`;
+            if ((state.claimedComponentIds ?? []).includes(componentId)) return false;
+            return !(session.results ?? []).some(result =>
+              result.creatureTokenUuid === creature.tokenUuid
+              && result.componentId === componentId
+            );
+          });
+
+          if (hasAvailableChoice) {
+            isComplete = false;
+            break;
+          }
+
+          state.status = Number(state.claimsMade ?? 0) > 0
+            ? "claimed"
+            : "no-results";
+          state.claimsRemaining = 0;
+          await this.#writeHarvestRecord(creature.tokenUuid, state.actorUuid, {
+            status: state.status,
+            skillId: state.skillId,
+            total: state.total,
+            naturalD20: state.naturalD20 ?? null
+          });
+        }
+
+        if (!["failed", "no-results", "claimed"].includes(state.status)) {
+          isComplete = false;
+          break;
+        }
+      }
+
+      if (!isComplete) continue;
+      completedUserIds.add(userId);
+      completed.push({
+        userId,
+        userName: game.users.get(userId)?.name ?? "A player"
+      });
+    }
+
+    session.completedUserIds = [...completedUserIds];
+    return completed;
+  }
+
   #applyRarityBias(entries, bias) {
     const rank = {
       common: 0,
@@ -792,7 +862,10 @@ export class HarvestService {
           actor,
           result.materialId,
           1,
-          { postChatCard: false }
+          {
+            postChatCard: false,
+            preferPartyRecipient: true
+          }
         );
 
       result.recipientUuid =

@@ -1,6 +1,13 @@
 import { MODULE_TITLE } from "../constants.mjs";
 
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
+import {
+  addCustomItem,
+  coinEditorValues,
+  deleteSelectedResultItems,
+  searchItemsByName,
+  updateResultCoins
+} from "./result-item-editor.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -13,6 +20,10 @@ export class LootApp extends ScrollPreservingApplicationMixin(
     this.session = null;
     this.preflightCreatures = null;
     this.selectedPreflightCreatureUuids = new Set();
+    this.itemSearchQuery = "";
+    this.itemSearchResults = [];
+    this.itemSearchTimer = null;
+    this.itemLookupOpen = false;
   }
 
   static DEFAULT_OPTIONS = {
@@ -86,7 +97,12 @@ export class LootApp extends ScrollPreservingApplicationMixin(
       creatures,
       resolvedCount,
       actors,
-      partyInfo
+      partyInfo,
+      itemSearchQuery: this.itemSearchQuery,
+      itemSearchResults: this.itemSearchResults,
+      itemLookupOpen: this.itemLookupOpen,
+      itemSearchReady: this.itemSearchQuery.trim().length >= 2,
+      coinEditor: coinEditorValues(this.session?.result)
     }, { inplace: false });
   }
 
@@ -107,6 +123,8 @@ export class LootApp extends ScrollPreservingApplicationMixin(
 
     this.element.querySelector("[data-action='reroll-loot']")
       ?.addEventListener("click", () => this.#rerollLoot());
+
+    this.#activateResultEditing();
 
     this.element.querySelectorAll("[data-loot-creature-select]")
       .forEach(input => input.addEventListener("change", event => {
@@ -170,6 +188,7 @@ export class LootApp extends ScrollPreservingApplicationMixin(
       if (materialSummary) parts.push(materialSummary);
       if (result.potions?.length) parts.push(`${result.potions.length} potion${result.potions.length === 1 ? "" : "s"}`);
       if (result.spellScrolls?.length) parts.push(`${result.spellScrolls.length} spell scroll${result.spellScrolls.length === 1 ? "" : "s"}`);
+      if (result.customItems?.length) parts.push(result.customItems.map(item => item.name).join(", "));
       if (result.coinTotalCopper > 0) parts.push(result.coinLabel);
       if (result.special?.itemName) parts.push(result.special.itemName);
 
@@ -180,6 +199,7 @@ export class LootApp extends ScrollPreservingApplicationMixin(
         materials: result.materials,
         potions: result.potions,
         spellScrolls: result.spellScrolls,
+        customItems: result.customItems,
         coinLabel: result.coinLabel,
         coinTotalCopper: result.coinTotalCopper,
         special: result.special,
@@ -212,6 +232,76 @@ export class LootApp extends ScrollPreservingApplicationMixin(
     } catch (err) {
       ui.notifications.error(err.message);
     }
+  }
+
+  #activateResultEditing() {
+    this.element.querySelectorAll("[data-result-item]")
+      .forEach(input => input.addEventListener("click", event => event.stopPropagation()));
+
+    this.element.querySelectorAll("[data-coin-denomination]")
+      .forEach(input => input.addEventListener("change", async () => {
+        const values = Object.fromEntries(
+          Array.from(this.element.querySelectorAll("[data-coin-denomination]"))
+            .map(field => [field.dataset.coinDenomination, field.value])
+        );
+        updateResultCoins(this.session?.result, values, this.craftworks.adapter);
+        await this.render();
+      }));
+
+    this.element.querySelector("[data-action='delete-result-items']")
+      ?.addEventListener("click", async () => {
+        const selected = Array.from(this.element.querySelectorAll("[data-result-item]:checked"))
+          .map(input => input.dataset.resultItem);
+        if (!selected.length) return ui.notifications.warn("Mark at least one item to delete.");
+        const count = deleteSelectedResultItems(this.session?.result, selected);
+        if (count) ui.notifications.info(`Removed ${count} item${count === 1 ? "" : "s"} from the encounter haul.`);
+        await this.render();
+      });
+
+    this.element.querySelector("[data-action='open-item-lookup']")
+      ?.addEventListener("click", async () => {
+        this.itemLookupOpen = true;
+        await this.render();
+        this.element.querySelector("[data-item-search]")?.focus();
+      });
+
+    this.element.querySelector("[data-action='close-item-lookup']")
+      ?.addEventListener("click", async () => {
+        this.itemLookupOpen = false;
+        this.itemSearchQuery = "";
+        this.itemSearchResults = [];
+        await this.render();
+      });
+
+    const search = this.element.querySelector("[data-item-search]");
+    search?.addEventListener("input", event => {
+      this.itemSearchQuery = event.currentTarget.value;
+      clearTimeout(this.itemSearchTimer);
+      this.itemSearchTimer = setTimeout(async () => {
+        const query = this.itemSearchQuery;
+        const results = await searchItemsByName(query, {
+          sourceFilter: this.craftworks.sourceFilter
+        });
+        if (query !== this.itemSearchQuery) return;
+        this.itemSearchResults = results;
+        await this.render();
+        const input = this.element.querySelector("[data-item-search]");
+        input?.focus();
+        input?.setSelectionRange(input.value.length, input.value.length);
+      }, 250);
+    });
+
+    this.element.querySelectorAll("[data-action='add-result-item']")
+      .forEach(button => button.addEventListener("click", async () => {
+        const item = this.itemSearchResults.find(entry => entry.uuid === button.dataset.itemUuid);
+        if (!item) return;
+        addCustomItem(this.session?.result, item);
+        this.itemSearchQuery = "";
+        this.itemSearchResults = [];
+        this.itemLookupOpen = false;
+        ui.notifications.info(`Added ${item.name} to the encounter haul.`);
+        await this.render();
+      }));
   }
 
   async #finish() {

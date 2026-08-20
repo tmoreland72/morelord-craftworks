@@ -51,6 +51,7 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
       ? users.map(user => ({
           userId: user.id,
           user: user.name,
+          completed: (this.session.completedUserIds ?? []).includes(user.id),
           perCreature: this.session.creatures.map(creature => {
             const state = this.session.participants?.[`${user.id}:${creature.tokenUuid}`];
             return {

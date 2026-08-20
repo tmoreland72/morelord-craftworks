@@ -335,6 +335,13 @@ export class LootService {
       awardedItems.push({ document: created, linkUuid: spell.uuid, quantity: 1, rarity: created.system?.rarity });
     }
 
+    for (const added of result.customItems ?? []) {
+      const source = await fromUuid(added.uuid);
+      if (!source || source.documentName !== "Item") throw new Error(`Added Item could not be resolved: ${added.name}`);
+      const created = await this.adapter.addItemToActor(recipient, source, Number(added.quantity ?? 1));
+      awardedItems.push({ document: created, linkUuid: added.uuid, quantity: Number(added.quantity ?? 1), rarity: created.system?.rarity });
+    }
+
     if (result.coinTotalCopper > 0) {
       await this.adapter.adjustCurrencyCopper(
         recipient,

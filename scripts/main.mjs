@@ -527,6 +527,7 @@ Hooks.once("ready", async () => {
       creatureTokenUuid: data.creatureTokenUuid,
       state
     }, { targetUserId: data.userId });
+    await harvest.updatePlayerCompletions(data.sessionId);
     gmHarvestApp?.setSession(sessions.get(data.sessionId));
   });
 
@@ -559,6 +560,8 @@ Hooks.once("ready", async () => {
       const authoritative =
         sessions.get(sessionId);
 
+      await harvest.updatePlayerCompletions(sessionId);
+
       // One session broadcast updates every creature result together. This
       // avoids a cascade of player rerenders during large Harvest batches.
       await socket.emit(
@@ -579,6 +582,8 @@ Hooks.once("ready", async () => {
 
     const resolved = await harvest.claim(data);
     const session = resolved.session;
+
+    await harvest.updatePlayerCompletions(data.sessionId);
 
     // Broadcast the authoritative session to every connected Harvest client.
     // This mirrors the standalone Drakkenheim Harvesting model: once a claim
@@ -660,6 +665,7 @@ Hooks.once("ready", async () => {
       if (materials) parts.push(materials);
       if (data.potions?.length) parts.push(`${data.potions.length} potion${data.potions.length === 1 ? "" : "s"}`);
       if (data.spellScrolls?.length) parts.push(`${data.spellScrolls.length} spell scroll${data.spellScrolls.length === 1 ? "" : "s"}`);
+      if (data.customItems?.length) parts.push(data.customItems.map(item => item.name).join(", "));
       if (data.coinTotalCopper > 0) parts.push(data.coinLabel);
       if (data.special?.itemName) parts.push(data.special.itemName);
       ui.notifications.info(`The party recovered ${parts.join("; ")}. Sent to ${data.actorName}.`);
