@@ -192,11 +192,23 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
           .map(result => [result.componentId, result])
       );
 
+      const currentUserClaimsByComponentId = new Map(
+        (this.session.results ?? [])
+          .filter(result =>
+            result.creatureTokenUuid === creature.tokenUuid
+            && result.userId === game.user.id
+          )
+          .map(result => [result.componentId, result])
+      );
+
       const components = (creature.components ?? [])
         .filter(component => component.matched && component.materialId)
         .map(component => {
           const globalClaim =
-            claimsByComponentId.get(component.id)
+            (creature.harvestMode === "drakkenheim"
+              ? claimsByComponentId
+              : currentUserClaimsByComponentId
+            ).get(component.id)
             ?? null;
 
           const inChoices =

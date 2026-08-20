@@ -295,6 +295,9 @@ export class CraftApp
         event => {
           this.crafterActorUuid =
             event.currentTarget.value || null;
+          this.craftworks.crafterContext.select(
+            this.crafterActorUuid
+          );
 
           // Default ingredient inventory to the newly selected
           // crafter unless the current inventory selection is a Group.

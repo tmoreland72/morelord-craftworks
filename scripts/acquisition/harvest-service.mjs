@@ -144,6 +144,21 @@ export class HarvestService {
       );
     }
 
+    // Kibbles-style harvesting presents one shared randomized offering per
+    // creature. Every successful participant receives the same choices and
+    // may harvest from that offering independently. Drakkenheim components
+    // remain exact, finite monster parts and are not changed here.
+    for (const creature of creatures) {
+      if (
+        creature.harvestMode !== "drakkenheim"
+        && !Array.isArray(creature.sharedChoiceMaterialIds)
+      ) {
+        creature.sharedChoiceMaterialIds = this.#buildChoices(creature)
+          .map(choice => choice.materialId)
+          .filter(Boolean);
+      }
+    }
+
     const session = this.sessions.create({
       type: "harvest",
       sceneId: canvas.scene?.id ?? null,
@@ -296,13 +311,17 @@ export class HarvestService {
       game.users.filter(user => user.active && !user.isGM).length
     );
 
-    return weightedDistinctSample(
-      weightedCandidates,
-      Math.max(
-        getHarvestChoiceCount(),
-        activePartySize
-      )
-    )
+    const selectedCandidates = Array.isArray(creature.sharedChoiceMaterialIds)
+      ? creature.sharedChoiceMaterialIds.map(materialId => ({ materialId }))
+      : weightedDistinctSample(
+          weightedCandidates,
+          Math.max(
+            getHarvestChoiceCount(),
+            activePartySize
+          )
+        );
+
+    return selectedCandidates
       .map(result => {
         const material =
           this.materialRegistry.get(
@@ -528,6 +547,12 @@ export class HarvestService {
       ?? componentId
       ?? `${creatureTokenUuid}::${choice.materialId}`;
 
+    const creature = session.creatures.find(
+      entry => entry.tokenUuid === creatureTokenUuid
+    );
+    const isExclusiveComponent =
+      creature?.harvestMode === "drakkenheim";
+
     if (
       (state.claimedComponentIds ?? [])
         .includes(resolvedComponentId)
@@ -537,10 +562,12 @@ export class HarvestService {
       );
     }
 
-    const alreadyClaimed = (session.results ?? []).find(result =>
-      result.creatureTokenUuid === creatureTokenUuid
-      && result.componentId === resolvedComponentId
-    );
+    const alreadyClaimed = isExclusiveComponent
+      ? (session.results ?? []).find(result =>
+          result.creatureTokenUuid === creatureTokenUuid
+          && result.componentId === resolvedComponentId
+        )
+      : null;
 
     if (alreadyClaimed) {
       throw new Error(
@@ -608,10 +635,11 @@ export class HarvestService {
           return false;
         }
 
-        return !(session.results ?? []).some(result =>
-          result.creatureTokenUuid === creatureTokenUuid
-          && result.componentId === id
-        );
+        return !isExclusiveComponent
+          || !(session.results ?? []).some(result =>
+            result.creatureTokenUuid === creatureTokenUuid
+            && result.componentId === id
+          );
       });
 
     const targetClaims =
@@ -657,10 +685,6 @@ export class HarvestService {
       sourceItemUuid: material.uuid,
       awarded: false
     });
-
-    const creature = session.creatures.find(
-      entry => entry.tokenUuid === creatureTokenUuid
-    );
 
     const result = {
       id:
@@ -735,10 +759,11 @@ export class HarvestService {
             const componentId = choice.componentId
               ?? `${creature.tokenUuid}::${choice.materialId}`;
             if ((state.claimedComponentIds ?? []).includes(componentId)) return false;
-            return !(session.results ?? []).some(result =>
-              result.creatureTokenUuid === creature.tokenUuid
-              && result.componentId === componentId
-            );
+            return creature.harvestMode !== "drakkenheim"
+              || !(session.results ?? []).some(result =>
+                result.creatureTokenUuid === creature.tokenUuid
+                && result.componentId === componentId
+              );
           });
 
           if (hasAvailableChoice) {
