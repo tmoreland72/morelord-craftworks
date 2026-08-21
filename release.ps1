@@ -355,6 +355,11 @@ function Get-ReleaseMetadataFromMarkdown {
             if ($CategoryMap.ContainsKey($Heading)) { $CurrentCategory = $CategoryMap[$Heading] } else { $CurrentCategory = $null }
             continue
         }
+        if ($Trimmed -match '^###\s+(.+)$') {
+            $Heading = $Matches[1].Trim().ToLowerInvariant()
+            if ($CategoryMap.ContainsKey($Heading)) { $CurrentCategory = $CategoryMap[$Heading] } else { $CurrentCategory = $null }
+            continue
+        }
         if (-not $SeenH2 -and -not [string]::IsNullOrWhiteSpace($Trimmed)) {
             $SummaryLines.Add($Trimmed)
             continue
@@ -377,6 +382,19 @@ function Get-ReleaseMetadataFromMarkdown {
         $Summary = [string]$Changes[0].description
     }
     return [pscustomobject]@{ title = $Title; summary = $Summary; changes = @($Changes | ForEach-Object { $_ }) }
+}
+
+function Assert-ReleaseMetadataHasChanges {
+    param(
+        [Parameter(Mandatory = $true)][psobject]$Metadata,
+        [Parameter(Mandatory = $true)][string]$Path
+    )
+    $Content = Get-Content -Path $Path -Raw -Encoding UTF8
+    if ($Content -notmatch '(?m)^##\s+What Changed\s*$') {
+        throw "Release notes '$Path' must include the standard '## What Changed' heading."
+    }
+    if (@($Metadata.changes).Count -gt 0) { return }
+    throw "Release notes '$Path' do not contain any publishable What Changed entries. Use bullet lists under subsections such as ### Added, ### Improvements, or ### Fixed."
 }
 
 function Publish-WebsiteRelease {
@@ -459,6 +477,7 @@ if ($WebsiteOnly) {
     if (-not (Test-Path $ReleaseNotesPath -PathType Leaf)) { throw "Release notes were not found: $ReleaseNotesPath" }
     if ([string]::IsNullOrWhiteSpace($WebsiteToken)) { throw 'Website-only publishing requires RELEASE_PUBLISH_TOKEN in the project .env file or -WebsiteToken.' }
     $ReleaseMetadata = Get-ReleaseMetadataFromMarkdown -Path $ReleaseNotesPath -DefaultTitle "$ModuleTitle $Version"
+    Assert-ReleaseMetadataHasChanges -Metadata $ReleaseMetadata -Path $ReleaseNotesPath
     $Payload = [pscustomobject]@{
         productSlug = $ProductSlug
         version = $Version
@@ -498,6 +517,7 @@ try {
         throw 'Website publishing is enabled but no token is configured. Set RELEASE_PUBLISH_TOKEN in the project .env file or pass -WebsiteToken. Use -SkipWebsitePublish only when intentionally bypassing the website feed.'
     }
     $ReleaseMetadata = Get-ReleaseMetadataFromMarkdown -Path $ReleaseNotesPath -DefaultTitle "$ModuleTitle $Version"
+    Assert-ReleaseMetadataHasChanges -Metadata $ReleaseMetadata -Path $ReleaseNotesPath
     Write-Host "  Notes           : $ReleaseNotesPath"
     Write-Host "  Website changes : $($ReleaseMetadata.changes.Count)"
 
