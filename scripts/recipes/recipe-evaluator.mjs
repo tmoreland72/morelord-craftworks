@@ -1,4 +1,8 @@
 import { MODULE_ID } from "../constants.mjs";
+import {
+  recipeItemMatches,
+  spellScrollMatches
+} from "./recipe-item-match-utils.mjs";
 
 export class RecipeEvaluator {
   constructor({ materialRegistry }) {
@@ -262,7 +266,14 @@ export class RecipeEvaluator {
       return false;
     }
 
-    if (match.itemName && entry.itemName !== String(match.itemName).trim().toLowerCase()) {
+    if (match.itemName && !recipeItemMatches(entry.item, match.itemName)) {
+      return false;
+    }
+
+    if (
+      match.itemType === "spellScroll"
+      && !spellScrollMatches(entry.item, match.spellName)
+    ) {
       return false;
     }
 

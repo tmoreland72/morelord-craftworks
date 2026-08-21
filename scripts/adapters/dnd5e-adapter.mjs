@@ -30,6 +30,37 @@ export class Dnd5eAdapter extends SystemAdapter {
     return Number.isFinite(value) ? value : 0;
   }
 
+  getCreatureHarvestTraits(actor) {
+    const creatureType = this.getCreatureType(actor);
+    const cr = this.getCreatureCR(actor);
+    const size = String(actor?.system?.traits?.size ?? "med").toLowerCase();
+    const ac = Number(actor?.system?.attributes?.ac?.value ?? 0);
+    const damageResistances = actor?.system?.traits?.dr?.value;
+    const resistanceValues = damageResistances instanceof Set
+      ? [...damageResistances]
+      : Array.isArray(damageResistances)
+        ? damageResistances
+        : [];
+    const elementalResistance = resistanceValues.some(value =>
+      ["acid", "cold", "fire", "lightning", "thunder"].includes(String(value).toLowerCase())
+    );
+    const typeDetails = actor?.system?.details?.type;
+    const customType = typeof typeDetails === "object"
+      ? String(typeDetails?.custom ?? "")
+      : "";
+    const incorporeal = /incorporeal/i.test(customType)
+      || /\b(banshee|ghost|poltergeist|shadow|specter|spectre|wraith|will[- ]o['’]?-wisp)\b/i.test(actor?.name ?? "");
+
+    return {
+      creatureType,
+      cr,
+      size,
+      ac: Number.isFinite(ac) ? ac : 0,
+      elementalResistance,
+      incorporeal
+    };
+  }
+
   isDeadCreatureToken(token) {
     const actor = token?.actor;
     if (!actor) return false;

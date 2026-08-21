@@ -45,6 +45,22 @@
         </select>
       </label>
 
+      <fieldset class="mcw-character-picker">
+        <legend>Player Characters</legend>
+        <p>Choose which connected player characters receive the gathering roll window.</p>
+        <div class="mcw-character-picker-list">
+          {{#each characters}}
+            <label>
+              <input type="checkbox" name="characterUuid" value="{{uuid}}" {{#if checked}}checked{{/if}}>
+              <img src="{{img}}" alt="{{name}}">
+              <span><strong>{{name}}</strong><small>{{#if connected}}Connected: {{userName}}{{else}}Offline — no window can be sent{{/if}}</small></span>
+            </label>
+          {{else}}
+            <p class="mcw-warning">No player character Actors are defined.</p>
+          {{/each}}
+        </div>
+      </fieldset>
+
       <div class="mcw-actions">
         <button type="button" data-action="start"><i class="fa-solid fa-seedling"></i> Start Gathering</button>
         {{#if gatherRecordCount}}

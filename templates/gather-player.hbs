@@ -5,7 +5,7 @@
   </header>
 
   {{#if actor}}
-    <div class="mcw-actor"><img src="{{actor.img}}" alt="{{actor.name}}"><strong>{{actor.name}}</strong></div>
+    <div class="mcw-actor mcw-player-actor"><img src="{{actor.img}}" alt="{{actor.name}}"><strong>{{actor.name}}</strong></div>
   {{else}}
     <p class="mcw-warning">Select a token you own or configure a user character.</p>
   {{/if}}
@@ -28,19 +28,19 @@
     </div>
   {{else}}
     {{#if alreadyGathered}}
-      <div class="mcw-panel">
+      <div class="mcw-panel mcw-player-roll-panel">
         <p class="mcw-warning"><strong>{{actor.name}} has already gathered on this scene.</strong></p>
         <p>The GM must reset gathering for this scene before this character can gather here again.</p>
       </div>
     {{else}}
       <div class="mcw-panel">
         <p>Gathering is optional. Choose a skill or decline.</p>
-        <div class="mcw-skill-row">
+        <div class="mcw-player-skill-grid">
           {{#each skills}}
-            <button type="button" data-action="roll" data-skill="{{id}}"><i class="fa-solid fa-dice-d20"></i> {{label}}</button>
+            <button type="button" data-action="roll" data-skill="{{id}}"><i class="fa-solid fa-dice-d20"></i><span>{{label}}</span><strong>{{modifierLabel}}</strong></button>
           {{/each}}
         </div>
-        <button type="button" data-action="decline"><i class="fa-solid fa-ban"></i> Decline</button>
+        <button class="mcw-player-decline" type="button" data-action="decline"><i class="fa-solid fa-ban"></i> Decline</button>
       </div>
     {{/if}}
   {{/if}}

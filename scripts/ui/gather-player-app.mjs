@@ -40,11 +40,16 @@ export class GatherPlayerApp extends ScrollPreservingApplicationMixin(
     return foundry.utils.mergeObject(context, {
       session: this.session,
       actor: actor ? { name: actor.name, img: actor.img, uuid: actor.uuid } : null,
-      skills: this.craftworks.gather.getSkillOptions(),
+      skills: this.craftworks.gather.getSkillOptions().map(skill => this.#describeSkill(actor, skill)),
       state: this.gatherState,
       alreadyGathered: Boolean(priorGather),
       priorGather
     }, { inplace: false });
+  }
+
+  #describeSkill(actor, skill) {
+    const value = Number(actor?.system?.skills?.[skill.id]?.total ?? actor?.system?.skills?.[skill.id]?.mod ?? 0);
+    return { ...skill, modifier: value, modifierLabel: value >= 0 ? `+${value}` : String(value) };
   }
 
   async _onRender(context, options) {

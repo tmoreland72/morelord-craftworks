@@ -41,6 +41,14 @@
           <i class="fa-solid fa-chevron-right"></i>
         </button>
 
+        {{#if deleriumSearchAvailable}}
+          <button type="button" class="mcw-dashboard-card" data-action="delerium-search" {{#unless scene}}disabled{{/unless}}>
+            <i class="fa-solid fa-gem"></i>
+            <span class="mcw-dashboard-card-copy"><strong>Delerium Search</strong><small>Search a ¼-mile hex in the ruins of Drakkenheim</small></span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        {{/if}}
+
         <button type="button" class="mcw-dashboard-card" data-action="loot" {{#unless scene}}disabled{{/unless}}>
           <i class="fa-solid fa-sack-dollar"></i>
           <span class="mcw-dashboard-card-copy">

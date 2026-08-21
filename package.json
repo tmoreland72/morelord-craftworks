@@ -6,6 +6,9 @@
   "description": "Development tooling for the Morelord Craftworks Foundry VTT module.",
   "scripts": {
     "check": "node --check scripts/main.mjs",
+    "check:kibbles": "node tools/check-kibbles-harvest.mjs",
+    "check:recipes": "node tools/check-recipe-item-matching.mjs",
+    "check:scroll-catalog": "node tools/check-spell-scroll-catalog.mjs",
     "build": "node tools/build.mjs"
   }
 }

@@ -77,10 +77,10 @@ export class SocketService {
     try {
       if (targetUserId) {
         log(`SOCKETLIB SEND ${type} -> ${targetUserId}`);
-        await this.socket.executeAsUser("dispatch", targetUserId, payload);
+        return await this.socket.executeAsUser("dispatch", targetUserId, payload);
       } else {
         log(`SOCKETLIB SEND ${type} -> other connected users`);
-        await this.socket.executeForOthers("dispatch", payload);
+        return await this.socket.executeForOthers("dispatch", payload);
       }
     } catch (err) {
       warn(`Socketlib send '${type}' failed.`, err);

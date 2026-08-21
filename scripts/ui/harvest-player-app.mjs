@@ -278,12 +278,17 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
     const skillOptions =
       this.craftworks.harvest
         .getSkillOptions()
-        .map(skill => ({
-          ...skill,
-          selected:
-            skill.id ===
-            this.selectedHarvestSkill
-        }));
+        .map(skill => {
+          const value = Number(actor?.system?.skills?.[skill.id]?.total ?? actor?.system?.skills?.[skill.id]?.mod ?? 0);
+          return {
+            ...skill,
+            modifier: value,
+            modifierLabel: value >= 0 ? `+${value}` : String(value),
+            selected: skill.id === this.selectedHarvestSkill
+          };
+        });
+
+    const selectedSkill = skillOptions.find(skill => skill.selected) ?? null;
 
     const skillChecksBypassed = Boolean(
       actor
@@ -298,6 +303,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
       actor: actor ? { name: actor.name, img: actor.img, uuid: actor.uuid } : null,
       skills: skillOptions,
       selectedHarvestSkill: this.selectedHarvestSkill,
+      selectedHarvestSkillLabel: selectedSkill ? `${selectedSkill.label} ${selectedSkill.modifierLabel}` : "",
       skillChecksBypassed,
       availableSkillCheckCount,
       canRollHarvestChecks: Boolean(
@@ -393,6 +399,11 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
             rollButton.disabled =
               !this.selectedHarvestSkill
               || available <= 0;
+            const label = rollButton.querySelector("[data-roll-skill-label]");
+            const option = event.currentTarget.selectedOptions?.[0];
+            if (label) label.textContent = option?.dataset.skillLabel
+              ? `Roll ${option.dataset.skillLabel} Checks`
+              : "Roll Harvest Checks";
           }
         }
       );

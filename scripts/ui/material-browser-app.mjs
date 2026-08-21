@@ -297,12 +297,26 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
     const searchInput = this.element.querySelector("[name='search']");
 
     if (searchInput) {
+      if (this.restoreSearchFocus) {
+        searchInput.focus();
+        searchInput.setSelectionRange(
+          searchInput.value.length,
+          searchInput.value.length
+        );
+        this.restoreSearchFocus = false;
+      }
+
       searchInput.addEventListener("input", event => {
         this.search =
           event.currentTarget.value
           ?? "";
         this.focusMaterialId = null;
-        this.render();
+        this.restoreSearchFocus = true;
+        clearTimeout(this.searchRenderTimer);
+        this.searchRenderTimer = setTimeout(
+          () => this.render(),
+          180
+        );
       });
 
     }

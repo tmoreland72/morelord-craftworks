@@ -12,6 +12,7 @@ export class GatherApp extends ScrollPreservingApplicationMixin(
     this.craftworks = craftworks;
     this.session = null;
     this.selectedTerrain = "grasslands";
+    this.selectedCharacterUuids = null;
   }
 
   static DEFAULT_OPTIONS = {
@@ -34,16 +35,35 @@ export class GatherApp extends ScrollPreservingApplicationMixin(
     const context = await super._prepareContext(options);
     const players = game.users.filter(user => user.active && !user.isGM);
     const gatherRecords = this.craftworks.gather.getSceneGatherRecords();
+    const characters = game.actors.filter(actor => actor.type === "character");
+    if (this.selectedCharacterUuids === null) {
+      this.selectedCharacterUuids = new Set(characters.map(actor => actor.uuid));
+    }
 
     return foundry.utils.mergeObject(context, {
       session: this.session,
       sceneName: canvas.scene?.name ?? "",
       gatherRecordCount: Object.keys(gatherRecords).length,
+      characters: characters.map(actor => {
+        const user = this.#activeUserForActor(actor);
+        return {
+          uuid: actor.uuid,
+          name: actor.name,
+          img: actor.img,
+          checked: this.selectedCharacterUuids.has(actor.uuid),
+          connected: Boolean(user),
+          userName: user?.name ?? null
+        };
+      }),
       terrains: this.craftworks.gather.getProfiles().map(profile => ({
         ...profile,
         selected: profile.id === this.selectedTerrain
       })),
-      progress: this.session ? players.map(user => {
+      progress: this.session ? players.filter(user => {
+        const actor = this.#characterForUser(user);
+        return !this.session.selectedCharacterUuids
+          || this.session.selectedCharacterUuids.includes(actor?.uuid);
+      }).map(user => {
         const state = this.session.participants?.[user.id];
         return {
           user: user.name,
@@ -63,6 +83,13 @@ export class GatherApp extends ScrollPreservingApplicationMixin(
         this.selectedTerrain = event.currentTarget.value;
       });
 
+    this.element.querySelectorAll("[name='characterUuid']")
+      .forEach(input => input.addEventListener("change", event => {
+        const uuid = event.currentTarget.value;
+        if (event.currentTarget.checked) this.selectedCharacterUuids.add(uuid);
+        else this.selectedCharacterUuids.delete(uuid);
+      }));
+
     this.element.querySelector("[data-action='start']")
       ?.addEventListener("click", () => this.#start());
 
@@ -79,9 +106,20 @@ export class GatherApp extends ScrollPreservingApplicationMixin(
         throw new Error("No Craftworks materials are indexed. Run the development material installer first.");
       }
 
+      const selectedCharacters = game.actors.filter(actor =>
+        actor.type === "character"
+        && this.selectedCharacterUuids.has(actor.uuid)
+      );
+      if (!selectedCharacters.length) throw new Error("Select at least one player character.");
+      const players = [...new Set(
+        selectedCharacters
+          .map(actor => this.#activeUserForActor(actor))
+          .filter(Boolean)
+      )];
+      if (!players.length) throw new Error("None of the selected player characters has a connected player.");
+
       this.session = this.craftworks.gather.start(this.selectedTerrain);
-      const players = game.users.filter(user => user.active && !user.isGM);
-      if (!players.length) throw new Error("No active player users are connected.");
+      this.session.selectedCharacterUuids = selectedCharacters.map(actor => actor.uuid);
 
       await Promise.all(players.map(user =>
         this.craftworks.socket.emit(
@@ -125,5 +163,23 @@ export class GatherApp extends ScrollPreservingApplicationMixin(
     } catch (err) {
       ui.notifications.error(err.message);
     }
+  }
+
+  #activeUserForActor(actor) {
+    if (!actor) return null;
+    return game.users.find(user =>
+      user.active
+      && !user.isGM
+      && this.#characterForUser(user)?.id === actor.id
+    ) ?? null;
+  }
+
+  #characterForUser(user) {
+    if (!user) return null;
+    if (user.character) return user.character;
+    return game.actors.find(actor =>
+      actor.type === "character"
+      && Number(actor.ownership?.[user.id] ?? 0) >= 3
+    ) ?? null;
   }
 }

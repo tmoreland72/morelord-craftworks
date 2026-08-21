@@ -267,6 +267,18 @@ The preflight display includes information such as:
 - Harvest DC
 - Harvest rarity when applicable
 
+For standard creatures, Craftworks resolves the complete Kibbles harvesting
+model. Depending on the creature's type, CR, size, AC, and resistances, its
+offering can include:
+
+- basic hide, carapace, scale, meat, or fresh-ingredient harvesting
+- an exotic harvest result
+- an exotic remnant result for applicable creature types
+- special tough hide, resistant hide, dragon scale, or higher-rarity meat
+
+Dice quantities and the exotic d100 result are generated once for the corpse
+and shared by every participant in that Harvest session.
+
 ### Skip Skill Checks
 
 The **Player Characters** section lists active player characters.
@@ -291,8 +303,9 @@ When a character is not set to **Skip Skill Checks**, the player uses the single
 1. Choose the Harvest skill to use.
 2. Click **Roll Harvest Checks**.
 3. Craftworks automatically rolls that skill separately against every unresolved creature available to that character.
-4. Each creature resolves against its own Harvest DC.
-5. Successful creatures immediately expose their claimable components.
+4. Each creature resolves against its base Harvest DC.
+5. Successful creatures immediately expose every component whose individual
+   Harvest DC the roll also meets.
 6. Failed creatures show their failed result and consume that character's Harvest attempt for that creature.
 
 Creatures already attempted, already resolved, or automatically succeeded through **Skip Skill Checks** are not rolled again.
@@ -328,8 +341,10 @@ When a player claims a component:
 
 - the component becomes reserved for that player
 - all open Harvest windows synchronize the claim
-- other players can see that it was claimed
-- other players cannot claim the same component
+- the displayed dice quantity is reserved with the component
+- standard Kibbles results remain independently claimable by every successful
+  participant
+- exact Drakkenheim monster components remain finite and exclusive
 - the item is **not yet added to inventory**
 
 This design lets the GM Reset or Cancel a Harvest session without needing to remove inventory items.

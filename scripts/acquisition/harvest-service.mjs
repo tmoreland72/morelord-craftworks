@@ -2,6 +2,7 @@ import { HARVEST_SKILLS_DND5E, MODULE_ID } from "../constants.mjs";
 import { SETTINGS, getSetting } from "../core/settings.mjs";
 import { getHarvestChoiceCount, getHarvestDC } from "./harvest-rules.mjs";
 import { findHarvestProfile } from "./harvest-profiles.mjs";
+import { resolveKibblesHarvest } from "./kibbles-harvest-resolver.mjs";
 import { weightedDistinctSample } from "./weighted-choice.mjs";
 import { DrakkenheimMonsterDataService } from "../integrations/drakkenheim-monster-data-service.mjs";
 import { DrakkenheimMaterialMatchService } from "../integrations/drakkenheim-material-match-service.mjs";
@@ -21,12 +22,13 @@ export class HarvestService {
 
   async buildCreatureContext(token) {
     const actor = token.actor;
-    const cr = this.adapter.getCreatureCR(actor);
-    const creatureType = this.adapter.getCreatureType(actor);
+    const harvestTraits = this.adapter.getCreatureHarvestTraits(actor);
+    const cr = harvestTraits.cr;
+    const creatureType = harvestTraits.creatureType;
     const activePackIds = this.contentPacks?.enabled({ capability: "harvest" }).map(pack => pack.id) ?? null;
     const profile = findHarvestProfile(creatureType, { activePackIds });
 
-    const standardComponents = [];
+    let standardComponents = [];
     const seenStandardMaterialIds = new Set();
 
     for (const result of profile?.results ?? []) {
@@ -66,6 +68,51 @@ export class HarvestService {
       components: standardComponents,
       specialItems: []
     };
+
+    const applyKibblesContext = () => {
+      const standardHarvestEnabled = activePackIds == null || activePackIds.includes("standard-core");
+      if (!standardHarvestEnabled) return context;
+
+      const harvestDcModifier = Number(getSetting(SETTINGS.HARVEST_DC_MODIFIER) ?? 0);
+      const components = resolveKibblesHarvest(harvestTraits)
+        .map(component => {
+          const material = this.materialRegistry.get(component.materialId);
+          if (!material || component.quantity <= 0) return null;
+
+          return {
+            id: `${token.document.uuid}::kibbles::${component.id}`,
+            category: component.categoryLabel ?? material.category ?? "Harvest Material",
+            componentName: material.name,
+            rarity: material.rarity ?? null,
+            matched: true,
+            status: "available",
+            materialId: material.materialId,
+            name: material.name,
+            img: material.img ?? null,
+            quantity: component.quantity,
+            quantityFormula: component.quantityFormula,
+            harvestDc: component.dc == null
+              ? getHarvestDC(cr)
+              : Number(component.dc) + harvestDcModifier,
+            harvestKind: component.kind,
+            sourceRoll: component.sourceRoll ?? null
+          };
+        })
+        .filter(Boolean);
+
+      if (!components.length) return context;
+      const dcs = components
+        .map(component => Number(component.harvestDc))
+        .filter(Number.isFinite);
+
+      context.components = components;
+      context.dc = dcs.length ? Math.min(...dcs) : getHarvestDC(cr);
+      context.profileId = "kibbles-exact";
+      context.harvestMode = "kibbles";
+      return context;
+    };
+
+    applyKibblesContext();
 
     // Drakkenheim is an enhancement path, never a dependency. A Drakkenheim
     // actor uses exact book components only when that content pack is both
@@ -151,11 +198,21 @@ export class HarvestService {
     for (const creature of creatures) {
       if (
         creature.harvestMode !== "drakkenheim"
+        && creature.harvestMode !== "kibbles"
         && !Array.isArray(creature.sharedChoiceMaterialIds)
       ) {
         creature.sharedChoiceMaterialIds = this.#buildChoices(creature)
           .map(choice => choice.materialId)
           .filter(Boolean);
+      }
+
+      if (
+        creature.harvestMode === "kibbles"
+        && !Array.isArray(creature.sharedChoiceComponentIds)
+      ) {
+        creature.sharedChoiceComponentIds = (creature.components ?? [])
+          .filter(component => component.matched && component.materialId)
+          .map(component => component.id);
       }
     }
 
@@ -251,7 +308,7 @@ export class HarvestService {
     return session?.participants?.[`${userId}:${creatureTokenUuid}`] ?? null;
   }
 
-  #buildChoices(creature) {
+  #buildChoices(creature, total = null) {
     if (creature.harvestMode === "drakkenheim") {
       return (creature.components ?? [])
         .filter(
@@ -275,6 +332,40 @@ export class HarvestService {
                   component.category
               }
             : null;
+        })
+        .filter(Boolean);
+    }
+
+    if (creature.harvestMode === "kibbles") {
+      const allowedIds = new Set(
+        creature.sharedChoiceComponentIds
+        ?? (creature.components ?? []).map(component => component.id)
+      );
+
+      return (creature.components ?? [])
+        .filter(component =>
+          component.matched
+          && component.materialId
+          && allowedIds.has(component.id)
+          && (
+            total == null
+            || component.harvestDc == null
+            || Number(total) >= Number(component.harvestDc)
+          )
+        )
+        .map(component => {
+          const material = this.materialRegistry.get(component.materialId);
+          return material ? {
+            ...material,
+            componentId: component.id,
+            componentName: component.componentName ?? material.name,
+            category: component.category ?? material.category ?? "Harvest Material",
+            quantity: Number(component.quantity ?? 1),
+            quantityFormula: component.quantityFormula ?? "1",
+            harvestDc: component.harvestDc ?? null,
+            harvestKind: component.harvestKind ?? null,
+            sourceRoll: component.sourceRoll ?? null
+          } : null;
         })
         .filter(Boolean);
     }
@@ -348,7 +439,9 @@ export class HarvestService {
           category:
             component?.category
             ?? material.category
-            ?? "Harvest Material"
+            ?? "Harvest Material",
+          quantity: Number(component?.quantity ?? 1),
+          quantityFormula: component?.quantityFormula ?? "1"
         };
       })
       .filter(Boolean);
@@ -364,7 +457,7 @@ export class HarvestService {
     automaticSuccess = false
   }) {
     const choices =
-      this.#buildChoices(creature);
+      this.#buildChoices(creature, total);
 
     if (!choices.length) {
       return {
@@ -429,7 +522,12 @@ export class HarvestService {
           choice.componentName
           ?? choice.name,
         category:
-          choice.category ?? null
+          choice.category ?? null,
+        quantity: Number(choice.quantity ?? 1),
+        quantityFormula: choice.quantityFormula ?? "1",
+        harvestDc: choice.harvestDc ?? null,
+        harvestKind: choice.harvestKind ?? null,
+        sourceRoll: choice.sourceRoll ?? null
       }))
     };
   }
@@ -714,6 +812,11 @@ export class HarvestService {
         ?? material.rarity
         ?? creature?.harvestRarity
         ?? null,
+      quantity: Number(choice.quantity ?? 1),
+      quantityFormula: choice.quantityFormula ?? "1",
+      harvestDc: choice.harvestDc ?? null,
+      harvestKind: choice.harvestKind ?? null,
+      sourceRoll: choice.sourceRoll ?? null,
       rollTotal: state.total,
       skillId: state.skillId,
       itemUuid: null,
@@ -886,7 +989,7 @@ export class HarvestService {
         await this.materialService.award(
           actor,
           result.materialId,
-          1,
+          Number(result.quantity ?? 1),
           {
             postChatCard: false,
             preferPartyRecipient: true
@@ -1002,7 +1105,7 @@ export class HarvestService {
           rarity:
             result.rarity
             ?? null,
-          quantity: 1
+          quantity: Number(result.quantity ?? 1)
         });
     }
 

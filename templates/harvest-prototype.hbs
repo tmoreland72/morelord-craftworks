@@ -96,8 +96,8 @@
                     </div>
 
                     <div class="mlh-component-body">
-                      <div class="mlh-component-name">{{componentName}}</div>
-                      <div class="mlh-component-category">{{category}} · {{rarity}}</div>
+                      <div class="mlh-component-name">{{componentName}}{{#if quantity}} ×{{quantity}}{{/if}}</div>
+                      <div class="mlh-component-category">{{category}} · {{rarity}}{{#if harvestDc}} · DC {{harvestDc}}{{/if}}</div>
                       {{#if name}}
                         <div class="mlh-ingredient-name">
                           <i class="fa-solid fa-arrow-right"></i>
@@ -137,9 +137,9 @@
                     </div>
 
                     <div class="mlh-component-body">
-                      <div class="mlh-component-name">{{componentName}}</div>
+                      <div class="mlh-component-name">{{componentName}}{{#if quantity}} ×{{quantity}}{{/if}}</div>
                       <div class="mlh-component-category">
-                        {{category}}{{#if rarity}} · {{rarity}}{{/if}}
+                        {{category}}{{#if rarity}} · {{rarity}}{{/if}}{{#if harvestDc}} · DC {{harvestDc}}{{/if}}{{#if sourceRoll}} · d100 {{sourceRoll}}{{/if}}
                       </div>
                       {{#if name}}
                         <div class="mlh-ingredient-name">
@@ -204,7 +204,7 @@
                 </button>
 
                 <div class="mlh-claimed-body">
-                  <div class="mlh-claimed-name">{{displayName}}</div>
+                  <div class="mlh-claimed-name">{{displayName}}{{#if quantity}} ×{{quantity}}{{/if}}</div>
                   <div class="mlh-claimed-meta">
                     <span class="mlh-claimed-rarity">{{displayRarity}}</span>
                     <span>{{creatureName}}</span>

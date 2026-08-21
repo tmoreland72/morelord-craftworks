@@ -19,6 +19,26 @@
 .mcw .mcw-progress-user span { padding-left: 12px; opacity: .85; }
 .mcw .mcw-actions { display: flex; justify-content: flex-end; margin-top: 10px; }
 
+.mcw .mcw-delerium-rewards { display: grid; gap: 0; }
+.mcw .mcw-delerium-rewards > div {
+  display: grid;
+  grid-template-columns: minmax(145px, auto) 1fr;
+  gap: 14px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--color-border-light-2);
+}
+.mcw .mcw-delerium-rewards > div:last-child { border-bottom: 0; }
+.mcw .mcw-delerium-rewards span { opacity: .85; }
+
+.mcw .mcw-character-picker { margin: 14px 0 0; padding: 10px; }
+.mcw .mcw-character-picker > p { margin: 0 0 8px; opacity: .85; }
+.mcw .mcw-character-picker-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 7px; }
+.mcw .mcw-character-picker-list > label { display: grid; grid-template-columns: auto 32px 1fr; align-items: center; gap: 8px; padding: 7px; border: 1px solid var(--color-border-light-2); border-radius: 4px; }
+.mcw .mcw-character-picker-list input { margin: 0; }
+.mcw .mcw-character-picker-list img { width: 32px; height: 32px; object-fit: cover; border: 0; }
+.mcw .mcw-character-picker-list span { display: grid; gap: 2px; }
+.mcw .mcw-character-picker-list small { opacity: .7; }
+
 .mcw .mcw-dead-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
 .mcw .mcw-dead-list span { display: inline-flex; align-items: center; gap: 6px; padding: 4px 7px; border: 1px solid var(--color-border-light-2); border-radius: 4px; }
 .mcw .mcw-dead-list img { width: 24px; height: 24px; object-fit: cover; border: 0; }
@@ -5609,3 +5629,72 @@
     grid-template-columns: repeat(3, minmax(65px, 1fr));
   }
 }
+
+.mcw .mcw-search-outcome {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.mcw .mcw-search-outcome > i { font-size: 2rem; text-align: center; }
+.mcw .mcw-search-outcome h3 { margin: 0 0 3px; }
+.mcw .mcw-search-outcome p { margin: 0; opacity: .85; }
+.mcw .mcw-delerium-result { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 14px; align-items: center; }
+.mcw .mcw-delerium-result > img { width: 64px; height: 64px; object-fit: cover; border: 0; border-radius: 5px; }
+.mcw .mcw-delerium-result h3 { margin: 0 0 4px; }
+.mcw .mcw-recipient-field { display: grid; gap: 5px; margin-top: 12px; }
+.mcw .mcw-recipient-field select { width: 100%; }
+.mcw .mcw-award-summary { display: flex; gap: 10px; align-items: center; }
+.mcw .mcw-award-summary img { width: 42px; height: 42px; object-fit: cover; border: 0; }
+
+.mcw .mcw-player-actor {
+  margin: 10px 0 14px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--color-border-light-2);
+  border-bottom: 1px solid var(--color-border-light-2);
+}
+
+.mcw .mcw-player-roll-panel { display: grid; gap: 12px; }
+.mcw .mcw-player-roll-panel > p { margin: 0; }
+.mcw .mcw-player-skill-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+.mcw .mcw-player-skill-grid button {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 12px;
+  text-align: left;
+}
+.mcw .mcw-player-skill-grid button > i { justify-self: center; }
+.mcw .mcw-player-skill-grid button > strong { color: rgba(197, 160, 91, 0.95); font-variant-numeric: tabular-nums; }
+.mcw .mcw-player-decline { justify-self: start; min-width: 120px; }
+
+.mcw .mcw-progress-card {
+  gap: 10px;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border-light-2);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.025);
+}
+.mcw .mcw-progress-card:last-child { border-bottom: 1px solid var(--color-border-light-2); }
+.mcw .mcw-progress-summary { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.mcw .mcw-progress-summary > div { display: grid; gap: 2px; }
+.mcw .mcw-progress-status { padding: 3px 8px; border-radius: 999px; background: rgba(255, 255, 255, 0.06); text-transform: capitalize; white-space: nowrap; }
+.mcw .mcw-progress-rolls { display: grid; gap: 6px; padding-top: 8px; border-top: 1px solid var(--color-border-light-2); }
+.mcw .mcw-progress-rolls > small { opacity: .75; }
+
+.mcw-window .mcw-search-results {
+  gap: 14px;
+  padding: 18px 20px 20px;
+}
+.mcw-window .mcw-search-results > .mcw-header { padding: 0 2px 12px; }
+.mcw-window .mcw-search-results > .mcw-header h2 { margin: 0 0 7px; font-size: 2rem; line-height: 1.05; }
+.mcw-window .mcw-search-results > .mcw-header p { margin: 0; line-height: 1.35; }
+.mcw-window .mcw-search-results > .mcw-panel { margin: 0; padding: 16px 18px; }
+.mcw-window .mcw-search-results .mcw-search-outcome { grid-template-columns: 48px minmax(0, 1fr); gap: 18px; }
+.mcw-window .mcw-search-results .mcw-search-outcome > i { font-size: 2.25rem; }
+.mcw-window .mcw-search-results .mcw-search-outcome h3 { margin: 0 0 6px; font-size: 1.65rem; line-height: 1.1; }
+.mcw-window .mcw-search-results .mcw-search-outcome p { line-height: 1.4; }

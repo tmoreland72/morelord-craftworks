@@ -419,7 +419,9 @@ export class RecipeRegistry {
       rarity: raw.rarity ? String(raw.rarity) : null,
       category: raw.category ? String(raw.category) : null,
       stage: raw.stage ? String(raw.stage) : null,
-      itemName: raw.itemName ? String(raw.itemName) : null
+      itemName: raw.itemName ? String(raw.itemName) : null,
+      itemType: raw.itemType ? String(raw.itemType) : null,
+      spellName: raw.spellName ? String(raw.spellName) : null
     };
   }
 
@@ -490,6 +492,8 @@ export class RecipeRegistry {
 
     if (match.materialId) {
       label = this.materialRegistry.get(match.materialId)?.name ?? match.materialId;
+    } else if (match.itemType === "spellScroll" && match.spellName) {
+      label = `Spell Scroll: ${match.spellName}`;
     } else if (match.itemName) {
       label = match.itemName;
     } else {
@@ -514,6 +518,8 @@ export class RecipeRegistry {
       match.materialId,
       material?.name,
       match.itemName,
+      match.itemType,
+      match.spellName,
       match.rarity,
       match.category,
       match.stage,

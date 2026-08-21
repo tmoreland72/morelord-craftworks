@@ -26,7 +26,12 @@ export class SpellScrollGeneratorService {
     );
   }
 
-  async availableSpells({ level = null, schools = null } = {}) {
+  async availableSpells({
+    level = null,
+    schools = null,
+    respectSourceConfiguration = true,
+    dedupe = true
+  } = {}) {
     const spells = [];
     const seen = new Set();
 
@@ -35,7 +40,8 @@ export class SpellScrollGeneratorService {
         pack.documentName === "Item"
         && this.#packEnabled(pack)
         && (
-          !this.sourceFilter
+          !respectSourceConfiguration
+          || !this.sourceFilter
           || this.sourceFilter.isPackEnabled(pack)
         )
       );
@@ -79,13 +85,16 @@ export class SpellScrollGeneratorService {
         ) continue;
         if (schools?.length && !schools.includes(school)) continue;
 
-        const key = `${spellLevel}|${String(row.name).toLowerCase()}`;
-        if (seen.has(key)) continue;
-        seen.add(key);
-
         const sourceLabel = this.sourceFilter
           ? await this.sourceFilter.sourceLabelForCompendiumItem(row, { pack })
           : "Craftworks";
+        const key = [
+          spellLevel,
+          String(row.name).toLowerCase(),
+          dedupe ? "" : sourceLabel
+        ].join("|");
+        if (seen.has(key)) continue;
+        seen.add(key);
 
         spells.push({
           name: row.name,

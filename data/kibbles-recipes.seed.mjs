@@ -5724,7 +5724,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "uncommon reagent (any)"
+              "materialId": "uncommon-curative-reagent"
             }
           },
           {
@@ -5875,7 +5875,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "rare reagent (any)"
+              "materialId": "rare-curative-reagent"
             }
           },
           {
@@ -5953,7 +5953,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "very rare reagent (any)"
+              "materialId": "very-rare-curative-reagent"
             }
           },
           {
@@ -6314,7 +6314,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of illusory script"
+              "itemType": "spellScroll",
+              "spellName": "illusory script"
             }
           },
           {
@@ -6380,7 +6381,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of secret chest"
+              "itemType": "spellScroll",
+              "spellName": "secret chest"
             }
           },
           {
@@ -6440,19 +6442,21 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "boots worth at least 50 gp"
+              "materialId": "valued-component-boots-50"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of silence"
+              "itemType": "spellScroll",
+              "spellName": "silence"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of pass without a trace"
+              "itemType": "spellScroll",
+              "spellName": "pass without a trace"
             }
           },
           {
@@ -6525,13 +6529,15 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of protection from energy"
+              "itemType": "spellScroll",
+              "spellName": "protection from energy"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of arctic breathK"
+              "itemType": "spellScroll",
+              "spellName": "arctic breathK"
             }
           },
           {
@@ -6597,19 +6603,22 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of levitate"
+              "itemType": "spellScroll",
+              "spellName": "levitate"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of fly"
+              "itemType": "spellScroll",
+              "spellName": "fly"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of animate objectK"
+              "itemType": "spellScroll",
+              "spellName": "animate objectK"
             }
           },
           {
@@ -6675,13 +6684,15 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of water breathing"
+              "itemType": "spellScroll",
+              "spellName": "water breathing"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of alter self"
+              "itemType": "spellScroll",
+              "spellName": "alter self"
             }
           },
           {
@@ -6741,13 +6752,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "circlet worth at least 50 gp"
+              "materialId": "valued-component-circlet-50"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of scorching ray"
+              "itemType": "spellScroll",
+              "spellName": "scorching ray"
             }
           },
           {
@@ -6880,7 +6892,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of create or destroy water"
+              "itemType": "spellScroll",
+              "spellName": "create or destroy water"
             }
           },
           {
@@ -6947,13 +6960,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "quiver worth 25 gp"
+              "materialId": "valued-component-quiver-25"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of secret chest"
+              "itemType": "spellScroll",
+              "spellName": "secret chest"
             }
           },
           {
@@ -7019,7 +7033,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of charm person"
+              "itemType": "spellScroll",
+              "spellName": "charm person"
             }
           },
           {
@@ -7085,7 +7100,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of far sightK"
+              "itemType": "spellScroll",
+              "spellName": "far sightK"
             }
           },
           {
@@ -7145,19 +7161,21 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "gauntlets worth 50 gp"
+              "materialId": "valued-component-gauntlets-50"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of enlarge/reduce"
+              "itemType": "spellScroll",
+              "spellName": "enlarge/reduce"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of enhance ability"
+              "itemType": "spellScroll",
+              "spellName": "enhance ability"
             }
           },
           {
@@ -7230,7 +7248,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of attract/repel"
+              "itemType": "spellScroll",
+              "spellName": "attract/repel"
             }
           },
           {
@@ -7303,13 +7322,15 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of disguise self"
+              "itemType": "spellScroll",
+              "spellName": "disguise self"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of minor illusion"
+              "itemType": "spellScroll",
+              "spellName": "minor illusion"
             }
           },
           {
@@ -7376,13 +7397,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "helm worth at least 25 gp"
+              "materialId": "valued-component-helm-25"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of comprhend languages"
+              "itemType": "spellScroll",
+              "spellName": "comprhend languages"
             }
           },
           {
@@ -7455,7 +7477,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of imbue luckK"
+              "itemType": "spellScroll",
+              "spellName": "imbue luckK"
             }
           },
           {
@@ -7522,13 +7545,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "pipes worth at least 25 gp"
+              "materialId": "valued-component-pipes-25"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of frightenK"
+              "itemType": "spellScroll",
+              "spellName": "frightenK"
             }
           },
           {
@@ -7595,13 +7619,13 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "robe 100 gp"
+              "materialId": "valued-component-robe-100"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "silver coffer worth 500 gp"
+              "materialId": "valued-component-silver-coffer-500"
             }
           },
           {
@@ -7619,7 +7643,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "picture of a horse worth 75 gp"
+              "materialId": "valued-component-picture-of-a-horse-75"
             }
           },
           {
@@ -7631,7 +7655,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of create holeK"
+              "itemType": "spellScroll",
+              "spellName": "create holeK"
             }
           },
           {
@@ -7655,7 +7680,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "picture of mastiffs worth at least 25 gp"
+              "materialId": "valued-component-picture-of-mastiffs-25"
             }
           },
           {
@@ -7733,7 +7758,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of sending"
+              "itemType": "spellScroll",
+              "spellName": "sending"
             }
           },
           {
@@ -7799,7 +7825,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of spider climbing"
+              "itemType": "spellScroll",
+              "spellName": "spider climbing"
             }
           },
           {
@@ -7866,25 +7893,28 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "boots worth at least 50 gp"
+              "materialId": "valued-component-boots-50"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of fly"
+              "itemType": "spellScroll",
+              "spellName": "fly"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of levitate"
+              "itemType": "spellScroll",
+              "spellName": "levitate"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of feather fall"
+              "itemType": "spellScroll",
+              "spellName": "feather fall"
             }
           },
           {
@@ -7951,7 +7981,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "belt worth at least 200 gp"
+              "materialId": "valued-component-belt-200"
             }
           },
           {
@@ -7977,13 +8007,15 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of stoneskin"
+              "itemType": "spellScroll",
+              "spellName": "stoneskin"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of alter self"
+              "itemType": "spellScroll",
+              "spellName": "alter self"
             }
           }
         ]
@@ -8036,13 +8068,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "boots worth at least 50 gp"
+              "materialId": "valued-component-boots-50"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of levitate"
+              "itemType": "spellScroll",
+              "spellName": "levitate"
             }
           },
           {
@@ -8109,19 +8142,21 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "set of bracers worth at least 200 gp"
+              "materialId": "valued-component-set-of-bracers-200"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of shield"
+              "itemType": "spellScroll",
+              "spellName": "shield"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of shield of faith"
+              "itemType": "spellScroll",
+              "spellName": "shield of faith"
             }
           },
           {
@@ -8188,13 +8223,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "bowl worth 200 gp"
+              "materialId": "valued-component-bowl-200"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of conjure elemental"
+              "itemType": "spellScroll",
+              "spellName": "conjure elemental"
             }
           },
           {
@@ -8261,19 +8297,21 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "cape worth at least 200 gp"
+              "materialId": "valued-component-cape-200"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of dimension door"
+              "itemType": "spellScroll",
+              "spellName": "dimension door"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of pyrotechnics"
+              "itemType": "spellScroll",
+              "spellName": "pyrotechnics"
             }
           },
           {
@@ -8340,13 +8378,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "cloak worth 50 gp"
+              "materialId": "valued-component-cloak-50"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of mirror image"
+              "itemType": "spellScroll",
+              "spellName": "mirror image"
             }
           },
           {
@@ -8419,13 +8458,15 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of hold monster"
+              "itemType": "spellScroll",
+              "spellName": "hold monster"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of forbiddence"
+              "itemType": "spellScroll",
+              "spellName": "forbiddence"
             }
           },
           {
@@ -8499,7 +8540,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of conjure animals"
+              "itemType": "spellScroll",
+              "spellName": "conjure animals"
             }
           },
           {
@@ -8578,7 +8620,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of dimension door"
+              "itemType": "spellScroll",
+              "spellName": "dimension door"
             }
           },
           {
@@ -8651,7 +8694,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of animate objects"
+              "itemType": "spellScroll",
+              "spellName": "animate objects"
             }
           },
           {
@@ -8711,13 +8755,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "figurine of a fly worth at least 20 gp"
+              "materialId": "valued-component-figurine-of-a-fly-20"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of giant insect"
+              "itemType": "spellScroll",
+              "spellName": "giant insect"
             }
           },
           {
@@ -8784,13 +8829,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 3,
             "match": {
-              "itemName": "figurines of a goat worth at least 20 gp"
+              "materialId": "valued-component-figurines-of-a-goat-20"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of conjure animals"
+              "itemType": "spellScroll",
+              "spellName": "conjure animals"
             }
           },
           {
@@ -8864,13 +8910,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "figurine of a dog worth at least 20 gp"
+              "materialId": "valued-component-figurine-of-a-dog-20"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of conjure animals"
+              "itemType": "spellScroll",
+              "spellName": "conjure animals"
             }
           },
           {
@@ -8930,7 +8977,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "figurine of a panther worth at least"
+              "materialId": "valued-component-figurine-of-a-panther-unpriced"
             }
           },
           {
@@ -8942,7 +8989,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of conjure animals"
+              "itemType": "spellScroll",
+              "spellName": "conjure animals"
             }
           },
           {
@@ -9008,7 +9056,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of secret chest"
+              "itemType": "spellScroll",
+              "spellName": "secret chest"
             }
           },
           {
@@ -9081,19 +9130,21 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "horn worth at least 100 gp"
+              "materialId": "valued-component-horn-100"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of shockwaveK"
+              "itemType": "spellScroll",
+              "spellName": "shockwaveK"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of sonic shriekK"
+              "itemType": "spellScroll",
+              "spellName": "sonic shriekK"
             }
           }
         ]
@@ -9146,19 +9197,21 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "brass horn worth at least 50 gp"
+              "materialId": "valued-component-brass-horn-50"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of spirit guardians"
+              "itemType": "spellScroll",
+              "spellName": "spirit guardians"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of guardian of faith"
+              "itemType": "spellScroll",
+              "spellName": "guardian of faith"
             }
           },
           {
@@ -9225,19 +9278,21 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "helm worth 50 gp"
+              "materialId": "valued-component-helm-50"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of heroism"
+              "itemType": "spellScroll",
+              "spellName": "heroism"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of shield of faith"
+              "itemType": "spellScroll",
+              "spellName": "shield of faith"
             }
           },
           {
@@ -9304,13 +9359,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "mantle worth at least 100 gp"
+              "materialId": "valued-component-mantle-100"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of dispel magic"
+              "itemType": "spellScroll",
+              "spellName": "dispel magic"
             }
           },
           {
@@ -9377,25 +9433,28 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "robe worth at least 100 gp"
+              "materialId": "valued-component-robe-100"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of darkvision"
+              "itemType": "spellScroll",
+              "spellName": "darkvision"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of see invisibility"
+              "itemType": "spellScroll",
+              "spellName": "see invisibility"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of arcane eye"
+              "itemType": "spellScroll",
+              "spellName": "arcane eye"
             }
           },
           {
@@ -9461,13 +9520,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "stone worth 200 gp"
+              "materialId": "valued-component-stone-200"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of conjure elemental"
+              "itemType": "spellScroll",
+              "spellName": "conjure elemental"
             }
           },
           {
@@ -9534,19 +9594,21 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "cloak worth 50 gp"
+              "materialId": "valued-component-cloak-50"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of fly"
+              "itemType": "spellScroll",
+              "spellName": "fly"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of polymorph"
+              "itemType": "spellScroll",
+              "spellName": "polymorph"
             }
           },
           {
@@ -9619,13 +9681,15 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of plane shift"
+              "itemType": "spellScroll",
+              "spellName": "plane shift"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of hunger of hadar"
+              "itemType": "spellScroll",
+              "spellName": "hunger of hadar"
             }
           }
         ]
@@ -9678,25 +9742,28 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "fancy carpet worth 1000 gp"
+              "materialId": "valued-component-fancy-carpet-1000"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of fly"
+              "itemType": "spellScroll",
+              "spellName": "fly"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of levitate"
+              "itemType": "spellScroll",
+              "spellName": "levitate"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of animate objects"
+              "itemType": "spellScroll",
+              "spellName": "animate objects"
             }
           },
           {
@@ -9763,13 +9830,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "figurine of a horse worth at least 50 gp"
+              "materialId": "valued-component-figurine-of-a-horse-50"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of summon greater steed"
+              "itemType": "spellScroll",
+              "spellName": "summon greater steed"
             }
           },
           {
@@ -9842,7 +9910,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of detect thoughts"
+              "itemType": "spellScroll",
+              "spellName": "detect thoughts"
             }
           },
           {
@@ -9908,25 +9977,29 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of wall of force"
+              "itemType": "spellScroll",
+              "spellName": "wall of force"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of antilife shell"
+              "itemType": "spellScroll",
+              "spellName": "antilife shell"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of gaseous form"
+              "itemType": "spellScroll",
+              "spellName": "gaseous form"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of antimagic field"
+              "itemType": "spellScroll",
+              "spellName": "antimagic field"
             }
           },
           {
@@ -9993,19 +10066,21 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "3 inch cube worth at least 500 gp"
+              "materialId": "valued-component-3-inch-cube-500"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of gate"
+              "itemType": "spellScroll",
+              "spellName": "gate"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of plane shift"
+              "itemType": "spellScroll",
+              "spellName": "plane shift"
             }
           },
           {
@@ -10072,25 +10147,28 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "bronze horn worth at least 100 gp"
+              "materialId": "valued-component-bronze-horn-100"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of spirit guardians"
+              "itemType": "spellScroll",
+              "spellName": "spirit guardians"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of guardian of faith"
+              "itemType": "spellScroll",
+              "spellName": "guardian of faith"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of conjure celestial"
+              "itemType": "spellScroll",
+              "spellName": "conjure celestial"
             }
           },
           {
@@ -10163,7 +10241,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of magnificent mansion"
+              "itemType": "spellScroll",
+              "spellName": "magnificent mansion"
             }
           },
           {
@@ -10237,25 +10316,28 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "robe worth at least 200 gp"
+              "materialId": "valued-component-robe-200"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of daylight"
+              "itemType": "spellScroll",
+              "spellName": "daylight"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of prismatic spray"
+              "itemType": "spellScroll",
+              "spellName": "prismatic spray"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of wall of light"
+              "itemType": "spellScroll",
+              "spellName": "wall of light"
             }
           },
           {
@@ -10335,19 +10417,22 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of enhance ability"
+              "itemType": "spellScroll",
+              "spellName": "enhance ability"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of enlarge/reduce"
+              "itemType": "spellScroll",
+              "spellName": "enlarge/reduce"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of stoneskin"
+              "itemType": "spellScroll",
+              "spellName": "stoneskin"
             }
           },
           {
@@ -10407,19 +10492,21 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "iron flask worth at least 200 gp"
+              "materialId": "valued-component-iron-flask-200"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of imprisonment"
+              "itemType": "spellScroll",
+              "spellName": "imprisonment"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of planar blinding"
+              "itemType": "spellScroll",
+              "spellName": "planar blinding"
             }
           },
           {
@@ -10551,19 +10638,22 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of enhance ability"
+              "itemType": "spellScroll",
+              "spellName": "enhance ability"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of transformation"
+              "itemType": "spellScroll",
+              "spellName": "transformation"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of invulnerability"
+              "itemType": "spellScroll",
+              "spellName": "invulnerability"
             }
           },
           {
@@ -10637,19 +10727,21 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "white, gray, or black robe worth at least 500 gp"
+              "materialId": "valued-component-white-gray-or-black-robe-500"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of mage armor"
+              "itemType": "spellScroll",
+              "spellName": "mage armor"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of antimagic field"
+              "itemType": "spellScroll",
+              "spellName": "antimagic field"
             }
           },
           {
@@ -10716,19 +10808,21 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "fine block cloth worth 100 gp"
+              "materialId": "valued-component-fine-black-cloth-100"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of plane shift"
+              "itemType": "spellScroll",
+              "spellName": "plane shift"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of demiplane"
+              "itemType": "spellScroll",
+              "spellName": "demiplane"
             }
           },
           {
@@ -11382,19 +11476,22 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of crown of madness"
+              "itemType": "spellScroll",
+              "spellName": "crown of madness"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of magic weapon"
+              "itemType": "spellScroll",
+              "spellName": "magic weapon"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of aid"
+              "itemType": "spellScroll",
+              "spellName": "aid"
             }
           },
           {
@@ -11460,7 +11557,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of lightning bolt"
+              "itemType": "spellScroll",
+              "spellName": "lightning bolt"
             }
           },
           {
@@ -11526,7 +11624,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of dominate beast"
+              "itemType": "spellScroll",
+              "spellName": "dominate beast"
             }
           },
           {
@@ -11599,7 +11698,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of magic weapon"
+              "itemType": "spellScroll",
+              "spellName": "magic weapon"
             }
           },
           {
@@ -11686,7 +11786,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of prismatic weaponK"
+              "itemType": "spellScroll",
+              "spellName": "prismatic weaponK"
             }
           },
           {
@@ -11765,7 +11866,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of banishment"
+              "itemType": "spellScroll",
+              "spellName": "banishment"
             }
           },
           {
@@ -11845,7 +11947,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of dispel constructK"
+              "itemType": "spellScroll",
+              "spellName": "dispel constructK"
             }
           },
           {
@@ -11919,25 +12022,28 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "sword hilt worth 200 gp"
+              "materialId": "valued-component-sword-hilt-200"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of vorpal weaponK"
+              "itemType": "spellScroll",
+              "spellName": "vorpal weaponK"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of magic weapon"
+              "itemType": "spellScroll",
+              "spellName": "magic weapon"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of daylight"
+              "itemType": "spellScroll",
+              "spellName": "daylight"
             }
           },
           {
@@ -12011,13 +12117,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "sword worth at least 200 gp"
+              "materialId": "valued-component-sword-200"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of vampiric touch"
+              "itemType": "spellScroll",
+              "spellName": "vampiric touch"
             }
           },
           {
@@ -12084,13 +12191,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "javalin worth at least 100 gp"
+              "materialId": "valued-component-javelin-100"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of returning weaponK"
+              "itemType": "spellScroll",
+              "spellName": "returning weaponK"
             }
           },
           {
@@ -12157,25 +12265,28 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "weapon worth at least 1,000 gp"
+              "materialId": "valued-component-weapon-1000"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of magic weapon"
+              "itemType": "spellScroll",
+              "spellName": "magic weapon"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of prismatic weaponK"
+              "itemType": "spellScroll",
+              "spellName": "prismatic weaponK"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of vorpal weaponK"
+              "itemType": "spellScroll",
+              "spellName": "vorpal weaponK"
             }
           },
           {
@@ -12249,13 +12360,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "sword worth 100 gp"
+              "materialId": "valued-component-sword-100"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of animate objects"
+              "itemType": "spellScroll",
+              "spellName": "animate objects"
             }
           },
           {
@@ -12328,13 +12440,15 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of magic missile"
+              "itemType": "spellScroll",
+              "spellName": "magic missile"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of magic weapon"
+              "itemType": "spellScroll",
+              "spellName": "magic weapon"
             }
           },
           {
@@ -12401,19 +12515,21 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "sword worth at least 500 gp"
+              "materialId": "valued-component-sword-500"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of power word kill"
+              "itemType": "spellScroll",
+              "spellName": "power word kill"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of magic jar"
+              "itemType": "spellScroll",
+              "spellName": "magic jar"
             }
           }
         ]
@@ -12466,13 +12582,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scimitar worth 500 gp"
+              "materialId": "valued-component-scimitar-500"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of haste"
+              "itemType": "spellScroll",
+              "spellName": "haste"
             }
           },
           {
@@ -12539,7 +12656,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "weapon worth at least 10,000 gp"
+              "materialId": "valued-component-weapon-10000"
             }
           },
           {
@@ -12552,19 +12669,22 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of holy weapon"
+              "itemType": "spellScroll",
+              "spellName": "holy weapon"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of holy aura"
+              "itemType": "spellScroll",
+              "spellName": "holy aura"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of magic weapon"
+              "itemType": "spellScroll",
+              "spellName": "magic weapon"
             }
           },
           {
@@ -12624,7 +12744,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "maul worth at least 1,000 gp"
+              "materialId": "valued-component-maul-1000"
             }
           },
           {
@@ -12644,7 +12764,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of thunderwave"
+              "itemType": "spellScroll",
+              "spellName": "thunderwave"
             }
           }
         ]
@@ -12697,19 +12818,21 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "lance worth 1,000 gp"
+              "materialId": "valued-component-lance-1000"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of summon dragon"
+              "itemType": "spellScroll",
+              "spellName": "summon dragon"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of chromatic orb"
+              "itemType": "spellScroll",
+              "spellName": "chromatic orb"
             }
           },
           {
@@ -12789,13 +12912,15 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of shield"
+              "itemType": "spellScroll",
+              "spellName": "shield"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of shield of faith"
+              "itemType": "spellScroll",
+              "spellName": "shield of faith"
             }
           },
           {
@@ -12868,7 +12993,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of protection from energy"
+              "itemType": "spellScroll",
+              "spellName": "protection from energy"
             }
           },
           {
@@ -12941,19 +13067,22 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of shield"
+              "itemType": "spellScroll",
+              "spellName": "shield"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of shield of faith"
+              "itemType": "spellScroll",
+              "spellName": "shield of faith"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of glyph of warding"
+              "itemType": "spellScroll",
+              "spellName": "glyph of warding"
             }
           },
           {
@@ -13026,7 +13155,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of warding wind"
+              "itemType": "spellScroll",
+              "spellName": "warding wind"
             }
           },
           {
@@ -13093,25 +13223,28 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "fine longcoat worth 100 gp"
+              "materialId": "valued-component-fine-longcoat-100"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of enhance ability"
+              "itemType": "spellScroll",
+              "spellName": "enhance ability"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of vicious mockery"
+              "itemType": "spellScroll",
+              "spellName": "vicious mockery"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of dancing waveK"
+              "itemType": "spellScroll",
+              "spellName": "dancing waveK"
             }
           },
           {
@@ -13178,37 +13311,42 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "shield worth at least 1,000 gp"
+              "materialId": "valued-component-shield-1000"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of wall of stone"
+              "itemType": "spellScroll",
+              "spellName": "wall of stone"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of wall of force"
+              "itemType": "spellScroll",
+              "spellName": "wall of force"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of wind wall"
+              "itemType": "spellScroll",
+              "spellName": "wind wall"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of shield"
+              "itemType": "spellScroll",
+              "spellName": "shield"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of shield of faith"
+              "itemType": "spellScroll",
+              "spellName": "shield of faith"
             }
           },
           {
@@ -13289,13 +13427,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "plate armor worth at least 1,500 gp"
+              "materialId": "valued-component-plate-armor-1500"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of summon fiend"
+              "itemType": "spellScroll",
+              "spellName": "summon fiend"
             }
           },
           {
@@ -13355,13 +13494,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "shield worth at least 200 gp"
+              "materialId": "valued-component-shield-200"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of antimagic field"
+              "itemType": "spellScroll",
+              "spellName": "antimagic field"
             }
           },
           {
@@ -13434,19 +13574,22 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of mage armor"
+              "itemType": "spellScroll",
+              "spellName": "mage armor"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of shield"
+              "itemType": "spellScroll",
+              "spellName": "shield"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of black tentacles"
+              "itemType": "spellScroll",
+              "spellName": "black tentacles"
             }
           },
           {
@@ -13466,7 +13609,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of water breathing"
+              "itemType": "spellScroll",
+              "spellName": "water breathing"
             }
           }
         ]
@@ -13519,19 +13663,21 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "set of plate armor worth at least 4,000 gp"
+              "materialId": "valued-component-set-of-plate-armor-4000"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of invulnerability"
+              "itemType": "spellScroll",
+              "spellName": "invulnerability"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of stone skin"
+              "itemType": "spellScroll",
+              "spellName": "stone skin"
             }
           },
           {
@@ -13598,13 +13744,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "ring worth at least 10 gp"
+              "materialId": "valued-component-ring-10"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of jump"
+              "itemType": "spellScroll",
+              "spellName": "jump"
             }
           },
           {
@@ -13670,7 +13817,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of alter self"
+              "itemType": "spellScroll",
+              "spellName": "alter self"
             }
           },
           {
@@ -13730,13 +13878,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "ring worth at least 10 gp"
+              "materialId": "valued-component-ring-10"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of water walking"
+              "itemType": "spellScroll",
+              "spellName": "water walking"
             }
           },
           {
@@ -13796,13 +13945,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "ring worth at least 400 gp"
+              "materialId": "valued-component-ring-400"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of haste"
+              "itemType": "spellScroll",
+              "spellName": "haste"
             }
           },
           {
@@ -13869,13 +14019,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "ring worth at least 200 gp"
+              "materialId": "valued-component-ring-200"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of freedom of movement"
+              "itemType": "spellScroll",
+              "spellName": "freedom of movement"
             }
           },
           {
@@ -13949,25 +14100,28 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "ring worth at least 200 gp"
+              "materialId": "valued-component-ring-200"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of animal friendship"
+              "itemType": "spellScroll",
+              "spellName": "animal friendship"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of fear"
+              "itemType": "spellScroll",
+              "spellName": "fear"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of speak with animals"
+              "itemType": "spellScroll",
+              "spellName": "speak with animals"
             }
           },
           {
@@ -14027,19 +14181,21 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "ring worth at least 200 gp"
+              "materialId": "valued-component-ring-200"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of true seeing"
+              "itemType": "spellScroll",
+              "spellName": "true seeing"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of find traps"
+              "itemType": "spellScroll",
+              "spellName": "find traps"
             }
           },
           {
@@ -14099,13 +14255,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "ring worth at least 400 gp"
+              "materialId": "valued-component-ring-400"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of regeneration"
+              "itemType": "spellScroll",
+              "spellName": "regeneration"
             }
           },
           {
@@ -14179,13 +14336,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "ringer worth at least 400 gp"
+              "materialId": "valued-component-ring-400"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of telekinesis"
+              "itemType": "spellScroll",
+              "spellName": "telekinesis"
             }
           },
           {
@@ -14310,19 +14468,21 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "ring worth at least 400 gp"
+              "materialId": "valued-component-ring-400"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of dominate monster"
+              "itemType": "spellScroll",
+              "spellName": "dominate monster"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of conjure elemental"
+              "itemType": "spellScroll",
+              "spellName": "conjure elemental"
             }
           },
           {
@@ -14395,7 +14555,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of nondetection"
+              "itemType": "spellScroll",
+              "spellName": "nondetection"
             }
           }
         ]
@@ -14448,13 +14609,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "medallion worth 25 gp"
+              "materialId": "valued-component-medallion-25"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of detect thoughts"
+              "itemType": "spellScroll",
+              "spellName": "detect thoughts"
             }
           },
           {
@@ -14520,19 +14682,21 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "necklace worth 50 gp"
+              "materialId": "valued-component-necklace-50"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of purify food and drink"
+              "itemType": "spellScroll",
+              "spellName": "purify food and drink"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of lesser restoration"
+              "itemType": "spellScroll",
+              "spellName": "lesser restoration"
             }
           },
           {
@@ -14592,13 +14756,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "necklace worth at least 10 gp"
+              "materialId": "valued-component-necklace-10"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of alter self"
+              "itemType": "spellScroll",
+              "spellName": "alter self"
             }
           },
           {
@@ -14671,19 +14836,22 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of planar ally"
+              "itemType": "spellScroll",
+              "spellName": "planar ally"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of wind walk"
+              "itemType": "spellScroll",
+              "spellName": "wind walk"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of branding smite"
+              "itemType": "spellScroll",
+              "spellName": "branding smite"
             }
           },
           {
@@ -14701,13 +14869,15 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of lesser restoration"
+              "itemType": "spellScroll",
+              "spellName": "lesser restoration"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of bless"
+              "itemType": "spellScroll",
+              "spellName": "bless"
             }
           },
           {
@@ -14767,7 +14937,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scarab shaped medallion worth at least"
+              "materialId": "valued-component-scarab-shaped-medallion-unpriced"
             }
           },
           {
@@ -14779,7 +14949,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of holy aura"
+              "itemType": "spellScroll",
+              "spellName": "holy aura"
             }
           },
           {
@@ -14839,7 +15010,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "talisman woth at least 1,000 gp"
+              "materialId": "valued-component-talisman-1000"
             }
           },
           {
@@ -14851,13 +15022,15 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of fissureK"
+              "itemType": "spellScroll",
+              "spellName": "fissureK"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of gate"
+              "itemType": "spellScroll",
+              "spellName": "gate"
             }
           }
         ]
@@ -14917,7 +15090,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of conjure animals"
+              "itemType": "spellScroll",
+              "spellName": "conjure animals"
             }
           },
           {
@@ -14998,19 +15172,22 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of mass cure wounds"
+              "itemType": "spellScroll",
+              "spellName": "mass cure wounds"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of cure wounds"
+              "itemType": "spellScroll",
+              "spellName": "cure wounds"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of lesser restoration"
+              "itemType": "spellScroll",
+              "spellName": "lesser restoration"
             }
           }
         ]
@@ -15084,7 +15261,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of blight"
+              "itemType": "spellScroll",
+              "spellName": "blight"
             }
           }
         ]
@@ -15164,19 +15342,22 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of burning hands"
+              "itemType": "spellScroll",
+              "spellName": "burning hands"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of fireball"
+              "itemType": "spellScroll",
+              "spellName": "fireball"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of wall of fire"
+              "itemType": "spellScroll",
+              "spellName": "wall of fire"
             }
           }
         ]
@@ -15248,55 +15429,64 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of cone of cold"
+              "itemType": "spellScroll",
+              "spellName": "cone of cold"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of fireball"
+              "itemType": "spellScroll",
+              "spellName": "fireball"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of globe of invulnerability"
+              "itemType": "spellScroll",
+              "spellName": "globe of invulnerability"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of hold monster"
+              "itemType": "spellScroll",
+              "spellName": "hold monster"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of levitate"
+              "itemType": "spellScroll",
+              "spellName": "levitate"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of lightning bolt"
+              "itemType": "spellScroll",
+              "spellName": "lightning bolt"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of magic missile"
+              "itemType": "spellScroll",
+              "spellName": "magic missile"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of ray of enfeeblement"
+              "itemType": "spellScroll",
+              "spellName": "ray of enfeeblement"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of wall of force"
+              "itemType": "spellScroll",
+              "spellName": "wall of force"
             }
           },
           {
@@ -15370,13 +15560,15 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of lightning bolt"
+              "itemType": "spellScroll",
+              "spellName": "lightning bolt"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of thunder pulseK"
+              "itemType": "spellScroll",
+              "spellName": "thunder pulseK"
             }
           }
         ]
@@ -15429,13 +15621,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "rod worth at least 100 gp"
+              "materialId": "valued-component-rod-100"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of gravity surgeK"
+              "itemType": "spellScroll",
+              "spellName": "gravity surgeK"
             }
           },
           {
@@ -15495,31 +15688,35 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "rod worth at least 500 gp"
+              "materialId": "valued-component-rod-500"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of command"
+              "itemType": "spellScroll",
+              "spellName": "command"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of charm person"
+              "itemType": "spellScroll",
+              "spellName": "charm person"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of suggestion"
+              "itemType": "spellScroll",
+              "spellName": "suggestion"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of charm monster"
+              "itemType": "spellScroll",
+              "spellName": "charm monster"
             }
           },
           {
@@ -15579,13 +15776,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "rod worth at least 500 gp"
+              "materialId": "valued-component-rod-500"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of black tentacle"
+              "itemType": "spellScroll",
+              "spellName": "black tentacle"
             }
           },
           {
@@ -15651,37 +15849,42 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "rod worth at least 3,000 gp"
+              "materialId": "valued-component-rod-3000"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of alarm"
+              "itemType": "spellScroll",
+              "spellName": "alarm"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of detect evil and good"
+              "itemType": "spellScroll",
+              "spellName": "detect evil and good"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of detect magic"
+              "itemType": "spellScroll",
+              "spellName": "detect magic"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of detect poison and disease"
+              "itemType": "spellScroll",
+              "spellName": "detect poison and disease"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of see invisibility"
+              "itemType": "spellScroll",
+              "spellName": "see invisibility"
             }
           },
           {
@@ -15741,7 +15944,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "rod worth at least 5,000 gp"
+              "materialId": "valued-component-rod-5000"
             }
           },
           {
@@ -15817,31 +16020,35 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "rod worth at least 10,000 gp"
+              "materialId": "valued-component-rod-10000"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of revivify"
+              "itemType": "spellScroll",
+              "spellName": "revivify"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of raise dead"
+              "itemType": "spellScroll",
+              "spellName": "raise dead"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of resurrection"
+              "itemType": "spellScroll",
+              "spellName": "resurrection"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of true resurrection"
+              "itemType": "spellScroll",
+              "spellName": "true resurrection"
             }
           },
           {
@@ -15908,13 +16115,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "blank book worth 500 gp"
+              "materialId": "valued-component-blank-book-500"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of enhance ability"
+              "itemType": "spellScroll",
+              "spellName": "enhance ability"
             }
           },
           {
@@ -15981,19 +16189,21 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "blank book worth 250 gp"
+              "materialId": "valued-component-blank-book-250"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of awaken"
+              "itemType": "spellScroll",
+              "spellName": "awaken"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of scroll of animate objects"
+              "itemType": "spellScroll",
+              "spellName": "scroll of animate objects"
             }
           },
           {
@@ -16060,13 +16270,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "blank book worth 500 gp"
+              "materialId": "valued-component-blank-book-500"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of enhance ability"
+              "itemType": "spellScroll",
+              "spellName": "enhance ability"
             }
           },
           {
@@ -16126,13 +16337,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "blank book worth 500 gp"
+              "materialId": "valued-component-blank-book-500"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of enhance ability"
+              "itemType": "spellScroll",
+              "spellName": "enhance ability"
             }
           },
           {
@@ -16205,7 +16417,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of mage armor"
+              "itemType": "spellScroll",
+              "spellName": "mage armor"
             }
           },
           {
@@ -16278,7 +16491,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of create food and water"
+              "itemType": "spellScroll",
+              "spellName": "create food and water"
             }
           },
           {
@@ -16351,7 +16565,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of enhance ability"
+              "itemType": "spellScroll",
+              "spellName": "enhance ability"
             }
           },
           {
@@ -16417,7 +16632,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of enhance ability"
+              "itemType": "spellScroll",
+              "spellName": "enhance ability"
             }
           },
           {
@@ -16490,7 +16706,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of enhance ability"
+              "itemType": "spellScroll",
+              "spellName": "enhance ability"
             }
           },
           {
@@ -16563,7 +16780,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of enhance ability"
+              "itemType": "spellScroll",
+              "spellName": "enhance ability"
             }
           },
           {
@@ -16629,7 +16847,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of enhance ability"
+              "itemType": "spellScroll",
+              "spellName": "enhance ability"
             }
           },
           {
@@ -17284,7 +17503,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of the spell"
+              "itemType": "spellScroll",
+              "spellName": "the spell"
             }
           },
           {
@@ -17350,7 +17570,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of the spell"
+              "itemType": "spellScroll",
+              "spellName": "the spell"
             }
           },
           {
@@ -17416,7 +17637,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of the spell"
+              "itemType": "spellScroll",
+              "spellName": "the spell"
             }
           },
           {
@@ -17482,7 +17704,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of the spell"
+              "itemType": "spellScroll",
+              "spellName": "the spell"
             }
           },
           {
@@ -17548,7 +17771,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of the spell"
+              "itemType": "spellScroll",
+              "spellName": "the spell"
             }
           },
           {
@@ -17669,13 +17893,14 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of minor illlusion"
+              "itemType": "spellScroll",
+              "spellName": "minor illlusion"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "hat worth at least 5 gp"
+              "materialId": "valued-component-hat-5"
             }
           },
           {
@@ -17742,7 +17967,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of message"
+              "itemType": "spellScroll",
+              "spellName": "message"
             }
           },
           {
@@ -17815,7 +18041,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of magic missile"
+              "itemType": "spellScroll",
+              "spellName": "magic missile"
             }
           },
           {
@@ -17888,7 +18115,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of web"
+              "itemType": "spellScroll",
+              "spellName": "web"
             }
           },
           {
@@ -17962,13 +18190,15 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of hold monster"
+              "itemType": "spellScroll",
+              "spellName": "hold monster"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of hold person"
+              "itemType": "spellScroll",
+              "spellName": "hold person"
             }
           },
           {
@@ -18035,7 +18265,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of fear"
+              "itemType": "spellScroll",
+              "spellName": "fear"
             }
           },
           {
@@ -18109,7 +18340,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of lightning bolt"
+              "itemType": "spellScroll",
+              "spellName": "lightning bolt"
             }
           },
           {
@@ -18189,43 +18421,50 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of prestidigitation"
+              "itemType": "spellScroll",
+              "spellName": "prestidigitation"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of faerie fire"
+              "itemType": "spellScroll",
+              "spellName": "faerie fire"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of stinking cloud"
+              "itemType": "spellScroll",
+              "spellName": "stinking cloud"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of darkness"
+              "itemType": "spellScroll",
+              "spellName": "darkness"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of enlarge/reduce"
+              "itemType": "spellScroll",
+              "spellName": "enlarge/reduce"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of invisibility"
+              "itemType": "spellScroll",
+              "spellName": "invisibility"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of lightning bolt"
+              "itemType": "spellScroll",
+              "spellName": "lightning bolt"
             }
           },
           {
@@ -18312,7 +18551,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of polymorph"
+              "itemType": "spellScroll",
+              "spellName": "polymorph"
             }
           },
           {
@@ -18393,13 +18633,13 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "leather (any)"
+              "materialId": "tanned-leather"
             }
           },
           {
             "quantity": 2,
             "match": {
-              "itemName": "buckles"
+              "materialId": "buckle"
             }
           }
         ]
@@ -18466,7 +18706,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "buckles"
+              "materialId": "buckle"
             }
           }
         ]
@@ -19039,7 +19279,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "buckles"
+              "materialId": "buckle"
             }
           }
         ]
@@ -19099,7 +19339,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "common alchemical reagents (any)"
+              "materialId": "common-reactive-reagent"
             }
           }
         ]
@@ -19227,7 +19467,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "buckles"
+              "materialId": "buckle"
             }
           }
         ]
@@ -21140,19 +21380,22 @@ export const KIBBLES_RECIPE_SEED = [
               {
                 "quantity": 1,
                 "match": {
-                  "itemName": "scroll of fog cloud, or"
+                  "itemType": "spellScroll",
+                  "spellName": "fog cloud, or"
                 }
               },
               {
                 "quantity": 1,
                 "match": {
-                  "itemName": "scroll of entangle, or"
+                  "itemType": "spellScroll",
+                  "spellName": "entangle, or"
                 }
               },
               {
                 "quantity": 1,
                 "match": {
-                  "itemName": "scroll of multishot"
+                  "itemType": "spellScroll",
+                  "spellName": "multishot"
                 }
               }
             ]
@@ -21403,7 +21646,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "tool of your choice"
+              "itemName": "Tinker's Tools"
             }
           },
           {
@@ -23134,13 +23377,15 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of detect thoughts"
+              "itemType": "spellScroll",
+              "spellName": "detect thoughts"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of calm emotions"
+              "itemType": "spellScroll",
+              "spellName": "calm emotions"
             }
           },
           {
@@ -23221,7 +23466,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of levitate"
+              "itemType": "spellScroll",
+              "spellName": "levitate"
             }
           }
         ]
@@ -23281,7 +23527,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of vampiric touch"
+              "itemType": "spellScroll",
+              "spellName": "vampiric touch"
             }
           },
           {
@@ -23348,7 +23595,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of dimension door"
+              "itemType": "spellScroll",
+              "spellName": "dimension door"
             }
           },
           {
@@ -23415,13 +23663,15 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of major image"
+              "itemType": "spellScroll",
+              "spellName": "major image"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "scroll of creation"
+              "itemType": "spellScroll",
+              "spellName": "creation"
             }
           },
           {
@@ -25136,7 +25386,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "50 gp of rare materials"
+              "materialId": "valued-component-rare-materials-50"
             }
           }
         ]

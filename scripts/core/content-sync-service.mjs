@@ -13,7 +13,8 @@ export class ContentSyncService {
     materialInstaller,
     materialRegistry,
     dnd5eItemResolver = null,
-    recipeRegistry = null
+    recipeRegistry = null,
+    spellScrollInstaller = null
   }) {
     this.materialInstaller =
       materialInstaller;
@@ -23,12 +24,15 @@ export class ContentSyncService {
       dnd5eItemResolver;
     this.recipeRegistry =
       recipeRegistry;
+    this.spellScrollInstaller =
+      spellScrollInstaller;
     this.running = null;
   }
 
   setRuntimeServices({
     dnd5eItemResolver = null,
-    recipeRegistry = null
+    recipeRegistry = null,
+    spellScrollInstaller = null
   } = {}) {
     if (dnd5eItemResolver) {
       this.dnd5eItemResolver =
@@ -38,6 +42,11 @@ export class ContentSyncService {
     if (recipeRegistry) {
       this.recipeRegistry =
         recipeRegistry;
+    }
+
+    if (spellScrollInstaller) {
+      this.spellScrollInstaller =
+        spellScrollInstaller;
     }
   }
 
@@ -207,6 +216,10 @@ export class ContentSyncService {
       await this.materialInstaller
         .installAll();
 
+    const spellScrollResult =
+      await this.spellScrollInstaller
+        ?.install();
+
     if (this.dnd5eItemResolver) {
       await this.dnd5eItemResolver
         .refresh();
@@ -242,6 +255,8 @@ export class ContentSyncService {
       completedAt,
       materials:
         materialResults ?? [],
+      spellScrolls:
+        spellScrollResult ?? null,
       materialCreates:
         sum(
           materialResults,

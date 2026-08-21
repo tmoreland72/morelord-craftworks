@@ -67,6 +67,7 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
       recipesCount,
       deadCreatureCount: deadCreatures.length,
       gatherRecordCount: Object.keys(gatherRecords).length,
+      deleriumSearchAvailable: Boolean(this.craftworks.deleriumSearch?.hasAccess),
       spellScrollGeneratorPremium:
         Boolean(this.craftworks.spellScrollGenerator?.hasAccess),
       spellbookGeneratorPremium:
@@ -94,6 +95,9 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
 
     this.element.querySelector("[data-action='gather']")
       ?.addEventListener("click", () => this.#gmAction(() => this.craftworks.openGather()));
+
+    this.element.querySelector("[data-action='delerium-search']")
+      ?.addEventListener("click", () => this.#gmAction(() => this.craftworks.openDeleriumSearch()));
 
     this.element.querySelector("[data-action='loot']")
       ?.addEventListener("click", () => this.#gmAction(() => this.craftworks.openLoot()));

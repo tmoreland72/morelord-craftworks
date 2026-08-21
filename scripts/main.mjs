@@ -21,11 +21,15 @@ import { SpecialTreasureService } from "./acquisition/special-treasure-service.m
 import { HoardService } from "./acquisition/hoard-service.mjs";
 import { GatherApp } from "./ui/gather-app.mjs";
 import { GatherPlayerApp } from "./ui/gather-player-app.mjs";
+import { DeleriumSearchService } from "./acquisition/delerium-search-service.mjs";
+import { DeleriumSearchApp } from "./ui/delerium-search-app.mjs";
+import { DeleriumSearchPlayerApp } from "./ui/delerium-search-player-app.mjs";
 import { LootApp } from "./ui/loot-app.mjs";
 import { HoardApp } from "./ui/hoard-app.mjs";
 import { RecipeRegistry } from "./recipes/recipe-registry.mjs";
 import { Dnd5eCompendiumItemResolver } from "./recipes/dnd5e-compendium-item-resolver.mjs";
 import { SpellScrollGeneratorService } from "./scrolls/spell-scroll-generator-service.mjs";
+import { SpellScrollCatalogInstaller } from "./scrolls/spell-scroll-catalog-installer.mjs";
 import { SpellScrollGeneratorApp } from "./ui/spell-scroll-generator-app.mjs";
 import { SpellbookGeneratorService } from "./spellbooks/spellbook-generator-service.mjs";
 import { SpellbookGeneratorApp } from "./ui/spellbook-generator-app.mjs";
@@ -172,6 +176,10 @@ Hooks.once("ready", async () => {
     dnd5eItemResolver
   });
 
+  const spellScrollInstaller = new SpellScrollCatalogInstaller({
+    spellScrollGenerator
+  });
+
   const spellbookGenerator = new SpellbookGeneratorService({
     spellScrollGenerator,
     adapter,
@@ -193,7 +201,8 @@ Hooks.once("ready", async () => {
   });
   contentSync.setRuntimeServices({
     dnd5eItemResolver,
-    recipeRegistry: recipes
+    recipeRegistry: recipes,
+    spellScrollInstaller
   });
 
   if (isSyncCoordinator) {
@@ -251,6 +260,13 @@ Hooks.once("ready", async () => {
     sessions,
     contentPacks
   });
+  const deleriumSearch = new DeleriumSearchService({
+    adapter,
+    recipientResolver,
+    sessions,
+    contentPacks,
+    sourceFilter
+  });
   const specialTreasure = new SpecialTreasureService({
     sourceFilter
   });
@@ -278,6 +294,8 @@ Hooks.once("ready", async () => {
   let playerHarvestApp = null;
   let gmGatherApp = null;
   let playerGatherApp = null;
+  let gmDeleriumSearchApp = null;
+  let playerDeleriumSearchApp = null;
   let gmLootApp = null;
   let gmHoardApp = null;
   let materialBrowserApp = null;
@@ -296,6 +314,7 @@ Hooks.once("ready", async () => {
     sessions,
     harvest,
     gather,
+    deleriumSearch,
     loot,
     hoard,
     specialTreasure,
@@ -374,6 +393,13 @@ Hooks.once("ready", async () => {
       if (gmGatherApp?.rendered) await gmGatherApp.close();
       gmGatherApp = new GatherApp(api);
       return gmGatherApp.render({ force: true });
+    },
+    openDeleriumSearch: async () => {
+      if (!game.user.isGM) throw new Error("Only the GM can initiate a delerium search.");
+      if (!deleriumSearch.hasAccess) throw new Error("Enable the Monsters of Drakkenheim Content Pack to search for delerium.");
+      if (gmDeleriumSearchApp?.rendered) await gmDeleriumSearchApp.close();
+      gmDeleriumSearchApp = new DeleriumSearchApp(api);
+      return gmDeleriumSearchApp.render({ force: true });
     },
     openLoot: () => {
       if (!game.user.isGM) throw new Error("Only the GM can initiate Encounter Loot.");
@@ -619,6 +645,44 @@ Hooks.once("ready", async () => {
     if (playerGatherApp?.rendered) await playerGatherApp.close();
     playerGatherApp = new GatherPlayerApp(api, imported);
     await playerGatherApp.render({ force: true });
+  });
+
+  socket.on("delerium-search.open", async ({ session }) => {
+    if (game.user.isGM) return { opened: false, reason: "gm-user" };
+    if (!session?.id) throw new Error("Cannot open a Delerium Search without a session.");
+    const imported = sessions.import(session);
+    if (playerDeleriumSearchApp?.rendered) await playerDeleriumSearchApp.close();
+    playerDeleriumSearchApp = new DeleriumSearchPlayerApp(api, imported);
+    await playerDeleriumSearchApp.render({ force: true });
+    playerDeleriumSearchApp.bringToFront();
+    return { opened: true, sessionId: imported.id };
+  });
+
+  socket.on("delerium-search.attempt", async data => {
+    if (!game.user.isGM) return;
+    const state = deleriumSearch.attempt(data);
+    await socket.emit("delerium-search.state", { sessionId: data.sessionId, state }, { targetUserId: data.userId });
+    gmDeleriumSearchApp?.setSession(sessions.get(data.sessionId));
+  });
+
+  socket.on("delerium-search.decline", async data => {
+    if (!game.user.isGM) return;
+    const state = deleriumSearch.decline(data);
+    await socket.emit("delerium-search.state", { sessionId: data.sessionId, state }, { targetUserId: data.userId });
+    gmDeleriumSearchApp?.setSession(sessions.get(data.sessionId));
+  });
+
+  socket.on("delerium-search.state", async ({ sessionId, state }) => {
+    if (game.user.isGM || playerDeleriumSearchApp?.session?.id !== sessionId) return;
+    await playerDeleriumSearchApp.setState(state);
+  });
+
+  socket.on("delerium-search.complete", async ({ session }) => {
+    if (game.user.isGM) return;
+    if (playerDeleriumSearchApp?.rendered) await playerDeleriumSearchApp.close();
+    playerDeleriumSearchApp = null;
+    if (session.randomEncounter) ui.notifications.warn("Two or more characters failed: the search triggers a Random Encounter.");
+    ui.notifications.info(session.reward ? `The search located ${session.reward.name}; the GM is resolving the award.` : "The delerium search found nothing.");
   });
 
   socket.on("gather.attempt", async data => {

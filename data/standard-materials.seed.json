@@ -10,7 +10,7 @@
       "metals"
     ],
     "img": "icons/commodities/metal/ingot-worn-iron.webp",
-    "priceGp": 40.0,
+    "priceGp": 40,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -34,7 +34,7 @@
       "misc"
     ],
     "img": "icons/equipment/chest/breastplate-quilted-brown.webp",
-    "priceGp": 5.0,
+    "priceGp": 5,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -59,7 +59,7 @@
       "leather-hide"
     ],
     "img": "icons/commodities/leather/leather-scrap-white.webp",
-    "priceGp": 3.0,
+    "priceGp": 3,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -211,7 +211,7 @@
       "magical"
     ],
     "img": "icons/tools/scribal/ink-quill-pink.webp",
-    "priceGp": 15.0,
+    "priceGp": 15,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -313,7 +313,7 @@
       "magical"
     ],
     "img": "icons/consumables/potions/vial-ornet-silver-black.webp",
-    "priceGp": 10.0,
+    "priceGp": 10,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -338,7 +338,7 @@
       "parts"
     ],
     "img": "icons/commodities/tech/coil-steel-grey.webp",
-    "priceGp": 100.0,
+    "priceGp": 100,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -363,7 +363,7 @@
       "parts"
     ],
     "img": "icons/tools/fasteners/bolt-steel-blue.webp",
-    "priceGp": 10.0,
+    "priceGp": 10,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -411,7 +411,7 @@
       "magical"
     ],
     "img": "icons/consumables/potions/bottle-corked-empty.webp",
-    "priceGp": 1.0,
+    "priceGp": 1,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -435,7 +435,7 @@
       "magical"
     ],
     "img": "icons/consumables/potions/vial-cork-empty.webp",
-    "priceGp": 1.0,
+    "priceGp": 1,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -460,7 +460,7 @@
       "scraps"
     ],
     "img": "icons/commodities/currency/coins-plain-gold.webp",
-    "priceGp": 1.0,
+    "priceGp": 1,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -485,7 +485,7 @@
       "leather-hide"
     ],
     "img": "icons/commodities/leather/fur-pelt-off-white.webp",
-    "priceGp": 2.0,
+    "priceGp": 2,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -536,7 +536,7 @@
       "metals"
     ],
     "img": "icons/commodities/metal/ingot-iron.webp",
-    "priceGp": 1.0,
+    "priceGp": 1,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -561,7 +561,7 @@
       "leather-hide"
     ],
     "img": "icons/commodities/biological/shell-ridged-blue.webp",
-    "priceGp": 30.0,
+    "priceGp": 30,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -690,7 +690,7 @@
       "magical"
     ],
     "img": "icons/consumables/potions/conical-ornate-purple.webp",
-    "priceGp": 5000.0,
+    "priceGp": 5000,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -715,7 +715,7 @@
       "parchment"
     ],
     "img": "icons/sundries/scrolls/scroll-writing-orange-black.webp",
-    "priceGp": 5000.0,
+    "priceGp": 5000,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -917,7 +917,7 @@
       "parts"
     ],
     "img": "icons/tools/fasteners/screw-flat-steel-grey.webp",
-    "priceGp": 2.0,
+    "priceGp": 2,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -942,7 +942,7 @@
       "wood"
     ],
     "img": "icons/commodities/wood/log-rough-brown.webp",
-    "priceGp": 2.0,
+    "priceGp": 2,
     "purchasable": true,
     "acquisition": {
       "gatherable": true,
@@ -993,7 +993,7 @@
       "wood"
     ],
     "img": "icons/commodities/wood/kindling-stick-brown.webp",
-    "priceGp": 80.0,
+    "priceGp": 80,
     "purchasable": true,
     "acquisition": {
       "gatherable": true,
@@ -1070,7 +1070,7 @@
       "magical"
     ],
     "img": "icons/consumables/potions/potion-flask-corked-tied-necklace-teal.webp",
-    "priceGp": 200.0,
+    "priceGp": 200,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -1095,7 +1095,7 @@
       "parchment"
     ],
     "img": "icons/sundries/scrolls/scroll-plain-tan-red.webp",
-    "priceGp": 200.0,
+    "priceGp": 200,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -1199,7 +1199,7 @@
       "leather-hide"
     ],
     "img": "icons/commodities/leather/leather-bolt-tan.webp",
-    "priceGp": 2.0,
+    "priceGp": 2,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -1224,7 +1224,7 @@
       "scale"
     ],
     "img": "icons/commodities/leather/scales-white.webp",
-    "priceGp": 1.0,
+    "priceGp": 1,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -1298,7 +1298,7 @@
       "metals"
     ],
     "img": "icons/commodities/metal/ingot-plain-steel.webp",
-    "priceGp": 2.0,
+    "priceGp": 2,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -1323,7 +1323,7 @@
       "leather-hide"
     ],
     "img": "icons/commodities/leather/leather-worn-tan.webp",
-    "priceGp": 3.0,
+    "priceGp": 3,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -1348,7 +1348,7 @@
       "leather-hide"
     ],
     "img": "icons/commodities/leather/leather-scrap-brown.webp",
-    "priceGp": 600.0,
+    "priceGp": 600,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -1399,7 +1399,7 @@
       "wood"
     ],
     "img": "icons/commodities/wood/kindling-stick-tan.webp",
-    "priceGp": 25.0,
+    "priceGp": 25,
     "purchasable": true,
     "acquisition": {
       "gatherable": true,
@@ -1476,7 +1476,7 @@
       "magical"
     ],
     "img": "icons/consumables/potions/potion-vial-corked-labeled-purple.webp",
-    "priceGp": 40.0,
+    "priceGp": 40,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -1501,7 +1501,7 @@
       "parchment"
     ],
     "img": "icons/sundries/scrolls/scroll-plain-tan.webp",
-    "priceGp": 40.0,
+    "priceGp": 40,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -1603,7 +1603,7 @@
       "cooking"
     ],
     "img": "icons/consumables/food/preserves-jam-jelly-jar-brown-red.webp",
-    "priceGp": 10.0,
+    "priceGp": 10,
     "purchasable": true,
     "acquisition": {
       "gatherable": true,
@@ -1678,7 +1678,7 @@
       "wood"
     ],
     "img": "icons/commodities/wood/logs-pile-rough-brown.webp",
-    "priceGp": 800.0,
+    "priceGp": 800,
     "purchasable": true,
     "acquisition": {
       "gatherable": true,
@@ -1755,7 +1755,7 @@
       "magical"
     ],
     "img": "icons/consumables/potions/bottle-pear-corked-labeled-ornamental-purple.webp",
-    "priceGp": 2000.0,
+    "priceGp": 2000,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -1780,7 +1780,7 @@
       "parchment"
     ],
     "img": "icons/sundries/scrolls/scroll-plain-red.webp",
-    "priceGp": 2000.0,
+    "priceGp": 2000,
     "purchasable": true,
     "acquisition": {
       "gatherable": false,
@@ -1894,6 +1894,2069 @@
       "title": "Kibbles' Compendium of Craft and Creation",
       "version": "1.1.3",
       "pages": "186-187"
+    }
+  },
+  {
+    "materialId": "bolt-of-cloth",
+    "name": "Bolt of Cloth",
+    "category": "tailoring",
+    "stage": "component",
+    "rarity": "common",
+    "tags": [
+      "cloth",
+      "textile",
+      "tailoring"
+    ],
+    "img": "icons/commodities/cloth/cloth-bolt-grey.webp",
+    "priceGp": 0.1,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": true
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "303-305"
+    }
+  },
+  {
+    "materialId": "cloth-scraps",
+    "name": "Cloth Scraps",
+    "category": "tailoring",
+    "stage": "raw",
+    "rarity": "trivial",
+    "tags": [
+      "cloth",
+      "scraps",
+      "textile",
+      "tailoring"
+    ],
+    "img": "icons/commodities/cloth/cloth-scraps-plain.webp",
+    "priceGp": 0.02,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": true
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "303-305"
+    }
+  },
+  {
+    "materialId": "spool-of-thread",
+    "name": "Spool of Thread",
+    "category": "tailoring",
+    "stage": "component",
+    "rarity": "trivial",
+    "tags": [
+      "thread",
+      "textile",
+      "tailoring"
+    ],
+    "img": "icons/commodities/cloth/thread-spindle-white.webp",
+    "priceGp": 0.1,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": true
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "303-305"
+    }
+  },
+  {
+    "materialId": "common-psionic-essence",
+    "name": "Common Psionic Essence",
+    "category": "essences",
+    "stage": "raw",
+    "rarity": "common",
+    "tags": [
+      "essence",
+      "essences",
+      "psionic"
+    ],
+    "img": "icons/magic/perception/third-eye-blue-red.webp",
+    "priceGp": 45,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": true,
+      "lootable": true
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "190-192"
+    }
+  },
+  {
+    "materialId": "uncommon-psionic-essence",
+    "name": "Uncommon Psionic Essence",
+    "category": "essences",
+    "stage": "raw",
+    "rarity": "uncommon",
+    "tags": [
+      "essence",
+      "essences",
+      "psionic"
+    ],
+    "img": "icons/magic/perception/third-eye-blue-red.webp",
+    "priceGp": 150,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": true,
+      "lootable": true
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "190-192"
+    }
+  },
+  {
+    "materialId": "rare-psionic-essence",
+    "name": "Rare Psionic Essence",
+    "category": "essences",
+    "stage": "raw",
+    "rarity": "rare",
+    "tags": [
+      "essence",
+      "essences",
+      "psionic"
+    ],
+    "img": "icons/magic/perception/third-eye-blue-red.webp",
+    "priceGp": 700,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": true,
+      "lootable": true
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "190-192"
+    }
+  },
+  {
+    "materialId": "very-rare-psionic-essence",
+    "name": "Very Rare Psionic Essence",
+    "category": "essences",
+    "stage": "raw",
+    "rarity": "very-rare",
+    "tags": [
+      "essence",
+      "essences",
+      "psionic"
+    ],
+    "img": "icons/magic/perception/third-eye-blue-red.webp",
+    "priceGp": 7000,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": true,
+      "lootable": true
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "190-192"
+    }
+  },
+  {
+    "materialId": "legendary-psionic-essence",
+    "name": "Legendary Psionic Essence",
+    "category": "essences",
+    "stage": "raw",
+    "rarity": "legendary",
+    "tags": [
+      "essence",
+      "essences",
+      "psionic"
+    ],
+    "img": "icons/magic/perception/third-eye-blue-red.webp",
+    "priceGp": 25000,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": true,
+      "lootable": true
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "190-192"
+    }
+  },
+  {
+    "materialId": "medium-carapace",
+    "name": "Medium Carapace",
+    "category": "leather-hide",
+    "stage": "raw",
+    "rarity": "common",
+    "tags": [
+      "carapace",
+      "leather-hide"
+    ],
+    "img": "icons/commodities/biological/shell-tan.webp",
+    "priceGp": 2,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": true,
+      "lootable": true
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "190-192"
+    }
+  },
+  {
+    "materialId": "common-meat",
+    "name": "Common Meat",
+    "category": "cooking",
+    "stage": "raw",
+    "rarity": "common",
+    "tags": [
+      "meat",
+      "fresh-ingredient"
+    ],
+    "img": "icons/consumables/meat/steak-raw-red-pink.webp",
+    "priceGp": 1,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": true,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "190-192"
+    }
+  },
+  {
+    "materialId": "uncommon-meat",
+    "name": "Uncommon Meat",
+    "category": "cooking",
+    "stage": "raw",
+    "rarity": "uncommon",
+    "tags": [
+      "meat",
+      "fresh-ingredient"
+    ],
+    "img": "icons/consumables/meat/steak-raw-red-pink.webp",
+    "priceGp": 40,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": true,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "190-192"
+    }
+  },
+  {
+    "materialId": "rare-meat",
+    "name": "Rare Meat",
+    "category": "cooking",
+    "stage": "raw",
+    "rarity": "rare",
+    "tags": [
+      "meat",
+      "fresh-ingredient"
+    ],
+    "img": "icons/consumables/meat/steak-raw-red-pink.webp",
+    "priceGp": 200,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": true,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "190-192"
+    }
+  },
+  {
+    "materialId": "very-rare-meat",
+    "name": "Very Rare Meat",
+    "category": "cooking",
+    "stage": "raw",
+    "rarity": "very-rare",
+    "tags": [
+      "meat",
+      "fresh-ingredient"
+    ],
+    "img": "icons/consumables/meat/steak-raw-red-pink.webp",
+    "priceGp": 2000,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": true,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "190-192"
+    }
+  },
+  {
+    "materialId": "legendary-meat",
+    "name": "Legendary Meat",
+    "category": "cooking",
+    "stage": "raw",
+    "rarity": "legendary",
+    "tags": [
+      "meat",
+      "fresh-ingredient"
+    ],
+    "img": "icons/consumables/meat/steak-raw-red-pink.webp",
+    "priceGp": 5000,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": true,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "190-192"
+    }
+  },
+  {
+    "materialId": "common-fresh-ingredient",
+    "name": "Common Fresh Ingredient",
+    "category": "cooking",
+    "stage": "raw",
+    "rarity": "common",
+    "tags": [
+      "fresh-ingredient",
+      "plant"
+    ],
+    "img": "icons/consumables/plants/leaf-herb-green.webp",
+    "priceGp": 1,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": true,
+      "harvestable": true,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "190-192"
+    }
+  },
+  {
+    "materialId": "tough-hide",
+    "name": "Tough Hide",
+    "category": "leather-hide",
+    "stage": "raw",
+    "rarity": "uncommon",
+    "tags": [
+      "hide",
+      "leather-hide",
+      "special-material"
+    ],
+    "img": "icons/commodities/leather/leather-pelt-cured.webp",
+    "priceGp": 600,
+    "purchasable": false,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": true,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "190-192"
+    }
+  },
+  {
+    "materialId": "resistant-hide",
+    "name": "Resistant Hide",
+    "category": "leather-hide",
+    "stage": "raw",
+    "rarity": "uncommon",
+    "tags": [
+      "hide",
+      "leather-hide",
+      "special-material"
+    ],
+    "img": "icons/commodities/leather/leather-pelt-cured.webp",
+    "priceGp": 600,
+    "purchasable": false,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": true,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "190-192"
+    }
+  },
+  {
+    "materialId": "dragon-scales",
+    "name": "Dragon Scales",
+    "category": "leather-hide",
+    "stage": "raw",
+    "rarity": "rare",
+    "tags": [
+      "scales",
+      "leather-hide",
+      "special-material",
+      "dragon"
+    ],
+    "img": "icons/commodities/leather/scales-blue.webp",
+    "priceGp": 700,
+    "purchasable": false,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": true,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "190-192"
+    }
+  },
+  {
+    "materialId": "valued-component-boots-50",
+    "name": "Gilded Boots",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 50,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-circlet-50",
+    "name": "Gilded Circlet",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 50,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-quiver-25",
+    "name": "Fine Quiver",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 25,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-gauntlets-50",
+    "name": "Gilded Gauntlets",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 50,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-helm-25",
+    "name": "Fine Helm",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 25,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-pipes-25",
+    "name": "Fine Pipes",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 25,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-silver-coffer-500",
+    "name": "Exquisite Silver Coffer",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 500,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-picture-of-a-horse-75",
+    "name": "Painted Horse Portrait",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 75,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-picture-of-mastiffs-25",
+    "name": "Fine Mastiff Portrait",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 25,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-belt-200",
+    "name": "Masterwork Belt",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 200,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-set-of-bracers-200",
+    "name": "Masterwork Bracer Set",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 200,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-bowl-200",
+    "name": "Masterwork Bowl",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 200,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-cape-200",
+    "name": "Masterwork Cape",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 200,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-cloak-50",
+    "name": "Gilded Cloak",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 50,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-figurine-of-a-fly-20",
+    "name": "Carved Figurine Of A Fly",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 20,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-figurines-of-a-goat-20",
+    "name": "Carved Goat Figurines",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 20,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-figurine-of-a-dog-20",
+    "name": "Carved Figurine Of A Dog",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 20,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-figurine-of-a-panther-unpriced",
+    "name": "Carved Panther Figurine",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 20,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-horn-100",
+    "name": "Ornate Horn",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 100,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-brass-horn-50",
+    "name": "Gilded Brass Horn",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 50,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-helm-50",
+    "name": "Gilded Helm",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 50,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-mantle-100",
+    "name": "Ornate Mantle",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 100,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-robe-100",
+    "name": "Ornate Robe",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 100,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-stone-200",
+    "name": "Carved Earthstone",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 200,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-fancy-carpet-1000",
+    "name": "Royal Woven Carpet",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 1000,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-figurine-of-a-horse-50",
+    "name": "Gilded Figurine Of A Horse",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 50,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-3-inch-cube-500",
+    "name": "Exquisite Silver Cube",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 500,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-bronze-horn-100",
+    "name": "Ornate Bronze Horn",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 100,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-robe-200",
+    "name": "Masterwork Robe",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 200,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-iron-flask-200",
+    "name": "Masterwork Iron Flask",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 200,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-white-gray-or-black-robe-500",
+    "name": "Exquisite Ceremonial Robe",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 500,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-fine-black-cloth-100",
+    "name": "Ornate Shadow-Weave Cloth",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 100,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-sword-hilt-200",
+    "name": "Masterwork Sword Hilt",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 200,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-sword-200",
+    "name": "Masterwork Sword",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 200,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-javelin-100",
+    "name": "Ornate Javelin",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 100,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-weapon-1000",
+    "name": "Royal Weapon",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 1000,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-sword-100",
+    "name": "Ornate Sword",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 100,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-sword-500",
+    "name": "Exquisite Sword",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 500,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-scimitar-500",
+    "name": "Exquisite Scimitar",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 500,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-weapon-10000",
+    "name": "Legendary Weapon",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 10000,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-maul-1000",
+    "name": "Royal Maul",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 1000,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-lance-1000",
+    "name": "Royal Lance",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 1000,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-fine-longcoat-100",
+    "name": "Ornate Captain's Longcoat",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 100,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-shield-1000",
+    "name": "Royal Shield",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 1000,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-plate-armor-1500",
+    "name": "Adamantine-Inlaid Plate Armor",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 1500,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-shield-200",
+    "name": "Masterwork Shield",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 200,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-set-of-plate-armor-4000",
+    "name": "Mythic Plate Harness",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 4000,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-ring-10",
+    "name": "Silver-Trimmed Ring",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 10,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-ring-400",
+    "name": "Jeweled Ring",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 400,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-ring-200",
+    "name": "Masterwork Ring",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 200,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-medallion-25",
+    "name": "Fine Medallion",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 25,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-necklace-50",
+    "name": "Gilded Necklace",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 50,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-necklace-10",
+    "name": "Silver-Trimmed Necklace",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 10,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-scarab-shaped-medallion-unpriced",
+    "name": "Masterwork Scarab Medallion",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 200,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-talisman-1000",
+    "name": "Royal Talisman",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 1000,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-rod-100",
+    "name": "Ornate Rod",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 100,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-rod-500",
+    "name": "Exquisite Rod",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 500,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-rod-3000",
+    "name": "Imperial Rod",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 3000,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-rod-5000",
+    "name": "Sovereign Rod",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 5000,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-rod-10000",
+    "name": "Legendary Rod",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 10000,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-blank-book-500",
+    "name": "Exquisite Blank Book",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 500,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-blank-book-250",
+    "name": "Illuminated Blank Book",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 250,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-hat-5",
+    "name": "Decorated Hat",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 5,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
+    }
+  },
+  {
+    "materialId": "valued-component-rare-materials-50",
+    "name": "Gilded Crafting Components",
+    "category": "recipe-components",
+    "stage": "finished",
+    "rarity": "common",
+    "tags": [
+      "valued-component",
+      "recipe-component"
+    ],
+    "img": "icons/commodities/treasure/case-red-silver.webp",
+    "priceGp": 50,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": false
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "Crafting recipe components"
     }
   }
 ]

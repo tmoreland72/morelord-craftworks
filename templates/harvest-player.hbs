@@ -61,9 +61,10 @@
             {{#each skills}}
               <option
                 value="{{id}}"
+                data-skill-label="{{label}} {{modifierLabel}}"
                 {{#if selected}}selected{{/if}}
               >
-                {{label}}
+                {{label}} ({{modifierLabel}})
               </option>
             {{/each}}
           </select>
@@ -75,7 +76,7 @@
             {{#unless canRollHarvestChecks}}disabled{{/unless}}
           >
             <i class="fa-solid fa-dice-d20"></i>
-            Roll Harvest Checks
+            <span data-roll-skill-label>{{#if selectedHarvestSkillLabel}}Roll {{selectedHarvestSkillLabel}} Checks{{else}}Roll Harvest Checks{{/if}}</span>
           </button>
         </div>
         </section>
@@ -169,9 +170,11 @@
                 </div>
 
                 <div class="mlh-component-body">
-                  <div class="mlh-component-name">{{componentName}}</div>
+                  <div class="mlh-component-name">
+                    {{componentName}}{{#if quantity}} ×{{quantity}}{{/if}}
+                  </div>
                   <div class="mlh-component-category">
-                    {{category}}{{#if rarity}} · {{rarity}}{{/if}}
+                    {{category}}{{#if rarity}} · {{rarity}}{{/if}}{{#if harvestDc}} · DC {{harvestDc}}{{/if}}{{#if sourceRoll}} · d100 {{sourceRoll}}{{/if}}
                   </div>
                   {{#if name}}
                     <div class="mlh-ingredient-name">
@@ -270,7 +273,7 @@
 
               <div class="mlh-claimed-body">
                 <div class="mlh-claimed-name">
-                  {{displayName}}
+                  {{displayName}}{{#if quantity}} ×{{quantity}}{{/if}}
                   {{#if neededForCrafting}}
                     <span class="mlh-needed-inline">
                       <i class="fa-solid fa-hammer"></i>

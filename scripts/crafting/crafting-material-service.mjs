@@ -1,5 +1,9 @@
 import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
 import { MODULE_ID } from "../constants.mjs";
+import {
+  recipeItemMatches,
+  spellScrollMatches
+} from "../recipes/recipe-item-match-utils.mjs";
 
 export class CraftingMaterialService {
   constructor({ materialRegistry, adapter }) {
@@ -376,7 +380,14 @@ export class CraftingMaterialService {
 
     if (
       match.itemName
-      && entry.itemName !== String(match.itemName).trim().toLowerCase()
+      && !recipeItemMatches(entry.item, match.itemName)
+    ) {
+      return false;
+    }
+
+    if (
+      match.itemType === "spellScroll"
+      && !spellScrollMatches(entry.item, match.spellName)
     ) {
       return false;
     }
@@ -416,8 +427,11 @@ export class CraftingMaterialService {
       ? this.materialRegistry.get(choice.match.materialId)
       : null;
 
-    const label = material?.name
+    const label = choice.match?.itemType === "spellScroll"
+      ? `Spell Scroll: ${choice.match.spellName}`
+      : material?.name
       ?? choice.match?.materialId
+      ?? choice.match?.itemName
       ?? "matching material";
 
     return `${Math.max(1, Number(choice.quantity ?? 1))} × ${label}`;

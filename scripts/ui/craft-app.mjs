@@ -615,8 +615,20 @@ export class CraftApp
   #friendlyRequirementLabel(match) {
     if (!match) return "Material";
 
+    if (match.itemType === "spellScroll" && match.spellName) {
+      return `Spell Scroll: ${String(match.spellName).trim()}`;
+    }
+
     if (match.itemName) {
       return String(match.itemName).trim() || "Material";
+    }
+
+    if (match.materialId) {
+      return String(match.materialId)
+        .trim()
+        .replace(/[-_]+/g, " ")
+        .replace(/\b\w/g, character => character.toUpperCase())
+        || "Material";
     }
 
     const tag =

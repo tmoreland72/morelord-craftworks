@@ -25,3 +25,9 @@ export const GATHER_SKILLS_DND5E = Object.freeze([
   { id: "sur", label: "Survival" },
   { id: "nat", label: "Nature" }
 ]);
+
+export const DELERIUM_SEARCH_SKILLS_DND5E = Object.freeze([
+  { id: "arc", label: "Arcana" },
+  { id: "inv", label: "Investigation" },
+  { id: "sur", label: "Survival" }
+]);
