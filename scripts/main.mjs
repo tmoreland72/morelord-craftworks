@@ -70,7 +70,7 @@ Hooks.once("init", () => {
 
 Hooks.once("ready", () => {
   document.addEventListener("click", async event => {
-    const row = event.target.closest?.("[data-mcw-link-target]");
+    const row = event.target.closest?.("[data-ml-craftworks-link-target]");
     if (!row) return;
 
     // Let Foundry handle its native UUID link so the normal document preview,
@@ -80,7 +80,7 @@ Hooks.once("ready", () => {
     event.preventDefault();
     event.stopPropagation();
 
-    const uuid = row.dataset.mcwLinkTarget;
+    const uuid = row.dataset.mlCraftworksLinkTarget;
     if (!uuid) return;
 
     try {

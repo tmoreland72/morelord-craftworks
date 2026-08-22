@@ -28,7 +28,7 @@ export class HoardApp extends ScrollPreservingApplicationMixin(
 
   static DEFAULT_OPTIONS = {
     id: "morelord-craftworks-hoard",
-    classes: ["morelord-craftworks", "mcw-window"],
+    classes: ["ml-window", "ml-craftworks-module", "ml-craftworks-window"],
     position: { width: 900, height: 800 },
     window: {
       title: `${MODULE_TITLE} — Hoard`,
@@ -239,7 +239,7 @@ export class HoardApp extends ScrollPreservingApplicationMixin(
         : escape(material.name);
 
       materialRows.push(`
-        <li class="mcw-chat-result">
+        <li class="ml-craftworks-chat-result">
           <img src="${escape(item?.img ?? material.img ?? "")}" alt="">
           <span>
             <strong>${itemLink}</strong>
@@ -252,15 +252,15 @@ export class HoardApp extends ScrollPreservingApplicationMixin(
     const materials = materialRows.join("");
 
     const potions = (this.result.potions ?? []).map(potion => `
-      <li class="mcw-chat-result"><img src="${escape(potion.img ?? "")}" alt=""><span><strong>@UUID[${potion.uuid}]{${escape(potion.name)}}</strong><small>${escape(potion.rarity ?? "")}</small></span></li>
+      <li class="ml-craftworks-chat-result"><img src="${escape(potion.img ?? "")}" alt=""><span><strong>@UUID[${potion.uuid}]{${escape(potion.name)}}</strong><small>${escape(potion.rarity ?? "")}</small></span></li>
     `).join("");
 
     const spellScrolls = (this.result.spellScrolls ?? []).map(spell => `
-      <li class="mcw-chat-result"><img src="${escape(spell.img ?? "")}" alt=""><span><strong>@UUID[${spell.uuid}]{Spell Scroll: ${escape(spell.name)}}</strong><small>Level ${Number(spell.level ?? 0)}</small></span></li>
+      <li class="ml-craftworks-chat-result"><img src="${escape(spell.img ?? "")}" alt=""><span><strong>@UUID[${spell.uuid}]{Spell Scroll: ${escape(spell.name)}}</strong><small>Level ${Number(spell.level ?? 0)}</small></span></li>
     `).join("");
 
     const customItems = (this.result.customItems ?? []).map(item => `
-      <li class="mcw-chat-result"><img src="${escape(item.img ?? "")}" alt=""><span><strong>@UUID[${item.uuid}]{${escape(item.name)}}</strong><small>${escape(item.sourceLabel ?? "")}</small></span></li>
+      <li class="ml-craftworks-chat-result"><img src="${escape(item.img ?? "")}" alt=""><span><strong>@UUID[${item.uuid}]{${escape(item.name)}}</strong><small>${escape(item.sourceLabel ?? "")}</small></span></li>
     `).join("");
 
     const specialItems = (this.result.special?.items ?? [])
@@ -271,7 +271,7 @@ export class HoardApp extends ScrollPreservingApplicationMixin(
           : escape(itemName);
 
         return `
-          <li class="mcw-chat-result">
+          <li class="ml-craftworks-chat-result">
             <img src="${escape(item.itemImg ?? "")}" alt="">
             <span>
               <strong>${itemLink}</strong>
@@ -287,19 +287,19 @@ export class HoardApp extends ScrollPreservingApplicationMixin(
       ? this.result.special.triggered
         ? specialItems
           ? `
-            <section class="mcw-chat-section">
+            <section class="ml-craftworks-chat-section">
               <h4>Special Treasure</h4>
-              <ul class="mcw-chat-results">${specialItems}</ul>
+              <ul class="ml-craftworks-chat-results">${specialItems}</ul>
             </section>
           `
           : `
-            <section class="mcw-chat-section">
+            <section class="ml-craftworks-chat-section">
               <h4>Special Treasure</h4>
               <p>No awardable special Item was resolved.</p>
             </section>
           `
         : `
-          <section class="mcw-chat-section">
+          <section class="ml-craftworks-chat-section">
             <h4>Special Treasure</h4>
             <p>None.</p>
           </section>
@@ -307,7 +307,7 @@ export class HoardApp extends ScrollPreservingApplicationMixin(
       : "";
 
     const content = `
-      <div class="mcw-chat-card mcw-hoard-chat-card">
+      <div class="ml-chat-card ml-craftworks-chat-card ml-craftworks-hoard-chat-card">
         <header>
           <i class="fa-solid fa-vault"></i>
           <div>
@@ -319,7 +319,7 @@ export class HoardApp extends ScrollPreservingApplicationMixin(
         ${
           this.result.coinCopper > 0
             ? `
-              <section class="mcw-chat-section">
+              <section class="ml-craftworks-chat-section">
                 <h4>Coin</h4>
                 <p>
                   <i class="fa-solid fa-coins"></i>
@@ -333,17 +333,17 @@ export class HoardApp extends ScrollPreservingApplicationMixin(
         ${
           materials
             ? `
-              <section class="mcw-chat-section">
+              <section class="ml-craftworks-chat-section">
                 <h4>Crafting Materials</h4>
-                <ul class="mcw-chat-results">${materials}</ul>
+                <ul class="ml-craftworks-chat-results">${materials}</ul>
               </section>
             `
             : ""
         }
 
-        <section class="mcw-chat-section"><h4>Potions</h4><ul class="mcw-chat-results">${potions}</ul></section>
-        <section class="mcw-chat-section"><h4>Spell Scrolls</h4><ul class="mcw-chat-results">${spellScrolls}</ul></section>
-        ${customItems ? `<section class="mcw-chat-section"><h4>Added Items</h4><ul class="mcw-chat-results">${customItems}</ul></section>` : ""}
+        <section class="ml-craftworks-chat-section"><h4>Potions</h4><ul class="ml-craftworks-chat-results">${potions}</ul></section>
+        <section class="ml-craftworks-chat-section"><h4>Spell Scrolls</h4><ul class="ml-craftworks-chat-results">${spellScrolls}</ul></section>
+        ${customItems ? `<section class="ml-craftworks-chat-section"><h4>Added Items</h4><ul class="ml-craftworks-chat-results">${customItems}</ul></section>` : ""}
 
         ${specialText}
       </div>

@@ -18,7 +18,7 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
 
   static DEFAULT_OPTIONS = {
     id: "morelord-craftworks-harvest",
-    classes: ["morelord-craftworks", "mcw-window", "mcw", "mcw-harvest-modern"],
+    classes: ["ml-window", "ml-craftworks-module", "ml-craftworks-window", "ml-craftworks", "ml-craftworks-harvest-modern"],
     position: {
       width: 960,
       height: 800
@@ -370,7 +370,7 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
         const id = button.dataset.creature;
         if (!id) return;
 
-        const scroll = this.element.querySelector(".mlh-creatures");
+        const scroll = this.element.querySelector(".ml-craftworks-harvest-creatures");
         const scrollTop = scroll?.scrollTop ?? 0;
 
         if (this.collapsedCreatures.has(id)) {
@@ -382,7 +382,7 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
         await this.render();
 
         requestAnimationFrame(() => {
-          const nextScroll = this.element.querySelector(".mlh-creatures");
+          const nextScroll = this.element.querySelector(".ml-craftworks-harvest-creatures");
           if (nextScroll) nextScroll.scrollTop = scrollTop;
         });
       }));

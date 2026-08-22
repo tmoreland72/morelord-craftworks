@@ -1,5 +1,5 @@
-<section class="mcw app-shell mcw-spellbook-generator">
-  <header class="mcw-header">
+<section class="ml-app ml-app-shell ml-craftworks app-shell ml-craftworks-spellbook-generator">
+  <header class="ml-craftworks-header">
     <div>
       <h2>Spellbook Generator</h2>
       <p>
@@ -11,8 +11,8 @@
 
   {{#if hasAccess}}
     {{#unless hasResult}}
-    <section class="mcw-panel">
-      <label class="mcw-spellbook-name">
+    <section class="ml-craftworks-panel">
+      <label class="ml-craftworks-spellbook-name">
         <span>Spellbook Name</span>
         <input
           type="text"
@@ -21,18 +21,18 @@
         >
       </label>
 
-      <fieldset class="mcw-generator-constraints">
+      <fieldset class="ml-craftworks-generator-constraints">
         <legend>Schools of Magic <small>(all selected by default)</small></legend>
-        <div class="mcw-generator-option-grid">
+        <div class="ml-craftworks-generator-option-grid">
           {{#each schools}}
             <label><input type="checkbox" data-spell-school="{{id}}" {{#if selected}}checked{{/if}}> {{label}}</label>
           {{/each}}
         </div>
       </fieldset>
 
-      <div class="mcw-spellbook-level-grid">
+      <div class="ml-craftworks-spellbook-level-grid">
         {{#each levels}}
-          <label class="mcw-spellbook-level-row">
+          <label class="ml-craftworks-spellbook-level-row">
             <span>
               <strong>{{label}}</strong>
               <small>{{available}} available</small>
@@ -49,7 +49,7 @@
         {{/each}}
       </div>
 
-      <div class="mcw-actions">
+      <div class="ml-actions ml-craftworks-actions">
         <button
           type="button"
           data-action="generate-spellbook"
@@ -63,33 +63,33 @@
     {{/unless}}
 
     {{#if hasResult}}
-      <section class="mcw-panel mcw-spellbook-preview">
-        <div class="mcw-spellbook-preview-heading">
+      <section class="ml-craftworks-panel ml-craftworks-spellbook-preview">
+        <div class="ml-craftworks-spellbook-preview-heading">
           <i class="fa-solid fa-book"></i>
           <h3>{{bookName}}</h3>
         </div>
 
-        <div class="mcw-spellbook-results-scroll">
+        <div class="ml-craftworks-spellbook-results-scroll">
           {{#each resultGroups}}
-            <div class="mcw-spellbook-result-level">
+            <div class="ml-craftworks-spellbook-result-level">
               <strong>{{label}}</strong>
-              <div class="mcw-spellbook-result-list">
+              <div class="ml-craftworks-spellbook-result-list">
                 {{#each spells}}
-                  <div class="mcw-spellbook-spell" data-document-uuid="{{uuid}}">
+                  <div class="ml-craftworks-spellbook-spell" data-document-uuid="{{uuid}}">
                     <img
-                      class="mcw-spellbook-spell-image"
+                      class="ml-craftworks-spellbook-spell-image"
                       src="{{img}}"
                       alt="{{name}}"
                     >
 
-                    <div class="mcw-spellbook-spell-copy">
+                    <div class="ml-craftworks-spellbook-spell-copy">
                       <strong>{{name}}</strong>
                       <small>{{sourceLabel}}</small>
                     </div>
 
                     <button
                       type="button"
-                      class="mcw-spellbook-spell-open"
+                      class="ml-craftworks-spellbook-spell-open"
                       data-spell-uuid="{{uuid}}"
                       title="Open {{name}}"
                       aria-label="Open {{name}}"
@@ -104,7 +104,7 @@
         </div>
       </section>
 
-      <section class="mcw-panel">
+      <section class="ml-craftworks-panel">
         <h3>Recipient</h3>
 
         <label>
@@ -116,9 +116,9 @@
             {{/each}}
           </select>
         </label>
-        {{#if partyInfo.valid}}<p class="mcw-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
+        {{#if partyInfo.valid}}<p class="ml-craftworks-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
 
-        <div class="mcw-actions">
+        <div class="ml-actions ml-craftworks-actions">
           <button type="button" data-action="reroll-spellbook">
             <i class="fa-solid fa-arrows-rotate"></i>
             Reroll
@@ -134,8 +134,8 @@
       </section>
     {{/if}}
   {{else}}
-    <div class="mcw-panel">
-      <p class="mcw-warning">
+    <div class="ml-craftworks-panel">
+      <p class="ml-text ml-craftworks-warning" data-tone="warning">
         Spellbook Generator requires premium Craftworks access.
       </p>
     </div>

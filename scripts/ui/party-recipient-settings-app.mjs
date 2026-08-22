@@ -9,7 +9,7 @@ export class PartyRecipientSettingsApp extends ScrollPreservingApplicationMixin(
 ) {
   static DEFAULT_OPTIONS = {
     id: "morelord-craftworks-party-recipient-settings",
-    classes: ["morelord-craftworks", "mcw-window"],
+    classes: ["ml-window", "ml-craftworks-module", "ml-craftworks-window"],
     position: { width: 580, height: "auto" },
     window: {
       title: `${MODULE_TITLE} — Party Collection`,

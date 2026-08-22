@@ -16,7 +16,7 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
 
   static DEFAULT_OPTIONS = {
     id: "morelord-craftworks-spell-scroll-generator",
-    classes: ["morelord-craftworks", "mcw-window", "mcw-generator-window", "mcw-spell-scroll-generator-window"],
+    classes: ["ml-window", "ml-craftworks-module", "ml-craftworks-window", "ml-craftworks-generator-window", "ml-craftworks-spell-scroll-generator-window"],
     position: { width: 820, height: 820 },
     window: { title: `${MODULE_TITLE} — Spell Scroll Generator`, resizable: true }
   };

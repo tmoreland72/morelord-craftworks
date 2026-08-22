@@ -1,21 +1,21 @@
-<section class="mcw app-shell mcw-browser-shell">
-  <header class="mcw-header">
+<section class="ml-app ml-app-shell ml-craftworks app-shell ml-craftworks-browser-shell">
+  <header class="ml-craftworks-header">
     <h2>Encounter Loot</h2>
     <p>Resolve materials and coin from every dead creature, plus one rare special-treasure check for the encounter.</p>
   </header>
 
   {{#unless session}}
-    <div class="mcw-panel">
+    <div class="ml-craftworks-panel">
       <h3>Dead Creatures</h3>
       {{#if creatures.length}}
         <p>Select only the defeated NPC tokens that should contribute to this Encounter Loot roll.</p>
-        <div class="mcw-loot-selection-actions">
+        <div class="ml-craftworks-loot-selection-actions">
           <button type="button" data-action="select-all-loot-creatures"><i class="fa-solid fa-check-double"></i> Select All</button>
           <button type="button" data-action="clear-all-loot-creatures"><i class="fa-solid fa-xmark"></i> Clear All</button>
         </div>
-        <div class="mcw-loot-creatures">
+        <div class="ml-craftworks-loot-creatures">
           {{#each creatures}}
-            <label class="mcw-creature mcw-loot-creature-select">
+            <label class="ml-craftworks-creature ml-craftworks-loot-creature-select">
               <input
                 type="checkbox"
                 data-loot-creature-select
@@ -32,7 +32,7 @@
           {{/each}}
         </div>
 
-        <div class="mcw-actions">
+        <div class="ml-actions ml-craftworks-actions">
           <button type="button" data-action="roll">
             <i class="fa-solid fa-dice-d20"></i> Roll Encounter Loot
           </button>
@@ -43,25 +43,25 @@
           {{/if}}
         </div>
       {{else}}
-        <p class="mcw-warning">No dead creatures were found on the current scene.</p>
+      <p class="ml-text ml-craftworks-warning" data-tone="warning">No dead creatures were found on the current scene.</p>
       {{/if}}
     </div>
   {{else}}
-    <div class="mcw-browser-results">
-      <div class="mcw-panel">
+    <div class="ml-craftworks-browser-results">
+      <div class="ml-craftworks-panel">
         <h3>Corpse Results</h3>
-        <div class="mcw-loot-roll-list">
+        <div class="ml-craftworks-loot-roll-list">
         {{#each session.result.rolls}}
-          <div class="mcw-loot-roll">
+          <div class="ml-craftworks-loot-roll">
             <div>
               <strong>{{creature}}</strong>
               <span>CR {{cr}}</span>
             </div>
 
-            <div class="mcw-loot-roll-result">
+            <div class="ml-craftworks-loot-roll-result">
               {{#if materialsEnabled}}
                 {{#if material}}
-                  <span class="mcw-result" data-document-uuid="{{material.uuid}}">
+                  <span class="ml-craftworks-result" data-document-uuid="{{material.uuid}}">
                     <img src="{{material.img}}" alt="{{material.name}}">
                     {{material.name}} ×{{material.quantity}}
                   </span>
@@ -79,11 +79,11 @@
               {{/if}}
 
               {{#if potion}}
-                <span class="mcw-result" data-document-uuid="{{potion.uuid}}"><img src="{{potion.img}}" alt="{{potion.name}}">{{potion.name}}</span>
+                <span class="ml-craftworks-result" data-document-uuid="{{potion.uuid}}"><img src="{{potion.img}}" alt="{{potion.name}}">{{potion.name}}</span>
               {{/if}}
 
               {{#if spellScroll}}
-                <span class="mcw-result" data-document-uuid="{{spellScroll.uuid}}"><img src="{{spellScroll.img}}" alt="{{spellScroll.name}}">Spell Scroll: {{spellScroll.name}}</span>
+                <span class="ml-craftworks-result" data-document-uuid="{{spellScroll.uuid}}"><img src="{{spellScroll.img}}" alt="{{spellScroll.name}}">Spell Scroll: {{spellScroll.name}}</span>
               {{/if}}
             </div>
           </div>
@@ -91,35 +91,35 @@
         </div>
       </div>
 
-      <div class="mcw-panel">
+      <div class="ml-craftworks-panel">
         <h3>Encounter Haul</h3>
 
-        <div class="mcw-result-toolbar">
+        <div class="ml-craftworks-result-toolbar">
           <button type="button" data-action="delete-result-items"><i class="fa-solid fa-trash"></i> Delete Marked</button>
           <button type="button" data-action="open-item-lookup"><i class="fa-solid fa-plus"></i> Add Item</button>
         </div>
 
         {{#if itemLookupOpen}}
-          <div class="mcw-item-lookup">
-            <div class="mcw-item-lookup-header">
+          <div class="ml-craftworks-item-lookup">
+            <div class="ml-craftworks-item-lookup-header">
               <div><strong>Add an Item</strong><small>Search enabled D&amp;D Item compendiums.</small></div>
-              <button type="button" class="mcw-icon-button" data-action="close-item-lookup" title="Close item lookup"><i class="fa-solid fa-xmark"></i></button>
+<button type="button" class="ml-icon-button ml-craftworks-icon-button" data-action="close-item-lookup" title="Close item lookup" aria-label="Close item lookup"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="mcw-item-lookup-search">
+            <div class="ml-craftworks-item-lookup-search">
               <i class="fa-solid fa-magnifying-glass"></i>
               <input type="search" data-item-search value="{{itemSearchQuery}}" placeholder="Type at least 2 characters…" autocomplete="off">
             </div>
             {{#if itemSearchResults.length}}
-              <div class="mcw-item-search-results">
+              <div class="ml-craftworks-item-search-results">
                 {{#each itemSearchResults}}
                   <button type="button" data-action="add-result-item" data-item-uuid="{{uuid}}"><img src="{{img}}" alt=""><span><strong>{{name}}</strong><small>{{sourceLabel}}{{#if type}} · {{type}}{{/if}}</small></span><i class="fa-solid fa-plus"></i></button>
                 {{/each}}
               </div>
             {{else}}
               {{#if itemSearchReady}}
-                <p class="mcw-item-lookup-empty">No matching Items found in enabled sources.</p>
+                <p class="ml-craftworks-item-lookup-empty">No matching Items found in enabled sources.</p>
               {{else}}
-                <p class="mcw-item-lookup-hint">Enter at least 2 characters to search.</p>
+                <p class="ml-craftworks-item-lookup-hint">Enter at least 2 characters to search.</p>
               {{/if}}
             {{/if}}
           </div>
@@ -127,9 +127,9 @@
 
         {{#if session.result.channels.materials}}
           {{#if session.result.materials.length}}
-            <div class="mcw-loot-summary-grid">
+            <div class="ml-craftworks-loot-summary-grid">
               {{#each session.result.materials}}
-                <div class="mcw-result mcw-editable-result" data-document-uuid="{{uuid}}">
+                <div class="ml-craftworks-result ml-craftworks-editable-result" data-document-uuid="{{uuid}}">
                   <input type="checkbox" data-result-item="materials:{{@index}}" aria-label="Mark {{name}} for deletion">
                   <img src="{{img}}" alt="{{name}}">
                   <strong>{{name}} ×{{quantity}}</strong>
@@ -143,26 +143,26 @@
 
         {{#if session.result.potions.length}}
           <h4>Potions</h4>
-          <div class="mcw-loot-summary-grid">{{#each session.result.potions}}<div class="mcw-result mcw-editable-result" data-document-uuid="{{uuid}}"><input type="checkbox" data-result-item="potions:{{@index}}" aria-label="Mark {{name}} for deletion"><img src="{{img}}" alt="{{name}}"><strong>{{name}}</strong></div>{{/each}}</div>
+          <div class="ml-craftworks-loot-summary-grid">{{#each session.result.potions}}<div class="ml-craftworks-result ml-craftworks-editable-result" data-document-uuid="{{uuid}}"><input type="checkbox" data-result-item="potions:{{@index}}" aria-label="Mark {{name}} for deletion"><img src="{{img}}" alt="{{name}}"><strong>{{name}}</strong></div>{{/each}}</div>
         {{/if}}
 
         {{#if session.result.spellScrolls.length}}
           <h4>Spell Scrolls</h4>
-          <div class="mcw-loot-summary-grid">{{#each session.result.spellScrolls}}<div class="mcw-result mcw-editable-result" data-document-uuid="{{uuid}}"><input type="checkbox" data-result-item="spellScrolls:{{@index}}" aria-label="Mark Spell Scroll: {{name}} for deletion"><img src="{{img}}" alt="{{name}}"><strong>Spell Scroll: {{name}}</strong></div>{{/each}}</div>
+          <div class="ml-craftworks-loot-summary-grid">{{#each session.result.spellScrolls}}<div class="ml-craftworks-result ml-craftworks-editable-result" data-document-uuid="{{uuid}}"><input type="checkbox" data-result-item="spellScrolls:{{@index}}" aria-label="Mark Spell Scroll: {{name}} for deletion"><img src="{{img}}" alt="{{name}}"><strong>Spell Scroll: {{name}}</strong></div>{{/each}}</div>
         {{/if}}
 
         {{#if session.result.customItems.length}}
           <h4>Added Items</h4>
-          <div class="mcw-loot-summary-grid">{{#each session.result.customItems}}<div class="mcw-result mcw-editable-result" data-document-uuid="{{uuid}}"><input type="checkbox" data-result-item="customItems:{{@index}}" aria-label="Mark {{name}} for deletion"><img src="{{img}}" alt="{{name}}"><div><strong>{{name}}</strong><small>{{sourceLabel}}</small></div></div>{{/each}}</div>
+          <div class="ml-craftworks-loot-summary-grid">{{#each session.result.customItems}}<div class="ml-craftworks-result ml-craftworks-editable-result" data-document-uuid="{{uuid}}"><input type="checkbox" data-result-item="customItems:{{@index}}" aria-label="Mark {{name}} for deletion"><img src="{{img}}" alt="{{name}}"><div><strong>{{name}}</strong><small>{{sourceLabel}}</small></div></div>{{/each}}</div>
         {{/if}}
 
         {{#if session.result.channels.coin}}
-          <div class="mcw-coin-editor">
-            <div class="mcw-coin-editor-heading">
+          <div class="ml-craftworks-coin-editor">
+            <div class="ml-craftworks-coin-editor-heading">
               <strong><i class="fa-solid fa-coins"></i> Coin</strong>
               <span>{{#if session.result.coinTotalCopper}}{{session.result.coinLabel}}{{else}}No coin{{/if}}</span>
             </div>
-            <div class="mcw-coin-fields">
+            <div class="ml-craftworks-coin-fields">
               {{#each coinEditor}}
                 <label><span>{{label}}</span><input type="number" min="0" step="1" value="{{value}}" data-coin-denomination="{{denomination}}"></label>
               {{/each}}
@@ -171,11 +171,11 @@
         {{/if}}
 
         {{#if session.result.channels.special}}
-          <div class="mcw-special-treasure">
+          <div class="ml-craftworks-special-treasure">
             <strong>Special Treasure</strong>
             {{#if session.result.special.triggered}}
               {{#if session.result.special.itemUuid}}
-                <div class="mcw-result mcw-special-result mcw-editable-result" data-document-uuid="{{session.result.special.itemUuid}}">
+                <div class="ml-craftworks-result ml-craftworks-special-result ml-craftworks-editable-result" data-document-uuid="{{session.result.special.itemUuid}}">
                   <input type="checkbox" data-result-item="lootSpecial" aria-label="Mark {{session.result.special.itemName}} for deletion">
                   <img src="{{session.result.special.itemImg}}" alt="{{session.result.special.itemName}}">
                   <div>
@@ -186,7 +186,7 @@
                   </div>
                 </div>
               {{else}}
-                <p class="mcw-warning">
+        <p class="ml-text ml-craftworks-warning" data-tone="warning">
                   <i class="fa-solid fa-triangle-exclamation"></i>
                   Special treasure triggered ({{session.result.special.roll}} / {{session.result.special.chance}}%), but no awardable Item was resolved.
                   {{session.result.special.detail}}
@@ -200,7 +200,7 @@
 
       </div>
 
-      <div class="mcw-panel">
+      <div class="ml-craftworks-panel">
         <h3>Recipient</h3>
         <label>
           Reward Recipient
@@ -209,9 +209,9 @@
             {{#each actors}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
           </select>
         </label>
-        {{#if partyInfo.valid}}<p class="mcw-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
+        {{#if partyInfo.valid}}<p class="ml-craftworks-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
 
-        <div class="mcw-actions">
+        <div class="ml-actions ml-craftworks-actions">
           <button type="button" data-action="reroll-loot"><i class="fa-solid fa-dice"></i> Reroll</button>
           <button type="button" data-action="reset-loot"><i class="fa-solid fa-rotate-left"></i> Reset</button>
           <button type="button" data-action="award" {{#unless session.result.found}}disabled{{/unless}}>

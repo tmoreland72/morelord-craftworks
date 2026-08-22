@@ -35,9 +35,10 @@ export class CraftCompletionApp
   static DEFAULT_OPTIONS = {
     id: "morelord-craftworks-craft-complete",
     classes: [
-      "morelord-craftworks",
-      "mcw-window",
-      "mcw-craft-complete-window"
+      "ml-window",
+      "ml-craftworks-module",
+      "ml-craftworks-window",
+      "ml-craftworks-craft-complete-window"
     ],
     position: {
       width: 720,

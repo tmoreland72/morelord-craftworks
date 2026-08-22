@@ -1,5 +1,6 @@
 import { MODULE_TITLE } from "../constants.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
+const ENCOUNTERS_MODULE_ID = "morelord-encounters";
 
 export class DeleriumSearchResultsApp extends HandlebarsApplicationMixin(ApplicationV2) {
   constructor(craftworks, session, options = {}) {
@@ -11,7 +12,7 @@ export class DeleriumSearchResultsApp extends HandlebarsApplicationMixin(Applica
 
   static DEFAULT_OPTIONS = {
     id: "morelord-craftworks-delerium-search-results",
-    classes: ["morelord-craftworks", "mcw-window"],
+    classes: ["ml-window", "ml-craftworks-module", "ml-craftworks-window"],
     position: { width: 640, height: "auto" },
     window: { title: `${MODULE_TITLE} — Search Results`, resizable: true }
   };
@@ -40,6 +41,9 @@ export class DeleriumSearchResultsApp extends HandlebarsApplicationMixin(Applica
       this.selectedRecipientUuid = defaultUuid;
     }
     for (const recipient of recipients) recipient.selected = recipient.uuid === this.selectedRecipientUuid;
+    const encountersModule = game.modules.get(ENCOUNTERS_MODULE_ID);
+    const encountersInstalled = Boolean(encountersModule);
+    const encountersActive = Boolean(encountersModule?.active);
 
     return foundry.utils.mergeObject(context, {
       session: this.session,
@@ -54,7 +58,12 @@ export class DeleriumSearchResultsApp extends HandlebarsApplicationMixin(Applica
       encounterTitle: this.session.randomEncounter ? "Random Encounter Required" : "No Random Encounter",
       encounterText: this.session.randomEncounter
         ? "Two or more characters failed their checks. Resolve a random encounter for this search."
-        : "Fewer than two characters failed. This search does not trigger a random encounter."
+        : "Fewer than two characters failed. This search does not trigger a random encounter.",
+      encountersInstalled,
+      encountersActive,
+      encountersUnavailableText: encountersInstalled
+        ? "Morelord Encounters is installed but not active. Enable it in Manage Modules to build this encounter."
+        : "Install Morelord Encounters from Foundry's Add-on Modules screen to build this encounter automatically."
     }, { inplace: false });
   }
 
@@ -64,6 +73,7 @@ export class DeleriumSearchResultsApp extends HandlebarsApplicationMixin(Applica
       this.selectedRecipientUuid = event.currentTarget.value;
     });
     this.element.querySelector("[data-action='roll-award']")?.addEventListener("click", event => this.#rollAndAward(event));
+    this.element.querySelector("[data-action='open-encounters']")?.addEventListener("click", event => this.#openEncounters(event));
   }
 
   async #rollAndAward(event) {
@@ -76,6 +86,38 @@ export class DeleriumSearchResultsApp extends HandlebarsApplicationMixin(Applica
       await this.render();
     } catch (error) {
       ui.notifications.error(error.message);
+      button.disabled = false;
+    }
+  }
+
+  async #openEncounters(event) {
+    const button = event.currentTarget;
+    const encountersModule = game.modules.get(ENCOUNTERS_MODULE_ID);
+    if (!encountersModule) {
+      return ui.notifications.warn("Install Morelord Encounters from Foundry's Add-on Modules screen first.");
+    }
+    if (!encountersModule.active) {
+      return ui.notifications.warn("Enable Morelord Encounters in Manage Modules first.");
+    }
+
+    button.disabled = true;
+    try {
+      const api = encountersModule.api;
+      const open = api?.openEncounterBuilder ?? api?.open;
+      if (typeof open === "function") {
+        await open.call(api);
+      } else {
+        const modulePath = "modules/morelord-encounters/scripts/apps/encounter-builder-dialog.mjs";
+        const moduleUrl = foundry.utils.getRoute?.(modulePath) ?? `/${modulePath}`;
+        const { configureEncounter } = await import(moduleUrl);
+        if (typeof configureEncounter !== "function") {
+          throw new Error("Morelord Encounters does not expose its encounter builder.");
+        }
+        await configureEncounter();
+      }
+    } catch (error) {
+      ui.notifications.error(`Could not open Morelord Encounters: ${error.message}`);
+    } finally {
       button.disabled = false;
     }
   }

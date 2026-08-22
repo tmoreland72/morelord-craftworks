@@ -1,29 +1,29 @@
-<div class="mlh-shell">
-  <header class="mlh-header">
-    <div class="mlh-title"><div><h1><i class="fa-solid fa-scalpel"></i> Harvesting</h1><div class="mlh-scene">{{#if session}}{{session.sceneName}}{{else}}Current Scene{{/if}}</div></div></div>
+<div class="ml-app ml-app-shell ml-craftworks-harvest-shell">
+  <header class="ml-craftworks-harvest-header">
+    <div class="ml-craftworks-harvest-title"><div><h1><i class="fa-solid fa-scalpel"></i> Harvesting</h1><div class="ml-craftworks-harvest-scene">{{#if session}}{{session.sceneName}}{{else}}Current Scene{{/if}}</div></div></div>
     {{#if session}}
-      <div class="mlh-instructions">Players make one harvest attempt per creature and choose one component after a successful check.</div>
-      <div class="mlh-summary"><span><i class="fa-solid fa-skull"></i> {{session.creatures.length}} Creatures</span><span><i class="fa-solid fa-users"></i> Player Progress</span></div>
+      <div class="ml-craftworks-harvest-instructions">Players make one harvest attempt per creature and choose one component after a successful check.</div>
+      <div class="ml-craftworks-harvest-summary"><span><i class="fa-solid fa-skull"></i> {{session.creatures.length}} Creatures</span><span><i class="fa-solid fa-users"></i> Player Progress</span></div>
     {{/if}}
   </header>
 
-  <main class="mlh-creatures">
+  <main class="ml-craftworks-harvest-creatures">
     {{#if session}}
-      <section class="mlh-gm-managed mlh-player-progress">
-        <div class="mlh-mode-heading">
+      <section class="ml-craftworks-harvest-gm-managed ml-craftworks-harvest-player-progress">
+        <div class="ml-craftworks-harvest-mode-heading">
           <i class="fa-solid fa-users"></i>
           Player Windows
         </div>
-        <p class="mlh-preflight-help">
+        <p class="ml-craftworks-harvest-preflight-help">
           Reopening a player's window restores this active session and keeps
           every roll and claimed component intact.
         </p>
-        <div class="mlh-player-progress-list">
+        <div class="ml-craftworks-harvest-player-progress-list">
           {{#each progress}}
-            <div class="mlh-player-progress-row">
+            <div class="ml-craftworks-harvest-player-progress-row">
               <strong>{{user}}</strong>
               {{#if completed}}
-                <span class="mlh-harvesting-completed">
+                <span class="ml-craftworks-harvest-harvesting-completed">
                   <i class="fa-solid fa-circle-check"></i>
                   Harvesting Completed
                 </span>
@@ -43,22 +43,22 @@
       </section>
 
       {{#each session.creatures}}
-        <section class="mlh-creature {{#if isCollapsed}}mlh-creature-collapsed{{/if}}" data-creature-token="{{tokenUuid}}">
-          <header class="mlh-creature-header">
+        <section class="ml-craftworks-harvest-creature {{#if isCollapsed}}ml-craftworks-harvest-creature-collapsed{{/if}}" data-creature-token="{{tokenUuid}}">
+          <header class="ml-craftworks-harvest-creature-header">
             {{#if img}}
-              <img class="mlh-creature-image" src="{{img}}" alt="{{name}}">
+              <img class="ml-craftworks-harvest-creature-image" src="{{img}}" alt="{{name}}">
             {{/if}}
 
-            <div class="mlh-creature-info">
+            <div class="ml-craftworks-harvest-creature-info">
               <h2>{{name}}</h2>
-              <div class="mlh-creature-meta">
+              <div class="ml-craftworks-harvest-creature-meta">
                 <span>{{creatureType}} · CR {{cr}}</span>
                 <span>Harvest DC {{dc}}</span>
                 {{#if harvestRarity}}
-                  <span class="mlh-rarity">{{harvestRarity}}</span>
+                  <span class="ml-craftworks-harvest-rarity">{{harvestRarity}}</span>
                 {{/if}}
                 {{#if (eq harvestMode "drakkenheim")}}
-                  <span class="mlh-has-claim">
+                  <span class="ml-craftworks-harvest-has-claim">
                     <i class="fa-solid fa-radiation"></i>
                     Drakkenheim Components
                   </span>
@@ -73,7 +73,7 @@
 
             <button
               type="button"
-              class="mlh-creature-toggle"
+              class="ml-craftworks-harvest-creature-toggle"
               data-action="toggle-creature"
               data-creature="{{tokenUuid}}"
               title="{{#if isCollapsed}}Expand{{else}}Collapse{{/if}}"
@@ -84,10 +84,10 @@
 
           {{#unless isCollapsed}}
             {{#if (eq harvestMode "drakkenheim")}}
-              <div class="mlh-components mlh-preview-components">
+              <div class="ml-craftworks-harvest-components ml-craftworks-harvest-preview-components">
                 {{#each components}}
-                  <article class="mlh-component {{#unless matched}}mlh-component-unavailable{{/unless}}">
-                    <div class="mlh-component-image">
+                  <article class="ml-craftworks-harvest-component {{#unless matched}}ml-craftworks-harvest-component-unavailable{{/unless}}">
+                    <div class="ml-craftworks-harvest-component-image">
                       {{#if img}}
                         <img src="{{img}}" alt="{{name}}">
                       {{else}}
@@ -95,20 +95,20 @@
                       {{/if}}
                     </div>
 
-                    <div class="mlh-component-body">
-                      <div class="mlh-component-name">{{componentName}}{{#if quantity}} ×{{quantity}}{{/if}}</div>
-                      <div class="mlh-component-category">{{category}} · {{rarity}}{{#if harvestDc}} · DC {{harvestDc}}{{/if}}</div>
+                    <div class="ml-craftworks-harvest-component-body">
+                      <div class="ml-craftworks-harvest-component-name">{{componentName}}{{#if quantity}} ×{{quantity}}{{/if}}</div>
+                      <div class="ml-craftworks-harvest-component-category">{{category}} · {{rarity}}{{#if harvestDc}} · DC {{harvestDc}}{{/if}}</div>
                       {{#if name}}
-                        <div class="mlh-ingredient-name">
+                        <div class="ml-craftworks-harvest-ingredient-name">
                           <i class="fa-solid fa-arrow-right"></i>
                           {{name}}
                         </div>
                       {{/if}}
                     </div>
 
-                    <div class="mlh-component-action">
+                    <div class="ml-craftworks-harvest-component-action">
                       {{#if claimed}}
-                        <div class="mlh-claim-status mlh-taken">
+                        <div class="ml-craftworks-harvest-claim-status ml-craftworks-harvest-taken">
                           <i class="fa-solid fa-lock"></i>
                           <span>
                             Claimed by <strong>{{claimantName}}</strong>
@@ -116,7 +116,7 @@
                           </span>
                         </div>
                       {{else}}
-                        <div class="mlh-claim-status {{#if matched}}mlh-mine{{else}}mlh-unavailable{{/if}}">
+                        <div class="ml-craftworks-harvest-claim-status {{#if matched}}ml-craftworks-harvest-mine{{else}}ml-craftworks-harvest-unavailable{{/if}}">
                           {{#if matched}}Available{{else}}No material match{{/if}}
                         </div>
                       {{/if}}
@@ -125,10 +125,10 @@
                 {{/each}}
               </div>
             {{else}}
-              <div class="mlh-components mlh-preview-components">
+              <div class="ml-craftworks-harvest-components ml-craftworks-harvest-preview-components">
                 {{#each components}}
-                  <article class="mlh-component" data-document-uuid="{{itemUuid}}">
-                    <div class="mlh-component-image">
+                  <article class="ml-craftworks-harvest-component" data-document-uuid="{{itemUuid}}">
+                    <div class="ml-craftworks-harvest-component-image">
                       {{#if img}}
                         <img src="{{img}}" alt="{{name}}">
                       {{else}}
@@ -136,21 +136,21 @@
                       {{/if}}
                     </div>
 
-                    <div class="mlh-component-body">
-                      <div class="mlh-component-name">{{componentName}}{{#if quantity}} ×{{quantity}}{{/if}}</div>
-                      <div class="mlh-component-category">
+                    <div class="ml-craftworks-harvest-component-body">
+                      <div class="ml-craftworks-harvest-component-name">{{componentName}}{{#if quantity}} ×{{quantity}}{{/if}}</div>
+                      <div class="ml-craftworks-harvest-component-category">
                         {{category}}{{#if rarity}} · {{rarity}}{{/if}}{{#if harvestDc}} · DC {{harvestDc}}{{/if}}{{#if sourceRoll}} · d100 {{sourceRoll}}{{/if}}
                       </div>
                       {{#if name}}
-                        <div class="mlh-ingredient-name">
+                        <div class="ml-craftworks-harvest-ingredient-name">
                           <i class="fa-solid fa-arrow-right"></i>{{name}}
                         </div>
                       {{/if}}
                     </div>
 
-                    <div class="mlh-component-action">
+                    <div class="ml-craftworks-harvest-component-action">
                       {{#if claimed}}
-                        <div class="mlh-claim-status mlh-taken">
+                        <div class="ml-craftworks-harvest-claim-status ml-craftworks-harvest-taken">
                           <i class="fa-solid fa-lock"></i>
                           <span>
                             Claimed by <strong>{{claimantName}}</strong>
@@ -158,14 +158,14 @@
                           </span>
                         </div>
                       {{else}}
-                        <div class="mlh-claim-status mlh-mine">Available</div>
+                        <div class="ml-craftworks-harvest-claim-status ml-craftworks-harvest-mine">Available</div>
                       {{/if}}
                     </div>
                   </article>
                 {{/each}}
 
                 {{#unless components.length}}
-                  <div class="mlh-harvest-message mcw-warning">
+          <div class="ml-text ml-craftworks-harvest-harvest-message ml-craftworks-warning" data-tone="warning">
                     No compatible Craftworks components are available for this creature.
                   </div>
                 {{/unless}}
@@ -175,22 +175,22 @@
         </section>
       {{/each}}
 
-      <section class="mlh-claimed-section">
-        <div class="mlh-claimed-heading">
+      <section class="ml-craftworks-harvest-claimed-section">
+        <div class="ml-craftworks-harvest-claimed-heading">
           <div>
             <i class="fa-solid fa-box-open"></i>
             <span>Claimed Components</span>
           </div>
-          <span class="mlh-claimed-count">{{claimedItems.length}}</span>
+          <span class="ml-craftworks-harvest-claimed-count">{{claimedItems.length}}</span>
         </div>
 
         {{#if claimedItems.length}}
-          <div class="mlh-claimed-list">
+          <div class="ml-craftworks-harvest-claimed-list">
             {{#each claimedItems}}
-              <article class="mlh-claimed-item" data-document-uuid="{{linkUuid}}">
+              <article class="ml-craftworks-harvest-claimed-item" data-document-uuid="{{linkUuid}}">
                 <button
                   type="button"
-                  class="mlh-claimed-image-link"
+                  class="ml-craftworks-harvest-claimed-image-link"
                   data-action="open-claimed-item"
                   data-uuid="{{linkUuid}}"
                   {{#unless linkUuid}}disabled{{/unless}}
@@ -203,16 +203,16 @@
                   {{/if}}
                 </button>
 
-                <div class="mlh-claimed-body">
-                  <div class="mlh-claimed-name">{{displayName}}{{#if quantity}} ×{{quantity}}{{/if}}</div>
-                  <div class="mlh-claimed-meta">
-                    <span class="mlh-claimed-rarity">{{displayRarity}}</span>
+                <div class="ml-craftworks-harvest-claimed-body">
+                  <div class="ml-craftworks-harvest-claimed-name">{{displayName}}{{#if quantity}} ×{{quantity}}{{/if}}</div>
+                  <div class="ml-craftworks-harvest-claimed-meta">
+                    <span class="ml-craftworks-harvest-claimed-rarity">{{displayRarity}}</span>
                     <span>{{creatureName}}</span>
                     <span>Claimed by {{displayClaimant}}</span>
                   </div>
                 </div>
 
-                <div class="mlh-claimed-roll">
+                <div class="ml-craftworks-harvest-claimed-roll">
                   <span>Harvest Roll</span>
                   <strong>{{displayRoll}}</strong>
                 </div>
@@ -220,26 +220,26 @@
             {{/each}}
           </div>
         {{else}}
-          <div class="mlh-claimed-empty">
+          <div class="ml-craftworks-harvest-claimed-empty">
             No components have been claimed yet.
           </div>
         {{/if}}
       </section>
     {{else}}
       {{#if deadCreatures.length}}
-        <section class="mlh-gm-managed mlh-harvest-preflight">
-          <div class="mlh-mode-heading">
+        <section class="ml-craftworks-harvest-gm-managed ml-craftworks-harvest-harvest-preflight">
+          <div class="ml-craftworks-harvest-mode-heading">
             <i class="fa-solid fa-skull"></i>
             {{deadCreatures.length}} defeated NPC token(s) found
           </div>
 
-          <p class="mlh-preflight-help">
+          <p class="ml-craftworks-harvest-preflight-help">
             Foundry cannot reliably distinguish a monster from a shopkeeper,
             trap, or other NPC-based token. Select only the creatures that can
             actually be harvested.
           </p>
 
-          <div class="mlh-preflight-selection-actions">
+          <div class="ml-craftworks-harvest-preflight-selection-actions">
             <button type="button" data-action="select-all-harvest-creatures">
               <i class="fa-solid fa-check-double"></i>
               Select All
@@ -250,10 +250,10 @@
             </button>
           </div>
 
-          <div class="mlh-preflight-creatures">
+          <div class="ml-craftworks-harvest-preflight-creatures">
             {{#each deadCreatures}}
-              <article class="mlh-preflight-creature">
-                <label class="mlh-preflight-creature-select" title="Include {{name}} in this Harvest session">
+              <article class="ml-craftworks-harvest-preflight-creature">
+                <label class="ml-craftworks-harvest-preflight-creature-select" title="Include {{name}} in this Harvest session">
                   <input
                     type="checkbox"
                     data-harvest-creature-select
@@ -262,7 +262,7 @@
                   >
                 </label>
                 <img src="{{img}}" alt="{{name}}">
-                <div class="mlh-preflight-creature-copy">
+                <div class="ml-craftworks-harvest-preflight-creature-copy">
                   <strong>{{name}}</strong>
                   <small>
                     {{creatureType}} · CR {{cr}} · Harvest DC {{dc}}
@@ -270,13 +270,13 @@
                   </small>
 
                   {{#if specialItems.length}}
-                    <div class="mlh-special-harvest-items">
-                      <div class="mlh-special-harvest-heading">
+                    <div class="ml-craftworks-harvest-special-harvest-items">
+                      <div class="ml-craftworks-harvest-special-harvest-heading">
                         <i class="fa-solid fa-triangle-exclamation"></i>
                         Special Harvest Items / Instructions
                       </div>
                       {{#each specialItems}}
-                        <div class="mlh-special-harvest-instruction">
+                        <div class="ml-craftworks-harvest-special-harvest-instruction">
                           {{{html}}}
                         </div>
                       {{/each}}
@@ -288,22 +288,22 @@
           </div>
         </section>
 
-        <section class="mlh-gm-managed mlh-skip-skill-section">
-          <div class="mlh-mode-heading">
+        <section class="ml-craftworks-harvest-gm-managed ml-craftworks-harvest-skip-skill-section">
+          <div class="ml-craftworks-harvest-mode-heading">
             <i class="fa-solid fa-users"></i>
             Player Characters
           </div>
-          <p class="mlh-preflight-help">
+          <p class="ml-craftworks-harvest-preflight-help">
             Check <strong>Skip Skill Checks</strong> for any character that
             should automatically succeed at Harvesting. Those players will
             open directly to their claimable components.
           </p>
 
           {{#if playerCharacters.length}}
-            <div class="mlh-skip-skill-list">
+            <div class="ml-craftworks-harvest-skip-skill-list">
               {{#each playerCharacters}}
-                <label class="mlh-skip-skill-row">
-                  <span class="mlh-skip-character">
+                <label class="ml-craftworks-harvest-skip-skill-row">
+                  <span class="ml-craftworks-harvest-skip-character">
                     {{#if actorImg}}
                       <img src="{{actorImg}}" alt="{{actorName}}">
                     {{/if}}
@@ -316,7 +316,7 @@
                     </span>
                   </span>
 
-                  <span class="mlh-skip-toggle">
+                  <span class="ml-craftworks-harvest-skip-toggle">
                     <span>Skip Skill Checks</span>
                     <input
                       type="checkbox"
@@ -329,13 +329,13 @@
               {{/each}}
             </div>
           {{else}}
-            <div class="mlh-harvest-message mcw-warning">
+          <div class="ml-text ml-craftworks-harvest-harvest-message ml-craftworks-warning" data-tone="warning">
               No active player characters were found.
             </div>
           {{/if}}
         </section>
       {{else}}
-        <section class="mlh-empty">
+        <section class="ml-craftworks-harvest-empty">
           <i class="fa-solid fa-scalpel"></i>
           <h2>No Dead Creatures</h2>
           <p>No defeated NPC tokens were found on the current scene.</p>
@@ -344,13 +344,13 @@
     {{/if}}
   </main>
 
-  <footer class="mlh-footer">
-    <div class="mlh-footer-status">{{#if session}}Harvest session active{{else}}Ready to scan the scene{{/if}}</div>
-    <div class="mcw-actions">
+  <footer class="ml-craftworks-harvest-footer">
+    <div class="ml-craftworks-harvest-footer-status">{{#if session}}Harvest session active{{else}}Ready to scan the scene{{/if}}</div>
+    <div class="ml-actions ml-craftworks-actions">
       {{#if session}}
         <button
           type="button"
-          class="mlh-cancel-harvest"
+          class="ml-craftworks-harvest-cancel-harvest"
           data-action="cancel-harvest"
         >
           <i class="fa-solid fa-ban"></i> Cancel Harvest
@@ -363,7 +363,7 @@
         </button>
         <button
           type="button"
-          class="mlh-finalize"
+          class="ml-craftworks-harvest-finalize"
           data-action="finalize"
         >
           <i class="fa-solid fa-box-open"></i> Finalize Harvest

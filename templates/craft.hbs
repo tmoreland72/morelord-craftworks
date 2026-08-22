@@ -1,105 +1,105 @@
-<section class="mcw app-shell mcw-marketplace-browser mcw-craft-browser">
-  <header class="mcw-header mcw-craft-browser-header">
+<section class="ml-app ml-app-shell ml-craftworks-craft ml-craftworks app-shell ml-craftworks-marketplace-browser ml-craftworks-craft-browser">
+  <header class="ml-craftworks-header ml-craftworks-craft-browser-header">
     <div><h2>Craft</h2><p>Search marked recipes and track crafting in progress.</p></div>
-    {{#if hasCrafter}}<span class="mcw-craft-result-count">{{recipeCount}} of {{totalRecipeCount}} recipes</span>{{/if}}
+    {{#if hasCrafter}}<span class="ml-craftworks-craft-result-count">{{recipeCount}} of {{totalRecipeCount}} recipes</span>{{/if}}
   </header>
 
-  <div class="mcw-marketplace-browser-body mcw-craft-browser-body">
-    <aside class="mcw-filter-rail mcw-craft-filter-rail">
-      <div class="mcw-market-filter-title">
+  <div class="ml-craftworks-marketplace-browser-body ml-craftworks-craft-browser-body">
+    <aside class="ml-craftworks-filter-rail ml-craftworks-craft-filter-rail">
+      <div class="ml-craftworks-market-filter-title">
         <strong>Craft</strong>
-        <button type="button" class="mcw-icon-button" data-action="clear-craft-filters" title="Clear all filters" {{#unless hasActiveFilters}}disabled{{/unless}}><i class="fa-solid fa-filter-circle-xmark"></i></button>
+        <button type="button" class="ml-icon-button ml-craftworks-icon-button" data-action="clear-craft-filters" title="Clear all filters" aria-label="Clear all filters" {{#unless hasActiveFilters}}disabled{{/unless}}><i class="fa-solid fa-filter-circle-xmark"></i></button>
       </div>
 
-      <section class="mcw-craft-actor-controls">
+      <section class="ml-craftworks-craft-actor-controls">
         <label><span>Crafter</span><select name="crafter-actor"><option value="">Choose character…</option>{{#each crafterActors}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
         {{#if hasCrafter}}
           <label><span>Ingredient Inventory</span><select name="inventory-actor">{{#each inventoryActors}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}{{#if type}} ({{type}}){{/if}}</option>{{/each}}</select></label>
         {{/if}}
       </section>
 
-      <label class="mcw-filter-search"><span>Search</span><input type="search" name="craft-search" value="{{search}}" placeholder="Recipe, output, tool…" {{#unless hasCrafter}}disabled{{/unless}}></label>
+      <label class="ml-craftworks-filter-search"><span>Search</span><input type="search" name="craft-search" value="{{search}}" placeholder="Recipe, output, tool…" {{#unless hasCrafter}}disabled{{/unless}}></label>
 
       {{#if hasCrafter}}
-        <section class="mcw-filter-group">
+        <section class="ml-craftworks-filter-group">
           <h3>Status</h3>
-          <div class="mcw-tristate-list">{{#each statusOptions}}<button type="button" class="mcw-tristate-filter {{#if selected}}is-include{{/if}}" data-craft-status="{{key}}"><span>{{label}}</span><small>{{count}}</small><i class="fa-solid {{#if selected}}fa-circle-check{{else}}fa-circle{{/if}}"></i></button>{{/each}}</div>
+          <div class="ml-craftworks-tristate-list">{{#each statusOptions}}<button type="button" class="ml-craftworks-tristate-filter {{#if selected}}is-include{{/if}}" data-craft-status="{{key}}"><span>{{label}}</span><small>{{count}}</small><i class="fa-solid {{#if selected}}fa-circle-check{{else}}fa-circle{{/if}}"></i></button>{{/each}}</div>
         </section>
-        <section class="mcw-filter-group">
+        <section class="ml-craftworks-filter-group">
           <h3>Category</h3>
-          <div class="mcw-tristate-list">
-            <button type="button" class="mcw-tristate-filter {{#if allCategoriesSelected}}is-include{{/if}}" data-craft-category="all"><span>All Categories</span><small>{{totalRecipeCount}}</small><i class="fa-solid {{#if allCategoriesSelected}}fa-circle-check{{else}}fa-circle{{/if}}"></i></button>
-            {{#each categories}}<button type="button" class="mcw-tristate-filter {{#if selected}}is-include{{/if}}" data-craft-category="{{key}}"><span>{{label}}</span><small>{{count}}</small><i class="fa-solid {{#if selected}}fa-circle-check{{else}}fa-circle{{/if}}"></i></button>{{/each}}
+          <div class="ml-craftworks-tristate-list">
+            <button type="button" class="ml-craftworks-tristate-filter {{#if allCategoriesSelected}}is-include{{/if}}" data-craft-category="all"><span>All Categories</span><small>{{totalRecipeCount}}</small><i class="fa-solid {{#if allCategoriesSelected}}fa-circle-check{{else}}fa-circle{{/if}}"></i></button>
+            {{#each categories}}<button type="button" class="ml-craftworks-tristate-filter {{#if selected}}is-include{{/if}}" data-craft-category="{{key}}"><span>{{label}}</span><small>{{count}}</small><i class="fa-solid {{#if selected}}fa-circle-check{{else}}fa-circle{{/if}}"></i></button>{{/each}}
           </div>
         </section>
-        <section class="mcw-craft-session-summary">
+        <section class="ml-craftworks-craft-session-summary">
           <h3>This Session</h3>
-          {{#if hasSessionLog}}<div class="mcw-craft-session-log">{{#each sessionLog}}<div class="mcw-craft-log-entry mcw-craft-log-{{kind}}"><span class="mcw-craft-log-time">{{time}}</span><strong>{{recipeName}}</strong><span>{{text}}</span></div>{{/each}}</div>{{else}}<p class="mcw-muted">Crafting activity will appear here.</p>{{/if}}
+          {{#if hasSessionLog}}<div class="ml-craftworks-craft-session-log">{{#each sessionLog}}<div class="ml-craftworks-craft-log-entry ml-craftworks-craft-log-{{kind}}"><span class="ml-craftworks-craft-log-time">{{time}}</span><strong>{{recipeName}}</strong><span>{{text}}</span></div>{{/each}}</div>{{else}}<p class="ml-craftworks-muted">Crafting activity will appear here.</p>{{/if}}
         </section>
       {{/if}}
     </aside>
 
-    <main class="mcw-marketplace-results mcw-craft-results">
+    <main class="ml-craftworks-marketplace-results ml-craftworks-craft-results">
       {{#unless hasCrafter}}
-        <div class="mcw-panel mcw-browser-empty-state"><i class="fa-solid fa-user"></i><p>Choose a crafter to view their marked recipes and crafting progress.</p></div>
+<div class="ml-empty-state ml-craftworks-panel ml-craftworks-browser-empty-state"><i class="fa-solid fa-user"></i><p>Choose a crafter to view their marked recipes and crafting progress.</p></div>
       {{else}}
-        <div class="mcw-craft-results-heading"><div><h2>Recipes</h2><p>Crafting as <strong>{{crafter.name}}</strong> using the selected inventory.</p></div><span>{{recipeCount}} matches</span></div>
+        <div class="ml-craftworks-craft-results-heading"><div><h2>Recipes</h2><p>Crafting as <strong>{{crafter.name}}</strong> using the selected inventory.</p></div><span>{{recipeCount}} matches</span></div>
         {{#if hasRecipes}}
-          <div class="mcw-craft-card-list mcw-craft-browser-list">
+          <div class="ml-craftworks-craft-card-list ml-craftworks-craft-browser-list">
             {{#each recipes}}
-              <article class="mcw-craft-card mcw-craft-list-card is-{{statusKey}}" data-document-uuid="{{outputDocumentUuid}}">
-                <header class="mcw-craft-card-header">
-                  <div class="mcw-craft-card-title">
-                    {{#if output.img}}{{#if outputDocumentUuid}}<button type="button" class="mcw-craft-card-image" data-output-document-uuid="{{outputDocumentUuid}}" title="Open source Item"><img src="{{output.img}}" alt="{{name}}"></button>{{else}}<img class="mcw-craft-card-image-static" src="{{output.img}}" alt="{{name}}">{{/if}}{{/if}}
-                    <div><h3>{{name}}</h3><div class="mcw-recipe-meta"><span>{{sourceLabel}}</span><span>{{category}}</span>{{#each tags}}<span>{{this}}</span>{{/each}}</div></div>
+              <article class="ml-craftworks-craft-card ml-craftworks-craft-list-card is-{{statusKey}}" data-document-uuid="{{outputDocumentUuid}}">
+                <header class="ml-craftworks-craft-card-header">
+                  <div class="ml-craftworks-craft-card-title">
+                    {{#if output.img}}{{#if outputDocumentUuid}}<button type="button" class="ml-craftworks-craft-card-image" data-output-document-uuid="{{outputDocumentUuid}}" title="Open source Item"><img src="{{output.img}}" alt="{{name}}"></button>{{else}}<img class="ml-craftworks-craft-card-image-static" src="{{output.img}}" alt="{{name}}">{{/if}}{{/if}}
+                    <div><h3>{{name}}</h3><div class="ml-craftworks-recipe-meta"><span>{{sourceLabel}}</span><span>{{category}}</span>{{#each tags}}<span>{{this}}</span>{{/each}}</div></div>
                   </div>
-                  <span class="mcw-craft-status-badge is-{{statusKey}}"><i class="fa-solid {{#if isActive}}fa-gears{{else if readiness.ready}}fa-circle-check{{else}}fa-circle-xmark{{/if}}"></i>{{statusLabel}}</span>
+<span class="ml-badge ml-craftworks-craft-status-badge is-{{statusKey}}"><i class="fa-solid {{#if isActive}}fa-gears{{else if readiness.ready}}fa-circle-check{{else}}fa-circle-xmark{{/if}}"></i>{{statusLabel}}</span>
                 </header>
 
-                <div class="mcw-craft-card-meta">
+                <div class="ml-craftworks-craft-card-meta">
                   {{#if craftMeta.tool}}<span><i class="fa-solid fa-screwdriver-wrench"></i>{{craftMeta.tool}}</span>{{/if}}
                   {{#if craftMeta.check}}<span><i class="fa-solid fa-dice-d20"></i>{{craftMeta.check}}{{#if craftMeta.activeDc}} · DC {{craftMeta.activeDc}}{{/if}}</span>{{/if}}
                   {{#if craftMeta.hoursRequired}}<span><i class="fa-solid fa-clock"></i>{{craftMeta.hoursRequired}} hours</span>{{/if}}
                   <span><i class="fa-solid fa-box-open"></i>{{output.label}} ×{{output.quantity}}</span>
                 </div>
 
-                {{#if progress}}<div class="mcw-craft-progress-large"><div><strong>{{progress.successes}} of {{progress.requiredSuccesses}} Successes</strong><span>{{progress.progressHours}} of {{progress.hoursRequired}} hours progress</span></div><span>{{progress.timeSpentHours}} hours spent</span></div>{{/if}}
+                {{#if progress}}<div class="ml-craftworks-craft-progress-large"><div><strong>{{progress.successes}} of {{progress.requiredSuccesses}} Successes</strong><span>{{progress.progressHours}} of {{progress.hoursRequired}} hours progress</span></div><span>{{progress.timeSpentHours}} hours spent</span></div>{{/if}}
 
-                <div class="mcw-craft-card-body mcw-craft-list-card-body"><section><h4>Requirements</h4>
+                <div class="ml-craftworks-craft-card-body ml-craftworks-craft-list-card-body"><section><h4>Requirements</h4>
                   {{#if requirementsKnown}}
-                    <div class="mcw-craft-requirements">
+                    <div class="ml-craftworks-craft-requirements">
                       {{#each requirementGroupRows}}
-                        <div class="mcw-craft-requirement-group">{{#each requirementRows}}
+                        <div class="ml-craftworks-craft-requirement-group">{{#each requirementRows}}
                           {{#if alternativeRows.length}}
-                            <fieldset class="mcw-craft-alternative-group">
+                            <fieldset class="ml-craftworks-craft-alternative-group">
                               <legend><i class="fa-solid fa-code-branch"></i> Choose one</legend>
                               {{#each alternativeRows}}
-                                <div class="mcw-craft-requirement-row {{#if inventory.ready}}mcw-ready{{else}}mcw-missing{{/if}}" data-document-uuid="{{materialUuid}}">{{#if materialImg}}<img src="{{materialImg}}" alt="">{{else}}<i class="fa-solid fa-cube"></i>{{/if}}<span>{{displayLabel}}</span>{{#if inventory}}<strong>{{inventory.available}} / {{inventory.required}}</strong>{{/if}}</div>
-                                {{#unless @last}}<div class="mcw-craft-alternative-or"><span>OR</span></div>{{/unless}}
+                                <div class="ml-craftworks-craft-requirement-row {{#if inventory.ready}}ml-craftworks-ready{{else}}ml-craftworks-missing{{/if}}" data-document-uuid="{{materialUuid}}">{{#if materialImg}}<img src="{{materialImg}}" alt="">{{else}}<i class="fa-solid fa-cube"></i>{{/if}}<span>{{displayLabel}}</span>{{#if inventory}}<strong>{{inventory.available}} / {{inventory.required}}</strong>{{/if}}</div>
+                                {{#unless @last}}<div class="ml-craftworks-craft-alternative-or"><span>OR</span></div>{{/unless}}
                               {{/each}}
                             </fieldset>
                           {{else}}
-                            <div class="mcw-craft-requirement-row {{#if inventory.ready}}mcw-ready{{else}}mcw-missing{{/if}}" data-document-uuid="{{materialUuid}}">{{#if materialImg}}<img src="{{materialImg}}" alt="">{{else}}<i class="fa-solid fa-cube"></i>{{/if}}<span>{{displayLabel}}</span>{{#if inventory}}<strong>{{inventory.available}} / {{inventory.required}}</strong>{{/if}}</div>
+                            <div class="ml-craftworks-craft-requirement-row {{#if inventory.ready}}ml-craftworks-ready{{else}}ml-craftworks-missing{{/if}}" data-document-uuid="{{materialUuid}}">{{#if materialImg}}<img src="{{materialImg}}" alt="">{{else}}<i class="fa-solid fa-cube"></i>{{/if}}<span>{{displayLabel}}</span>{{#if inventory}}<strong>{{inventory.available}} / {{inventory.required}}</strong>{{/if}}</div>
                           {{/if}}
-                        {{/each}}</div>{{#unless @last}}<div class="mcw-requirement-group-or">OR</div>{{/unless}}
+                        {{/each}}</div>{{#unless @last}}<div class="ml-craftworks-requirement-group-or">OR</div>{{/unless}}
                       {{/each}}
                     </div>
-                  {{else}}<div class="mcw-recipe-unknown-requirements"><i class="fa-solid fa-circle-question"></i><span>Ingredients have not been discovered.</span></div>{{/if}}
+                  {{else}}<div class="ml-craftworks-recipe-unknown-requirements"><i class="fa-solid fa-circle-question"></i><span>Ingredients have not been discovered.</span></div>{{/if}}
                 </section></div>
 
-                <footer class="mcw-craft-card-actions">
+                <footer class="ml-craftworks-craft-card-actions">
                   {{#if isCompletePending}}
-                    <span class="mcw-crafting-complete"><i class="fa-solid fa-trophy"></i> Crafting Complete</span><button type="button" data-action="choose-destination" data-recipe-id="{{id}}"><i class="fa-solid fa-box-open"></i> Choose Destination</button>
+                    <span class="ml-craftworks-crafting-complete"><i class="fa-solid fa-trophy"></i> Crafting Complete</span><button type="button" data-action="choose-destination" data-recipe-id="{{id}}"><i class="fa-solid fa-box-open"></i> Choose Destination</button>
                   {{else if isActive}}
-                    <span class="mcw-muted">Materials consumed from {{inventoryActorName}}.</span><button type="button" data-action="craft" data-recipe-id="{{id}}"><i class="fa-solid fa-dice-d20"></i> Roll Crafting Check</button><button type="button" class="mcw-button-subtle" data-action="cancel-crafting" data-recipe-id="{{id}}"><i class="fa-solid fa-ban"></i> Cancel</button>
+                    <span class="ml-craftworks-muted">Materials consumed from {{inventoryActorName}}.</span><button type="button" data-action="craft" data-recipe-id="{{id}}"><i class="fa-solid fa-dice-d20"></i> Roll Crafting Check</button><button type="button" class="ml-craftworks-button-subtle" data-action="cancel-crafting" data-recipe-id="{{id}}"><i class="fa-solid fa-ban"></i> Cancel</button>
                   {{else if requirementsKnown}}
-                    {{#if readiness.ready}}<span class="mcw-craft-ready-label"><i class="fa-solid fa-circle-check"></i> Ready to Craft</span><button type="button" data-action="craft" data-recipe-id="{{id}}"><i class="fa-solid fa-hammer"></i> Start Crafting</button>{{else}}<span class="mcw-craft-missing-label"><i class="fa-solid fa-circle-xmark"></i> Missing Requirements</span>{{/if}}
-                  {{else}}<span class="mcw-craft-missing-label"><i class="fa-solid fa-circle-question"></i> Ingredients Unknown</span>{{/if}}
+                    {{#if readiness.ready}}<span class="ml-craftworks-craft-ready-label"><i class="fa-solid fa-circle-check"></i> Ready to Craft</span><button type="button" data-action="craft" data-recipe-id="{{id}}"><i class="fa-solid fa-hammer"></i> Start Crafting</button>{{else}}<span class="ml-craftworks-craft-missing-label"><i class="fa-solid fa-circle-xmark"></i> Missing Requirements</span>{{/if}}
+                  {{else}}<span class="ml-craftworks-craft-missing-label"><i class="fa-solid fa-circle-question"></i> Ingredients Unknown</span>{{/if}}
                 </footer>
               </article>
             {{/each}}
           </div>
-        {{else}}<div class="mcw-panel mcw-browser-empty-state"><i class="fa-solid {{#if totalRecipeCount}}fa-filter-circle-xmark{{else}}fa-bookmark{{/if}}"></i><p>{{#if totalRecipeCount}}No marked recipes match the current search and filters.{{else}}No recipes are marked for crafting. Open <strong>Recipes</strong> and mark the recipes you want to work on.{{/if}}</p></div>{{/if}}
+{{else}}<div class="ml-empty-state ml-craftworks-panel ml-craftworks-browser-empty-state"><i class="fa-solid {{#if totalRecipeCount}}fa-filter-circle-xmark{{else}}fa-bookmark{{/if}}"></i><p>{{#if totalRecipeCount}}No marked recipes match the current search and filters.{{else}}No recipes are marked for crafting. Open <strong>Recipes</strong> and mark the recipes you want to work on.{{/if}}</p></div>{{/if}}
       {{/unless}}
     </main>
   </div>

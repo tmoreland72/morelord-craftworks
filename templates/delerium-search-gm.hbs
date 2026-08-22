@@ -1,19 +1,19 @@
-<section class="mcw app-shell">
-  <header class="mcw-header"><h2>Delerium Search</h2><p>A deliberate search takes 1 hour per ¼-mile hex.</p></header>
+<section class="ml-app ml-app-shell ml-craftworks app-shell">
+  <header class="ml-craftworks-header"><h2>Delerium Search</h2><p>A deliberate search takes 1 hour per ¼-mile hex.</p></header>
   {{#if session}}
-    <div class="mcw-panel"><h3>{{session.zone.name}}</h3><p>{{session.sceneName}} • DC {{session.zone.dc}} • 1 hour • ¼ mile</p></div>
-    <div class="mcw-panel">
+    <div class="ml-craftworks-panel"><h3>{{session.zone.name}}</h3><p>{{session.sceneName}} • DC {{session.zone.dc}} • 1 hour • ¼ mile</p></div>
+    <div class="ml-craftworks-panel">
       <h3>Player Progress</h3>
       {{#each progress}}
-        <div class="mcw-progress-user mcw-progress-card">
-          <div class="mcw-progress-summary">
+        <div class="ml-craftworks-progress-user ml-craftworks-progress-card">
+          <div class="ml-craftworks-progress-summary">
             <div><strong>{{actorName}}</strong><small>{{#if active}}Connected: {{user}}{{else}}No connected player{{/if}}</small></div>
-            <span class="mcw-progress-status">{{status}}{{#if total}} · {{total}}{{/if}}{{#if successes}} · +{{successes}} {{#if (eq successes 1)}}success{{else}}successes{{/if}}{{/if}}</span>
+            <span class="ml-craftworks-progress-status">{{status}}{{#if total}} · {{total}}{{/if}}{{#if successes}} · +{{successes}} {{#if (eq successes 1)}}success{{else}}successes{{/if}}{{/if}}</span>
           </div>
           {{#if gmCanRoll}}
-            <div class="mcw-progress-rolls">
+            <div class="ml-craftworks-progress-rolls">
               <small>Roll for this character</small>
-              <div class="mcw-player-skill-grid">
+              <div class="ml-craftworks-player-skill-grid">
               {{#each skills}}
                 <button type="button" data-action="gm-roll" data-participant-id="{{../participantId}}" data-actor-uuid="{{../actorUuid}}" data-skill="{{id}}"><i class="fa-solid fa-dice-d20"></i><span>{{label}}</span><strong>{{modifierLabel}}</strong></button>
               {{/each}}
@@ -23,17 +23,17 @@
         </div>
       {{/each}}
     </div>
-    <div class="mcw-panel">
+    <div class="ml-craftworks-panel">
       <h3>What the Party Finds</h3>
-      <div class="mcw-delerium-rewards">
+      <div class="ml-craftworks-delerium-rewards">
         <div><strong>0–2 successes</strong><span>No delerium is found.</span></div>
         <div><strong>3 successes</strong><span>Roll 3d6 to determine how many Delerium Chips are found.</span></div>
         <div><strong>4 successes</strong><span>Roll 1d6 to determine how many Delerium Fragments are found.</span></div>
         <div><strong>5 or more successes</strong><span>The party finds 1 Delerium Shard.</span></div>
       </div>
     </div>
-    <footer class="mcw-actions"><button type="button" data-action="finalize"><i class="fa-solid fa-flag-checkered"></i> Finalize Search</button></footer>
+    <footer class="ml-actions ml-craftworks-actions"><button type="button" data-action="finalize"><i class="fa-solid fa-flag-checkered"></i> Finalize Search</button></footer>
   {{else}}
-    <div class="mcw-panel"><h3>{{sceneName}}</h3><label>Search Area<select name="zone">{{#each zones}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}} — DC {{dc}}</option>{{/each}}</select></label><p>Each player rolls Arcana, Investigation, or Survival. Meeting the DC earns 1 success; beating it by 5+ or rolling a natural 20 earns 2.</p><div class="mcw-actions"><button type="button" data-action="start"><i class="fa-solid fa-gem"></i> Start Delerium Search</button></div></div>
+    <div class="ml-craftworks-panel"><h3>{{sceneName}}</h3><label>Search Area<select name="zone">{{#each zones}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}} — DC {{dc}}</option>{{/each}}</select></label><p>Each player rolls Arcana, Investigation, or Survival. Meeting the DC earns 1 success; beating it by 5+ or rolling a natural 20 earns 2.</p><div class="ml-actions ml-craftworks-actions"><button type="button" data-action="start"><i class="fa-solid fa-gem"></i> Start Delerium Search</button></div></div>
   {{/if}}
 </section>

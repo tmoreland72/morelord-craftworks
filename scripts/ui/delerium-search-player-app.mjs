@@ -4,7 +4,7 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 export class DeleriumSearchPlayerApp extends ScrollPreservingApplicationMixin(HandlebarsApplicationMixin(ApplicationV2)) {
   constructor(craftworks, session, options = {}) { super(options); this.craftworks = craftworks; this.session = session; this.searchState = null; }
-  static DEFAULT_OPTIONS = { id: "morelord-craftworks-delerium-search-player", classes: ["morelord-craftworks", "mcw-window"], position: { width: 680, height: "auto" }, window: { title: `${MODULE_TITLE} — Delerium Search`, resizable: true } };
+  static DEFAULT_OPTIONS = { id: "morelord-craftworks-delerium-search-player", classes: ["ml-window", "ml-craftworks-module", "ml-craftworks-window"], position: { width: 680, height: "auto" }, window: { title: `${MODULE_TITLE} — Delerium Search`, resizable: true } };
   static PARTS = { content: { template: "modules/morelord-craftworks/templates/delerium-search-player.hbs" } };
   setState(state) { this.searchState = state; return this.render(); }
   async _prepareContext(options) {

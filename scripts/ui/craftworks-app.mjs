@@ -15,7 +15,7 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
 
   static DEFAULT_OPTIONS = {
     id: "morelord-craftworks",
-    classes: ["morelord-craftworks", "mcw-window", "mcw-dashboard-window"],
+    classes: ["ml-window", "ml-craftworks-module", "ml-craftworks-window", "ml-craftworks-dashboard-window"],
     position: {
       width: 900,
       height: 780

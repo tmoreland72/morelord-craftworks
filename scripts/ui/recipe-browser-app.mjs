@@ -45,7 +45,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
 
   static DEFAULT_OPTIONS = {
     id: "morelord-craftworks-recipes",
-    classes: ["morelord-craftworks", "mcw-window"],
+    classes: ["ml-window", "ml-craftworks-module", "ml-craftworks-window"],
     position: { width: 1280, height: 840 },
     window: {
       title: `${MODULE_TITLE} — Recipes`,
@@ -1166,7 +1166,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         });
       });
 
-    this.element.querySelectorAll(".mcw-material-icon-link[data-document-uuid]")
+    this.element.querySelectorAll(".ml-craftworks-material-icon-link[data-document-uuid]")
       .forEach(button => button.addEventListener("click", async event => {
         event.preventDefault();
         event.stopPropagation();
@@ -2073,7 +2073,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
 
   async #chooseMaterialPlan(recipe, plans) {
     const options = plans.map((plan, index) => `
-      <label class="mcw-crafting-plan-option">
+      <label class="ml-craftworks-crafting-plan-option">
         <input
           type="radio"
           name="plan"
@@ -2090,7 +2090,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       },
       content: `
         <p>More than one valid material path is available. Choose which materials to use.</p>
-        <div class="mcw-crafting-plan-options">
+        <div class="ml-craftworks-crafting-plan-options">
           ${options}
         </div>
       `,

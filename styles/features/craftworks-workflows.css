@@ -1,0 +1,2892 @@
+/* Harvest UI migrated from Morelord Drakkenheim Harvesting */
+#morelord-drakkenheim-harvesting-app,
+.ml-craftworks-harvest-modern {
+    --ml-craftworks-harvest-border: rgba(0, 0, 0, 0.35);
+    --ml-craftworks-harvest-soft-border: rgba(255, 255, 255, 0.12);
+    --ml-craftworks-harvest-panel: rgba(20, 20, 20, 0.32);
+    --ml-craftworks-harvest-panel-dark: rgba(10, 10, 10, 0.45);
+    --ml-craftworks-harvest-highlight: #b99452;
+    --ml-craftworks-harvest-success: #4fa66c;
+    --ml-craftworks-harvest-danger: #a94b4b;
+    --ml-craftworks-harvest-muted: rgba(255, 255, 255, 0.58);
+}
+
+
+/*
+ * APPLICATION WINDOW
+ */
+
+.ml-craftworks-harvest-modern .window-content,
+.ml-craftworks-harvest-modern .window-content {
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+    min-height: 0;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-shell,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-shell {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    height: 100%;
+
+    min-width: 0;
+    min-height: 0;
+
+    overflow: hidden;
+}
+
+
+/*
+ * HEADER
+ */
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-header,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-header {
+    flex: 0 0 auto;
+
+    padding: 12px 16px;
+
+    border-bottom: 1px solid var(--ml-craftworks-harvest-border);
+
+    background: var(--ml-craftworks-harvest-panel-dark);
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-title,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-title h1,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-title h1 {
+    margin: 0;
+
+    font-size: 24px;
+    line-height: 1.1;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-title h1 i,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-title h1 i {
+    margin-right: 6px;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-scene,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-scene {
+    margin-top: 3px;
+
+    font-size: 12px;
+
+    opacity: 0.7;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-refresh,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-refresh {
+    flex: 0 0 34px;
+
+    width: 34px;
+    height: 34px;
+
+    margin: 0;
+    padding: 0;
+}
+
+
+/*
+ * CURRENT USER
+ */
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-user,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-top: 8px;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-user img,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-user img {
+    flex: 0 0 36px;
+
+    width: 36px !important;
+    height: 36px !important;
+
+    max-width: 36px !important;
+    max-height: 36px !important;
+
+    object-fit: cover;
+
+    border: 1px solid var(--ml-craftworks-harvest-border);
+    border-radius: 50%;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-user div,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-user div {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-user span,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-user span {
+    font-size: 11px;
+    opacity: 0.65;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-instructions,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-instructions {
+    margin-top: 8px;
+
+    font-size: 12px;
+
+    opacity: 0.78;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-summary,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+
+    margin-top: 8px;
+
+    font-size: 12px;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-summary span,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-summary span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+
+/*
+ * SCROLLABLE CREATURE AREA
+ */
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creatures,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creatures {
+    flex: 1 1 auto;
+
+    min-height: 0;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    padding: 12px;
+}
+
+
+/*
+ * CREATURE
+ */
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature {
+    margin: 0 0 14px;
+
+    overflow: hidden;
+
+    border: 1px solid var(--ml-craftworks-harvest-border);
+    border-radius: 6px;
+
+    background: var(--ml-craftworks-harvest-panel);
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature:last-child,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature:last-child {
+    margin-bottom: 0;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature-header,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    min-height: 64px;
+
+    padding: 8px 10px;
+
+    background: var(--ml-craftworks-harvest-panel-dark);
+
+    border-bottom: 1px solid var(--ml-craftworks-harvest-border);
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature-image,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature-image {
+    flex: 0 0 52px;
+
+    width: 52px !important;
+    height: 52px !important;
+
+    min-width: 52px;
+    max-width: 52px !important;
+
+    min-height: 52px;
+    max-height: 52px !important;
+
+    object-fit: cover;
+
+    border: 1px solid var(--ml-craftworks-harvest-border);
+    border-radius: 4px;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature-info,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature-info {
+    flex: 1 1 auto;
+
+    min-width: 0;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature-info h2,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature-info h2 {
+    margin: 0;
+
+    font-size: 18px;
+    line-height: 1.2;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature-meta,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    margin-top: 3px;
+
+    font-size: 11px;
+
+    opacity: 0.78;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-rarity,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-rarity {
+    font-weight: 700;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-has-claim,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-has-claim {
+    color: var(--ml-craftworks-harvest-success);
+}
+
+
+/*
+ * COMPONENT ROWS
+ */
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-components,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-components {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component {
+    display: grid;
+
+    grid-template-columns:
+        42px
+        minmax(0, 1fr)
+        135px;
+
+    align-items: center;
+
+    gap: 10px;
+
+    min-height: 56px;
+
+    padding: 7px 10px;
+
+    border-bottom:
+        1px solid var(--ml-craftworks-harvest-soft-border);
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component:last-child,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component:last-child {
+    border-bottom: 0;
+}
+
+
+/*
+ * COMPONENT IMAGE
+ */
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-image,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 42px;
+    height: 42px;
+
+    overflow: hidden;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-image img,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-image img {
+    width: 38px !important;
+    height: 38px !important;
+
+    max-width: 38px !important;
+    max-height: 38px !important;
+
+    object-fit: cover;
+
+    border-radius: 3px;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-image > i,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-image > i {
+    font-size: 21px;
+
+    opacity: 0.45;
+}
+
+
+/*
+ * COMPONENT TEXT
+ */
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-body,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-body {
+    min-width: 0;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-name,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-name {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-category,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-category {
+    margin-top: 2px;
+
+    font-size: 10px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.04em;
+
+    opacity: 0.55;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-ingredient-name,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-ingredient-name {
+    margin-top: 3px;
+
+    overflow: hidden;
+
+    font-size: 11px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    opacity: 0.72;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-ingredient-name i,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-ingredient-name i {
+    margin-right: 3px;
+
+    opacity: 0.6;
+}
+
+
+/*
+ * ACTIONS
+ */
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-action,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-action {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+
+    min-width: 0;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-action button,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-action button {
+    width: 100%;
+
+    margin: 0;
+
+    min-height: 28px;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claim,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claim {
+    font-weight: 700;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-release,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-release {
+    font-size: 11px;
+}
+
+
+/*
+ * STATUS
+ */
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claim-status,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claim-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 5px;
+
+    min-height: 28px;
+
+    padding: 4px 6px;
+
+    text-align: center;
+
+    border-radius: 3px;
+
+    font-size: 11px;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-mine,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-mine {
+    color: var(--ml-craftworks-harvest-success);
+
+    font-weight: 700;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-taken,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-taken {
+    opacity: 0.72;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-locked,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-unavailable,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-locked,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-unavailable {
+    opacity: 0.45;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-mine,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-mine {
+    box-shadow:
+        inset 3px 0 0 var(--ml-craftworks-harvest-success);
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-claimed,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-locked,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-claimed,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-locked {
+    opacity: 0.62;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-unavailable,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-unavailable {
+    opacity: 0.4;
+}
+
+
+/*
+ * EMPTY STATE
+ */
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-empty,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    height: 100%;
+
+    padding: 30px;
+
+    text-align: center;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-empty > i,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-empty > i {
+    font-size: 42px;
+
+    opacity: 0.45;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-empty h2,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-empty h2 {
+    margin: 0;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-empty p,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-empty p {
+    margin: 0;
+
+    opacity: 0.7;
+}
+
+/*
+ * EXPAND / COLLAPSE
+ */
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature-toggle,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature-toggle {
+    flex: 0 0 34px;
+
+    width: 34px;
+    height: 34px;
+
+    margin: 0;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature-toggle i,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature-toggle i {
+    margin: 0;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature-collapsed,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature-collapsed {
+    margin-bottom: 8px;
+}
+
+
+#morelord-drakkenheim-harvesting-app
+    .ml-craftworks-harvest-creature-collapsed
+    .ml-craftworks-harvest-creature-header,
+.morelord-harvest-app
+    .ml-craftworks-harvest-creature-collapsed
+    .ml-craftworks-harvest-creature-header {
+    border-bottom: 0;
+}
+
+/*
+ * FINALIZE FOOTER
+ */
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-footer,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-footer {
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    min-height: 48px;
+
+    padding: 8px 12px;
+
+    border-top: 1px solid var(--ml-craftworks-harvest-border);
+
+    background: var(--ml-craftworks-harvest-panel-dark);
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-footer-status,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-footer-status {
+    font-size: 12px;
+
+    opacity: 0.75;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-finalized,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-finalized {
+    color: var(--ml-craftworks-harvest-success);
+
+    font-weight: 700;
+
+    opacity: 1;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-finalize,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-finalize {
+    flex: 0 0 auto;
+
+    width: auto;
+
+    min-width: 170px;
+
+    margin: 0;
+
+    font-weight: 700;
+}
+
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-finalize:disabled,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-finalize:disabled {
+    cursor: not-allowed;
+
+    opacity: 0.45;
+}
+
+/* GM-managed Standard workflow */
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-gm-managed,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-gm-managed {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--ml-craftworks-harvest-soft-border);
+    border-radius: 6px;
+    background: var(--ml-craftworks-harvest-panel);
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-mode-heading,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-mode-heading {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: var(--ml-craftworks-harvest-highlight);
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-gm-managed label,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-gm-managed label {
+    display: grid;
+    grid-template-columns: max-content minmax(220px, 1fr);
+    align-items: center;
+    gap: 10px;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-gm-managed select,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-gm-managed select {
+    width: 100%;
+    margin: 0;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-gm-managed p,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-gm-managed p {
+    margin: 7px 0 0;
+    font-size: 11px;
+    opacity: 0.72;
+}
+
+
+/* Craftworks additions for the migrated Drakkenheim harvesting interface. */
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-check-panel { padding: 14px 12px; border-top: 1px solid var(--ml-craftworks-harvest-soft-border); }
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-check-title { font-weight: 700; margin-bottom: 8px; }
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-skill-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-skill-row button { flex: 1 1 130px; margin: 0; }
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-harvest-message { padding: 14px 12px; border-top: 1px solid var(--ml-craftworks-harvest-soft-border); }
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-preview-components { opacity: .92; }
+.ml-craftworks-harvest-modern .ml-craftworks-actions { display:flex; gap:8px; align-items:center; }
+.ml-craftworks-harvest-modern .ml-craftworks-progress-user { display:flex; flex-direction:column; gap:3px; padding:5px 0; }
+
+/* Harvest scan-state dead creature list. Keep token artwork compact. */
+.ml-craftworks-harvest-modern .ml-craftworks-dead-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 8px;
+    margin: 8px 0 0;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-dead-list span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    padding: 7px 9px;
+    border: 1px solid var(--ml-craftworks-harvest-soft-border);
+    border-radius: 5px;
+    background: var(--ml-craftworks-harvest-panel-dark);
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-dead-list img {
+    flex: 0 0 40px;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px;
+    max-width: 40px !important;
+    min-height: 40px;
+    max-height: 40px !important;
+    object-fit: cover;
+    border: 1px solid var(--ml-craftworks-harvest-border);
+    border-radius: 4px;
+}
+
+/* Harvest creature collapse/expand control */
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature-toggle {
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  margin: 0;
+  padding: 0;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature-collapsed .ml-craftworks-harvest-creature-header {
+  border-bottom: 0;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-harvest-message {
+  padding: 10px 12px;
+  border-top: 1px solid var(--ml-craftworks-harvest-soft-border, rgba(255, 255, 255, 0.12));
+  font-size: 12px;
+  opacity: 0.82;
+}
+
+/* Harvest skill selector: compact and right-aligned above component rows. */
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-check-panel {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 9px 12px;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-check-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  width: min(100%, 430px);
+  margin-left: auto;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-check-controls select {
+  flex: 1 1 260px;
+  min-width: 180px;
+  margin: 0;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-check-controls button {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 92px;
+  margin: 0;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-unavailable .ml-craftworks-harvest-claim:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+/* Realtime Harvest claimed-component history */
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-section {
+  margin-top: 16px;
+  border: 1px solid rgba(197, 160, 91, 0.35);
+  border-radius: 10px;
+  background: rgba(10, 10, 16, 0.55);
+  overflow: hidden;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 14px;
+  border-bottom: 1px solid rgba(197, 160, 91, 0.25);
+  background: rgba(197, 160, 91, 0.08);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-heading > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-count {
+  min-width: 28px;
+  padding: 2px 8px;
+  border: 1px solid rgba(197, 160, 91, 0.35);
+  border-radius: 999px;
+  text-align: center;
+  font-size: 12px;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-list {
+  display: grid;
+  gap: 1px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-item {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 66px;
+  padding: 8px 12px;
+  background: rgba(9, 9, 14, 0.96);
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-image-link {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(197, 160, 91, 0.28);
+  border-radius: 7px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-image-link:not(:disabled) {
+  cursor: pointer;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-image-link:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-image-link img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 0;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-body {
+  min-width: 0;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 10px;
+  margin-top: 3px;
+  font-size: 11px;
+  opacity: .78;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-rarity {
+  text-transform: capitalize;
+  font-weight: 700;
+  color: var(--color-text-hyperlink, #d2a85f);
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-roll {
+  display: grid;
+  justify-items: end;
+  gap: 1px;
+  min-width: 76px;
+  padding-left: 12px;
+  border-left: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-roll span {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  opacity: .62;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-roll strong {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-empty {
+  padding: 14px;
+  text-align: center;
+  opacity: .62;
+  font-size: 12px;
+}
+
+@media (max-width: 640px) {
+  .ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-item {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+
+  .ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-image-link {
+    width: 40px;
+    height: 40px;
+  }
+
+  .ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-roll {
+    grid-column: 2;
+    display: flex;
+    justify-content: flex-start;
+    gap: 7px;
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-roll strong {
+    font-size: 14px;
+  }
+}
+
+/* GM Harvest: authoritative claimed component state */
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component:has(.ml-craftworks-harvest-claim-status.ml-craftworks-harvest-taken) {
+  opacity: .72;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claim-status.ml-craftworks-harvest-taken {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Harvest creature separation and marked-recipe material cues */
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature {
+  border-color: rgba(197, 160, 91, 0.34);
+  background: rgba(7, 7, 12, 0.82);
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature > .ml-craftworks-harvest-components,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature > .ml-craftworks-harvest-check-panel,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature > .ml-craftworks-harvest-harvest-message {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(197, 160, 91, 0.085),
+      rgba(197, 160, 91, 0.025)
+    );
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature > .ml-craftworks-harvest-components {
+  border-top: 1px solid rgba(197, 160, 91, 0.24);
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature + .ml-craftworks-harvest-creature {
+  margin-top: 14px;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-needed {
+  position: relative;
+  box-shadow:
+    inset 3px 0 0 rgba(218, 178, 74, 0.95),
+    inset 0 0 28px rgba(218, 178, 74, 0.07);
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-needed-badge,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-needed-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #e4bd55;
+  font-weight: 700;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-needed-badge {
+  width: fit-content;
+  margin-top: 5px;
+  padding: 2px 7px;
+  border: 1px solid rgba(218, 178, 74, 0.38);
+  border-radius: 999px;
+  background: rgba(218, 178, 74, 0.09);
+  font-size: 10px;
+  letter-spacing: .02em;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-needed-inline {
+  margin-left: 7px;
+  font-size: 10px;
+  vertical-align: middle;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-needed-recipes {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 5px;
+  color: #e4bd55;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-recipe-tag {
+  display: inline-flex;
+  align-items: center;
+  max-width: 190px;
+  padding: 2px 7px;
+  overflow: hidden;
+  border: 1px solid rgba(218, 178, 74, 0.38);
+  border-radius: 999px;
+  background: rgba(218, 178, 74, 0.09);
+  color: #e4bd55;
+  font-size: 10px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-recipe-help {
+  width: auto;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 1px 3px;
+  border: 0;
+  background: transparent;
+  color: #e58b2a;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.ml-craftworks-harvest-recipe-dialog-list {
+  display: grid;
+  gap: 7px;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.ml-craftworks-harvest-recipe-dialog-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 7px 9px;
+  border: 1px solid var(--color-border-light-2);
+  border-radius: 5px;
+}
+
+.ml-craftworks-harvest-recipe-dialog-row span {
+  opacity: .72;
+  text-align: right;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-needed {
+  box-shadow: inset 3px 0 0 rgba(218, 178, 74, 0.8);
+}
+
+/* Shared public award chat cards */
+.chat-message .ml-craftworks-award-card {
+  overflow: hidden;
+  margin: 2px 0;
+  border: 1px solid rgba(197, 160, 91, 0.5);
+  border-radius: 8px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(197, 160, 91, 0.12),
+      rgba(197, 160, 91, 0.025)
+    );
+}
+
+.chat-message .ml-craftworks-award-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 11px;
+  border-bottom: 1px solid rgba(197, 160, 91, 0.28);
+}
+
+.chat-message .ml-craftworks-award-card-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(197, 160, 91, 0.38);
+  border-radius: 50%;
+  color: #d5ae58;
+  background: rgba(197, 160, 91, 0.1);
+}
+
+.chat-message .ml-craftworks-award-card-heading {
+  min-width: 0;
+}
+
+.chat-message .ml-craftworks-award-card-title {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.chat-message .ml-craftworks-award-card-recipient {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.chat-message .ml-craftworks-award-card-subtitle {
+  margin-top: 2px;
+  font-size: 11px;
+  opacity: .72;
+}
+
+.chat-message .ml-craftworks-award-card-items {
+  display: grid;
+  gap: 1px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.chat-message .ml-craftworks-award-card-item {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  min-height: 46px;
+  padding: 5px 9px;
+  background: rgba(8, 8, 13, 0.72);
+}
+
+.chat-message .ml-craftworks-award-card-item-image {
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  border: 1px solid rgba(197, 160, 91, 0.25);
+  border-radius: 5px;
+  object-fit: cover;
+}
+
+.chat-message .ml-craftworks-award-card-item-body {
+  min-width: 0;
+}
+
+.chat-message .ml-craftworks-award-card-item-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.chat-message .ml-craftworks-award-card-item-name .content-link {
+  font-weight: 700;
+}
+
+.chat-message .ml-craftworks-award-card-item-rarity {
+  margin-top: 1px;
+  font-size: 10px;
+  text-transform: capitalize;
+  opacity: .7;
+}
+
+.chat-message .ml-craftworks-award-card-item-quantity {
+  min-width: 34px;
+  text-align: right;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.chat-message .ml-craftworks-award-card-coins {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 11px;
+  border-top: 1px solid rgba(197, 160, 91, 0.2);
+  font-weight: 700;
+}
+
+.chat-message .ml-craftworks-award-card-coins i {
+  color: #d5ae58;
+}
+
+.chat-message .ml-craftworks-award-card-footer {
+  padding: 4px 9px;
+  border-top: 1px solid rgba(197, 160, 91, 0.16);
+  text-align: right;
+  font-size: 9px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  opacity: .5;
+}
+
+/* GM Harvest cancellation */
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-cancel-harvest {
+  border-color: rgba(190, 67, 67, 0.65);
+  color: #e79797;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-cancel-harvest:hover {
+  border-color: rgba(220, 82, 82, 0.9);
+  background: rgba(170, 45, 45, 0.14);
+}
+
+/* Award Card dark-row text contrast */
+.chat-message .ml-craftworks-award-card-item,
+.chat-message .ml-craftworks-award-card-item-name,
+.chat-message .ml-craftworks-award-card-item-name .content-link,
+.chat-message .ml-craftworks-award-card-item-name a,
+.chat-message .ml-craftworks-award-card-item-quantity {
+  color: #f2eee6;
+}
+
+.ml-craftworks [data-document-uuid],
+.chat-message [data-ml-craftworks-link-target],
+.chat-message .ml-craftworks-award-card-item-name .content-link,
+.chat-message .ml-craftworks-award-card-item-name a,
+.chat-message a.ml-craftworks-award-card-item.content-link,
+.chat-message .ml-craftworks-chat-card .content-link,
+.chat-message .ml-craftworks-chat-card a {
+  cursor: pointer;
+}
+
+.chat-message .ml-craftworks-award-card-item-rarity {
+  color: rgba(242, 238, 230, 0.72);
+}
+
+.chat-message .ml-craftworks-award-card-item,
+.chat-message .ml-craftworks-award-card-item:hover {
+  color: #f2eee6 !important;
+  background: rgba(8, 8, 13, 0.72) !important;
+  text-decoration: none !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transform: none !important;
+}
+
+/* Configurable Gathering terrain DCs */
+.ml-craftworks-gather-dc-settings {
+  margin-top: 14px;
+  border: 1px solid rgba(197, 160, 91, 0.25);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ml-craftworks-gather-dc-heading {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(197, 160, 91, 0.2);
+  background: rgba(197, 160, 91, 0.06);
+}
+
+.ml-craftworks-gather-dc-heading strong,
+.ml-craftworks-gather-dc-heading small {
+  display: block;
+}
+
+.ml-craftworks-gather-dc-heading small {
+  margin-top: 3px;
+  opacity: .72;
+}
+
+.ml-craftworks-gather-dc-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ml-craftworks-gather-dc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  padding: 9px 11px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ml-craftworks-gather-dc-row:nth-child(odd) {
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ml-craftworks-gather-dc-copy {
+  min-width: 0;
+}
+
+.ml-craftworks-gather-dc-copy strong,
+.ml-craftworks-gather-dc-copy small {
+  display: block;
+}
+
+.ml-craftworks-gather-dc-copy small {
+  margin-top: 2px;
+  opacity: .68;
+}
+
+.ml-craftworks-gather-dc-row input {
+  flex: 0 0 64px;
+  width: 64px;
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .ml-craftworks-gather-dc-list {
+    grid-template-columns: 1fr;
+  }
+
+  .ml-craftworks-gather-dc-row:nth-child(odd) {
+    border-right: 0;
+  }
+}
+
+/* Harvest preflight controls and Drakkenheim special item instructions */
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-harvest-preflight,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-skill-section {
+  margin-bottom: 14px;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creatures,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-skill-list {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creature,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-skill-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border: 1px solid rgba(197, 160, 91, 0.2);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creature > img,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-character > img {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid rgba(197, 160, 91, 0.25);
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creature-copy,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-character {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creature-copy > strong,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creature-copy > small,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-character strong,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-character small {
+  display: block;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-character {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-skill-row {
+  justify-content: space-between;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-help {
+  margin: 8px 10px 0;
+  opacity: .78;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-special-harvest-items {
+  margin-top: 7px;
+  padding: 8px 10px;
+  border: 1px solid rgba(225, 153, 49, 0.45);
+  border-radius: 6px;
+  background: rgba(225, 153, 49, 0.08);
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-special-harvest-heading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  color: #e1a84e;
+  font-weight: 800;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-special-harvest-instruction + .ml-craftworks-harvest-special-harvest-instruction {
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px solid rgba(225, 153, 49, 0.2);
+}
+
+/* Spellbook Generator */
+.ml-craftworks-spellbook-level-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px 12px;
+  margin: 12px 0;
+}
+
+.ml-craftworks-spellbook-level-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ml-craftworks-spellbook-level-row span strong,
+.ml-craftworks-spellbook-level-row span small {
+  display: block;
+}
+
+.ml-craftworks-spellbook-level-row input {
+  width: 68px;
+  flex: 0 0 68px;
+  text-align: center;
+}
+
+.ml-craftworks-spellbook-result-level + .ml-craftworks-spellbook-result-level {
+  margin-top: 12px;
+}
+
+.ml-craftworks-spellbook-result-list {
+  display: grid;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.ml-craftworks-spellbook-spell {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+}
+
+.ml-craftworks-spellbook-spell img {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.ml-craftworks-spellbook-spell span strong,
+.ml-craftworks-spellbook-spell span small {
+  display: block;
+}
+
+.chat-message .ml-craftworks-spellbook-card {
+  overflow: hidden;
+  border: 1px solid rgba(197, 160, 91, 0.5);
+  border-radius: 8px;
+}
+
+.chat-message .ml-craftworks-spellbook-card header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px;
+  background: rgba(197, 160, 91, 0.1);
+}
+
+.chat-message .ml-craftworks-spellbook-card header img {
+  width: 42px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.chat-message .ml-craftworks-spellbook-card header strong,
+.chat-message .ml-craftworks-spellbook-card header span {
+  display: block;
+}
+
+.chat-message .ml-craftworks-spellbook-card-spells {
+  padding: 8px 10px;
+}
+
+.chat-message .ml-craftworks-spellbook-card-level + .ml-craftworks-spellbook-card-level {
+  margin-top: 8px;
+}
+
+.chat-message .ml-craftworks-spellbook-card-level ul {
+  margin: 3px 0 0 18px;
+}
+
+.chat-message .ml-craftworks-spellbook-card footer {
+  padding: 4px 8px;
+  text-align: right;
+  font-size: 9px;
+  text-transform: uppercase;
+  opacity: .55;
+}
+
+/* Spellbook Generator result scrolling */
+.ml-craftworks-spellbook-generator-window .window-content {
+  overflow: hidden;
+}
+
+.ml-craftworks-spellbook-generator {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.ml-craftworks-spellbook-preview {
+  min-height: 0;
+}
+
+.ml-craftworks-spellbook-results-scroll {
+  max-height: 340px;
+  min-height: 120px;
+  margin-top: 8px;
+  padding-right: 6px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Spellbook Generator corrected results layout */
+.ml-craftworks-spellbook-generator-window .window-content {
+  overflow: hidden;
+}
+
+.ml-craftworks-spellbook-generator {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.ml-craftworks-spellbook-preview {
+  display: flex;
+  flex-direction: column;
+  min-height: 220px;
+  max-height: 430px;
+  overflow: hidden;
+}
+
+.ml-craftworks-spellbook-results-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 6px;
+}
+
+.ml-craftworks-spellbook-result-level {
+  min-width: 0;
+}
+
+.ml-craftworks-spellbook-result-list {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.ml-craftworks-spellbook-spell {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 38px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  min-height: 56px;
+  padding: 6px 8px;
+  border: 1px solid rgba(197, 160, 91, 0.24);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.ml-craftworks-spellbook-spell-image {
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  border: 1px solid rgba(197, 160, 91, 0.22);
+  border-radius: 5px;
+  object-fit: cover;
+}
+
+.ml-craftworks-spellbook-spell-copy {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ml-craftworks-spellbook-spell-copy strong,
+.ml-craftworks-spellbook-spell-copy small {
+  display: block;
+  min-width: 0;
+}
+
+.ml-craftworks-spellbook-spell-copy strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ml-craftworks-spellbook-spell-copy small {
+  margin-top: 2px;
+  opacity: .7;
+}
+
+.ml-craftworks-spellbook-spell-open {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  padding: 0;
+  margin: 0;
+}
+
+.ml-craftworks-spellbook-generator > .ml-craftworks-panel:last-child {
+  flex: 0 0 auto;
+}
+
+/* Harvest preflight Skip Skill Checks alignment */
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-character {
+  flex: 1 1 auto;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-toggle {
+  margin-left: auto;
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  text-align: right;
+}
+
+/* Player Harvest batch skill check */
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+
+  margin-top: 10px;
+  padding: 10px 12px;
+
+  border: 1px solid var(--ml-craftworks-harvest-soft-border);
+  border-radius: 6px;
+
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check-copy {
+  min-width: 0;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check-copy strong,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check-copy small {
+  display: block;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check-copy small {
+  margin-top: 2px;
+  opacity: 0.72;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check-controls select {
+  min-width: 160px;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check-controls button {
+  min-width: 175px;
+}
+
+@media (max-width: 680px) {
+  .ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check-controls {
+    width: 100%;
+  }
+
+  .ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check-controls select,
+  .ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check-controls button {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
+.ml-craftworks-material-icon-display {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Recipe knowledge state */
+.ml-craftworks-recipe-unknown-requirements {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 10px 12px;
+  border: 1px dashed rgba(197, 160, 91, 0.42);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.ml-craftworks-recipe-unknown-requirements > i {
+  flex: 0 0 auto;
+  font-size: 20px;
+  opacity: 0.78;
+}
+
+.ml-craftworks-recipe-unknown-requirements strong,
+.ml-craftworks-recipe-unknown-requirements span {
+  display: block;
+}
+
+.ml-craftworks-recipe-unknown-requirements span {
+  margin-top: 2px;
+  opacity: 0.72;
+}
+
+/* Content synchronization */
+.ml-craftworks-content-sync-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 12px 0;
+}
+
+.ml-craftworks-content-sync-card > div {
+  min-width: 0;
+}
+
+.ml-craftworks-content-sync-card p {
+  margin: 4px 0;
+}
+
+.ml-craftworks-content-sync-card button {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 700px) {
+  .ml-craftworks-content-sync-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+/* Marketplace-standard long-list filtering */
+.ml-craftworks-marketplace-browser {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ml-craftworks-marketplace-browser-body {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  gap: 12px;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ml-craftworks-filter-rail {
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px;
+  border: 1px solid rgba(197, 160, 91, 0.24);
+  border-radius: 6px;
+  background: rgba(10, 10, 10, 0.24);
+}
+
+.ml-craftworks-filter-rail-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+
+.ml-craftworks-filter-search {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.ml-craftworks-filter-search > span,
+.ml-craftworks-filter-group h3 {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  opacity: .8;
+}
+
+.ml-craftworks-filter-legend {
+  display: flex;
+  gap: 10px;
+  margin: 8px 0 12px;
+  font-size: 10px;
+  opacity: .68;
+}
+
+.ml-craftworks-filter-group {
+  margin: 0 0 14px;
+}
+
+.ml-craftworks-filter-group h3 {
+  margin-bottom: 5px;
+}
+
+.ml-craftworks-tristate-list {
+  display: grid;
+  gap: 3px;
+}
+
+.ml-craftworks-tristate-filter {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 16px;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  min-height: 28px;
+  padding: 4px 6px;
+  margin: 0;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.025);
+  text-align: left;
+  font-size: 11px;
+}
+
+.ml-craftworks-tristate-filter > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ml-craftworks-tristate-filter > small {
+  opacity: .55;
+}
+
+.ml-craftworks-tristate-filter > i {
+  text-align: center;
+  opacity: .35;
+}
+
+.ml-craftworks-tristate-filter.is-include {
+  border-color: color-mix(in srgb, var(--ml-color-success) 55%, transparent);
+  background: color-mix(in srgb, var(--ml-color-success) 10%, transparent);
+}
+
+.ml-craftworks-tristate-filter.is-include > i {
+  opacity: 1;
+}
+
+.ml-craftworks-tristate-filter.is-exclude {
+  border-color: color-mix(in srgb, var(--ml-color-danger) 55%, transparent);
+  background: color-mix(in srgb, var(--ml-color-danger) 10%, transparent);
+}
+
+.ml-craftworks-tristate-filter.is-exclude > i {
+  opacity: 1;
+}
+
+.ml-craftworks-marketplace-results {
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+}
+
+.ml-craftworks-marketplace-results > .ml-craftworks-browser-query-summary,
+.ml-craftworks-marketplace-results > .ml-craftworks-recipe-visibility-toolbar,
+.ml-craftworks-marketplace-results > .ml-craftworks-recipe-mark-context {
+  margin-bottom: 10px;
+}
+
+@media (max-width: 760px) {
+  .ml-craftworks-marketplace-browser-body {
+    grid-template-columns: 190px minmax(0, 1fr);
+  }
+}
+
+/* Marketplace UI standard — long list browsers */
+.ml-craftworks-marketplace-browser-body {
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 18px;
+  padding: 0 14px 14px;
+}
+
+.ml-craftworks-filter-rail {
+  padding: 18px 16px;
+  border: 0;
+  border-radius: 0;
+  background: rgba(35, 15, 48, 0.52);
+}
+
+.ml-craftworks-market-filter-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.ml-craftworks-market-filter-title > strong {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.ml-craftworks-filter-search {
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.ml-craftworks-filter-search > span,
+.ml-craftworks-filter-group h3 {
+  font-size: 13px;
+  letter-spacing: .02em;
+  text-transform: none;
+  opacity: .95;
+}
+
+.ml-craftworks-filter-search input,
+.ml-craftworks-filter-search select {
+  min-height: 42px;
+  padding: 8px 11px;
+  border-radius: 7px;
+  font-size: 14px;
+}
+
+.ml-craftworks-market-filter-mode-legend {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 4px 0 22px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 12px;
+}
+
+.ml-craftworks-market-filter-mode-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ml-craftworks-filter-group {
+  margin-bottom: 24px;
+}
+
+.ml-craftworks-filter-group h3 {
+  margin-bottom: 9px;
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.ml-craftworks-tristate-list {
+  gap: 3px;
+}
+
+.ml-craftworks-tristate-filter {
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  min-height: 34px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  font-size: 13px;
+}
+
+.ml-craftworks-tristate-filter > i {
+  grid-column: 1;
+  grid-row: 1;
+  font-size: 15px;
+  opacity: .75;
+}
+
+.ml-craftworks-tristate-filter > span {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.ml-craftworks-tristate-filter > small {
+  grid-column: 3;
+  grid-row: 1;
+  font-size: 11px;
+  opacity: .65;
+}
+
+.ml-craftworks-tristate-filter:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.ml-craftworks-tristate-filter.is-include {
+  border: 0;
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.ml-craftworks-tristate-filter.is-exclude {
+  border: 0;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.ml-craftworks-tristate-filter.is-include > i,
+.ml-craftworks-tristate-filter.is-exclude > i {
+  opacity: 1;
+}
+
+.ml-craftworks-marketplace-results {
+  padding: 0 4px 8px 0;
+}
+
+.ml-craftworks-market-results-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 4px 0 14px;
+}
+
+.ml-craftworks-market-results-heading h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.ml-craftworks-market-results-heading span {
+  opacity: .65;
+  font-size: 12px;
+}
+
+.ml-craftworks-market-limit-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin: 18px 0;
+  padding: 18px;
+  border: 1px solid rgba(197, 160, 91, 0.28);
+  border-radius: 8px;
+  background: rgba(10, 10, 10, 0.26);
+}
+
+.ml-craftworks-market-limit-message > i {
+  margin-top: 2px;
+  font-size: 22px;
+  opacity: .75;
+}
+
+.ml-craftworks-market-limit-message > div > strong,
+.ml-craftworks-market-limit-message > div > span {
+  display: block;
+}
+
+.ml-craftworks-market-limit-message > div > span strong {
+  display: inline;
+}
+
+.ml-craftworks-market-limit-message span {
+  margin-top: 4px;
+  opacity: .74;
+}
+
+@media (max-width: 820px) {
+  .ml-craftworks-marketplace-browser-body {
+    grid-template-columns: 240px minmax(0, 1fr);
+  }
+}
+
+/* Human-readable recipe requirements */
+.ml-craftworks-requirement-copy {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+.ml-craftworks-requirement-copy > strong {
+  font-weight: 600;
+}
+
+.ml-craftworks-requirement-rarity {
+  padding: 1px 6px;
+  border: 1px solid rgba(197, 160, 91, 0.32);
+  border-radius: 999px;
+  font-size: 10px;
+  line-height: 1.5;
+  text-transform: capitalize;
+  opacity: .78;
+}
+
+.ml-craftworks-requirement-row {
+  gap: 9px;
+}
+
+.ml-craftworks-requirement-group-items {
+  display: grid;
+  gap: 7px;
+}
+
+/* Harvest preflight creature selection */
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-selection-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-selection-actions button {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creature {
+  position: relative;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creature-copy,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creature-copy > *,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-skill-row,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-character,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-character > *,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-creature-info,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-component-body,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-body {
+  text-align: left;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-skill-check-bypassed {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  border-color: rgba(218, 178, 74, 0.58);
+  background: rgba(218, 178, 74, 0.12);
+  text-align: left;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-skill-check-bypassed > i {
+  color: #e4bd55;
+  font-size: 24px;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-skill-check-bypassed strong,
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-skill-check-bypassed small {
+  display: block;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-player-progress-list {
+  display: grid;
+  gap: 7px;
+  padding: 10px;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-player-progress-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border: 1px solid rgba(197, 160, 91, 0.2);
+  border-radius: 7px;
+  text-align: left;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-player-progress-row button {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-harvesting-completed {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ml-craftworks-harvest-success);
+  font-weight: 700;
+}
+
+/* Potion generator */
+.ml-craftworks-generator-constraints {
+  margin: 0 0 0.75rem;
+  padding: 0.6rem 0.75rem 0.7rem;
+  border: 1px solid var(--color-border-light-primary, #777);
+  border-radius: 4px;
+}
+
+.ml-craftworks-generator-constraints legend {
+  padding: 0 0.3rem;
+  font-weight: 700;
+}
+
+.ml-craftworks-generator-constraints legend small {
+  font-weight: 400;
+  opacity: 0.75;
+}
+
+.ml-craftworks-generator-option-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  gap: 0.35rem 0.75rem;
+}
+
+.ml-craftworks-generator-option-grid label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.ml-craftworks-generator-option-grid input {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.ml-craftworks-potion-generator {
+  display: grid;
+  gap: 12px;
+  text-align: left;
+}
+
+.ml-craftworks-potion-rarity-grid,
+.ml-craftworks-potion-result-list {
+  display: grid;
+  gap: 8px;
+}
+
+.ml-craftworks-potion-rarity-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 9px 10px;
+  border: 1px solid rgba(197, 160, 91, 0.22);
+  border-radius: 7px;
+  text-align: left;
+}
+
+.ml-craftworks-potion-rarity-row span,
+.ml-craftworks-potion-result span {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.ml-craftworks-potion-rarity-row strong,
+.ml-craftworks-potion-rarity-row small,
+.ml-craftworks-potion-result strong,
+.ml-craftworks-potion-result small {
+  display: block;
+}
+
+.ml-craftworks-potion-rarity-row input {
+  width: 90px;
+}
+
+.ml-craftworks-potion-results-scroll {
+  display: grid;
+  gap: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.ml-craftworks-potion-result-group {
+  display: grid;
+  gap: 7px;
+}
+
+.ml-craftworks-potion-result {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 8px;
+  border: 1px solid rgba(197, 160, 91, 0.18);
+  border-radius: 7px;
+  text-align: left;
+}
+
+.ml-craftworks-potion-result img {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.ml-craftworks-potion-result button {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+}
+
+/* Generator windows use one outer scrollbar; result lists never scroll independently. */
+.ml-craftworks-module.ml-craftworks-window.ml-craftworks-spellbook-generator-window .window-content,
+.ml-craftworks-module.ml-craftworks-window.ml-craftworks-potion-generator-window .window-content,
+.ml-craftworks-module.ml-craftworks-window.ml-craftworks-spell-scroll-generator-window .window-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto !important;
+  scrollbar-gutter: stable;
+}
+
+.ml-craftworks-spellbook-generator,
+.ml-craftworks-potion-generator,
+.ml-craftworks-spell-scroll-generator {
+  height: auto;
+  min-height: 100%;
+  overflow: visible;
+}
+
+.ml-craftworks-spellbook-preview {
+  display: block;
+  min-height: 0;
+  max-height: none;
+  overflow: visible;
+}
+
+.ml-craftworks-spellbook-results-scroll,
+.ml-craftworks-potion-results-scroll,
+.ml-craftworks-generator-results {
+  display: grid;
+  gap: 12px;
+  min-height: 0;
+  max-height: none;
+  overflow: visible;
+  padding-right: 0;
+}
+
+.ml-craftworks-generator-count-grid,
+.ml-craftworks-generator-result-list {
+  display: grid;
+  gap: 8px;
+}
+
+.ml-craftworks-generator-count-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 9px 10px;
+  border: 1px solid rgba(197, 160, 91, 0.22);
+  border-radius: 7px;
+  text-align: left;
+}
+
+/* Window scrolling policy: page content uses one outer scrollbar only. */
+.ml-craftworks-module.ml-craftworks-window .window-content {
+  min-height: 0;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  scrollbar-gutter: stable;
+}
+
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks.app-shell,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-browser-shell,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-browser-results,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-dashboard,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-reference-list,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-harvest-creature-list,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-content-packs-shell,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-content-pack-list,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-settings-form,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-craft-browser,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-craft-browser-body,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-craft-filter-rail,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-craft-results,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-craft-completion-description,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-spellbook-generator,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-spellbook-preview,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-spellbook-results-scroll,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-potion-generator,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-potion-results-scroll,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-spell-scroll-generator,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-generator-results,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-marketplace-browser,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-marketplace-browser-body,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-filter-rail,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-marketplace-results,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-loot-creatures,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-loot-roll-list {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  overscroll-behavior: auto !important;
+  scrollbar-gutter: auto;
+}
+
+/* Two-pane browsers keep their page header fixed while each pane scrolls. */
+.ml-craftworks-module.ml-craftworks-window .window-content:has(.ml-craftworks-marketplace-browser-body) {
+  overflow: hidden !important;
+}
+
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-marketplace-browser {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0;
+  overflow: hidden !important;
+}
+
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-marketplace-browser > .ml-craftworks-header {
+  flex: 0 0 auto;
+}
+
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-marketplace-browser-body {
+  flex: 1 1 auto;
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0;
+  overflow: hidden !important;
+}
+
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-marketplace-browser-body > .ml-craftworks-filter-rail,
+.ml-craftworks-module.ml-craftworks-window .ml-craftworks-marketplace-browser-body > .ml-craftworks-marketplace-results {
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  scrollbar-gutter: stable;
+}
+
+/* Harvest is a fixed header/body/footer layout; its claim list owns scrolling. */
+.ml-craftworks-module.ml-craftworks-window.ml-craftworks-harvest-modern .window-content {
+  overflow: hidden !important;
+}
+
+.ml-craftworks-module.ml-craftworks-window.ml-craftworks-harvest-modern .ml-craftworks-harvest-creatures {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto !important;
+  max-height: none !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain !important;
+  scrollbar-gutter: stable;
+}
+
+.ml-craftworks-generator-count-row span,
+.ml-craftworks-generator-result-row span {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.ml-craftworks-generator-count-row strong,
+.ml-craftworks-generator-count-row small,
+.ml-craftworks-generator-result-row strong,
+.ml-craftworks-generator-result-row small {
+  display: block;
+}
+
+.ml-craftworks-generator-count-row input {
+  width: 90px;
+}
+
+.ml-craftworks-generator-result-group {
+  display: grid;
+  gap: 7px;
+}
+
+.ml-craftworks-generator-result-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 8px;
+  border: 1px solid rgba(197, 160, 91, 0.18);
+  border-radius: 7px;
+  text-align: left;
+}
+
+.ml-craftworks-generator-result-row img {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.ml-craftworks-generator-result-row button {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+}
+
+.ml-craftworks-loot-selection-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.ml-craftworks-loot-selection-actions button {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+.ml-craftworks .ml-craftworks-loot-creature-select {
+  justify-content: flex-start;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ml-craftworks .ml-craftworks-loot-creature-select > input {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creature-select {
+  display: grid;
+  place-items: center;
+  flex: 0 0 26px;
+  width: 26px;
+  min-width: 26px;
+  max-width: 26px;
+  align-self: stretch;
+  padding: 0 2px 0 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creature-select input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.ml-craftworks .ml-craftworks-editable-result > input[type="checkbox"] {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  margin: 0 4px 0 0;
+  accent-color: var(--ml-craftworks-accent, #c5a05b);
+  cursor: pointer;
+}
+
+.ml-craftworks .ml-craftworks-result-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -2px 0 14px;
+}
+
+.ml-craftworks .ml-craftworks-result-toolbar > button {
+  flex: 0 0 auto;
+  width: auto;
+  min-height: 34px;
+  padding: 6px 12px;
+  white-space: nowrap;
+}
+
+.ml-craftworks .ml-craftworks-item-lookup {
+  margin: -4px 0 16px;
+  padding: 12px;
+  border: 1px solid rgba(197, 160, 91, 0.38);
+  border-radius: 8px;
+  background: rgba(197, 160, 91, 0.055);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.ml-craftworks .ml-craftworks-item-lookup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.ml-craftworks .ml-craftworks-item-lookup-header > div {
+  display: grid;
+  gap: 2px;
+}
+
+.ml-craftworks .ml-craftworks-item-lookup-header small {
+  color: var(--color-text-dark-secondary, #aaa);
+}
+
+.ml-craftworks .ml-craftworks-item-lookup-header .ml-craftworks-icon-button {
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  min-height: 30px;
+  padding: 0;
+}
+
+.ml-craftworks .ml-craftworks-item-lookup-search {
+  position: relative;
+}
+
+.ml-craftworks .ml-craftworks-item-lookup-search > i {
+  position: absolute;
+  top: 50%;
+  left: 11px;
+  z-index: 1;
+  color: rgba(197, 160, 91, 0.85);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.ml-craftworks .ml-craftworks-item-lookup-search > input {
+  width: 100%;
+  height: 38px;
+  padding-left: 34px;
+  border-color: rgba(197, 160, 91, 0.42);
+}
+
+.ml-craftworks .ml-craftworks-item-search-results {
+  display: grid;
+  gap: 5px;
+  max-height: 260px;
+  margin-top: 8px;
+  padding: 5px;
+  overflow-y: auto;
+  border: 1px solid rgba(197, 160, 91, 0.2);
+  border-radius: 7px;
+  background: rgba(0, 0, 0, 0.16);
+}
+
+.ml-craftworks .ml-craftworks-item-search-results button {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 22px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 5px 9px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.025);
+  text-align: left;
+}
+
+.ml-craftworks .ml-craftworks-item-search-results button:hover,
+.ml-craftworks .ml-craftworks-item-search-results button:focus-visible {
+  border-color: rgba(197, 160, 91, 0.5);
+  background: rgba(197, 160, 91, 0.1);
+}
+
+.ml-craftworks .ml-craftworks-item-search-results img {
+  width: 38px;
+  height: 38px;
+  object-fit: cover;
+  border: 1px solid rgba(197, 160, 91, 0.25);
+  border-radius: 5px;
+}
+
+.ml-craftworks .ml-craftworks-item-search-results span {
+  display: grid;
+  min-width: 0;
+}
+
+.ml-craftworks .ml-craftworks-item-search-results small {
+  color: var(--color-text-dark-secondary, #aaa);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ml-craftworks .ml-craftworks-item-search-results button > i {
+  justify-self: center;
+  color: rgba(197, 160, 91, 0.95);
+}
+
+.ml-craftworks .ml-craftworks-item-lookup-empty {
+  margin: 10px 0 0;
+  padding: 10px;
+  border-radius: 5px;
+  color: var(--color-text-dark-secondary, #aaa);
+  background: rgba(0, 0, 0, 0.12);
+  text-align: center;
+}
+
+.ml-craftworks .ml-craftworks-item-lookup-hint {
+  margin: 8px 2px 0;
+  color: var(--color-text-dark-secondary, #aaa);
+  font-size: 0.9em;
+}
+
+.ml-craftworks .ml-craftworks-coin-editor {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(197, 160, 91, 0.2);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.ml-craftworks .ml-craftworks-coin-editor-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ml-craftworks .ml-craftworks-coin-editor-heading > span {
+  color: rgba(197, 160, 91, 0.95);
+  font-weight: 600;
+}
+
+.ml-craftworks .ml-craftworks-coin-fields {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(58px, 1fr));
+  gap: 7px;
+}
+
+.ml-craftworks .ml-craftworks-coin-fields label {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+}
+
+.ml-craftworks .ml-craftworks-coin-fields label > span {
+  color: var(--color-text-dark-secondary, #aaa);
+  font-size: 0.78em;
+  font-weight: 700;
+}
+
+.ml-craftworks .ml-craftworks-coin-fields input {
+  width: 100%;
+  min-width: 0;
+  height: 30px;
+  padding: 3px 5px;
+  text-align: right;
+}
+
+@media (max-width: 600px) {
+  .ml-craftworks .ml-craftworks-result-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .ml-craftworks .ml-craftworks-coin-fields {
+    grid-template-columns: repeat(3, minmax(65px, 1fr));
+  }
+}
+
+.ml-craftworks .ml-craftworks-search-outcome {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.ml-craftworks .ml-craftworks-search-outcome > i { font-size: 2rem; text-align: center; }
+.ml-craftworks .ml-craftworks-search-outcome h3 { margin: 0 0 3px; }
+.ml-craftworks .ml-craftworks-search-outcome p { margin: 0; opacity: .85; }
+.ml-craftworks .ml-craftworks-delerium-result { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 14px; align-items: center; }
+.ml-craftworks .ml-craftworks-delerium-result > img { width: 64px; height: 64px; object-fit: cover; border: 0; border-radius: 5px; }
+.ml-craftworks .ml-craftworks-delerium-result h3 { margin: 0 0 4px; }
+.ml-craftworks .ml-craftworks-recipient-field { display: grid; gap: 5px; margin-top: 12px; }
+.ml-craftworks .ml-craftworks-recipient-field select { width: 100%; }
+.ml-craftworks .ml-craftworks-award-summary { display: flex; gap: 10px; align-items: center; }
+.ml-craftworks .ml-craftworks-award-summary img { width: 42px; height: 42px; object-fit: cover; border: 0; }
+
+.ml-craftworks .ml-craftworks-player-actor {
+  margin: 10px 0 14px;
+  padding: 8px 10px;
+  border-top: 1px solid var(--color-border-light-2);
+  border-bottom: 1px solid var(--color-border-light-2);
+}
+
+.ml-craftworks .ml-craftworks-player-roll-panel { display: grid; gap: 12px; }
+.ml-craftworks .ml-craftworks-player-roll-panel > p { margin: 0; }
+.ml-craftworks .ml-craftworks-player-skill-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+.ml-craftworks .ml-craftworks-player-skill-grid button {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 12px;
+  text-align: left;
+}
+.ml-craftworks .ml-craftworks-player-skill-grid button > i { justify-self: center; }
+.ml-craftworks .ml-craftworks-player-skill-grid button > strong { color: rgba(197, 160, 91, 0.95); font-variant-numeric: tabular-nums; }
+.ml-craftworks .ml-craftworks-player-decline { justify-self: start; min-width: 120px; }
+
+.ml-craftworks .ml-craftworks-progress-card {
+  gap: 10px;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border-light-2);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.025);
+}
+.ml-craftworks .ml-craftworks-progress-card:last-child { border-bottom: 1px solid var(--color-border-light-2); }
+.ml-craftworks .ml-craftworks-progress-summary { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.ml-craftworks .ml-craftworks-progress-summary > div { display: grid; gap: 2px; }
+.ml-craftworks .ml-craftworks-progress-status { padding: 3px 8px; border-radius: 999px; background: rgba(255, 255, 255, 0.06); text-transform: capitalize; white-space: nowrap; }
+.ml-craftworks .ml-craftworks-progress-rolls { display: grid; gap: 6px; padding-top: 8px; border-top: 1px solid var(--color-border-light-2); }
+.ml-craftworks .ml-craftworks-progress-rolls > small { opacity: .75; }
+
+.ml-craftworks-window .ml-craftworks-search-results {
+  gap: 14px;
+  padding: 18px 20px 20px;
+}
+.ml-craftworks-window .ml-craftworks-search-results > .ml-craftworks-header { padding: 0 2px 12px; }
+.ml-craftworks-window .ml-craftworks-search-results > .ml-craftworks-header h2 { margin: 0 0 7px; font-size: 2rem; line-height: 1.05; }
+.ml-craftworks-window .ml-craftworks-search-results > .ml-craftworks-header p { margin: 0; line-height: 1.35; }
+.ml-craftworks-window .ml-craftworks-search-results > .ml-craftworks-panel { margin: 0; padding: 16px 18px; }
+.ml-craftworks-window .ml-craftworks-search-results .ml-craftworks-search-outcome { grid-template-columns: 48px minmax(0, 1fr); gap: 18px; }
+.ml-craftworks-window .ml-craftworks-search-results .ml-craftworks-search-outcome > i { font-size: 2.25rem; }
+.ml-craftworks-window .ml-craftworks-search-results .ml-craftworks-search-outcome h3 { margin: 0 0 6px; font-size: 1.65rem; line-height: 1.1; }
+.ml-craftworks-window .ml-craftworks-search-results .ml-craftworks-search-outcome p { line-height: 1.4; }

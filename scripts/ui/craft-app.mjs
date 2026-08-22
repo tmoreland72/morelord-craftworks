@@ -33,9 +33,10 @@ export class CraftApp
   static DEFAULT_OPTIONS = {
     id: "morelord-craftworks-craft",
     classes: [
-      "morelord-craftworks",
-      "mcw-window",
-      "mcw-craft-window"
+      "ml-window",
+      "ml-craftworks-module",
+      "ml-craftworks-window",
+      "ml-craftworks-craft-window"
     ],
     position: {
       width: 1240,
@@ -1296,7 +1297,7 @@ export class CraftApp
     const options = plans
       .map(
         (plan, index) => `
-          <label class="mcw-crafting-plan-option">
+          <label class="ml-craftworks-crafting-plan-option">
             <input type="radio"
                    name="plan"
                    value="${index}"
@@ -1316,7 +1317,7 @@ export class CraftApp
           },
           content: `
             <p>More than one valid material path is available. Choose which materials to consume.</p>
-            <div class="mcw-crafting-plan-options">
+            <div class="ml-craftworks-crafting-plan-options">
               ${options}
             </div>
           `,

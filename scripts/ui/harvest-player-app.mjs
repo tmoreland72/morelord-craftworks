@@ -44,7 +44,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
 
   static DEFAULT_OPTIONS = {
     id: "morelord-craftworks-harvest-player",
-    classes: ["morelord-craftworks", "mcw-window", "mcw", "mcw-harvest-modern"],
+    classes: ["ml-window", "ml-craftworks-module", "ml-craftworks-window", "ml-craftworks", "ml-craftworks-harvest-modern"],
     position: {
       width: 960,
       height: 800
@@ -482,11 +482,11 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#039;");
     const content = `
-      <div class="mcw mcw-harvest-recipe-dialog">
+      <div class="ml-craftworks ml-craftworks-harvest-recipe-dialog">
         <p>This harvested material is used by these marked recipes:</p>
-        <div class="mcw-harvest-recipe-dialog-list">
+        <div class="ml-craftworks-harvest-recipe-dialog-list">
           ${recipes.map(recipe => `
-            <div class="mcw-harvest-recipe-dialog-row">
+            <div class="ml-craftworks-harvest-recipe-dialog-row">
               <strong>${escape(recipe.name)}</strong>
               <span>${escape([recipe.category, recipe.tool].filter(Boolean).join(" · "))}</span>
             </div>

@@ -1,17 +1,17 @@
-<section class="mcw app-shell">
-  <header class="mcw-header">
+<section class="ml-app ml-app-shell ml-craftworks app-shell">
+  <header class="ml-craftworks-header">
     <h2>Gathering Opportunity</h2>
     <p>{{session.terrain.name}} • DC {{session.terrain.dc}} • {{session.sceneName}}</p>
   </header>
 
   {{#if actor}}
-    <div class="mcw-actor mcw-player-actor"><img src="{{actor.img}}" alt="{{actor.name}}"><strong>{{actor.name}}</strong></div>
+    <div class="ml-craftworks-actor ml-craftworks-player-actor"><img src="{{actor.img}}" alt="{{actor.name}}"><strong>{{actor.name}}</strong></div>
   {{else}}
-    <p class="mcw-warning">Select a token you own or configure a user character.</p>
+    <p class="ml-text ml-craftworks-warning" data-tone="warning">Select a token you own or configure a user character.</p>
   {{/if}}
 
   {{#if state}}
-    <div class="mcw-panel">
+    <div class="ml-craftworks-panel">
       {{#if (eq state.status "declined")}}
         <p>You declined this gathering opportunity. Declining does not consume this character's gathering opportunity for the scene.</p>
       {{/if}}
@@ -21,31 +21,31 @@
       {{/if}}
       {{#if (eq state.status "succeeded")}}
         <p><strong>Gathering succeeded.</strong> Your check total was {{state.total}}.</p>
-        <div class="mcw-result" data-document-uuid="{{state.result.itemUuid}}"><img src="{{state.result.img}}" alt="{{state.result.name}}"> {{state.result.name}} ×{{state.result.quantity}}</div>
+        <div class="ml-craftworks-result" data-document-uuid="{{state.result.itemUuid}}"><img src="{{state.result.img}}" alt="{{state.result.name}}"> {{state.result.name}} ×{{state.result.quantity}}</div>
         {{#if state.result.recipientName}}<p>Sent to <strong>{{state.result.recipientName}}</strong>.</p>{{/if}}
         <p>This character has now used their gathering opportunity for this scene.</p>
       {{/if}}
     </div>
   {{else}}
     {{#if alreadyGathered}}
-      <div class="mcw-panel mcw-player-roll-panel">
-        <p class="mcw-warning"><strong>{{actor.name}} has already gathered on this scene.</strong></p>
+      <div class="ml-craftworks-panel ml-craftworks-player-roll-panel">
+    <p class="ml-text ml-craftworks-warning" data-tone="warning"><strong>{{actor.name}} has already gathered on this scene.</strong></p>
         <p>The GM must reset gathering for this scene before this character can gather here again.</p>
       </div>
     {{else}}
-      <div class="mcw-panel">
+      <div class="ml-craftworks-panel">
         <p>Gathering is optional. Choose a skill or decline.</p>
-        <div class="mcw-player-skill-grid">
+        <div class="ml-craftworks-player-skill-grid">
           {{#each skills}}
             <button type="button" data-action="roll" data-skill="{{id}}"><i class="fa-solid fa-dice-d20"></i><span>{{label}}</span><strong>{{modifierLabel}}</strong></button>
           {{/each}}
         </div>
-        <button class="mcw-player-decline" type="button" data-action="decline"><i class="fa-solid fa-ban"></i> Decline</button>
+        <button class="ml-craftworks-player-decline" type="button" data-action="decline"><i class="fa-solid fa-ban"></i> Decline</button>
       </div>
     {{/if}}
   {{/if}}
 
-  <footer class="mcw-actions">
+  <footer class="ml-actions ml-craftworks-actions">
     <button type="button" data-action="close"><i class="fa-solid fa-xmark"></i> Close</button>
   </footer>
 </section>

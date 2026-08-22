@@ -17,7 +17,7 @@ export class PotionGeneratorApp extends ScrollPreservingApplicationMixin(
 
   static DEFAULT_OPTIONS = {
     id: "morelord-craftworks-potion-generator",
-    classes: ["morelord-craftworks", "mcw-window", "mcw-potion-generator-window"],
+    classes: ["ml-window", "ml-craftworks-module", "ml-craftworks-window", "ml-craftworks-potion-generator-window"],
     position: { width: 820, height: 820 },
     window: { title: `${MODULE_TITLE} — Potion Generator`, resizable: true }
   };

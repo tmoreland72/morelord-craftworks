@@ -30,22 +30,22 @@ export class AwardChatCardService {
     }
 
     const content = `
-      <section class="mcw-award-card">
-        <header class="mcw-award-card-header">
-          <div class="mcw-award-card-icon">
+      <section class="ml-chat-card ml-craftworks-award-card">
+        <header class="ml-craftworks-award-card-header">
+          <div class="ml-craftworks-award-card-icon">
             <i class="fa-solid fa-gift"></i>
           </div>
-          <div class="mcw-award-card-heading">
-            <div class="mcw-award-card-title">
+          <div class="ml-craftworks-award-card-heading">
+            <div class="ml-craftworks-award-card-title">
               ${this.#escape(title)}
             </div>
-            <div class="mcw-award-card-recipient">
+            <div class="ml-craftworks-award-card-recipient">
               <i class="fa-solid fa-user"></i>
               ${this.#escape(recipient.name)}
             </div>
             ${
               subtitle
-                ? `<div class="mcw-award-card-subtitle">${this.#escape(subtitle)}</div>`
+                ? `<div class="ml-craftworks-award-card-subtitle">${this.#escape(subtitle)}</div>`
                 : ""
             }
           </div>
@@ -54,7 +54,7 @@ export class AwardChatCardService {
         ${
           normalizedItems.length
             ? `
-              <div class="mcw-award-card-items">
+              <div class="ml-craftworks-award-card-items">
                 ${normalizedItems.map(item => this.#renderItem(item)).join("")}
               </div>
             `
@@ -64,7 +64,7 @@ export class AwardChatCardService {
         ${
           hasCoin
             ? `
-              <div class="mcw-award-card-coins">
+              <div class="ml-craftworks-award-card-coins">
                 <i class="fa-solid fa-coins"></i>
                 <span>${this.#escape(String(coinLabel))}</span>
               </div>
@@ -72,7 +72,7 @@ export class AwardChatCardService {
             : ""
         }
 
-        <footer class="mcw-award-card-footer">
+        <footer class="ml-craftworks-award-card-footer">
           ${this.#escape(MODULE_TITLE)}
         </footer>
       </section>
@@ -134,30 +134,30 @@ export class AwardChatCardService {
 
   static #renderItem(item) {
     const linkAttribute = item.uuid
-      ? ` data-mcw-link-target="${this.#escapeAttribute(item.uuid)}"`
+      ? ` data-ml-craftworks-link-target="${this.#escapeAttribute(item.uuid)}"`
       : "";
     const label = item.uuid
       ? `@UUID[${item.uuid}]{${this.#escape(item.name)}}`
       : this.#escape(item.name);
 
     return `
-      <article class="mcw-award-card-item"${linkAttribute}>
+      <article class="ml-craftworks-award-card-item"${linkAttribute}>
         <img
-          class="mcw-award-card-item-image"
+          class="ml-craftworks-award-card-item-image"
           src="${this.#escapeAttribute(item.img)}"
           alt="${this.#escapeAttribute(item.name)}"
         >
-        <div class="mcw-award-card-item-body">
-          <div class="mcw-award-card-item-name">
+        <div class="ml-craftworks-award-card-item-body">
+          <div class="ml-craftworks-award-card-item-name">
             ${label}
           </div>
           ${
             item.rarity
-              ? `<div class="mcw-award-card-item-rarity">${this.#escape(item.rarity)}</div>`
+              ? `<div class="ml-craftworks-award-card-item-rarity">${this.#escape(item.rarity)}</div>`
               : ""
           }
         </div>
-        <div class="mcw-award-card-item-quantity">
+        <div class="ml-craftworks-award-card-item-quantity">
           ×${item.quantity}
         </div>
       </article>

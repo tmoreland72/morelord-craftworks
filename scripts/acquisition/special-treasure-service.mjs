@@ -193,7 +193,7 @@ export class SpecialTreasureService {
             "system.rarity",
             "system.source.book",
             "system.source.custom",
-            "flags.morelord-craftworks.materialId"
+      "flags.morelord-craftworks.materialId"
           ]
         });
 

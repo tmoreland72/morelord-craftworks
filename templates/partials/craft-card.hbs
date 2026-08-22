@@ -1,16 +1,16 @@
-<article class="mcw-craft-card">
-  <header class="mcw-craft-card-header">
-    <div class="mcw-craft-card-title">
+<article class="ml-craftworks-craft-card">
+  <header class="ml-craftworks-craft-card-header">
+    <div class="ml-craftworks-craft-card-title">
       {{#if output.img}}
         {{#if outputDocumentUuid}}
           <button type="button"
-                  class="mcw-craft-card-image"
+                  class="ml-craftworks-craft-card-image"
                   data-output-document-uuid="{{outputDocumentUuid}}"
                   title="Open source Item">
             <img src="{{output.img}}" alt="{{name}}">
           </button>
         {{else}}
-          <img class="mcw-craft-card-image-static"
+          <img class="ml-craftworks-craft-card-image-static"
                src="{{output.img}}"
                alt="{{name}}">
         {{/if}}
@@ -18,7 +18,7 @@
 
       <div>
         <h3>{{name}}</h3>
-        <div class="mcw-recipe-meta">
+        <div class="ml-craftworks-recipe-meta">
           <span>{{sourceLabel}}</span>
           {{#if tags.length}}
             {{#each tags}}<span>{{this}}</span>{{/each}}
@@ -28,7 +28,7 @@
     </div>
 
     <button type="button"
-            class="mcw-button-subtle"
+            class="ml-craftworks-button-subtle"
             data-action="unmark"
             data-recipe-id="{{id}}"
             {{#if isActive}}disabled{{/if}}
@@ -38,7 +38,7 @@
     </button>
   </header>
 
-  <div class="mcw-craft-card-meta">
+  <div class="ml-craftworks-craft-card-meta">
     {{#if craftMeta.tool}}
       <span>
         <i class="fa-solid fa-screwdriver-wrench"></i>
@@ -61,7 +61,7 @@
   </div>
 
   {{#if progress}}
-    <div class="mcw-craft-progress-large">
+    <div class="ml-craftworks-craft-progress-large">
       <div>
         <strong>{{progress.successes}} of {{progress.requiredSuccesses}} Successes</strong>
         <span>{{progress.progressHours}} of {{progress.hoursRequired}} hours progress</span>
@@ -70,36 +70,36 @@
     </div>
   {{/if}}
 
-  <div class="mcw-craft-card-body">
+  <div class="ml-craftworks-craft-card-body">
     <section>
       <h4>Requirements</h4>
       {{#if requirementsKnown}}
-        <div class="mcw-craft-requirements">
+        <div class="ml-craftworks-craft-requirements">
           {{#each requirementGroupRows}}
-          <div class="mcw-craft-requirement-group">
+          <div class="ml-craftworks-craft-requirement-group">
             {{#each requirementRows}}
               {{#if alternativeRows.length}}
-                <div class="mcw-craft-alternative-group">
+                <div class="ml-craftworks-craft-alternative-group">
                   <strong>Choose one:</strong>
                   {{#each alternativeRows}}
-                    <div class="mcw-craft-requirement-row {{#if inventory.ready}}mcw-ready{{else}}mcw-missing{{/if}}" data-document-uuid="{{materialUuid}}">
+                    <div class="ml-craftworks-craft-requirement-row {{#if inventory.ready}}ml-craftworks-ready{{else}}ml-craftworks-missing{{/if}}" data-document-uuid="{{materialUuid}}">
                       {{#if materialImg}}
                         {{#if materialId}}
                           <button type="button"
                                   data-material-id="{{materialId}}"
-                                  class="mcw-material-icon-link">
+                                  class="ml-craftworks-material-icon-link">
                             <img src="{{materialImg}}" alt="">
                           </button>
                         {{else}}
-                          <span class="mcw-material-icon-link mcw-material-icon-display">
+                          <span class="ml-craftworks-material-icon-link ml-craftworks-material-icon-display">
                             <img src="{{materialImg}}" alt="">
                           </span>
                         {{/if}}
                       {{/if}}
-                      <span class="mcw-requirement-copy">
+                      <span class="ml-craftworks-requirement-copy">
           <strong>{{displayLabel}}</strong>
           {{#if displayRarity}}
-            <small class="mcw-requirement-rarity">{{displayRarity}}</small>
+            <small class="ml-craftworks-requirement-rarity">{{displayRarity}}</small>
           {{/if}}
         </span>
                       {{#if inventory}}
@@ -109,24 +109,24 @@
                   {{/each}}
                 </div>
               {{else}}
-                <div class="mcw-craft-requirement-row {{#if inventory.ready}}mcw-ready{{else}}mcw-missing{{/if}}" data-document-uuid="{{materialUuid}}">
+                <div class="ml-craftworks-craft-requirement-row {{#if inventory.ready}}ml-craftworks-ready{{else}}ml-craftworks-missing{{/if}}" data-document-uuid="{{materialUuid}}">
                   {{#if materialImg}}
                     {{#if materialId}}
                       <button type="button"
                               data-material-id="{{materialId}}"
-                              class="mcw-material-icon-link">
+                              class="ml-craftworks-material-icon-link">
                         <img src="{{materialImg}}" alt="">
                       </button>
                     {{else}}
-                      <span class="mcw-material-icon-link mcw-material-icon-display">
+                      <span class="ml-craftworks-material-icon-link ml-craftworks-material-icon-display">
                         <img src="{{materialImg}}" alt="">
                       </span>
                     {{/if}}
                   {{/if}}
-                  <span class="mcw-requirement-copy">
+                  <span class="ml-craftworks-requirement-copy">
           <strong>{{displayLabel}}</strong>
           {{#if displayRarity}}
-            <small class="mcw-requirement-rarity">{{displayRarity}}</small>
+            <small class="ml-craftworks-requirement-rarity">{{displayRarity}}</small>
           {{/if}}
         </span>
                   {{#if inventory}}
@@ -136,11 +136,11 @@
               {{/if}}
             {{/each}}
           </div>
-          {{#unless @last}}<div class="mcw-requirement-group-or">OR</div>{{/unless}}
+          {{#unless @last}}<div class="ml-craftworks-requirement-group-or">OR</div>{{/unless}}
           {{/each}}
         </div>
       {{else}}
-        <div class="mcw-recipe-unknown-requirements">
+        <div class="ml-craftworks-recipe-unknown-requirements">
           <i class="fa-solid fa-circle-question"></i>
           <div>
             <strong>Ingredients Unknown</strong>
@@ -150,9 +150,9 @@
       {{/if}}
     </section>
 
-    <section class="mcw-craft-output-panel">
+    <section class="ml-craftworks-craft-output-panel">
       <h4>Produces</h4>
-      <div class="mcw-craft-output">
+      <div class="ml-craftworks-craft-output">
         {{#if output.img}}
           <img src="{{output.img}}" alt="{{output.label}}">
         {{/if}}
@@ -164,9 +164,9 @@
     </section>
   </div>
 
-  <footer class="mcw-craft-card-actions">
+  <footer class="ml-craftworks-craft-card-actions">
     {{#if isCompletePending}}
-      <span class="mcw-crafting-complete">
+      <span class="ml-craftworks-crafting-complete">
         <i class="fa-solid fa-trophy"></i>
         Crafting Complete
       </span>
@@ -178,7 +178,7 @@
       </button>
     {{else}}
       {{#if isActive}}
-        <span class="mcw-muted">
+        <span class="ml-craftworks-muted">
           Materials were consumed from {{inventoryActorName}}.
         </span>
         <button type="button"
@@ -188,7 +188,7 @@
           Roll Crafting Check
         </button>
         <button type="button"
-                class="mcw-button-subtle"
+                class="ml-craftworks-button-subtle"
                 data-action="cancel-crafting"
                 data-recipe-id="{{id}}">
           <i class="fa-solid fa-ban"></i>
@@ -197,7 +197,7 @@
       {{else}}
         {{#if requirementsKnown}}
         {{#if readiness.ready}}
-          <span class="mcw-craft-ready-label">
+          <span class="ml-craftworks-craft-ready-label">
             <i class="fa-solid fa-circle-check"></i>
             Ready to Craft
           </span>
@@ -208,13 +208,13 @@
             Start Crafting
           </button>
         {{else}}
-          <span class="mcw-craft-missing-label">
+          <span class="ml-craftworks-craft-missing-label">
             <i class="fa-solid fa-circle-xmark"></i>
             Missing Requirements
           </span>
         {{/if}}
       {{else}}
-        <span class="mcw-craft-missing-label">
+        <span class="ml-craftworks-craft-missing-label">
           <i class="fa-solid fa-circle-question"></i>
           Ingredients Unknown
         </span>

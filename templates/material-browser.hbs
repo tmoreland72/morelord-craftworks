@@ -1,24 +1,25 @@
-<section class="mcw app-shell mcw-browser-shell mcw-marketplace-browser">
-  <header class="mcw-header">
+<section class="ml-app ml-app-shell ml-craftworks app-shell ml-craftworks-browser-shell ml-craftworks-marketplace-browser">
+  <header class="ml-craftworks-header">
     <div>
       <h2>Materials</h2>
       <p>Reference Craftworks materials, acquisition methods, values, recipes, and inventory quantities.</p>
     </div>
   </header>
 
-  <div class="mcw-marketplace-browser-body">
-    <aside class="mcw-filter-rail">
-      <div class="mcw-market-filter-title">
+  <div class="ml-craftworks-marketplace-browser-body">
+    <aside class="ml-craftworks-filter-rail">
+      <div class="ml-craftworks-market-filter-title">
         <strong>Filters</strong>
         <button type="button"
-                class="mcw-icon-button"
+                class="ml-icon-button ml-craftworks-icon-button"
                 data-action="clear-material-filters"
+                aria-label="Clear all filters"
                 title="Clear all filters">
           <i class="fa-solid fa-filter-circle-xmark"></i>
         </button>
       </div>
 
-      <label class="mcw-filter-search">
+      <label class="ml-craftworks-filter-search">
         <span>Search</span>
         <input type="search"
                name="search"
@@ -26,18 +27,18 @@
                placeholder="Material, tag, category, source…">
       </label>
 
-      <div class="mcw-market-filter-mode-legend">
+      <div class="ml-craftworks-market-filter-mode-legend">
         <span><i class="fa-regular fa-square"></i> Any</span>
         <span><i class="fa-solid fa-square-check"></i> Include</span>
         <span><i class="fa-solid fa-square-minus"></i> Exclude</span>
       </div>
 
-      <section class="mcw-filter-group">
+      <section class="ml-craftworks-filter-group">
         <h3>Content Pack</h3>
-        <div class="mcw-tristate-list">
+        <div class="ml-craftworks-tristate-list">
           {{#each packs}}
             <button type="button"
-                    class="mcw-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
+                    class="ml-craftworks-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
                     data-tristate-filter
                     data-filter-group="pack"
                     data-filter-value="{{id}}"
@@ -50,12 +51,12 @@
         </div>
       </section>
 
-      <section class="mcw-filter-group">
+      <section class="ml-craftworks-filter-group">
         <h3>Rarity</h3>
-        <div class="mcw-tristate-list">
+        <div class="ml-craftworks-tristate-list">
           {{#each rarities}}
             <button type="button"
-                    class="mcw-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
+                    class="ml-craftworks-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
                     data-tristate-filter
                     data-filter-group="rarity"
                     data-filter-value="{{id}}">
@@ -67,12 +68,12 @@
       </section>
 
       {{#each tagGroups}}
-      <section class="mcw-filter-group mcw-filter-subsection">
+      <section class="ml-craftworks-filter-group ml-craftworks-filter-subsection">
         <h3>{{label}}</h3>
-        <div class="mcw-tristate-list">
+        <div class="ml-craftworks-tristate-list">
           {{#each options}}
             <button type="button"
-                    class="mcw-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
+                    class="ml-craftworks-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
                     data-tristate-filter
                     data-filter-group="tag"
                     data-filter-value="{{id}}">
@@ -84,7 +85,7 @@
       </section>
       {{/each}}
 
-      <label class="mcw-filter-search">
+      <label class="ml-craftworks-filter-search">
         <span>Check Inventory</span>
         <select name="actor">
           <option value="">No inventory selected</option>
@@ -95,14 +96,14 @@
       </label>
 </aside>
 
-    <main class="mcw-marketplace-results">
-      <div class="mcw-market-results-heading">
+    <main class="ml-craftworks-marketplace-results">
+      <div class="ml-craftworks-market-results-heading">
         <h2>Materials</h2>
         <span>{{prospectiveCount}} matches</span>
       </div>
 
       {{#if overDisplayLimit}}
-        <div class="mcw-market-limit-message">
+        <div class="ml-craftworks-market-limit-message">
           <i class="fa-solid fa-filter"></i>
           <div>
             <strong>{{prospectiveCount}} materials match the current filters.</strong>
@@ -113,20 +114,20 @@
           </div>
         </div>
       {{/if}}
-        <div class="mcw-reference-list mcw-browser-results">
+        <div class="ml-craftworks-reference-list ml-craftworks-browser-results">
           {{#each materials}}
-      <article class="mcw-reference-card mcw-material-card {{#if owned}}mcw-material-owned{{/if}} {{#if focused}}mcw-material-focused{{/if}}" data-document-uuid="{{uuid}}">
+      <article class="ml-craftworks-reference-card ml-craftworks-material-card {{#if owned}}ml-craftworks-material-owned{{/if}} {{#if focused}}ml-craftworks-material-focused{{/if}}" data-document-uuid="{{uuid}}">
         <img src="{{img}}" alt="{{name}}">
 
-        <div class="mcw-reference-main">
-          <div class="mcw-reference-title">
+        <div class="ml-craftworks-reference-main">
+          <div class="ml-craftworks-reference-title">
             <strong>{{name}}</strong>
             <span>{{rarity}} • {{category}} • {{packLabel}}</span>
           </div>
 
-          <div class="mcw-pills">
+          <div class="ml-craftworks-pills">
             {{#if ../actorName}}
-              <span class="mcw-owned-pill">
+              <span class="ml-craftworks-owned-pill">
                 Owned: {{ownedQuantity}}
               </span>
             {{/if}}
@@ -161,7 +162,7 @@
         </div>
       </article>
           {{else}}
-            <div class="mcw-panel">
+            <div class="ml-craftworks-panel">
               <p>No materials match the current filters.</p>
             </div>
           {{/each}}

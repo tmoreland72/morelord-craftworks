@@ -287,7 +287,7 @@ export class SpellbookGeneratorService {
               .join("");
 
           return `
-            <div class="mcw-spellbook-card-level">
+            <div class="ml-craftworks-spellbook-card-level">
               <strong>${heading}</strong>
               <ul>${links}</ul>
             </div>
@@ -301,7 +301,7 @@ export class SpellbookGeneratorService {
           actor: recipient
         }),
       content: `
-        <section class="mcw-spellbook-card">
+        <section class="ml-craftworks-spellbook-card">
           <header>
             <img
               src="${spellbook.img}"
@@ -312,7 +312,7 @@ export class SpellbookGeneratorService {
               <span>Received by ${foundry.utils.escapeHTML(recipient.name)}</span>
             </div>
           </header>
-          <div class="mcw-spellbook-card-spells">
+          <div class="ml-craftworks-spellbook-card-spells">
             ${sections}
           </div>
           <footer>Morelord Craftworks</footer>

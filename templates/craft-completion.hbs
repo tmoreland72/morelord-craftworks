@@ -1,5 +1,5 @@
-<section class="mcw app-shell mcw-craft-completion">
-  <header class="mcw-craft-completion-hero">
+<section class="ml-app ml-app-shell ml-craftworks app-shell ml-craftworks-craft-completion">
+  <header class="ml-craftworks-craft-completion-hero">
     <i class="fa-solid fa-trophy"></i>
     <div>
       <h2>Crafting Success!</h2>
@@ -7,17 +7,17 @@
     </div>
   </header>
 
-  <div class="mcw-craft-completion-item" data-document-uuid="{{itemUuid}}">
+  <div class="ml-craftworks-craft-completion-item" data-document-uuid="{{itemUuid}}">
     <button type="button"
-            class="mcw-craft-completion-image"
+            class="ml-craftworks-craft-completion-image"
             data-action="open-item"
             title="Open source Item">
       <img src="{{itemImg}}" alt="{{itemName}}">
     </button>
 
-    <div class="mcw-craft-completion-summary">
+    <div class="ml-craftworks-craft-completion-summary">
       <h3>{{itemName}}</h3>
-      <div class="mcw-recipe-meta">
+      <div class="ml-craftworks-recipe-meta">
         {{#if sourceLabel}}<span>{{sourceLabel}}</span>{{/if}}
         {{#if rarity}}<span>{{rarity}}</span>{{/if}}
         {{#if price}}<span>{{price}}</span>{{/if}}
@@ -27,14 +27,14 @@
   </div>
 
   {{#if description}}
-    <div class="mcw-panel mcw-craft-completion-description">
+    <div class="ml-craftworks-panel ml-craftworks-craft-completion-description">
       {{{description}}}
     </div>
   {{/if}}
 
-  <div class="mcw-craft-completion-actions">
+  <div class="ml-craftworks-craft-completion-actions">
     <button type="button"
-            class="mcw-primary-action"
+            class="ml-craftworks-primary-action"
             data-action="place-self">
       <i class="fa-solid fa-user"></i>
       Place in My Inventory
@@ -49,7 +49,7 @@
     {{/if}}
   </div>
 
-  <p class="mcw-muted">
+  <p class="ml-craftworks-muted">
     The crafted Item is not placed anywhere until you choose a destination.
   </p>
 </section>

@@ -1,10 +1,10 @@
-<section class="mcw app-shell">
-  <header class="mcw-header">
+<section class="ml-app ml-app-shell ml-craftworks app-shell">
+  <header class="ml-craftworks-header">
     <h2>Party Collection</h2>
     <p>Select one D&D5e Group actor, then choose which acquisition activities deposit materials there.</p>
   </header>
 
-  <div class="mcw-panel">
+  <div class="ml-craftworks-panel">
     <label>
       Party Actor
       <select name="partyActorUuid">
@@ -18,28 +18,28 @@
     </label>
 
     {{#unless groups.length}}
-      <p class="mcw-warning">No D&D5e Group actors were found in this world.</p>
+    <p class="ml-text ml-craftworks-warning" data-tone="warning">No D&D5e Group actors were found in this world.</p>
     {{/unless}}
 
-    <div class="mcw-party-toggles">
-      <label class="mcw-checkbox-row">
+    <div class="ml-craftworks-party-toggles">
+      <label class="ml-craftworks-checkbox-row">
         <input type="checkbox" name="partyHarvest" {{#if partyHarvest}}checked{{/if}}>
         <span><strong>Harvesting → Party</strong><small>Successful player harvest claims are added to the Party actor instead of the harvesting character.</small></span>
       </label>
 
-      <label class="mcw-checkbox-row">
+      <label class="ml-craftworks-checkbox-row">
         <input type="checkbox" name="partyGather" {{#if partyGather}}checked{{/if}}>
         <span><strong>Gathering → Party</strong><small>Successful individual gathering results are added to the Party actor instead of the gathering character.</small></span>
       </label>
 
-      <label class="mcw-checkbox-row">
+      <label class="ml-craftworks-checkbox-row">
         <input type="checkbox" name="partyLoot" {{#if partyLoot}}checked{{/if}}>
         <span><strong>Looting → Party</strong><small>The consolidated post-combat party haul is added directly to the Party actor.</small></span>
       </label>
     </div>
   </div>
 
-  <footer class="mcw-actions">
+  <footer class="ml-actions ml-craftworks-actions">
     <button type="button" data-action="save"><i class="fa-solid fa-floppy-disk"></i> Save</button>
   </footer>
 </section>

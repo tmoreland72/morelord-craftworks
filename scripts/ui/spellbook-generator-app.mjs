@@ -30,9 +30,10 @@ export class SpellbookGeneratorApp
     id:
       "morelord-craftworks-spellbook-generator",
     classes: [
-      "morelord-craftworks",
-      "mcw-window",
-      "mcw-spellbook-generator-window"
+      "ml-window",
+      "ml-craftworks-module",
+      "ml-craftworks-window",
+      "ml-craftworks-spellbook-generator-window"
     ],
     position: {
       width: 820,
@@ -222,7 +223,7 @@ export class SpellbookGeneratorApp
 
     this.element
       .querySelectorAll(
-        ".mcw-spellbook-spell-open[data-spell-uuid]"
+        ".ml-craftworks-spellbook-spell-open[data-spell-uuid]"
       )
       .forEach(button =>
         button.addEventListener(
@@ -251,7 +252,7 @@ export class SpellbookGeneratorApp
 
     const form =
       this.element.querySelector(
-        ".mcw-spellbook-generator"
+        ".ml-craftworks-spellbook-generator"
       );
 
     if (form) {

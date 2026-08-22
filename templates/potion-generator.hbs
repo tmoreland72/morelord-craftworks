@@ -1,5 +1,5 @@
-<section class="mcw app-shell mcw-potion-generator">
-  <header class="mcw-header">
+<section class="ml-app ml-app-shell ml-craftworks app-shell ml-craftworks-potion-generator">
+  <header class="ml-craftworks-header">
     <div>
       <h2>Potion Generator</h2>
       <p>Choose how many potions of each rarity to generate from enabled Item compendiums. Each draw is random and duplicates are allowed.</p>
@@ -8,18 +8,18 @@
 
   {{#if hasAccess}}
     {{#unless hasResult}}
-    <section class="mcw-panel">
-      <fieldset class="mcw-generator-constraints">
+    <section class="ml-craftworks-panel">
+      <fieldset class="ml-craftworks-generator-constraints">
         <legend>Potion Categories <small>(inferred from potion names; all selected by default)</small></legend>
-        <div class="mcw-generator-option-grid">
+        <div class="ml-craftworks-generator-option-grid">
           {{#each categories}}
             <label><input type="checkbox" data-potion-category="{{id}}" {{#if selected}}checked{{/if}}> {{label}}</label>
           {{/each}}
         </div>
       </fieldset>
-      <div class="mcw-potion-rarity-grid">
+      <div class="ml-craftworks-potion-rarity-grid">
         {{#each rarities}}
-          <label class="mcw-potion-rarity-row">
+          <label class="ml-craftworks-potion-rarity-row">
             <span>
               <strong>{{label}}</strong>
               <small>{{available}} available</small>
@@ -29,22 +29,22 @@
         {{/each}}
       </div>
 
-      <div class="mcw-actions">
+      <div class="ml-actions ml-craftworks-actions">
         <button type="button" data-action="generate-potions"><i class="fa-solid fa-dice"></i> Generate</button>
       </div>
     </section>
     {{/unless}}
 
     {{#if hasResult}}
-      <section class="mcw-panel mcw-potion-preview">
+      <section class="ml-craftworks-panel ml-craftworks-potion-preview">
         <h3><i class="fa-solid fa-flask"></i> {{resultCount}} Generated Potions</h3>
-        <div class="mcw-potion-results-scroll">
+        <div class="ml-craftworks-potion-results-scroll">
           {{#each resultGroups}}
-            <div class="mcw-potion-result-group">
+            <div class="ml-craftworks-potion-result-group">
               <strong>{{label}}</strong>
-              <div class="mcw-potion-result-list">
+              <div class="ml-craftworks-potion-result-list">
                 {{#each potions}}
-                  <div class="mcw-potion-result" data-document-uuid="{{uuid}}">
+                  <div class="ml-craftworks-potion-result" data-document-uuid="{{uuid}}">
                     <img src="{{img}}" alt="{{name}}">
                     <span><strong>{{name}}</strong><small>{{sourceLabel}}</small></span>
                     <button type="button" data-potion-uuid="{{uuid}}" title="Open {{name}}"><i class="fa-solid fa-up-right-from-square"></i></button>
@@ -56,7 +56,7 @@
         </div>
       </section>
 
-      <section class="mcw-panel">
+      <section class="ml-craftworks-panel">
         <h3>Recipient</h3>
         <label>Recipient
           <select name="recipient">
@@ -64,14 +64,14 @@
             {{#each actors}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
           </select>
         </label>
-        {{#if partyInfo.valid}}<p class="mcw-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
-        <div class="mcw-actions">
+        {{#if partyInfo.valid}}<p class="ml-craftworks-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
+        <div class="ml-actions ml-craftworks-actions">
           <button type="button" data-action="reroll-potions"><i class="fa-solid fa-arrows-rotate"></i> Reroll</button>
           <button type="button" data-action="award-potions"><i class="fa-solid fa-flask"></i> Award Generated Potions</button>
         </div>
       </section>
     {{/if}}
   {{else}}
-    <div class="mcw-panel"><p class="mcw-warning">Potion Generator requires premium Craftworks access.</p></div>
+    <div class="ml-craftworks-panel"><p class="ml-text ml-craftworks-warning" data-tone="premium">Potion Generator requires premium Craftworks access.</p></div>
   {{/if}}
 </section>

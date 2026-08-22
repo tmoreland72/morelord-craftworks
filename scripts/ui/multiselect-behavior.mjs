@@ -7,7 +7,7 @@ export function bindMultiselectBehavior(
   if (!app?.element) return;
 
   const details = Array.from(
-    app.element.querySelectorAll(".mcw-multiselect")
+    app.element.querySelectorAll(".ml-craftworks-multiselect")
   );
 
   for (const detail of details) {
@@ -36,7 +36,7 @@ export function bindMultiselectBehavior(
     "pointerdown",
     event => {
       const inside = event.target.closest(
-        ".mcw-multiselect"
+        ".ml-craftworks-multiselect"
       );
 
       if (inside) return;

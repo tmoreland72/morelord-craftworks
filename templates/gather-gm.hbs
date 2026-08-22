@@ -1,34 +1,34 @@
-<section class="mcw app-shell">
-  <header class="mcw-header">
+<section class="ml-app ml-app-shell ml-craftworks app-shell">
+  <header class="ml-craftworks-header">
     <h2>Gathering</h2>
     <p>Start an optional gathering opportunity for every connected player.</p>
   </header>
 
   {{#if session}}
-    <div class="mcw-panel">
+    <div class="ml-craftworks-panel">
       <h3>{{session.terrain.name}}</h3>
       <p>{{session.sceneName}} • Gathering DC {{session.terrain.dc}}</p>
     </div>
 
-    <div class="mcw-panel">
+    <div class="ml-craftworks-panel">
       <h3>Player Progress</h3>
       {{#each progress}}
-        <div class="mcw-progress-user">
+        <div class="ml-craftworks-progress-user">
           <strong>{{user}}</strong>
           <span>{{status}}{{#if total}} [{{total}}]{{/if}}</span>
           {{#if result}}
-            <span class="mcw-result" data-document-uuid="{{result.itemUuid}}"><img src="{{result.img}}" alt="{{result.name}}"> {{result.name}} ×{{result.quantity}}</span>
+            <span class="ml-craftworks-result" data-document-uuid="{{result.itemUuid}}"><img src="{{result.img}}" alt="{{result.name}}"> {{result.name}} ×{{result.quantity}}</span>
             {{#if result.recipientName}}<span>Recipient: {{result.recipientName}}</span>{{/if}}
           {{/if}}
         </div>
       {{/each}}
     </div>
 
-    <footer class="mcw-actions">
+    <footer class="ml-actions ml-craftworks-actions">
       <button type="button" data-action="finalize"><i class="fa-solid fa-flag-checkered"></i> Finalize Gathering</button>
     </footer>
   {{else}}
-    <div class="mcw-panel">
+    <div class="ml-craftworks-panel">
       <h3>{{sceneName}}</h3>
       {{#if gatherRecordCount}}
         <p>{{gatherRecordCount}} character(s) have already used their gathering opportunity on this scene.</p>
@@ -45,10 +45,10 @@
         </select>
       </label>
 
-      <fieldset class="mcw-character-picker">
+      <fieldset class="ml-craftworks-character-picker">
         <legend>Player Characters</legend>
         <p>Choose which connected player characters receive the gathering roll window.</p>
-        <div class="mcw-character-picker-list">
+        <div class="ml-craftworks-character-picker-list">
           {{#each characters}}
             <label>
               <input type="checkbox" name="characterUuid" value="{{uuid}}" {{#if checked}}checked{{/if}}>
@@ -56,12 +56,12 @@
               <span><strong>{{name}}</strong><small>{{#if connected}}Connected: {{userName}}{{else}}Offline — no window can be sent{{/if}}</small></span>
             </label>
           {{else}}
-            <p class="mcw-warning">No player character Actors are defined.</p>
+      <p class="ml-text ml-craftworks-warning" data-tone="warning">No player character Actors are defined.</p>
           {{/each}}
         </div>
       </fieldset>
 
-      <div class="mcw-actions">
+      <div class="ml-actions ml-craftworks-actions">
         <button type="button" data-action="start"><i class="fa-solid fa-seedling"></i> Start Gathering</button>
         {{#if gatherRecordCount}}
           <button type="button" data-action="reset"><i class="fa-solid fa-rotate-left"></i> Reset Gathering for Scene</button>

@@ -1,24 +1,25 @@
-<section class="mcw app-shell mcw-browser-shell mcw-marketplace-browser">
-  <header class="mcw-header">
+<section class="ml-app ml-app-shell ml-craftworks app-shell ml-craftworks-browser-shell ml-craftworks-marketplace-browser">
+  <header class="ml-craftworks-header">
     <div>
       <h2>Recipes</h2>
       <p>Browse recipes, discover requirements, and mark recipes for Craft.</p>
     </div>
   </header>
 
-  <div class="mcw-marketplace-browser-body">
-    <aside class="mcw-filter-rail">
-      <div class="mcw-market-filter-title">
+  <div class="ml-craftworks-marketplace-browser-body">
+    <aside class="ml-craftworks-filter-rail">
+      <div class="ml-craftworks-market-filter-title">
         <strong>Filters</strong>
         <button type="button"
-                class="mcw-icon-button"
+                class="ml-icon-button ml-craftworks-icon-button"
                 data-action="clear-recipe-filters"
+                aria-label="Clear all filters"
                 title="Clear all filters">
           <i class="fa-solid fa-filter-circle-xmark"></i>
         </button>
       </div>
 
-      <label class="mcw-filter-search">
+      <label class="ml-craftworks-filter-search">
         <span>Search</span>
         <input type="search"
                name="search"
@@ -26,18 +27,18 @@
                placeholder="Recipe, source, category…">
       </label>
 
-      <div class="mcw-market-filter-mode-legend">
+      <div class="ml-craftworks-market-filter-mode-legend">
         <span><i class="fa-regular fa-square"></i> Any</span>
         <span><i class="fa-solid fa-square-check"></i> Include</span>
         <span><i class="fa-solid fa-square-minus"></i> Exclude</span>
       </div>
 
-      <section class="mcw-filter-group">
+      <section class="ml-craftworks-filter-group">
         <h3>Knowledge</h3>
-        <div class="mcw-tristate-list">
+        <div class="ml-craftworks-tristate-list">
           {{#each knowledgeFilters}}
             <button type="button"
-                    class="mcw-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
+                    class="ml-craftworks-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
                     data-tristate-filter
                     data-filter-group="knowledge"
                     data-filter-value="{{id}}">
@@ -48,12 +49,12 @@
         </div>
       </section>
 
-      <section class="mcw-filter-group">
+      <section class="ml-craftworks-filter-group">
         <h3>Content Pack</h3>
-        <div class="mcw-tristate-list">
+        <div class="ml-craftworks-tristate-list">
           {{#each packs}}
             <button type="button"
-                    class="mcw-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
+                    class="ml-craftworks-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
                     data-tristate-filter
                     data-filter-group="pack"
                     data-filter-value="{{id}}">
@@ -65,12 +66,12 @@
         </div>
       </section>
 
-      <section class="mcw-filter-group">
+      <section class="ml-craftworks-filter-group">
         <h3>Category</h3>
-        <div class="mcw-tristate-list">
+        <div class="ml-craftworks-tristate-list">
           {{#each categories}}
             <button type="button"
-                    class="mcw-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
+                    class="ml-craftworks-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
                     data-tristate-filter
                     data-filter-group="category"
                     data-filter-value="{{id}}">
@@ -81,12 +82,12 @@
         </div>
       </section>
 
-      <section class="mcw-filter-group">
+      <section class="ml-craftworks-filter-group">
         <h3>Preferred Artisan Tool</h3>
-        <div class="mcw-tristate-list">
+        <div class="ml-craftworks-tristate-list">
           {{#each toolFilters}}
             <button type="button"
-                    class="mcw-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
+                    class="ml-craftworks-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
                     data-tristate-filter
                     data-filter-group="tool"
                     data-filter-value="{{id}}">
@@ -98,12 +99,12 @@
         </div>
       </section>
 
-      <section class="mcw-filter-group">
+      <section class="ml-craftworks-filter-group">
         <h3>Rarity</h3>
-        <div class="mcw-tristate-list">
+        <div class="ml-craftworks-tristate-list">
           {{#each ingredientRarities}}
             <button type="button"
-                    class="mcw-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
+                    class="ml-craftworks-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
                     data-tristate-filter
                     data-filter-group="rarity"
                     data-filter-value="{{id}}">
@@ -116,12 +117,12 @@
       </section>
 
       {{#each ingredientTagGroups}}
-      <section class="mcw-filter-group mcw-filter-subsection">
+      <section class="ml-craftworks-filter-group ml-craftworks-filter-subsection">
         <h3>{{label}}</h3>
-        <div class="mcw-tristate-list">
+        <div class="ml-craftworks-tristate-list">
           {{#each options}}
             <button type="button"
-                    class="mcw-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
+                    class="ml-craftworks-tristate-filter {{#if included}}is-include{{else if excluded}}is-exclude{{/if}}"
                     data-tristate-filter
                     data-filter-group="tag"
                     data-filter-value="{{id}}">
@@ -134,14 +135,14 @@
       {{/each}}
 </aside>
 
-    <main class="mcw-marketplace-results">
+    <main class="ml-craftworks-marketplace-results">
       {{#if canManageRecipeVisibility}}
-        <div class="mcw-recipe-visibility-toolbar">
+        <div class="ml-craftworks-recipe-visibility-toolbar">
           <span>
             <i class="fa-solid fa-circle-question"></i>
             {{unknownRecipeCount}} recipe(s) with unknown ingredients
           </span>
-          <div class="mcw-actions">
+          <div class="ml-actions ml-craftworks-actions">
             <button type="button" data-action="mark-all-recipes-unknown">
               <i class="fa-solid fa-circle-question"></i> Mark Context Unknown
             </button>
@@ -152,13 +153,13 @@
         </div>
       {{/if}}
 
-      <div class="mcw-market-results-heading">
+      <div class="ml-craftworks-market-results-heading">
         <h2>Recipes</h2>
         <span>{{prospectiveCount}} matches</span>
       </div>
 
       {{#if overDisplayLimit}}
-        <div class="mcw-market-limit-message">
+        <div class="ml-craftworks-market-limit-message">
           <i class="fa-solid fa-filter"></i>
           <div>
             <strong>{{prospectiveCount}} recipes match the current filters.</strong>
@@ -169,9 +170,9 @@
           </div>
         </div>
       {{/if}}
-  <div class="mcw-panel mcw-recipe-mark-context">
+  <div class="ml-craftworks-panel ml-craftworks-recipe-mark-context">
     <i class="fa-solid fa-bookmark"></i>
-    <label class="mcw-recipe-crafter-selector">
+    <label class="ml-craftworks-recipe-crafter-selector">
       <span>Mark recipes for</span>
       <select name="crafter">
         <option value="">Choose character…</option>
@@ -185,23 +186,23 @@
     {{/if}}
   </div>
 
-  <div class="mcw-reference-list mcw-browser-results">
+  <div class="ml-craftworks-reference-list ml-craftworks-browser-results">
       {{#if hasRecipes}}
         {{#each recipeGroups}}
-          <section class="mcw-recipe-category-group">
-            <h3 class="mcw-recipe-category-heading">{{label}}</h3>
-            <div class="mcw-recipe-category-list">
+          <section class="ml-craftworks-recipe-category-group">
+            <h3 class="ml-craftworks-recipe-category-heading">{{label}}</h3>
+            <div class="ml-craftworks-recipe-category-list">
               {{#each recipes}}
-                <article class="mcw-recipe-card">
-                  <header class="mcw-recipe-header">
-                    <div class="mcw-recipe-heading">
-                      <div class="mcw-recipe-title-line">
+                <article class="ml-craftworks-recipe-card">
+                  <header class="ml-craftworks-recipe-header">
+                    <div class="ml-craftworks-recipe-heading">
+                      <div class="ml-craftworks-recipe-title-line">
                         <h3>{{name}}</h3>
 
-                        <div class="mcw-recipe-title-actions">
+                        <div class="ml-craftworks-recipe-title-actions">
                           {{#if ../../canManageRecipeVisibility}}
                             <button type="button"
-                                    class="mcw-recipe-title-button {{#if isUnknown}}mcw-recipe-hidden{{/if}}"
+                                    class="ml-craftworks-recipe-title-button {{#if isUnknown}}ml-craftworks-recipe-hidden{{/if}}"
                                     data-action="toggle-recipe-knowledge"
                                     data-recipe-id="{{id}}"
                                     title="{{#if isUnknown}}Ingredients are unknown to players{{else}}Ingredients are known to players{{/if}}">
@@ -214,7 +215,7 @@
                           {{/if}}
 
                           <button type="button"
-                                  class="mcw-recipe-title-button {{#if isMarked}}mcw-recipe-marked{{/if}}"
+                                  class="ml-craftworks-recipe-title-button {{#if isMarked}}ml-craftworks-recipe-marked{{/if}}"
                                   data-action="toggle-mark-recipe"
                                   data-recipe-id="{{id}}"
                                   {{#unless canMark}}disabled{{/unless}}>
@@ -224,24 +225,24 @@
                         </div>
                       </div>
 
-                      <div class="mcw-recipe-meta">
+                      <div class="ml-craftworks-recipe-meta">
                         <span>{{sourceLabel}}</span>
                       </div>
                     </div>
 
-                    <div class="mcw-pills mcw-recipe-tags">
+                    <div class="ml-craftworks-pills ml-craftworks-recipe-tags">
                       {{#if showPremiumBadge}}
-                        <span class="mcw-source-badge">{{sourceBadgeLabel}}</span>
+                        <span class="ml-craftworks-source-badge">{{sourceBadgeLabel}}</span>
                       {{/if}}
                       {{#each tags}}<span>{{this}}</span>{{/each}}
                     </div>
                   </header>
 
                   {{#if description}}
-                    <p class="mcw-recipe-description">{{description}}</p>
+                    <p class="ml-craftworks-recipe-description">{{description}}</p>
                   {{/if}}
 
-                  <div class="mcw-recipe-craft-meta">
+                  <div class="ml-craftworks-recipe-craft-meta">
                     {{#if craftMeta.tool}}
                       <span>
                         <i class="fa-solid fa-screwdriver-wrench"></i>
@@ -263,73 +264,73 @@
                     {{/if}}
                   </div>
 
-                  <div class="mcw-recipe-grid">
-                    <section class="mcw-recipe-block">
+                  <div class="ml-craftworks-recipe-grid">
+                    <section class="ml-craftworks-recipe-block">
                       <h4>Requires</h4>
                       {{#if requirementsKnown}}
-                        <div class="mcw-requirement-list mcw-requirement-groups">
+                        <div class="ml-craftworks-requirement-list ml-craftworks-requirement-groups">
                           {{#each requirementGroupRows}}
-                          <div class="mcw-requirement-group">
-                            <div class="mcw-requirement-group-items">
+                          <div class="ml-craftworks-requirement-group">
+                            <div class="ml-craftworks-requirement-group-items">
                               {{#each requirementRows}}
                                 {{#if alternativeRows.length}}
-                                  <div class="mcw-requirement-alternatives">
+                                  <div class="ml-craftworks-requirement-alternatives">
                                     {{#each alternativeRows}}
-                                      <div class="mcw-requirement-row" data-document-uuid="{{materialUuid}}">
+                                      <div class="ml-craftworks-requirement-row" data-document-uuid="{{materialUuid}}">
                                         {{#if materialImg}}
                                           {{#if materialId}}
                                             <button type="button"
-                                                    class="mcw-material-icon-link"
+                                                    class="ml-craftworks-material-icon-link"
                                                     data-material-id="{{materialId}}">
                                               <img src="{{materialImg}}" alt="">
                                             </button>
                                           {{else if materialUuid}}
                                             <button type="button"
-                                                    class="mcw-material-icon-link"
+                                                    class="ml-craftworks-material-icon-link"
                                                     data-document-uuid="{{materialUuid}}">
                                               <img src="{{materialImg}}" alt="">
                                             </button>
                                           {{else}}
-                                            <span class="mcw-material-icon-link mcw-material-icon-display">
+                                            <span class="ml-craftworks-material-icon-link ml-craftworks-material-icon-display">
                                               <img src="{{materialImg}}" alt="">
                                             </span>
                                           {{/if}}
                                         {{/if}}
-                                        <span class="mcw-requirement-copy">
+                                        <span class="ml-craftworks-requirement-copy">
           <strong>{{displayLabel}}</strong>
           {{#if displayRarity}}
-            <small class="mcw-requirement-rarity">{{displayRarity}}</small>
+            <small class="ml-craftworks-requirement-rarity">{{displayRarity}}</small>
           {{/if}}
         </span>
-                                        {{#unless @last}}<span class="mcw-requirement-or">OR</span>{{/unless}}
+                                        {{#unless @last}}<span class="ml-craftworks-requirement-or">OR</span>{{/unless}}
                                       </div>
                                     {{/each}}
                                   </div>
                                 {{else}}
-                                  <div class="mcw-requirement-row" data-document-uuid="{{materialUuid}}">
+                                  <div class="ml-craftworks-requirement-row" data-document-uuid="{{materialUuid}}">
                                     {{#if materialImg}}
                                       {{#if materialId}}
                                         <button type="button"
-                                                class="mcw-material-icon-link"
+                                                class="ml-craftworks-material-icon-link"
                                                 data-material-id="{{materialId}}">
                                           <img src="{{materialImg}}" alt="">
                                         </button>
                                       {{else if materialUuid}}
                                         <button type="button"
-                                                class="mcw-material-icon-link"
+                                                class="ml-craftworks-material-icon-link"
                                                 data-document-uuid="{{materialUuid}}">
                                           <img src="{{materialImg}}" alt="">
                                         </button>
                                       {{else}}
-                                        <span class="mcw-material-icon-link mcw-material-icon-display">
+                                        <span class="ml-craftworks-material-icon-link ml-craftworks-material-icon-display">
                                           <img src="{{materialImg}}" alt="">
                                         </span>
                                       {{/if}}
                                     {{/if}}
-                                    <span class="mcw-requirement-copy">
+                                    <span class="ml-craftworks-requirement-copy">
           <strong>{{displayLabel}}</strong>
           {{#if displayRarity}}
-            <small class="mcw-requirement-rarity">{{displayRarity}}</small>
+            <small class="ml-craftworks-requirement-rarity">{{displayRarity}}</small>
           {{/if}}
         </span>
                                   </div>
@@ -338,12 +339,12 @@
                             </div>
                           </div>
                           {{#unless @last}}
-                            <div class="mcw-requirement-group-or">OR</div>
+                            <div class="ml-craftworks-requirement-group-or">OR</div>
                           {{/unless}}
                           {{/each}}
                         </div>
                       {{else}}
-                        <div class="mcw-recipe-unknown-requirements">
+                        <div class="ml-craftworks-recipe-unknown-requirements">
                           <i class="fa-solid fa-circle-question"></i>
                           <div>
                             <strong>Ingredients Unknown</strong>
@@ -353,27 +354,27 @@
                       {{/if}}
                     </section>
 
-                    <section class="mcw-recipe-block">
+                    <section class="ml-craftworks-recipe-block">
                       <h4>Produces</h4>
-                      <div class="mcw-recipe-output-card mcw-recipe-output-compact" data-document-uuid="{{outputDocumentUuid}}">
+                      <div class="ml-craftworks-recipe-output-card ml-craftworks-recipe-output-compact" data-document-uuid="{{outputDocumentUuid}}">
                         {{#if output.img}}
                           {{#if outputMaterialId}}
                             <button type="button"
-                                    class="mcw-material-icon-link mcw-output-icon-link"
+                                    class="ml-craftworks-material-icon-link ml-craftworks-output-icon-link"
                                     data-material-id="{{outputMaterialId}}">
                               <img src="{{output.img}}" alt="">
                             </button>
                           {{else}}
                             {{#if outputDocumentUuid}}
                               <button type="button"
-                                      class="mcw-foundry-output-link"
+                                      class="ml-craftworks-foundry-output-link"
                                       data-output-document-uuid="{{outputDocumentUuid}}">
-                                <img class="mcw-recipe-output-icon"
+                                <img class="ml-craftworks-recipe-output-icon"
                                      src="{{output.img}}"
                                      alt="">
                               </button>
                             {{else}}
-                              <img class="mcw-recipe-output-icon"
+                              <img class="ml-craftworks-recipe-output-icon"
                                    src="{{output.img}}"
                                    alt="">
                             {{/if}}
@@ -392,7 +393,7 @@
           </section>
         {{/each}}
       {{else}}
-        <div class="mcw-panel">
+        <div class="ml-craftworks-panel">
           <p>No recipes match the current filters.</p>
         </div>
       {{/if}}
