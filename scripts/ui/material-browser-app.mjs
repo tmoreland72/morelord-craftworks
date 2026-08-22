@@ -28,6 +28,7 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
     this.searchSelectionStart = null;
     this.searchSelectionEnd = null;
     this.openFilterKey = null;
+    this.ownedOnly = false;
   }
 
   static DEFAULT_OPTIONS = {
@@ -215,6 +216,7 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
       selectedPackIds: this.selectedPackIds,
       actorUuid: this.actorUuid,
       actorName: actor?.name ?? null,
+      ownedOnly: this.ownedOnly,
       actors: actors.map(entry => ({
         ...entry,
         selected: entry.uuid === this.actorUuid
@@ -327,6 +329,7 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
         this.openFilterKey = null;
         this.render();
       });
+    this.element.querySelector("[name='ownedOnly']")?.addEventListener("change", event => { this.ownedOnly = event.currentTarget.checked; this.render(); });
 
     this.element
       .querySelectorAll("[data-tristate-filter]")
@@ -435,6 +438,12 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
     const term = this.search.trim().toLowerCase();
 
     let materials = this.craftworks.materials.all();
+
+    if (this.ownedOnly) {
+      const actor = this.actorUuid ? globalThis.fromUuidSync?.(this.actorUuid) : null;
+      const inventory = this.#materialInventory(actor);
+      materials = materials.filter(material => (inventory.get(material.materialId) ?? 0) > 0);
+    }
 
     if (this.selectedPackIds.length) {
       const selected = new Set(this.selectedPackIds);

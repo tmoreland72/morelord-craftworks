@@ -1,8 +1,12 @@
 import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
 import { MODULE_ID } from "../constants.mjs";
 import {
+  equipmentTypeMatches,
   recipeItemMatches,
-  spellScrollMatches
+  spellScrollLevelMatches,
+  spellScrollMatches,
+  valuedLootMatches,
+  weaponTypeMatches
 } from "../recipes/recipe-item-match-utils.mjs";
 
 export class CraftingMaterialService {
@@ -386,8 +390,33 @@ export class CraftingMaterialService {
     }
 
     if (
+      match.equipmentType
+      && !equipmentTypeMatches(entry.item, match.equipmentType)
+    ) {
+      return false;
+    }
+
+
+    if (
+      match.weaponType
+      && !weaponTypeMatches(entry.item, match.weaponType)
+    ) {
+      return false;
+    }
+
+
+    if (
+      match.lootTypes?.length
+      && !valuedLootMatches(entry.item, match.lootTypes, match.minValueGp)
+    ) {
+      return false;
+    }
+
+    if (
       match.itemType === "spellScroll"
-      && !spellScrollMatches(entry.item, match.spellName)
+      && !(match.spellName
+        ? spellScrollMatches(entry.item, match.spellName)
+        : spellScrollLevelMatches(entry.item, match.spellLevel))
     ) {
       return false;
     }
@@ -428,7 +457,15 @@ export class CraftingMaterialService {
       : null;
 
     const label = choice.match?.itemType === "spellScroll"
-      ? `Spell Scroll: ${choice.match.spellName}`
+      ? choice.match.spellName
+        ? `Spell Scroll: ${choice.match.spellName}`
+        : `Level ${choice.match.spellLevel} Spell Scroll`
+      : choice.match?.equipmentType
+        ? `${choice.match.equipmentType} equipment`
+      : choice.match?.weaponType
+        ? `${choice.match.weaponType} Weapons`
+      : choice.match?.lootTypes?.length
+        ? `${choice.match.lootTypes.join(" or ")} worth at least ${choice.match.minValueGp ?? 0} gp`
       : material?.name
       ?? choice.match?.materialId
       ?? choice.match?.itemName

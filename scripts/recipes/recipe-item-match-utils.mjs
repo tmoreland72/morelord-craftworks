@@ -53,6 +53,92 @@ export function spellScrollMatches(item, requiredSpellName) {
   return normalizeSpellName(nativeSpell) === requiredSpell;
 }
 
+export function spellScrollLevelMatches(item, requiredLevel) {
+  if (!isNativeSpellScroll(item)) return false;
+  const level = Number(
+    item?.flags?.[MODULE_ID]?.spellScrollGenerator?.spellLevel
+    ?? item?.system?.spell?.level
+    ?? item?.system?.level
+  );
+  return Number.isFinite(level) && level === Number(requiredLevel);
+}
+
+export function equipmentTypeMatches(item, requiredEquipmentType) {
+  if (normalizeRecipeItemName(item?.type) !== "equipment") return false;
+  const required = normalizeRecipeItemName(requiredEquipmentType);
+  if (!required) return false;
+
+  return [
+    item?.system?.type?.value,
+    item?.system?.type?.subtype,
+    item?.system?.type,
+    item?.system?.equipmentType,
+    item?.system?.armor?.type
+  ]
+    .filter(value => typeof value === "string")
+    .map(normalizeRecipeItemName)
+    .includes(required);
+}
+
+export function weaponTypeMatches(item, requiredWeaponType) {
+  if (normalizeRecipeItemName(item?.type) !== "weapon") return false;
+  const required = normalizeRecipeItemName(requiredWeaponType);
+  if (!required) return false;
+
+  const candidates = [
+    item?.system?.type?.value,
+    item?.system?.type?.subtype,
+    item?.system?.type,
+    item?.system?.weaponType
+  ]
+    .filter(value => typeof value === "string")
+    .map(normalizeRecipeItemName);
+
+  if (required === "simple") {
+    return candidates.some(value =>
+      value === "simple"
+      || value === "simplem"
+      || value === "simpler"
+      || value.startsWith("simple ")
+    );
+  }
+
+  return candidates.includes(required);
+}
+
+export function valuedLootMatches(item, requiredLootTypes, minimumValueGp = 0) {
+  if (normalizeRecipeItemName(item?.type) !== "loot") return false;
+
+  const aliases = {
+    gem: "gemstone",
+    gems: "gemstone",
+    gemstone: "gemstone",
+    art: "art object",
+    artobject: "art object",
+    "art object": "art object"
+  };
+  const normalizeLootType = value => {
+    const normalized = normalizeRecipeItemName(value);
+    return aliases[normalized.replace(/\s+/g, "")] ?? aliases[normalized] ?? normalized;
+  };
+  const allowed = new Set((requiredLootTypes ?? []).map(normalizeLootType));
+  const actual = normalizeLootType(
+    item?.system?.type?.value
+    ?? item?.system?.type
+    ?? item?.system?.lootType
+  );
+  if (!allowed.size || !allowed.has(actual)) return false;
+
+  const price = item?.system?.price ?? item?.system?.value ?? {};
+  const amount = Number(typeof price === "object" ? price.value : price);
+  const denomination = normalizeRecipeItemName(
+    typeof price === "object" ? price.denomination ?? "gp" : "gp"
+  );
+  const gpMultiplier = { cp: 0.01, sp: 0.1, ep: 0.5, gp: 1, pp: 10 }[denomination] ?? 1;
+  const valueGp = Number.isFinite(amount) ? amount * gpMultiplier : 0;
+  return valueGp >= Math.max(0, Number(minimumValueGp ?? 0));
+}
+
 function normalizeSpellName(value) {
   return normalizeRecipeItemName(value)
     .split(" ")

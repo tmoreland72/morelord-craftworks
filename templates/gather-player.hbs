@@ -13,26 +13,18 @@
   {{#if state}}
     <div class="ml-craftworks-panel">
       {{#if (eq state.status "declined")}}
-        <p>You declined this gathering opportunity. Declining does not consume this character's gathering opportunity for the scene.</p>
+        <p>You declined this gathering opportunity.</p>
       {{/if}}
       {{#if (eq state.status "failed")}}
         <p><strong>Nothing found.</strong> Your check total was {{state.total}}.</p>
-        <p>This character has now used their gathering opportunity for this scene.</p>
       {{/if}}
       {{#if (eq state.status "succeeded")}}
         <p><strong>Gathering succeeded.</strong> Your check total was {{state.total}}.</p>
         <div class="ml-craftworks-result" data-document-uuid="{{state.result.itemUuid}}"><img src="{{state.result.img}}" alt="{{state.result.name}}"> {{state.result.name}} ×{{state.result.quantity}}</div>
         {{#if state.result.recipientName}}<p>Sent to <strong>{{state.result.recipientName}}</strong>.</p>{{/if}}
-        <p>This character has now used their gathering opportunity for this scene.</p>
       {{/if}}
     </div>
   {{else}}
-    {{#if alreadyGathered}}
-      <div class="ml-craftworks-panel ml-craftworks-player-roll-panel">
-    <p class="ml-text ml-craftworks-warning" data-tone="warning"><strong>{{actor.name}} has already gathered on this scene.</strong></p>
-        <p>The GM must reset gathering for this scene before this character can gather here again.</p>
-      </div>
-    {{else}}
       <div class="ml-craftworks-panel">
         <p>Gathering is optional. Choose a skill or decline.</p>
         <div class="ml-craftworks-player-skill-grid">
@@ -42,7 +34,6 @@
         </div>
         <button class="ml-craftworks-player-decline" type="button" data-action="decline"><i class="fa-solid fa-ban"></i> Decline</button>
       </div>
-    {{/if}}
   {{/if}}
 
   <footer class="ml-actions ml-craftworks-actions">

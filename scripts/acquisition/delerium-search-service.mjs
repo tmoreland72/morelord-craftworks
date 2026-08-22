@@ -22,7 +22,11 @@ export class DeleriumSearchService {
   }
 
   get hasAccess() {
-    return Boolean(this.contentPacks?.isEnabled("monsters-of-drakkenheim"));
+    return Boolean(
+      this.contentPacks
+        ?.enabled({ capability: "delerium-search" })
+        .some(pack => pack.id === "monsters-of-drakkenheim")
+    );
   }
 
   getZones() { return Object.values(ZONES).map(zone => ({ ...zone })); }

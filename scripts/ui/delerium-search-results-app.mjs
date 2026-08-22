@@ -1,6 +1,7 @@
 import { MODULE_TITLE } from "../constants.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 const ENCOUNTERS_MODULE_ID = "morelord-encounters";
+const ENCOUNTERS_PRODUCT_URL = "https://morelord.com/products/morelord-encounters";
 
 export class DeleriumSearchResultsApp extends HandlebarsApplicationMixin(ApplicationV2) {
   constructor(craftworks, session, options = {}) {
@@ -74,6 +75,7 @@ export class DeleriumSearchResultsApp extends HandlebarsApplicationMixin(Applica
     });
     this.element.querySelector("[data-action='roll-award']")?.addEventListener("click", event => this.#rollAndAward(event));
     this.element.querySelector("[data-action='open-encounters']")?.addEventListener("click", event => this.#openEncounters(event));
+    this.element.querySelector("[data-action='get-encounters']")?.addEventListener("click", () => window.open(ENCOUNTERS_PRODUCT_URL, "_blank", "noopener"));
   }
 
   async #rollAndAward(event) {

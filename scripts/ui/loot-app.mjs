@@ -75,11 +75,7 @@ export class LootApp extends ScrollPreservingApplicationMixin(
     let resolvedCount = 0;
 
     for (const creature of allCreatures) {
-      const resolved = await this.craftworks.loot.isLootResolved(creature.tokenUuid);
-      if (resolved) {
-        resolvedCount += 1;
-        this.selectedPreflightCreatureUuids.delete(creature.tokenUuid);
-      }
+      const resolved = false;
       creatures.push({
         ...creature,
         resolved,
@@ -118,8 +114,6 @@ export class LootApp extends ScrollPreservingApplicationMixin(
     this.element.querySelector("[data-action='finish']")
       ?.addEventListener("click", () => this.#finish());
 
-    this.element.querySelector("[data-action='reset-loot']")
-      ?.addEventListener("click", () => this.#resetLoot());
 
     this.element.querySelector("[data-action='reroll-loot']")
       ?.addEventListener("click", () => this.#rerollLoot());
@@ -207,17 +201,6 @@ export class LootApp extends ScrollPreservingApplicationMixin(
       });
 
       await this.#finish();
-    } catch (err) {
-      ui.notifications.error(err.message);
-    }
-  }
-
-  async #resetLoot() {
-    try {
-      const count = await this.craftworks.loot.resetSceneLooting();
-      ui.notifications.info(`Reset encounter-loot records for ${count} dead creature token${count === 1 ? "" : "s"} on this scene.`);
-      this.session = null;
-      await this.render();
     } catch (err) {
       ui.notifications.error(err.message);
     }

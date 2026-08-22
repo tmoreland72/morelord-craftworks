@@ -1114,7 +1114,8 @@ export const SRD_52_RECIPES = [
               {
                 "quantity": 1,
                 "match": {
-                  "itemName": "finely shredded scroll of web"
+                  "itemType": "spellScroll",
+                  "spellName": "web"
                 }
               },
               {
@@ -2889,7 +2890,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "0.5 ingot"
+              "materialId": "iron-ingot"
             }
           }
         ]
@@ -2942,7 +2943,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "ingot"
+              "materialId": "iron-ingot"
             }
           },
           {
@@ -3002,7 +3003,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
             }
           },
           {
@@ -3062,7 +3063,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "ingot"
+              "materialId": "iron-ingot"
             }
           },
           {
@@ -3122,7 +3123,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 3,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
             }
           },
           {
@@ -3182,7 +3183,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 4,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
             }
           },
           {
@@ -3242,7 +3243,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 10,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
             }
           }
         ]
@@ -3295,7 +3296,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 4,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
             }
           }
         ]
@@ -3348,7 +3349,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 4,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
             }
           },
           {
@@ -3408,7 +3409,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "ingot"
+              "materialId": "iron-ingot"
             }
           }
         ]
@@ -3461,7 +3462,13 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
+            }
+          },
+          {
+            "quantity": 1,
+            "match": {
+              "itemName": "Rope"
             }
           }
         ]
@@ -3514,7 +3521,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 4,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
             }
           },
           {
@@ -3574,7 +3581,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 5,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
             }
           }
         ]
@@ -3627,7 +3634,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 10,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
             }
           }
         ]
@@ -3680,7 +3687,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 4,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
             }
           },
           {
@@ -3740,7 +3747,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 12,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
             }
           },
           {
@@ -3800,7 +3807,13 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
+            }
+          },
+          {
+            "quantity": 1,
+            "match": {
+              "itemName": "Rope"
             }
           }
         ]
@@ -3853,7 +3866,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 3,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
             }
           }
         ]
@@ -3960,7 +3973,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "ingot"
+              "materialId": "iron-ingot"
             }
           }
         ]
@@ -4013,7 +4026,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "ingot"
+              "materialId": "iron-ingot"
             }
           }
         ]
@@ -4174,7 +4187,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
             }
           },
           {
@@ -4186,7 +4199,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "chain (5 feet)"
+              "itemName": "Chain"
             }
           }
         ]
@@ -4239,7 +4252,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 4,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
             }
           },
           {
@@ -4308,12 +4321,6 @@ export const SRD_52_RECIPES = [
             "sameMaterial": false,
             "match": {
               "materialId": "adamant-ingot"
-            }
-          },
-          {
-            "quantity": 1,
-            "match": {
-              "itemName": "requires magical forge"
             }
           }
         ]
@@ -4813,7 +4820,13 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
+            }
+          },
+          {
+            "quantity": 1,
+            "match": {
+              "itemName": "Rope"
             }
           }
         ]
@@ -4866,7 +4879,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 3,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
             }
           },
           {
@@ -4933,7 +4946,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 8,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
             }
           },
           {
@@ -5007,7 +5020,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "ingot"
+              "materialId": "iron-ingot"
             }
           },
           {
@@ -5067,7 +5080,13 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
+            }
+          },
+          {
+            "quantity": 1,
+            "match": {
+              "itemName": "Rope"
             }
           }
         ]
@@ -5120,7 +5139,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "ingot"
+              "materialId": "iron-ingot"
             }
           }
         ]
@@ -5173,7 +5192,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 4,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
             }
           },
           {
@@ -5233,7 +5252,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "ingot"
+              "materialId": "iron-ingot"
             }
           },
           {
@@ -5293,7 +5312,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 3,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
             }
           }
         ]
@@ -5346,7 +5365,13 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "ingots"
+              "materialId": "iron-ingot"
+            }
+          },
+          {
+            "quantity": 1,
+            "match": {
+              "itemName": "Rope"
             }
           }
         ]
@@ -5399,7 +5424,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "common fresh ingredient"
+              "materialId": "common-fresh-ingredient"
             }
           },
           {
@@ -5458,7 +5483,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "uncommon meat"
+              "materialId": "uncommon-meat"
             }
           },
           {
@@ -5596,7 +5621,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "rare meat"
+              "materialId": "rare-meat"
             }
           },
           {
@@ -5747,7 +5772,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "very rare meat"
+              "materialId": "very-rare-meat"
             }
           },
           {
@@ -6186,7 +6211,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "ring"
+              "equipmentType": "ring"
             }
           },
           {
@@ -6399,10 +6424,14 @@ export const SRD_52_RECIPES = [
         "id": "default",
         "requirements": [
           {
-            "quantity": 1,
-            "match": {
-              "itemName": "boots"
-            }
+            "type": "alternatives",
+            "alternatives": [
+            { "quantity": 1, "match": { "itemName": "Boots" } },
+            { "quantity": 1, "match": { "itemName": "Boots of Elvenkind" } },
+            { "quantity": 1, "match": { "itemName": "Boots of Striding and Springing" } },
+            { "quantity": 1, "match": { "itemName": "Boots of the Winterlands" } },
+            { "quantity": 1, "match": { "itemName": "Winged Boots" } }
+            ]
           },
           {
             "quantity": 1,
@@ -6415,7 +6444,7 @@ export const SRD_52_RECIPES = [
             "quantity": 1,
             "match": {
               "itemType": "spellScroll",
-              "spellName": "arctic breathK"
+              "spellName": "arctic breath"
             }
           },
           {
@@ -6496,7 +6525,7 @@ export const SRD_52_RECIPES = [
             "quantity": 1,
             "match": {
               "itemType": "spellScroll",
-              "spellName": "animate objectK"
+              "spellName": "animate object"
             }
           },
           {
@@ -6704,7 +6733,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "pearl worth at least 100 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 100
             }
           },
           {
@@ -6905,7 +6935,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "crystal lenses (glasses) worth 50 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 50
             }
           },
           {
@@ -6979,7 +7010,7 @@ export const SRD_52_RECIPES = [
             "quantity": 1,
             "match": {
               "itemType": "spellScroll",
-              "spellName": "far sightK"
+              "spellName": "far sight"
             }
           },
           {
@@ -7349,14 +7380,15 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "polished agate worth 50 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 50
             }
           },
           {
             "quantity": 1,
             "match": {
               "itemType": "spellScroll",
-              "spellName": "imbue luckK"
+              "spellName": "imbue luck"
             }
           },
           {
@@ -7430,7 +7462,7 @@ export const SRD_52_RECIPES = [
             "quantity": 1,
             "match": {
               "itemType": "spellScroll",
-              "spellName": "frightenK"
+              "spellName": "frighten"
             }
           },
           {
@@ -7506,16 +7538,12 @@ export const SRD_52_RECIPES = [
               "materialId": "valued-component-silver-coffer-500"
             }
           },
+          {"quantity": 1, "match": {"itemName": "Iron Door"}},
+          {"quantity": 10, "match": {"lootTypes": ["Gemstone", "Art Object"], "minValueGp": 100}},
           {
             "quantity": 1,
             "match": {
-              "itemName": "iron door 10 gems worth 100 gp each"
-            }
-          },
-          {
-            "quantity": 1,
-            "match": {
-              "itemName": "wooden ladder"
+              "itemName": "Ladder"
             }
           },
           {
@@ -7527,32 +7555,33 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "saddle bag"
+              "itemName": "Saddlebags"
             }
           },
           {
             "quantity": 1,
             "match": {
               "itemType": "spellScroll",
-              "spellName": "create holeK"
+              "spellName": "create hole"
             }
           },
           {
             "quantity": 4,
             "match": {
-              "itemName": "potions of healing"
+              "itemName": "Potion of Healing"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "rowboat"
+              "itemName": "Rowboat"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "1st level scroll"
+              "itemType": "spellScroll",
+              "spellLevel": 1
             }
           },
           {
@@ -7570,7 +7599,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "portable ram"
+              "itemName": "Portable Ram"
             }
           },
           {
@@ -8330,7 +8359,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "set of manacles"
+              "itemName": "Manacles"
             }
           },
           {
@@ -8425,7 +8454,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "scrolls of enlarge reduce"
+              "itemType": "spellScroll",
+              "spellName": "enlarge/reduce"
             }
           },
           {
@@ -8941,7 +8971,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "instant summons"
+              "itemType": "spellScroll",
+              "spellName": "instant summons"
             }
           },
           {
@@ -9015,14 +9046,14 @@ export const SRD_52_RECIPES = [
             "quantity": 1,
             "match": {
               "itemType": "spellScroll",
-              "spellName": "shockwaveK"
+              "spellName": "shockwave"
             }
           },
           {
             "quantity": 1,
             "match": {
               "itemType": "spellScroll",
-              "spellName": "sonic shriekK"
+              "spellName": "sonic shriek"
             }
           }
         ]
@@ -9345,7 +9376,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "uncommon psionic essence"
+              "materialId": "uncommon-psionic-essence"
             }
           }
         ]
@@ -10113,7 +10144,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "admantine cube 100 adamantine ingots"
+              "itemName": "Adamantine Cube"
             }
           },
           {
@@ -10767,13 +10798,14 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "crystal worth at least 10 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 10
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "common psion essence"
+              "materialId": "common-psionic-essence"
             }
           }
         ]
@@ -10826,19 +10858,20 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "crystal worth at least 20 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 20
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "uncommon psionic essence"
+              "materialId": "uncommon-psionic-essence"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "common psionic essence"
+              "materialId": "common-psionic-essence"
             }
           },
           {
@@ -10898,19 +10931,20 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "crystal worth at least 20 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 20
             }
           },
           {
             "quantity": 2,
             "match": {
-              "itemName": "uncommon psionic essence"
+              "materialId": "uncommon-psionic-essence"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "common psionic essence"
+              "materialId": "common-psionic-essence"
             }
           }
         ]
@@ -10960,22 +10994,17 @@ export const SRD_52_RECIPES = [
       {
         "id": "default",
         "requirements": [
+          { "quantity": 1, "match": { "weaponType": "Simple" } },
           {
             "quantity": 1,
             "match": {
-              "itemName": "weapon"
+              "materialId": "uncommon-psionic-essence"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "uncommon psionic essence"
-            }
-          },
-          {
-            "quantity": 1,
-            "match": {
-              "itemName": "common psionic essence"
+              "materialId": "common-psionic-essence"
             }
           }
         ]
@@ -11028,19 +11057,20 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "crystal worth at least 100 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 100
             }
           },
           {
             "quantity": 2,
             "match": {
-              "itemName": "rare psionic essence"
+              "materialId": "rare-psionic-essence"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "uncommon psionic essence"
+              "materialId": "uncommon-psionic-essence"
             }
           }
         ]
@@ -11093,19 +11123,20 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "crystal worth at least 100 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 100
             }
           },
           {
             "quantity": 2,
             "match": {
-              "itemName": "rare psionic essences"
+              "materialId": "rare-psionic-essence"
             }
           },
           {
             "quantity": 2,
             "match": {
-              "itemName": "uncommon psionic essences"
+              "materialId": "uncommon-psionic-essence"
             }
           }
         ]
@@ -11158,19 +11189,20 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "crystal worth at least 200 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 200
             }
           },
           {
             "quantity": 4,
             "match": {
-              "itemName": "very rare psionic essence"
+              "materialId": "very-rare-psionic-essence"
             }
           },
           {
             "quantity": 2,
             "match": {
-              "itemName": "rare psionic essence"
+              "materialId": "rare-psionic-essence"
             }
           }
         ]
@@ -11223,19 +11255,20 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "crystal worth at least 50 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 50
             }
           },
           {
             "quantity": 3,
             "match": {
-              "itemName": "very rare psionic essence"
+              "materialId": "very-rare-psionic-essence"
             }
           },
           {
             "quantity": 2,
             "match": {
-              "itemName": "rare psionic essences"
+              "materialId": "rare-psionic-essence"
             }
           }
         ]
@@ -11286,10 +11319,11 @@ export const SRD_52_RECIPES = [
         "id": "default",
         "requirements": [
           {
-            "quantity": 1,
-            "match": {
-              "itemName": "piece of ammunition"
-            }
+            "type": "alternatives",
+            "alternatives": [
+            { "quantity": 1, "match": { "itemName": "Arrow" } },
+            { "quantity": 1, "match": { "itemName": "Bolt" } }
+            ]
           },
           {
             "quantity": 1,
@@ -11429,7 +11463,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "javalin"
+              "itemName": "Javelin"
             }
           },
           {
@@ -11567,12 +11601,7 @@ export const SRD_52_RECIPES = [
       {
         "id": "default",
         "requirements": [
-          {
-            "quantity": 1,
-            "match": {
-              "itemName": "weapon"
-            }
-          },
+          { "quantity": 1, "match": { "weaponType": "Simple" } },
           {
             "quantity": 1,
             "match": {
@@ -11655,23 +11684,18 @@ export const SRD_52_RECIPES = [
       {
         "id": "default",
         "requirements": [
-          {
-            "quantity": 1,
-            "match": {
-              "itemName": "weapon"
-            }
-          },
+          { "quantity": 1, "match": { "weaponType": "Simple" } },
           {
             "quantity": 1,
             "match": {
               "itemType": "spellScroll",
-              "spellName": "prismatic weaponK"
+              "spellName": "prismatic weapon"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "flametongue oilK"
+              "itemName": "Flametongue Oil"
             }
           },
           {
@@ -11826,7 +11850,7 @@ export const SRD_52_RECIPES = [
             "quantity": 1,
             "match": {
               "itemType": "spellScroll",
-              "spellName": "dispel constructK"
+              "spellName": "dispel construct"
             }
           },
           {
@@ -11907,7 +11931,7 @@ export const SRD_52_RECIPES = [
             "quantity": 1,
             "match": {
               "itemType": "spellScroll",
-              "spellName": "vorpal weaponK"
+              "spellName": "vorpal weapon"
             }
           },
           {
@@ -12076,7 +12100,7 @@ export const SRD_52_RECIPES = [
             "quantity": 1,
             "match": {
               "itemType": "spellScroll",
-              "spellName": "returning weaponK"
+              "spellName": "returning weapon"
             }
           },
           {
@@ -12157,14 +12181,14 @@ export const SRD_52_RECIPES = [
             "quantity": 1,
             "match": {
               "itemType": "spellScroll",
-              "spellName": "prismatic weaponK"
+              "spellName": "prismatic weapon"
             }
           },
           {
             "quantity": 1,
             "match": {
               "itemType": "spellScroll",
-              "spellName": "vorpal weaponK"
+              "spellName": "vorpal weapon"
             }
           },
           {
@@ -12312,7 +12336,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "bow (short or long)"
+              "itemName": "Shortbow"
             }
           },
           {
@@ -12784,7 +12808,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "shield"
+              "itemName": "Shield"
             }
           },
           {
@@ -12865,7 +12889,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "set of armor"
+              "itemName": "Chain Mail"
             }
           },
           {
@@ -12939,7 +12963,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "shield"
+              "itemName": "Shield"
             }
           },
           {
@@ -13027,7 +13051,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "shield"
+              "itemName": "Shield"
             }
           },
           {
@@ -13122,7 +13146,7 @@ export const SRD_52_RECIPES = [
             "quantity": 1,
             "match": {
               "itemType": "spellScroll",
-              "spellName": "dancing waveK"
+              "spellName": "dancing wave"
             }
           },
           {
@@ -13446,7 +13470,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "set of studded leather armor"
+              "itemName": "Studded Leather Armor"
             }
           },
           {
@@ -13689,7 +13713,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "ring"
+              "equipmentType": "ring"
             }
           },
           {
@@ -14234,7 +14258,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "very rare psionic essence"
+              "materialId": "very-rare-psionic-essence"
             }
           }
         ]
@@ -14287,13 +14311,14 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "ring"
+              "equipmentType": "ring"
             }
           },
           {
             "quantity": 3,
             "match": {
-              "itemName": "scrolls of wish"
+              "itemType": "spellScroll",
+              "spellName": "wish"
             }
           }
         ]
@@ -14427,7 +14452,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "amulet"
+              "itemName": "Amulet"
             }
           },
           {
@@ -14507,7 +14532,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "uncommon psionic essence"
+              "materialId": "uncommon-psionic-essence"
             }
           }
         ]
@@ -14708,7 +14733,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 6,
             "match": {
-              "itemName": "gems worth 50 gp each"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 50
             }
           },
           {
@@ -14735,7 +14761,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "greater restoration"
+              "itemType": "spellScroll",
+              "spellName": "greater restoration"
             }
           },
           {
@@ -14901,7 +14928,7 @@ export const SRD_52_RECIPES = [
             "quantity": 1,
             "match": {
               "itemType": "spellScroll",
-              "spellName": "fissureK"
+              "spellName": "fissure"
             }
           },
           {
@@ -15200,7 +15227,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "ruby worth 500 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 500
             }
           },
           {
@@ -15294,7 +15322,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "diamond worth 500 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 500
             }
           },
           {
@@ -15446,7 +15475,7 @@ export const SRD_52_RECIPES = [
             "quantity": 1,
             "match": {
               "itemType": "spellScroll",
-              "spellName": "thunder pulseK"
+              "spellName": "thunder pulse"
             }
           }
         ]
@@ -15506,7 +15535,7 @@ export const SRD_52_RECIPES = [
             "quantity": 1,
             "match": {
               "itemType": "spellScroll",
-              "spellName": "gravity surgeK"
+              "spellName": "gravity surge"
             }
           },
           {
@@ -15817,37 +15846,18 @@ export const SRD_52_RECIPES = [
     },
     "requirementGroups": [
       {
-        "id": "default",
+        "id": "entrapped-soul",
         "requirements": [
-          {
-            "quantity": 1,
-            "match": {
-              "materialId": "valued-component-rod-5000"
-            }
-          },
-          {
-            "quantity": 15,
-            "match": {
-              "itemName": "or higher 2 very rare arcane essence, or"
-            }
-          },
-          {
-            "alternatives": [
-              {
-                "quantity": 1,
-                "match": {
-                  "itemName": "entrapped soul of a devil or demon CR"
-                }
-              },
-              {
-                "quantity": 4,
-                "sameMaterial": true,
-                "match": {
-                  "materialId": "very-rare-arcane-essence"
-                }
-              }
-            ]
-          }
+          { "quantity": 1, "match": { "materialId": "valued-component-rod-5000" } },
+          { "quantity": 1, "match": { "itemName": "Entrapped Soul of a Devil or Demon (CR 15+)" } },
+          { "quantity": 2, "sameMaterial": true, "match": { "materialId": "very-rare-arcane-essence" } }
+        ]
+      },
+      {
+        "id": "arcane-essence",
+        "requirements": [
+          { "quantity": 1, "match": { "materialId": "valued-component-rod-5000" } },
+          { "quantity": 4, "sameMaterial": true, "match": { "materialId": "very-rare-arcane-essence" } }
         ]
       }
     ],
@@ -16289,7 +16299,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "rose gem worth at least 200 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 200
             }
           },
           {
@@ -16363,7 +16374,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "clear gem worth at least 200 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 200
             }
           },
           {
@@ -16437,7 +16449,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "pale blue gem at least 500 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 500
             }
           },
           {
@@ -16504,7 +16517,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "deep red gem worth at least 500 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 500
             }
           },
           {
@@ -16578,7 +16592,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "incandescent blue worth at least 500 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 500
             }
           },
           {
@@ -16652,7 +16667,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "pink gem at least 500 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 500
             }
           },
           {
@@ -16719,7 +16735,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "green gem worth at least 1,000 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 1000
             }
           },
           {
@@ -16800,7 +16817,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "diamond worth at least 25 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 25
             }
           },
           {
@@ -16860,7 +16878,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "ruby worth at least 50 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 50
             }
           },
           {
@@ -16920,7 +16939,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "garnet worth at least 100 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 100
             }
           },
           {
@@ -16987,7 +17007,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "cut gem worth at least 50 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 50
             }
           },
           {
@@ -17115,7 +17136,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "common essence"
+              "rarity": "Common",
+              "tags": ["essence"]
             }
           },
           {
@@ -17182,7 +17204,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "uncommon essence"
+              "rarity": "Uncommon",
+              "tags": ["essence"]
             }
           },
           {
@@ -17249,7 +17272,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "rare essence"
+              "rarity": "Rare",
+              "tags": ["essence"]
             }
           },
           {
@@ -17316,7 +17340,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "very rare essence"
+              "rarity": "Very Rare",
+              "tags": ["essence"]
             }
           },
           {
@@ -17532,7 +17557,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "common psionic essence"
+              "materialId": "common-psionic-essence"
             }
           },
           {
@@ -17606,7 +17631,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "gem worth 50 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 50
             }
           },
           {
@@ -17912,7 +17938,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "topaz worth 500 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 500
             }
           },
           {
@@ -18021,7 +18048,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "A handful of colorful gems worth 250 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 250
             }
           },
           {
@@ -18547,7 +18575,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "hide or rawhide"
+              "tags": ["hide"]
             }
           }
         ]
@@ -19071,7 +19099,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 4,
             "match": {
-              "itemName": "rawhide"
+              "materialId": "rawhide-leather"
             }
           },
           {
@@ -20711,7 +20739,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "shield"
+              "itemName": "Shield"
             }
           },
           {
@@ -20788,10 +20816,11 @@ export const SRD_52_RECIPES = [
         "id": "default",
         "requirements": [
           {
-            "quantity": 1,
-            "match": {
-              "itemName": "piece of ammunition"
-            }
+            "type": "alternatives",
+            "alternatives": [
+            { "quantity": 1, "match": { "itemName": "Arrow" } },
+            { "quantity": 1, "match": { "itemName": "Bolt" } }
+            ]
           },
           {
             "quantity": 2,
@@ -20848,10 +20877,11 @@ export const SRD_52_RECIPES = [
         "id": "default",
         "requirements": [
           {
-            "quantity": 1,
-            "match": {
-              "itemName": "piece of ammunition"
-            }
+            "type": "alternatives",
+            "alternatives": [
+            { "quantity": 1, "match": { "itemName": "Arrow" } },
+            { "quantity": 1, "match": { "itemName": "Bolt" } }
+            ]
           },
           {
             "quantity": 1,
@@ -20914,10 +20944,11 @@ export const SRD_52_RECIPES = [
         "id": "default",
         "requirements": [
           {
-            "quantity": 1,
-            "match": {
-              "itemName": "piece of ammunition"
-            }
+            "type": "alternatives",
+            "alternatives": [
+            { "quantity": 1, "match": { "itemName": "Arrow" } },
+            { "quantity": 1, "match": { "itemName": "Bolt" } }
+            ]
           },
           {
             "quantity": 1,
@@ -20932,14 +20963,14 @@ export const SRD_52_RECIPES = [
                 "quantity": 1,
                 "match": {
                   "itemType": "spellScroll",
-                  "spellName": "fog cloud, or"
+                  "spellName": "fog cloud"
                 }
               },
               {
                 "quantity": 1,
                 "match": {
                   "itemType": "spellScroll",
-                  "spellName": "entangle, or"
+                  "spellName": "entangle"
                 }
               },
               {
@@ -20999,10 +21030,11 @@ export const SRD_52_RECIPES = [
         "id": "default",
         "requirements": [
           {
-            "quantity": 1,
-            "match": {
-              "itemName": "piece of ammunition"
-            }
+            "type": "alternatives",
+            "alternatives": [
+            { "quantity": 1, "match": { "itemName": "Arrow" } },
+            { "quantity": 1, "match": { "itemName": "Bolt" } }
+            ]
           },
           {
             "quantity": 1,
@@ -21278,7 +21310,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "boat (not inluded in cost)"
+              "itemName": "Rowboat"
             }
           },
           {
@@ -21624,7 +21656,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "lengths of string"
+              "materialId": "length-of-string"
             }
           },
           {
@@ -21691,7 +21723,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "lengths of string"
+              "materialId": "length-of-string"
             }
           },
           {
@@ -21812,7 +21844,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "lengths of string"
+              "materialId": "length-of-string"
             }
           },
           {
@@ -22062,7 +22094,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 3,
             "match": {
-              "itemName": "lengths of string"
+              "materialId": "length-of-string"
             }
           }
         ]
@@ -22671,7 +22703,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 3,
             "match": {
-              "itemName": "rare primal ressences"
+              "materialId": "rare-primal-essence"
             }
           },
           {
@@ -23248,7 +23280,13 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 5,
             "match": {
-              "itemName": "leather scraps rope (20 ft.)"
+              "materialId": "leather-scraps"
+            }
+          },
+          {
+            "quantity": 1,
+            "match": {
+              "itemName": "Rope"
             }
           }
         ]
@@ -23321,7 +23359,13 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "ingots rope (20 ft.)"
+              "materialId": "iron-ingot"
+            }
+          },
+          {
+            "quantity": 1,
+            "match": {
+              "itemName": "Rope"
             }
           }
         ]
@@ -23387,7 +23431,13 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 10,
             "match": {
-              "itemName": "rawhide leather rope (60 ft.)"
+              "materialId": "rawhide-leather"
+            }
+          },
+          {
+            "quantity": 2,
+            "match": {
+              "itemName": "Rope"
             }
           }
         ]
@@ -23440,7 +23490,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "units of stone"
+              "materialId": "unit-of-stone"
             }
           },
           {
@@ -23739,7 +23789,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 3,
             "match": {
-              "itemName": "units of stone"
+              "materialId": "unit-of-stone"
             }
           },
           {
@@ -23924,7 +23974,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 5,
             "match": {
-              "itemName": "units of stone"
+              "materialId": "unit-of-stone"
             }
           },
           {
@@ -24003,7 +24053,7 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 50,
             "match": {
-              "itemName": "units of stone"
+              "materialId": "unit-of-stone"
             }
           },
           {
@@ -25069,7 +25119,8 @@ export const SRD_52_RECIPES = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "Gem worth at least 50 gp"
+              "lootTypes": ["Gemstone", "Art Object"],
+              "minValueGp": 50
             }
           }
         ]

@@ -98,12 +98,6 @@ export class GatherService {
       throw new Error("This gathering opportunity is already resolved for that player.");
     }
 
-    if (this.hasGathered(session.sceneId, actorUuid)) {
-      const record = this.getGatherRecord(session.sceneId, actorUuid);
-      const when = record?.gatheredAt ? new Date(record.gatheredAt).toLocaleString() : "previously";
-      throw new Error(`This character has already gathered on ${session.sceneName ?? "this scene"} (${when}).`);
-    }
-
     const numericTotal = Number(total);
     const success = Number.isFinite(numericTotal) && numericTotal >= session.terrain.dc;
 

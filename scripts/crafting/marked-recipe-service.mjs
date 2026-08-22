@@ -52,4 +52,11 @@ export class MarkedRecipeService {
     await this.set(crafter, recipeId, marked);
     return marked;
   }
+
+  async addAll(crafter, recipeIds) {
+    if (!crafter) throw new Error("A crafter character is required to mark recipes.");
+    const next = [...new Set([...this.list(crafter), ...recipeIds.map(String)])].sort();
+    await crafter.setFlag(MODULE_ID, FLAG_KEY, next);
+    return next;
+  }
 }

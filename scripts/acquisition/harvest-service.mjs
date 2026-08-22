@@ -235,15 +235,6 @@ export class HarvestService {
       }
 
       for (const creature of creatures) {
-        if (
-          await this.hasHarvested(
-            creature.tokenUuid,
-            entry.actorUuid
-          )
-        ) {
-          continue;
-        }
-
         const key =
           `${entry.userId}:${creature.tokenUuid}`;
 
@@ -548,10 +539,6 @@ export class HarvestService {
     const creature = session.creatures.find(c => c.tokenUuid === creatureTokenUuid);
     if (!creature) throw new Error("Creature is not part of this harvest session.");
 
-    if (await this.hasHarvested(creature.tokenUuid, actorUuid)) {
-      throw new Error("This character has already attempted to harvest this creature.");
-    }
-
     const key = `${userId}:${creature.tokenUuid}`;
     if (session.participants[key]?.status) throw new Error("This player has already attempted to harvest this creature.");
 
@@ -832,6 +819,39 @@ export class HarvestService {
       result,
       session
     };
+  }
+
+  async releaseClaims(sessionId, userId) {
+    const session = this.sessions.get(sessionId);
+    if (!session || session.status !== "open") throw new Error("Harvest session not found.");
+
+    session.results = (session.results ?? []).filter(result => result.userId !== userId);
+    session.completedUserIds = (session.completedUserIds ?? []).filter(id => id !== userId);
+
+    for (const [key, state] of Object.entries(session.participants ?? {})) {
+      if (state?.userId !== userId) continue;
+      state.claimedComponentIds = [];
+      state.claimedMaterialIds = [];
+      state.claimedNames = [];
+      state.claimsMade = 0;
+      state.claimsRemaining = Math.max(1, Number(state.claimsAllowed ?? 1));
+      state.claimedMaterialId = null;
+      state.claimedComponentId = null;
+      state.claimedName = null;
+      state.recipientUuid = null;
+      state.recipientName = null;
+      if (state.choices?.length) state.status = "awaiting-claim";
+
+      const token = await fromUuid(state.creatureTokenUuid ?? key.slice(key.indexOf(":") + 1));
+      if (token && state.actorUuid) {
+        const records = foundry.utils.deepClone(token.getFlag(MODULE_ID, HARVEST_FLAG) ?? {});
+        delete records[state.actorUuid];
+        if (Object.keys(records).length) await token.setFlag(MODULE_ID, HARVEST_FLAG, records);
+        else await token.unsetFlag(MODULE_ID, HARVEST_FLAG);
+      }
+    }
+
+    return session;
   }
 
   async updatePlayerCompletions(sessionId) {

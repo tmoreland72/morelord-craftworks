@@ -1083,7 +1083,8 @@
   border: 0;
   background: transparent;
   color: #e58b2a;
-  font-size: 15px;
+  font-size: 10px;
+  font-weight: 700;
   line-height: 1;
 }
 
@@ -2861,7 +2862,7 @@
 }
 .ml-craftworks .ml-craftworks-player-skill-grid button > i { justify-self: center; }
 .ml-craftworks .ml-craftworks-player-skill-grid button > strong { color: rgba(197, 160, 91, 0.95); font-variant-numeric: tabular-nums; }
-.ml-craftworks .ml-craftworks-player-decline { justify-self: start; min-width: 120px; }
+.ml-craftworks .ml-craftworks-player-decline { justify-self: start; min-width: 180px; margin-top: 10px; }
 
 .ml-craftworks .ml-craftworks-progress-card {
   gap: 10px;

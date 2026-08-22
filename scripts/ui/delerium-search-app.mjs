@@ -4,20 +4,22 @@ import { DeleriumSearchResultsApp } from "./delerium-search-results-app.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 export class DeleriumSearchApp extends ScrollPreservingApplicationMixin(HandlebarsApplicationMixin(ApplicationV2)) {
-  constructor(craftworks, options = {}) { super(options); this.craftworks = craftworks; this.session = null; this.selectedZone = "outer"; }
+  constructor(craftworks, options = {}) { super(options); this.craftworks = craftworks; this.session = null; this.selectedZone = "outer"; this.selectedCharacterUuids = null; }
   static DEFAULT_OPTIONS = { id: "morelord-craftworks-delerium-search", classes: ["ml-window", "ml-craftworks-module", "ml-craftworks-window"], position: { width: 800, height: "auto" }, window: { title: `${MODULE_TITLE} — Delerium Search`, resizable: true } };
   static PARTS = { content: { template: "modules/morelord-craftworks/templates/delerium-search-gm.hbs" } };
   setSession(session) { this.session = session; return this.render(); }
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
     const characters = game.actors.filter(actor => actor.type === "character");
+    if (this.selectedCharacterUuids === null) this.selectedCharacterUuids = new Set(characters.filter(actor => this.#activeUserForActor(actor)).map(actor => actor.uuid));
     const skills = this.craftworks.deleriumSearch.getSkillOptions();
     return foundry.utils.mergeObject(context, {
       session: this.session,
       encounterTriggered: Boolean(this.session?.failures >= 2),
       sceneName: canvas.scene?.name ?? "",
       zones: this.craftworks.deleriumSearch.getZones().map(zone => ({ ...zone, selected: zone.id === this.selectedZone })),
-      progress: this.session ? characters.map(actor => {
+      characters: characters.map(actor => { const user = this.#activeUserForActor(actor); return { uuid: actor.uuid, name: actor.name, img: actor.img, checked: this.selectedCharacterUuids.has(actor.uuid), connected: Boolean(user), userName: user?.name ?? null }; }),
+      progress: this.session ? characters.filter(actor => this.session.selectedCharacterUuids?.includes(actor.uuid)).map(actor => {
         const activeUser = this.#activeUserForActor(actor);
         const participantId = activeUser?.id ?? `actor:${actor.id}`;
         const state = this.session.participants[participantId] ?? { status: "waiting" };
@@ -40,6 +42,7 @@ export class DeleriumSearchApp extends ScrollPreservingApplicationMixin(Handleba
   async _onRender(context, options) {
     await super._onRender(context, options);
     this.element.querySelector("[name='zone']")?.addEventListener("change", event => { this.selectedZone = event.currentTarget.value; });
+    this.element.querySelectorAll("[name='characterUuid']").forEach(input => input.addEventListener("change", event => event.currentTarget.checked ? this.selectedCharacterUuids.add(event.currentTarget.value) : this.selectedCharacterUuids.delete(event.currentTarget.value)));
     this.element.querySelector("[data-action='start']")?.addEventListener("click", () => this.#start());
     this.element.querySelector("[data-action='finalize']")?.addEventListener("click", () => this.#finalize());
     this.element.querySelectorAll("[data-action='gm-roll']")
@@ -47,10 +50,11 @@ export class DeleriumSearchApp extends ScrollPreservingApplicationMixin(Handleba
   }
   async #start() {
     try {
-      const characters = game.actors.filter(actor => actor.type === "character");
+      const characters = game.actors.filter(actor => actor.type === "character" && this.selectedCharacterUuids.has(actor.uuid));
       if (!characters.length) throw new Error("No player character Actors were found.");
-      const connectedPlayers = game.users.filter(user => user.active && !user.isGM);
+      const connectedPlayers = [...new Set(characters.map(actor => this.#activeUserForActor(actor)).filter(Boolean))];
       this.session = this.craftworks.deleriumSearch.start(this.selectedZone);
+      this.session.selectedCharacterUuids = characters.map(actor => actor.uuid);
       const deliveries = await Promise.all(connectedPlayers.map(async user => ({
         user,
         response: await this.craftworks.socket.emit(

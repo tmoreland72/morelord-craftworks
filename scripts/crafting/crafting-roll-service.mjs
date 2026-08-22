@@ -133,6 +133,7 @@ export class CraftingRollService {
     const success = Number.isFinite(target)
       ? total >= target
       : true;
+    const naturalD20 = this.#naturalD20(roll);
 
     return {
       cancelled: false,
@@ -147,6 +148,7 @@ export class CraftingRollService {
       toolId,
       rollType,
       success
+      , naturalD20
     };
   }
 
@@ -196,6 +198,12 @@ export class CraftingRollService {
     }
 
     return null;
+  }
+
+  #naturalD20(roll) {
+    const die = (roll?.dice ?? []).find(entry => Number(entry.faces) === 20);
+    const result = die?.results?.find(entry => entry.active !== false && !entry.discarded);
+    return Number.isFinite(Number(result?.result)) ? Number(result.result) : null;
   }
 
   async #legacyRoll({

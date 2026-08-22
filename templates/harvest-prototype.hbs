@@ -111,7 +111,7 @@
                         <div class="ml-craftworks-harvest-claim-status ml-craftworks-harvest-taken">
                           <i class="fa-solid fa-lock"></i>
                           <span>
-                            Claimed by <strong>{{claimantName}}</strong>
+                            Claimed by <strong>{{claimantName}}</strong>{{#if multipleClaims}} (multiple claims){{/if}}
                             {{#if claimRoll}} · Roll {{claimRoll}}{{/if}}
                           </span>
                         </div>
@@ -153,7 +153,7 @@
                         <div class="ml-craftworks-harvest-claim-status ml-craftworks-harvest-taken">
                           <i class="fa-solid fa-lock"></i>
                           <span>
-                            Claimed by <strong>{{claimantName}}</strong>
+                            Claimed by <strong>{{claimantName}}</strong>{{#if multipleClaims}} (multiple claims){{/if}}
                             {{#if claimRoll}} · Roll {{claimRoll}}{{/if}}
                           </span>
                         </div>
@@ -354,12 +354,6 @@
           data-action="cancel-harvest"
         >
           <i class="fa-solid fa-ban"></i> Cancel Harvest
-        </button>
-        <button
-          type="button"
-          data-action="reset-harvest"
-        >
-          <i class="fa-solid fa-rotate-left"></i> Reset Harvest
         </button>
         <button
           type="button"

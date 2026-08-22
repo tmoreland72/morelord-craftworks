@@ -37,7 +37,9 @@ export class GatherApp extends ScrollPreservingApplicationMixin(
     const gatherRecords = this.craftworks.gather.getSceneGatherRecords();
     const characters = game.actors.filter(actor => actor.type === "character");
     if (this.selectedCharacterUuids === null) {
-      this.selectedCharacterUuids = new Set(characters.map(actor => actor.uuid));
+      this.selectedCharacterUuids = new Set(characters
+        .filter(actor => this.#activeUserForActor(actor))
+        .map(actor => actor.uuid));
     }
 
     return foundry.utils.mergeObject(context, {
@@ -96,8 +98,6 @@ export class GatherApp extends ScrollPreservingApplicationMixin(
     this.element.querySelector("[data-action='finalize']")
       ?.addEventListener("click", () => this.#finalize());
 
-    this.element.querySelector("[data-action='reset']")
-      ?.addEventListener("click", () => this.#resetScene());
   }
 
   async #start() {
@@ -153,16 +153,6 @@ export class GatherApp extends ScrollPreservingApplicationMixin(
     // Do not retain completed session data in a closed ApplicationV2 instance.
     this.session = null;
     await this.close();
-  }
-
-  async #resetScene() {
-    try {
-      await this.craftworks.gather.resetScene();
-      ui.notifications.info(`Gathering availability reset for ${canvas.scene?.name ?? "the current scene"}.`);
-      await this.render();
-    } catch (err) {
-      ui.notifications.error(err.message);
-    }
   }
 
   #activeUserForActor(actor) {

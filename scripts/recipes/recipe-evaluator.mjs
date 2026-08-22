@@ -1,7 +1,11 @@
 import { MODULE_ID } from "../constants.mjs";
 import {
+  equipmentTypeMatches,
   recipeItemMatches,
-  spellScrollMatches
+  spellScrollLevelMatches,
+  spellScrollMatches,
+  valuedLootMatches,
+  weaponTypeMatches
 } from "./recipe-item-match-utils.mjs";
 
 export class RecipeEvaluator {
@@ -270,9 +274,23 @@ export class RecipeEvaluator {
       return false;
     }
 
+    if (match.equipmentType && !equipmentTypeMatches(entry.item, match.equipmentType)) {
+      return false;
+    }
+
+    if (match.weaponType && !weaponTypeMatches(entry.item, match.weaponType)) {
+      return false;
+    }
+
+    if (match.lootTypes?.length && !valuedLootMatches(entry.item, match.lootTypes, match.minValueGp)) {
+      return false;
+    }
+
     if (
       match.itemType === "spellScroll"
-      && !spellScrollMatches(entry.item, match.spellName)
+      && !(match.spellName
+        ? spellScrollMatches(entry.item, match.spellName)
+        : spellScrollLevelMatches(entry.item, match.spellLevel))
     ) {
       return false;
     }

@@ -194,7 +194,7 @@
                                 data-action="show-matching-recipes"
                                 data-material="{{materialId}}"
                                 title="Show all {{recipeCount}} matching recipes">
-                          <i class="fa-solid fa-circle-question"></i>
+                          More...
                         </button>
                       {{/if}}
                     </div>
@@ -209,7 +209,7 @@
                         {{#if claimedByCurrentUser}}
                           Claimed by you
                         {{else}}
-                          Claimed by <strong>{{claimantName}}</strong>
+                          Claimed by <strong>{{claimantNames}}</strong>{{#if multipleClaims}} (multiple claims){{/if}}
                         {{/if}}
                         {{#if claimRoll}}
                           · Roll {{claimRoll}}
@@ -217,6 +217,7 @@
                       </span>
                     </div>
                   {{else}}
+                    {{#if hasVisibleClaims}}<div class="ml-craftworks-harvest-claim-status ml-craftworks-harvest-taken"><i class="fa-solid fa-users"></i><span>Also claimed by <strong>{{claimantNames}}</strong></span></div>{{/if}}
                     <button
                       type="button"
                       class="ml-craftworks-harvest-claim"
@@ -286,7 +287,7 @@
                                 data-action="show-matching-recipes"
                                 data-material="{{materialId}}"
                                 title="Show all {{recipeCount}} matching recipes">
-                          <i class="fa-solid fa-circle-question"></i>
+                          More...
                         </button>
                       {{/if}}
                     </span>
@@ -316,6 +317,10 @@
 
   <footer class="ml-craftworks-harvest-footer">
     <div class="ml-craftworks-harvest-footer-status"><span>{{summary.completed}} of {{summary.creatures}} creature attempts resolved</span></div>
-    <button type="button" data-action="close"><i class="fa-solid fa-xmark"></i> Close</button>
+    <div class="ml-actions ml-craftworks-actions">
+      <button type="button" data-action="cancel-claims"><i class="fa-solid fa-ban"></i> Cancel</button>
+      <button type="button" data-action="reset-claims"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+      <button type="button" data-action="done-claims"><i class="fa-solid fa-check"></i> Done</button>
+    </div>
   </footer>
 </div>

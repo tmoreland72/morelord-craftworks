@@ -621,6 +621,14 @@ Hooks.once("ready", async () => {
     gmHarvestApp?.setSession(session);
   });
 
+  socket.on("harvest.release-claims", async ({ sessionId, userId }) => {
+    if (!game.user.isGM) return;
+    const session = await harvest.releaseClaims(sessionId, userId);
+    await socket.emit("harvest.session", { session });
+    gmHarvestApp?.setSession(session);
+    return { released: true };
+  });
+
   socket.on("harvest.state", async ({ sessionId, creatureTokenUuid, state }) => {
     if (game.user.isGM) return;
     if (!playerHarvestApp || playerHarvestApp.session?.id !== sessionId) return;

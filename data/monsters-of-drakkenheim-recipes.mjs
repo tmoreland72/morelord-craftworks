@@ -681,7 +681,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-animus-aberration"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -691,7 +691,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-dust-undead"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -701,7 +701,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-fluid-elemental"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -711,7 +711,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-hair"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -721,7 +721,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-hide"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           }
         ]
@@ -732,7 +732,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "quantity": 1,
       "label": "Charged Gauntlets",
       "img": "icons/containers/bags/sack-simple-tan.webp",
-      "rarity": "very rare",
+      "rarity": "Very Rare",
       "valueGp": 0,
       "itemType": "loot"
     }
@@ -1157,7 +1157,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-animus-sanguine-witch"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -1167,7 +1167,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-dust"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -1177,7 +1177,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-fluid-monster-blood-from-an-undead"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -1187,7 +1187,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-natural-weapon-teeth-from-a-vampire"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -1197,7 +1197,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-organ-heart-from-a-dragon"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           }
         ]
@@ -1208,7 +1208,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "quantity": 1,
       "label": "Crimson Blade",
       "img": "icons/containers/bags/sack-simple-tan.webp",
-      "rarity": "very rare",
+      "rarity": "Very Rare",
       "valueGp": 0,
       "itemType": "loot"
     }
@@ -1673,7 +1673,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-animus"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -1683,7 +1683,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-bones"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -1693,7 +1693,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-dust-undead"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -1703,7 +1703,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-fluid-ectoplasm"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -1713,7 +1713,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-fluid-monster-blood-from-an-undead"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -1723,7 +1723,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-hair"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           }
         ]
@@ -1734,7 +1734,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "quantity": 1,
       "label": "Ghost Sight Bow",
       "img": "icons/containers/bags/sack-simple-tan.webp",
-      "rarity": "very rare",
+      "rarity": "Very Rare",
       "valueGp": 0,
       "itemType": "loot"
     }
@@ -2567,7 +2567,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-animus"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -2577,7 +2577,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-fluid-chemical-solution-from-a-construct"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -2587,7 +2587,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-hide-skin-from-a-fey"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -2597,7 +2597,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-hide-plates"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -2607,7 +2607,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-organ-heart-from-a-gorgon"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           }
         ]
@@ -2618,7 +2618,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "quantity": 1,
       "label": "Inexhaustible Armor",
       "img": "icons/containers/bags/sack-simple-tan.webp",
-      "rarity": "very rare",
+      "rarity": "Very Rare",
       "valueGp": 0,
       "itemType": "loot"
     }
@@ -2961,7 +2961,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-animus"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -2971,7 +2971,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-dust"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -2981,7 +2981,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-fluid-monster-blood-from-a-monstrosity"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -2991,7 +2991,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-hide-scales"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -3001,7 +3001,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-hide-skin-from-an-aberration"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           }
         ]
@@ -3012,7 +3012,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "quantity": 1,
       "label": "Manual of Occult Anatomy",
       "img": "icons/containers/bags/sack-simple-tan.webp",
-      "rarity": "very rare",
+      "rarity": "Very Rare",
       "valueGp": 0,
       "itemType": "loot"
     }
@@ -3355,7 +3355,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-animus"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -3365,7 +3365,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-fluid-sap"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -3375,7 +3375,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-hair"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -3385,7 +3385,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-hair-leaves"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -3395,7 +3395,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-hide-bark"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           }
         ]
@@ -3406,7 +3406,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "quantity": 1,
       "label": "Monster Hunter’s Weapon",
       "img": "icons/containers/bags/sack-simple-tan.webp",
-      "rarity": "very rare",
+      "rarity": "Very Rare",
       "valueGp": 0,
       "itemType": "loot"
     }
@@ -4073,7 +4073,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-animus"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -4083,7 +4083,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-dust-fey"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -4093,7 +4093,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-fluid-elemental"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -4103,7 +4103,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-fluid-monster-blood-from-a-dragon"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -4113,7 +4113,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-organ-heart-from-a-fiend"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           }
         ]
@@ -4124,7 +4124,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "quantity": 1,
       "label": "Rejuvenation Potion",
       "img": "icons/containers/bags/sack-simple-tan.webp",
-      "rarity": "very rare",
+      "rarity": "Very Rare",
       "valueGp": 0,
       "itemType": "loot"
     }
@@ -4533,7 +4533,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-animus-aberration"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -4543,7 +4543,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-bones-ribs-from-aberration"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -4553,7 +4553,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-fluid-contaminated-ichor-from-a-far-dweller"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -4563,7 +4563,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-hide-skin-from-an-aberration"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -4573,7 +4573,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-natural-weapon-tentacles-from-a-warp-marauder"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           }
         ]
@@ -4584,7 +4584,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "quantity": 1,
       "label": "Sword Between Worlds",
       "img": "icons/containers/bags/sack-simple-tan.webp",
-      "rarity": "very rare",
+      "rarity": "Very Rare",
       "valueGp": 0,
       "itemType": "loot"
     }
@@ -4907,7 +4907,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-animus-undead"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -4917,7 +4917,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-dust"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -4927,7 +4927,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-fluid-ectoplasm"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -4937,7 +4937,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-fluid-monster-blood-from-a-vampire"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           }
         ]
@@ -4948,7 +4948,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "quantity": 1,
       "label": "Vampire Blood Potion",
       "img": "icons/containers/bags/sack-simple-tan.webp",
-      "rarity": "very rare",
+      "rarity": "Very Rare",
       "valueGp": 0,
       "itemType": "loot"
     }
@@ -5241,7 +5241,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-animus"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -5251,7 +5251,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-bones-ribs"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -5261,7 +5261,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-fluid-elemental"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -5271,7 +5271,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-hide-plates"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -5281,7 +5281,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-hide-skin-from-a-monstrosity"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           },
           {
@@ -5291,7 +5291,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
               "tags": [
                 "drakkenheim-component-natural-weapon"
               ],
-              "rarity": "very rare"
+              "rarity": "Very Rare"
             }
           }
         ]
@@ -5302,7 +5302,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "quantity": 1,
       "label": "Whirling Bonesaw",
       "img": "icons/containers/bags/sack-simple-tan.webp",
-      "rarity": "very rare",
+      "rarity": "Very Rare",
       "valueGp": 0,
       "itemType": "loot"
     }

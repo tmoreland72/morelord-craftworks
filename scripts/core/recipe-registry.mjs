@@ -148,7 +148,12 @@ export class RecipeRegistry {
       stage: raw.stage ? String(raw.stage) : null,
       itemName: raw.itemName ? String(raw.itemName) : null,
       itemType: raw.itemType ? String(raw.itemType) : null,
-      spellName: raw.spellName ? String(raw.spellName) : null
+      equipmentType: raw.equipmentType ? String(raw.equipmentType) : null,
+      weaponType: raw.weaponType ? String(raw.weaponType) : null,
+      lootTypes: Array.isArray(raw.lootTypes) ? raw.lootTypes.map(String) : [],
+      minValueGp: Math.max(0, Number(raw.minValueGp ?? 0)),
+      spellName: raw.spellName ? String(raw.spellName) : null,
+      spellLevel: Number.isFinite(Number(raw.spellLevel)) ? Number(raw.spellLevel) : null
     };
   }
 
@@ -192,8 +197,16 @@ export class RecipeRegistry {
       label = this.materialRegistry.get(match.materialId)?.name ?? match.materialId;
     } else if (match.itemType === "spellScroll" && match.spellName) {
       label = `Spell Scroll: ${match.spellName}`;
+    } else if (match.itemType === "spellScroll" && match.spellLevel != null) {
+      label = `Level ${match.spellLevel} Spell Scroll`;
     } else if (match.itemName) {
       label = match.itemName;
+    } else if (match.equipmentType) {
+      label = `${match.equipmentType} equipment`;
+    } else if (match.weaponType) {
+      label = `${match.weaponType} Weapons`;
+    } else if (match.lootTypes?.length) {
+      label = `${match.lootTypes.join(" or ")} worth at least ${match.minValueGp} gp`;
     } else {
       const parts = [];
       if (match.rarity) parts.push(match.rarity);
@@ -215,7 +228,12 @@ export class RecipeRegistry {
       material?.name,
       match.itemName,
       match.itemType,
+      match.equipmentType,
+      match.weaponType,
+      ...(match.lootTypes ?? []),
+      match.minValueGp,
       match.spellName,
+      match.spellLevel,
       match.rarity,
       match.category,
       match.stage,

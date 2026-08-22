@@ -619,9 +619,24 @@ export class CraftApp
     if (match.itemType === "spellScroll" && match.spellName) {
       return `Spell Scroll: ${String(match.spellName).trim()}`;
     }
+    if (match.itemType === "spellScroll" && match.spellLevel != null) {
+      return `Level ${match.spellLevel} Spell Scroll`;
+    }
 
     if (match.itemName) {
       return String(match.itemName).trim() || "Material";
+    }
+
+    if (match.equipmentType) {
+      return `${String(match.equipmentType).trim()} equipment`;
+    }
+
+    if (match.weaponType) {
+      return `${String(match.weaponType).trim()} Weapons`;
+    }
+
+    if (match.lootTypes?.length) {
+      return `${match.lootTypes.join(" or ")} worth at least ${match.minValueGp ?? 0} gp`;
     }
 
     if (match.materialId) {
@@ -1119,14 +1134,18 @@ export class CraftApp
           recipe.id,
           crafter,
           inventoryActor.uuid,
-          { success: result.success }
+          { success: result.success, progressDelta: result.naturalD20 === 20 ? 2 : result.naturalD20 === 1 ? -1 : (result.success ? 1 : 0) }
         );
 
     this.#log({
       recipe,
-      text: result.success
-        ? `Success: ${result.total} vs DC ${dc}. ${progress.successes} of ${progress.requiredSuccesses} successes.`
-        : `Failure: ${result.total} vs DC ${dc}. 2 hours spent with no progress.`,
+      text: result.naturalD20 === 20
+        ? `Natural 20: 4 hours of progress. ${progress.successes} of ${progress.requiredSuccesses} successes.`
+        : result.naturalD20 === 1
+          ? `Natural 1: 2 hours of progress lost where applicable. ${progress.successes} of ${progress.requiredSuccesses} successes.`
+          : result.success
+            ? `Success: ${result.total} vs DC ${dc}. ${progress.successes} of ${progress.requiredSuccesses} successes.`
+            : `Failure: ${result.total} vs DC ${dc}. 2 hours spent with no progress.`,
       kind:
         result.success
           ? "success"

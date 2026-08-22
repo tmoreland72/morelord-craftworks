@@ -70,10 +70,6 @@ export class GatherPlayerApp extends ScrollPreservingApplicationMixin(
     const actor = this.craftworks.adapter.getActorForUser(game.user);
     if (!actor) return ui.notifications.error("Select a token you own or configure a user character first.");
 
-    if (this.craftworks.gather.hasGathered(this.session.sceneId, actor.uuid)) {
-      return ui.notifications.warn(`${actor.name} has already gathered on this scene.`);
-    }
-
     button.disabled = true;
     try {
       const skillId = button.dataset.skill;

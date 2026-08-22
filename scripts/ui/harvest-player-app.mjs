@@ -168,9 +168,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
 
     const creatures = [];
     for (const creature of this.session.creatures) {
-      const priorHarvest = actor
-        ? await this.craftworks.harvest.getHarvestRecord(creature.tokenUuid, actor.uuid)
-        : null;
+      const priorHarvest = null;
       const state = this.states[creature.tokenUuid] ?? null;
 
 
@@ -186,11 +184,12 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
           .filter(Boolean)
       );
 
-      const claimsByComponentId = new Map(
-        (this.session.results ?? [])
-          .filter(result => result.creatureTokenUuid === creature.tokenUuid)
-          .map(result => [result.componentId, result])
-      );
+      const claimsByComponentId = new Map();
+      for (const result of (this.session.results ?? []).filter(result => result.creatureTokenUuid === creature.tokenUuid)) {
+        const claims = claimsByComponentId.get(result.componentId) ?? [];
+        claims.push(result);
+        claimsByComponentId.set(result.componentId, claims);
+      }
 
       const currentUserClaimsByComponentId = new Map(
         (this.session.results ?? [])
@@ -204,12 +203,14 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
       const components = (creature.components ?? [])
         .filter(component => component.matched && component.materialId)
         .map(component => {
-          const globalClaim =
+          const globalClaims =
             (creature.harvestMode === "drakkenheim"
               ? claimsByComponentId
               : currentUserClaimsByComponentId
             ).get(component.id)
-            ?? null;
+            ?? [];
+          const visibleClaims = claimsByComponentId.get(component.id) ?? [];
+          const globalClaim = Array.isArray(globalClaims) ? globalClaims[0] : globalClaims;
 
           const inChoices =
             choiceComponentIds.has(component.id)
@@ -247,6 +248,9 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
               globalClaim?.actorName
               ?? globalClaim?.userName
               ?? null,
+            claimantNames: visibleClaims.map(claim => claim.actorName ?? claim.userName ?? "Unknown").join(", "),
+            hasVisibleClaims: visibleClaims.length > 0,
+            multipleClaims: visibleClaims.length > 1,
             claimRoll:
               globalClaim?.rollTotal
               ?? null
@@ -468,7 +472,23 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
         event.stopPropagation();
         await this.close();
       }));
+    this.element.querySelector("[data-action='cancel-claims']")?.addEventListener("click", () => this.#releaseClaims({ close: true }));
+    this.element.querySelector("[data-action='reset-claims']")?.addEventListener("click", () => this.#releaseClaims({ reset: true }));
+    this.element.querySelector("[data-action='done-claims']")?.addEventListener("click", () => this.close());
 
+  }
+
+  async #releaseClaims({ close = false, reset = false } = {}) {
+    try {
+      await this.craftworks.socket.emit("harvest.release-claims", { sessionId: this.session.id, userId: game.user.id });
+      if (close) return this.close();
+      if (reset) {
+        this.collapsedCreatures.clear();
+        this.focusedCreatureTokenUuid = null;
+        await this.render();
+        this.element.querySelector(".ml-craftworks-harvest-creatures")?.scrollTo({ top: 0 });
+      }
+    } catch (error) { ui.notifications.error(error.message); }
   }
 
   async #showMatchingRecipes(materialId) {
@@ -520,6 +540,19 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
 
   #materialMatches(match, material) {
     if (!match || !material) return false;
+
+    // Non-material recipe requirements (notably spell scrolls) do not carry
+    // any material selector. Treating an empty selector as a match caused
+    // those recipes to appear on every harvested component.
+    const hasMaterialSelector = Boolean(
+      match.materialId
+      || match.itemName
+      || match.rarity
+      || match.category
+      || match.stage
+      || match.tags?.length
+    );
+    if (!hasMaterialSelector || match.itemType === "spellScroll") return false;
 
     if (
       match.materialId
@@ -607,17 +640,6 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
         ?? null;
 
       if (state?.status) {
-        continue;
-      }
-
-      const priorHarvest =
-        await this.craftworks.harvest
-          .getHarvestRecord(
-            creature.tokenUuid,
-            actor.uuid
-          );
-
-      if (priorHarvest) {
         continue;
       }
 

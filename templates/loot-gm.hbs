@@ -21,12 +21,11 @@
                 data-loot-creature-select
                 data-token-uuid="{{tokenUuid}}"
                 {{checked selectedForLoot}}
-                {{#if resolved}}disabled{{/if}}
               >
               <img src="{{img}}" alt="{{name}}">
               <div>
                 <strong>{{name}}</strong>
-                <div>CR {{cr}}{{#if resolved}} • Already resolved{{/if}}</div>
+                <div>CR {{cr}}</div>
               </div>
             </label>
           {{/each}}
@@ -36,11 +35,6 @@
           <button type="button" data-action="roll">
             <i class="fa-solid fa-dice-d20"></i> Roll Encounter Loot
           </button>
-          {{#if resolvedCount}}
-            <button type="button" data-action="reset-loot">
-              <i class="fa-solid fa-rotate-left"></i> Reset Looting for Scene
-            </button>
-          {{/if}}
         </div>
       {{else}}
       <p class="ml-text ml-craftworks-warning" data-tone="warning">No dead creatures were found on the current scene.</p>

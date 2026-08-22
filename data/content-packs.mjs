@@ -72,7 +72,7 @@ export const CONTENT_PACKS = [
     requiredFeatures: ["craftworks.content-mod"],
     enabledByDefault: false,
     sort: 110,
-    capabilities: ["materials", "recipes", "harvest", "gathering", "loot", "crafting"]
+    capabilities: ["materials", "recipes", "harvest", "gathering", "loot", "crafting", "delerium-search"]
   }
 ];
 

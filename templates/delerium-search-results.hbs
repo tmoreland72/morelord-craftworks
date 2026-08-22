@@ -14,6 +14,7 @@
           <button type="button" data-action="open-encounters"><i class="fa-solid fa-hydra"></i> Open Morelord Encounters</button>
         {{else}}
           <p><strong>{{encountersUnavailableText}}</strong></p>
+          {{#unless encountersInstalled}}<button type="button" data-action="get-encounters"><i class="fa-solid fa-arrow-up-right-from-square"></i> Get Morelord Encounters</button>{{/unless}}
         {{/if}}
       {{/if}}
     </div>

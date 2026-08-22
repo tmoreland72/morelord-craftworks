@@ -71,14 +71,7 @@ export class LootService {
       : this.getDeadCreatureSummary();
     if (!allCreatures.length) throw new Error("No dead creatures were found on the current scene.");
 
-    const creatures = [];
-    for (const creature of allCreatures) {
-      if (!(await this.isLootResolved(creature.tokenUuid))) creatures.push(creature);
-    }
-
-    if (!creatures.length) {
-      throw new Error("All dead creatures on the current scene have already had their encounter loot resolved.");
-    }
+    const creatures = allCreatures;
 
     return this.sessions.create({
       type: "loot",

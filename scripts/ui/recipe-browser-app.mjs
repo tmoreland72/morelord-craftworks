@@ -459,6 +459,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
           .join(" "),
         recipes: categoryRecipes.sort((a, b) => a.name.localeCompare(b.name))
       }));
+    this.markAllRecipeIds = preparedRecipes.map(recipe => recipe.id);
 
     return foundry.utils.mergeObject(context, {
       search: this.search,
@@ -813,9 +814,28 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     if (match.itemType === "spellScroll" && match.spellName) {
       return `Spell Scroll: ${String(match.spellName).trim()}`;
     }
+    if (match.itemType === "spellScroll" && match.spellLevel != null) {
+      return `Level ${match.spellLevel} Spell Scroll`;
+    }
 
     if (match.itemName) {
       return String(match.itemName).trim() || "Material";
+    }
+
+    if (match.equipmentType) {
+      return `${String(match.equipmentType).trim()} equipment`;
+    }
+
+    if (match.weaponType) {
+      return `${String(match.weaponType).trim()} Weapons`;
+    }
+
+    if (match.lootTypes?.length) {
+      return `${match.lootTypes.join(" or ")} worth at least ${match.minValueGp ?? 0} gp`;
+    }
+
+    if (match.equipmentType) {
+      return `${String(match.equipmentType).trim()} equipment`;
     }
 
     if (match.materialId) {
@@ -1165,6 +1185,15 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
           await this.render();
         });
       });
+
+    this.element.querySelector("[data-action='mark-all-for-crafting']")?.addEventListener("click", async event => {
+      event.preventDefault();
+      const crafter = this.#currentCrafter();
+      if (!crafter) return ui.notifications.warn("Select a character before marking recipes.");
+      await this.craftworks.markedRecipes.addAll(crafter, this.markAllRecipeIds ?? []);
+      ui.notifications.info(`Marked ${this.markAllRecipeIds?.length ?? 0} recipes for crafting by ${crafter.name}.`);
+      await this.render();
+    });
 
     this.element.querySelectorAll(".ml-craftworks-material-icon-link[data-document-uuid]")
       .forEach(button => button.addEventListener("click", async event => {

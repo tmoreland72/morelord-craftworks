@@ -223,7 +223,7 @@ export class CraftingJobService {
     recipeId,
     crafter,
     inventoryActorUuid,
-    { success }
+    { success, progressDelta = null }
   ) {
     const jobs = this.#jobs(crafter);
     const key = this.#key(recipeId);
@@ -244,7 +244,7 @@ export class CraftingJobService {
     const job = {
       ...existing,
       attempts: existing.attempts + 1,
-      successes: existing.successes + (success ? 1 : 0),
+      successes: Math.max(0, existing.successes + (progressDelta ?? (success ? 1 : 0))),
       updatedAt: Date.now()
     };
 

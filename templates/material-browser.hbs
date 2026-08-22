@@ -27,6 +27,12 @@
                placeholder="Material, tag, category, source…">
       </label>
 
+      <label class="ml-craftworks-filter-search">
+        <span>Check Inventory</span>
+        <select name="actor"><option value="">No inventory selected</option>{{#each actors}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select>
+      </label>
+      <label class="ml-craftworks-filter-checkbox"><input type="checkbox" name="ownedOnly" {{#if ownedOnly}}checked{{/if}} {{#unless actorName}}disabled{{/unless}}> <span>Owned only</span></label>
+
       <div class="ml-craftworks-market-filter-mode-legend">
         <span><i class="fa-regular fa-square"></i> Any</span>
         <span><i class="fa-solid fa-square-check"></i> Include</span>
@@ -85,15 +91,6 @@
       </section>
       {{/each}}
 
-      <label class="ml-craftworks-filter-search">
-        <span>Check Inventory</span>
-        <select name="actor">
-          <option value="">No inventory selected</option>
-          {{#each actors}}
-            <option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>
-          {{/each}}
-        </select>
-      </label>
 </aside>
 
     <main class="ml-craftworks-marketplace-results">

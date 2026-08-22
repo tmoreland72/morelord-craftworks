@@ -189,9 +189,10 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
         claimsByCreature.set(result.creatureTokenUuid, new Map());
       }
 
-      claimsByCreature
-        .get(result.creatureTokenUuid)
-        .set(result.componentId, result);
+      const componentClaims = claimsByCreature.get(result.creatureTokenUuid);
+      const claims = componentClaims.get(result.componentId) ?? [];
+      claims.push(result);
+      componentClaims.set(result.componentId, claims);
     }
 
     const session = this.session
@@ -206,9 +207,10 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
               ...creature,
               isCollapsed: this.collapsedCreatures.has(creature.tokenUuid),
               components: (creature.components ?? []).map(component => {
-                const claim =
+                const claims =
                   creatureClaims.get(component.id)
-                  ?? null;
+                  ?? [];
+                const claim = claims[0] ?? null;
                 const material = component.materialId
                   ? this.craftworks.materials.get(component.materialId)
                   : null;
@@ -223,7 +225,9 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
                     ?? null,
                   claimRoll:
                     claim?.rollTotal
-                    ?? null
+                    ?? null,
+                  claimantName: claims.map(entry => entry.actorName ?? entry.userName ?? "Unknown").join(", "),
+                  multipleClaims: claims.length > 1
                 };
               })
             };
@@ -285,9 +289,6 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
 
     this.element.querySelector("[data-action='finalize']")
       ?.addEventListener("click", () => this.#finalizeHarvest());
-
-    this.element.querySelector("[data-action='reset-harvest']")
-      ?.addEventListener("click", () => this.#resetHarvest());
 
     this.element.querySelector("[data-action='cancel-harvest']")
       ?.addEventListener("click", () => this.#cancelHarvest());
@@ -522,9 +523,6 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
   async #cancelHarvest() {
     try {
       const sessionId = this.session?.id ?? null;
-      const count =
-        await this.craftworks.harvest
-          .resetSceneHarvesting();
 
       if (sessionId) {
         this.craftworks.sessions.delete(sessionId);
@@ -548,9 +546,7 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
       );
 
       ui.notifications.info(
-        `Harvesting cancelled. Reset ${count} dead creature token${
-          count === 1 ? "" : "s"
-        }.`
+        "Harvesting cancelled."
       );
 
       await this.close();
