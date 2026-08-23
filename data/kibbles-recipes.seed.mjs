@@ -4603,13 +4603,13 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 10,
             "match": {
-              "itemName": "ore"
+              "materialId": "ore"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "supplies"
+              "materialId": "supplies"
             }
           }
         ]
@@ -4662,7 +4662,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "silver ingot"
+              "materialId": "silver-ingot"
             }
           }
         ]
@@ -4769,7 +4769,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "mithril ore"
+              "materialId": "mithril-ore"
             }
           }
         ]
@@ -4822,7 +4822,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "icesteel ore"
+              "materialId": "icesteel-ore"
             }
           },
           {
@@ -4882,7 +4882,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "darksteel ore"
+              "materialId": "darksteel-ore"
             }
           },
           {
@@ -5552,7 +5552,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "common supplies"
+              "materialId": "common-supplies"
             }
           }
         ]
@@ -5618,7 +5618,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "common supplies"
+              "materialId": "common-supplies"
             }
           }
         ]
@@ -5669,16 +5669,11 @@ export const KIBBLES_RECIPE_SEED = [
         "id": "default",
         "requirements": [
           {
-            "quantity": 1,
-            "match": {
-              "itemName": "uncommon meat from a creature with a"
-            }
-          },
-          {
-            "quantity": 1,
-            "match": {
-              "itemName": "swimming speed greater than its walking speed"
-            }
+            "type": "alternatives",
+            "alternatives": [
+              { "quantity": 1, "match": { "materialId": "uncommon-meat" } },
+              { "quantity": 1, "match": { "materialId": "rare-meat" } }
+            ]
           },
           {
             "quantity": 2,
@@ -5690,7 +5685,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "common supplies"
+              "materialId": "common-supplies"
             }
           }
         ]
@@ -5755,7 +5750,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "rare supplies"
+              "materialId": "rare-supplies"
             }
           },
           {
@@ -5768,7 +5763,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "common supplies"
+              "materialId": "common-supplies"
             }
           }
         ]
@@ -5835,13 +5830,13 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 4,
             "match": {
-              "itemName": "rare supplies"
+              "materialId": "rare-supplies"
             }
           },
           {
             "quantity": 4,
             "match": {
-              "itemName": "supplies"
+              "materialId": "supplies"
             }
           }
         ]
@@ -5906,7 +5901,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "rare supplies"
+              "materialId": "rare-supplies"
             }
           },
           {
@@ -5919,7 +5914,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "common supplies"
+              "materialId": "common-supplies"
             }
           }
         ]
@@ -5984,7 +5979,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 3,
             "match": {
-              "itemName": "rare supplies"
+              "materialId": "rare-supplies"
             }
           },
           {
@@ -5997,7 +5992,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "common supplies"
+              "materialId": "common-supplies"
             }
           }
         ]
@@ -6048,16 +6043,11 @@ export const KIBBLES_RECIPE_SEED = [
         "id": "default",
         "requirements": [
           {
-            "quantity": 1,
-            "match": {
-              "itemName": "uncommon or rarer meat from a"
-            }
-          },
-          {
-            "quantity": 1,
-            "match": {
-              "itemName": "creature that is immune to fire damage"
-            }
+            "type": "alternatives",
+            "alternatives": [
+              { "quantity": 1, "match": { "materialId": "uncommon-meat" } },
+              { "quantity": 1, "match": { "materialId": "rare-meat" } }
+            ]
           },
           {
             "quantity": 2,
@@ -6069,7 +6059,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "rare supplies"
+              "materialId": "rare-supplies"
             }
           }
         ]
@@ -6134,7 +6124,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "rare supplies"
+              "materialId": "rare-supplies"
             }
           },
           {
@@ -6147,7 +6137,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "common supplies"
+              "materialId": "common-supplies"
             }
           }
         ]
@@ -6200,7 +6190,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "rare supplies"
+              "materialId": "rare-supplies"
             }
           },
           {
@@ -6213,7 +6203,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "common supplies"
+              "materialId": "common-supplies"
             }
           }
         ]
@@ -6280,7 +6270,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "common supplies"
+              "materialId": "common-supplies"
             }
           }
         ]
@@ -7125,7 +7115,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "crystal lenses"
+              "materialId": "crystal-lenses"
             }
           },
           {
@@ -10000,10 +9990,12 @@ export const KIBBLES_RECIPE_SEED = [
         "id": "default",
         "requirements": [
           {
-            "quantity": 1,
-            "match": {
-              "itemName": "metal cube of mithril, adamantine, or gold"
-            }
+            "type": "alternatives",
+            "alternatives": [
+              { "quantity": 1, "match": { "materialId": "mithril-ingot" } },
+              { "quantity": 1, "match": { "materialId": "adamant-ingot" } },
+              { "quantity": 1, "match": { "materialId": "gold-ingot" } }
+            ]
           },
           {
             "quantity": 1,
@@ -13011,7 +13003,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "Chain Mail"
+              "equipmentType": "armor"
             }
           },
           {
@@ -23781,7 +23773,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "units of lumber"
+              "materialId": "lumber"
             }
           },
           {
@@ -23860,7 +23852,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 4,
             "match": {
-              "itemName": "units of lumber"
+              "materialId": "lumber"
             }
           },
           {
@@ -23939,7 +23931,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 10,
             "match": {
-              "itemName": "units of lumber"
+              "materialId": "lumber"
             }
           },
           {
@@ -24070,7 +24062,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "units of lumber"
+              "materialId": "lumber"
             }
           }
         ]
@@ -24123,7 +24115,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 5,
             "match": {
-              "itemName": "units of lumber"
+              "materialId": "lumber"
             }
           },
           {
@@ -24190,7 +24182,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "units of lumber"
+              "materialId": "lumber"
             }
           },
           {
@@ -24250,7 +24242,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 5,
             "match": {
-              "itemName": "units of lumber"
+              "materialId": "lumber"
             }
           },
           {
@@ -24369,7 +24361,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "unit of lumber"
+              "materialId": "lumber"
             }
           },
           {
@@ -24429,7 +24421,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 6,
             "match": {
-              "itemName": "units of lumber"
+              "materialId": "lumber"
             }
           },
           {
@@ -24489,7 +24481,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 10,
             "match": {
-              "itemName": "units of lumber"
+              "materialId": "lumber"
             }
           },
           {
@@ -24568,7 +24560,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 50,
             "match": {
-              "itemName": "units of lumber"
+              "materialId": "lumber"
             }
           },
           {
@@ -24654,7 +24646,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 3,
             "match": {
-              "itemName": "units of lumber"
+              "materialId": "lumber"
             }
           },
           {
@@ -24735,7 +24727,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 2,
             "match": {
-              "itemName": "units of lumber"
+              "materialId": "lumber"
             }
           },
           {
@@ -24816,7 +24808,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 3,
             "match": {
-              "itemName": "units of lumber"
+              "materialId": "lumber"
             }
           },
           {
@@ -24890,7 +24882,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 100,
             "match": {
-              "itemName": "units of lumber"
+              "materialId": "lumber"
             }
           },
           {
@@ -24970,7 +24962,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 40,
             "match": {
-              "itemName": "units of lumber"
+              "materialId": "lumber"
             }
           },
           {
@@ -25050,7 +25042,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 60,
             "match": {
-              "itemName": "units of lumber"
+              "materialId": "lumber"
             }
           },
           {

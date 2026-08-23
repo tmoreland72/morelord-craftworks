@@ -3958,5 +3958,312 @@
       "version": "1.1.3",
       "pages": "Crafting recipe components"
     }
+  },
+  {
+    "materialId": "common-supplies",
+    "name": "Common Supplies",
+    "category": "cooking",
+    "stage": "raw",
+    "rarity": "common",
+    "tags": [
+      "cooking",
+      "supplies"
+    ],
+    "img": "icons/containers/bags/sack-simple-leather-brown.webp",
+    "priceGp": 1,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": true,
+      "harvestable": false,
+      "lootable": true
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "186-187"
+    }
+  },
+  {
+    "materialId": "crystal-lenses",
+    "name": "Crystal Lenses",
+    "category": "recipe-components",
+    "stage": "raw",
+    "rarity": "common",
+    "tags": [
+      "crystal",
+      "lenses",
+      "recipe-component"
+    ],
+    "img": "icons/tools/navigation/spyglass-telescope-brass-blue.webp",
+    "priceGp": 50,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": true
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "186-187"
+    }
+  },
+  {
+    "materialId": "darksteel-ore",
+    "name": "Darksteel Ore",
+    "category": "metals",
+    "stage": "raw",
+    "rarity": "uncommon",
+    "tags": [
+      "metals",
+      "ore",
+      "darksteel"
+    ],
+    "img": "icons/commodities/stone/ore-pile-black.webp",
+    "priceGp": 30,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": true
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "186-187"
+    }
+  },
+  {
+    "materialId": "gold-ingot",
+    "name": "Gold Ingot",
+    "category": "metals",
+    "stage": "raw",
+    "rarity": "common",
+    "tags": [
+      "ingot",
+      "metals",
+      "gold"
+    ],
+    "img": "icons/commodities/metal/ingot-gold.webp",
+    "priceGp": 25,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": true
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "186-187"
+    }
+  },
+  {
+    "materialId": "icesteel-ore",
+    "name": "Icesteel Ore",
+    "category": "metals",
+    "stage": "raw",
+    "rarity": "uncommon",
+    "tags": [
+      "metals",
+      "ore",
+      "icesteel"
+    ],
+    "img": "icons/commodities/stone/ore-pile-blue.webp",
+    "priceGp": 30,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": true
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "186-187"
+    }
+  },
+  {
+    "materialId": "lumber",
+    "name": "Lumber",
+    "category": "wood",
+    "stage": "raw",
+    "rarity": "common",
+    "tags": [
+      "lumber",
+      "wood"
+    ],
+    "img": "icons/commodities/wood/wood-pole.webp",
+    "priceGp": 1,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": true,
+      "harvestable": false,
+      "lootable": true
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "186-187"
+    }
+  },
+  {
+    "materialId": "mithril-ingot",
+    "name": "Mithril Ingot",
+    "category": "metals",
+    "stage": "raw",
+    "rarity": "uncommon",
+    "tags": [
+      "ingot",
+      "metals",
+      "mithril"
+    ],
+    "img": "icons/commodities/metal/ingot-silver.webp",
+    "priceGp": 30,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": true
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "186-187"
+    }
+  },
+  {
+    "materialId": "mithril-ore",
+    "name": "Mithril Ore",
+    "category": "metals",
+    "stage": "raw",
+    "rarity": "uncommon",
+    "tags": [
+      "metals",
+      "ore",
+      "mithril"
+    ],
+    "img": "icons/commodities/stone/ore-pile-silver.webp",
+    "priceGp": 15,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": true
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "186-187"
+    }
+  },
+  {
+    "materialId": "ore",
+    "name": "Ore",
+    "category": "metals",
+    "stage": "raw",
+    "rarity": "common",
+    "tags": [
+      "metals",
+      "ore"
+    ],
+    "img": "icons/commodities/stone/ore-pile-grey.webp",
+    "priceGp": 0.5,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": true
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "186-187"
+    }
+  },
+  {
+    "materialId": "rare-supplies",
+    "name": "Rare Supplies",
+    "category": "cooking",
+    "stage": "raw",
+    "rarity": "rare",
+    "tags": [
+      "cooking",
+      "supplies"
+    ],
+    "img": "icons/containers/bags/sack-ornate-gold.webp",
+    "priceGp": 100,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": true,
+      "harvestable": false,
+      "lootable": true
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "186-187"
+    }
+  },
+  {
+    "materialId": "silver-ingot",
+    "name": "Silver Ingot",
+    "category": "metals",
+    "stage": "raw",
+    "rarity": "common",
+    "tags": [
+      "ingot",
+      "metals",
+      "silver"
+    ],
+    "img": "icons/commodities/metal/ingot-silver.webp",
+    "priceGp": 5,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": false,
+      "harvestable": false,
+      "lootable": true
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "186-187"
+    }
+  },
+  {
+    "materialId": "supplies",
+    "name": "Supplies",
+    "category": "cooking",
+    "stage": "raw",
+    "rarity": "common",
+    "tags": [
+      "cooking",
+      "supplies"
+    ],
+    "img": "icons/containers/bags/pack-simple-leather.webp",
+    "priceGp": 1,
+    "purchasable": true,
+    "acquisition": {
+      "gatherable": true,
+      "harvestable": false,
+      "lootable": true
+    },
+    "packId": "standard-core",
+    "source": {
+      "title": "Kibbles' Compendium of Craft and Creation",
+      "version": "1.1.3",
+      "pages": "186-187"
+    }
   }
 ]
