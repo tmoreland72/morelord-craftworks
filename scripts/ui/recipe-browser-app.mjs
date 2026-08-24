@@ -12,6 +12,25 @@ import { ScrollPreservingApplicationMixin } from "./scroll-preserving-applicatio
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
+function requirementFallbackImg(match) {
+  if (match?.itemType === "spellScroll") {
+    return "icons/sundries/scrolls/scroll-bound-sealed-red.webp";
+  }
+  if (match?.equipmentType) {
+    return "icons/equipment/chest/breastplate-layered-steel-grey.webp";
+  }
+  if (match?.weaponType) {
+    return "icons/weapons/swords/sword-guard-steel.webp";
+  }
+  if (match?.lootTypes?.length) {
+    return "icons/commodities/gems/gem-faceted-round-white.webp";
+  }
+  if (match?.itemName) {
+    return "icons/svg/hazard.svg";
+  }
+  return "icons/containers/bags/pouch-leather-simple-tan.webp";
+}
+
 export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
   HandlebarsApplicationMixin(ApplicationV2)
 ) {
@@ -294,6 +313,11 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         }
       }
 
+      resolvedOutput = {
+        ...resolvedOutput,
+        showQuantity: Number(resolvedOutput?.quantity ?? 1) > 1
+      };
+
       const sourcePack = this.craftworks.contentPacks?.get(recipe.packId);
       const requirementItemMatches = new Map();
       const requirementItemNames = new Set(
@@ -310,7 +334,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
 
       for (const itemName of requirementItemNames) {
         const item = await this.craftworks.recipes.dnd5eItemResolver
-          ?.resolve(itemName, { sourceBook: sourcePack?.label });
+          ?.resolveAny(itemName, { preferredSourceBook: sourcePack?.label });
 
         if (item) {
           requirementItemMatches.set(itemName.toLowerCase(), item);
@@ -395,7 +419,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
               materialId:
                 materialView.materialId,
               materialImg:
-                materialView.img,
+                materialView.img ?? requirementFallbackImg(requirement.match),
               materialUuid:
                 materialView.uuid,
               tooltip: requirement.display,
@@ -420,7 +444,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
                       materialId:
                         altMaterialView.materialId,
                       materialImg:
-                        altMaterialView.img,
+                        altMaterialView.img ?? requirementFallbackImg(alternative.match),
                       materialUuid:
                         altMaterialView.uuid,
                       tooltip: alternative.display,

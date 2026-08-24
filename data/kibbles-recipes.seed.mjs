@@ -1252,7 +1252,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "handful of sand"
+              "materialId": "sand"
             }
           },
           {
@@ -1394,7 +1394,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "flask of alcohol"
+              "itemName": "Flask or Tankard"
             }
           },
           {
@@ -1407,7 +1407,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "sturdy metal flask"
+              "itemName": "Flask or Tankard"
             }
           }
         ]
@@ -6390,7 +6390,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "bag"
+              "itemName": "Pouch"
             }
           },
           {
@@ -6538,10 +6538,8 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "type": "alternatives",
             "alternatives": [
-            { "quantity": 1, "match": { "itemName": "Boots" } },
             { "quantity": 1, "match": { "itemName": "Boots of Elvenkind" } },
             { "quantity": 1, "match": { "itemName": "Boots of Striding and Springing" } },
-            { "quantity": 1, "match": { "itemName": "Boots of the Winterlands" } },
             { "quantity": 1, "match": { "itemName": "Winged Boots" } }
             ]
           },
@@ -6616,7 +6614,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "broom"
+              "itemName": "Quarterstaff"
             }
           },
           {
@@ -6697,7 +6695,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "cloak"
+              "itemName": "Clothes, Traveler's"
             }
           },
           {
@@ -6906,7 +6904,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "decanter"
+              "itemName": "Bottle, Glass"
             }
           },
           {
@@ -7263,7 +7261,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "pair of gloves"
+              "itemName": "Gloves of Thievery"
             }
           },
           {
@@ -7337,7 +7335,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "hat"
+              "itemName": "Hat of Wizardry"
             }
           },
           {
@@ -7771,7 +7769,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "set of the same kind of stones"
+              "itemName": "Sling Bullet"
             }
           },
           {
@@ -7838,7 +7836,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "slippers"
+              "itemName": "Boots of Elvenkind"
             }
           },
           {
@@ -8634,7 +8632,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "boat 50 feet long and 20 feet wide"
+              "itemName": "Sailing Ship"
             }
           },
           {
@@ -9925,7 +9923,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "very rare magical crystal ball"
+              "itemName": "Crystal Ball"
             }
           },
           {
@@ -10258,7 +10256,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "Adamantine Cube"
+              "materialId": "adamantine-cube"
             }
           },
           {
@@ -10434,7 +10432,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "belt"
+              "itemName": "Belt of Dwarvenkind"
             }
           },
           {
@@ -10575,34 +10573,60 @@ export const KIBBLES_RECIPE_SEED = [
       "title": "Kibbles' Compendium of Craft and Creation",
       "version": "1.1.3",
       "page": 245,
-      "craftingTime": "22 hours",
-      "checks": "11",
-      "difficulty": "DC 100",
+      "craftingTime": "80 hours",
+      "checks": "40",
+      "difficulty": "DC 22",
       "value": "???",
-      "materialsText": "22 cards 1 tears of a dungeon master"
+      "materialsText": "1 playing card set, 1 legendary magical ink, 1 legendary arcane essence, 1 legendary divine essence, 1 scroll of wish, 1 scroll of foresight"
     },
     "craft": {
       "tool": null,
       "ability": "Intelligence",
       "skill": "Arcana",
-      "dc": 100,
-      "noToolDc": 105,
-      "hoursRequired": 22
+    "dc": 22,
+    "noToolDc": 27,
+    "hoursRequired": 80
     },
     "requirementGroups": [
       {
         "id": "default",
         "requirements": [
           {
-            "quantity": 22,
+            "quantity": 1,
             "match": {
-              "itemName": "cards"
+              "itemName": "Playing Card Set"
             }
           },
           {
             "quantity": 1,
             "match": {
-              "itemName": "tears of a dungeon master"
+            "materialId": "legendary-magical-ink"
+          }
+        },
+        {
+          "quantity": 1,
+          "match": {
+            "materialId": "legendary-arcane-essence"
+          }
+        },
+        {
+          "quantity": 1,
+          "match": {
+            "materialId": "legendary-divine-essence"
+          }
+        },
+        {
+          "quantity": 1,
+          "match": {
+            "itemType": "spellScroll",
+            "spellName": "wish"
+          }
+        },
+        {
+          "quantity": 1,
+          "match": {
+            "itemType": "spellScroll",
+            "spellName": "foresight"
             }
           }
         ]
@@ -10655,7 +10679,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 1,
             "match": {
-              "itemName": "belt"
+              "itemName": "Belt of Dwarvenkind"
             }
           },
           {
@@ -11494,10 +11518,12 @@ export const KIBBLES_RECIPE_SEED = [
         "id": "default",
         "requirements": [
           {
-            "quantity": 1,
-            "match": {
-              "itemName": "axe"
-            }
+            "type": "alternatives",
+            "alternatives": [
+              { "quantity": 1, "match": { "itemName": "Battleaxe" } },
+              { "quantity": 1, "match": { "itemName": "Greataxe" } },
+              { "quantity": 1, "match": { "itemName": "Handaxe" } }
+            ]
           },
           {
             "quantity": 1,
@@ -15810,7 +15836,7 @@ export const KIBBLES_RECIPE_SEED = [
           {
             "quantity": 3,
             "match": {
-              "itemName": "tentacles at least 5 feet long"
+              "materialId": "tentacle"
             }
           },
           {

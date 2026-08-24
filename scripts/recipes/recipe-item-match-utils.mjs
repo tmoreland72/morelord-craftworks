@@ -68,7 +68,7 @@ export function equipmentTypeMatches(item, requiredEquipmentType) {
   const required = normalizeRecipeItemName(requiredEquipmentType);
   if (!required) return false;
 
-  return [
+  const candidates = [
     item?.system?.type?.value,
     item?.system?.type?.subtype,
     item?.system?.type,
@@ -76,8 +76,21 @@ export function equipmentTypeMatches(item, requiredEquipmentType) {
     item?.system?.armor?.type
   ]
     .filter(value => typeof value === "string")
-    .map(normalizeRecipeItemName)
-    .includes(required);
+    .map(normalizeRecipeItemName);
+
+  if (required === "armor") {
+    return candidates.some(value => [
+      "armor",
+      "light",
+      "medium",
+      "heavy",
+      "light armor",
+      "medium armor",
+      "heavy armor"
+    ].includes(value));
+  }
+
+  return candidates.includes(required);
 }
 
 export function weaponTypeMatches(item, requiredWeaponType) {

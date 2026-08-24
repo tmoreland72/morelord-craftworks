@@ -12,6 +12,25 @@ const {
   HandlebarsApplicationMixin
 } = foundry.applications.api;
 
+function requirementFallbackImg(match) {
+  if (match?.itemType === "spellScroll") {
+    return "icons/sundries/scrolls/scroll-bound-sealed-red.webp";
+  }
+  if (match?.equipmentType) {
+    return "icons/equipment/chest/breastplate-layered-steel-grey.webp";
+  }
+  if (match?.weaponType) {
+    return "icons/weapons/swords/sword-guard-steel.webp";
+  }
+  if (match?.lootTypes?.length) {
+    return "icons/commodities/gems/gem-faceted-round-white.webp";
+  }
+  if (match?.itemName) {
+    return "icons/svg/hazard.svg";
+  }
+  return "icons/containers/bags/pouch-leather-simple-tan.webp";
+}
+
 export class CraftApp
   extends ScrollPreservingApplicationMixin(
   HandlebarsApplicationMixin(ApplicationV2)
@@ -443,7 +462,7 @@ export class CraftApp
       });
   }
 
-  #resolveRequirementMaterial(match) {
+  #resolveRequirementMaterial(match, requirementItemMatches = new Map()) {
     if (!match) {
       return {
         materialId: null,
@@ -478,6 +497,27 @@ export class CraftApp
           material?.rarity
           ?? match.rarity
           ?? null
+      };
+    }
+
+    if (match.itemName) {
+      const normalizedItemName = String(match.itemName)
+        .trim()
+        .toLowerCase();
+      const material = this.craftworks.materials
+        .all()
+        .find(entry =>
+          String(entry.name ?? "").trim().toLowerCase()
+          === normalizedItemName
+        );
+      const item = requirementItemMatches.get(normalizedItemName);
+
+      return {
+        materialId: material?.materialId ?? null,
+        img: material?.img ?? item?.img ?? null,
+        uuid: material?.uuid ?? item?.uuid ?? null,
+        label: material?.name ?? item?.name ?? String(match.itemName).trim(),
+        rarity: material?.rarity ?? match.rarity ?? null
       };
     }
 
@@ -811,10 +851,34 @@ export class CraftApp
       }
     }
 
+    output.showQuantity = Number(output.quantity ?? 1) > 1;
+
     const sourcePack =
       this.craftworks.contentPacks?.get(
         recipe.packId
       );
+
+    const requirementItemMatches = new Map();
+    const requirementItemNames = new Set(
+      (recipe.requirementGroups ?? [])
+        .flatMap(group => group.requirements ?? [])
+        .flatMap(requirement => [
+          requirement.match?.itemName,
+          ...(requirement.alternatives ?? [])
+            .map(alternative => alternative.match?.itemName)
+        ])
+        .map(name => String(name ?? "").trim())
+        .filter(Boolean)
+    );
+
+    for (const itemName of requirementItemNames) {
+      const item = await this.craftworks.recipes.dnd5eItemResolver
+        ?.resolveAny(itemName, { preferredSourceBook: sourcePack?.label });
+
+      if (item) {
+        requirementItemMatches.set(itemName.toLowerCase(), item);
+      }
+    }
 
     const requirementGroupRows =
       requirementsKnown
@@ -837,7 +901,8 @@ export class CraftApp
 
                 const materialView =
                   this.#resolveRequirementMaterial(
-                    requirement.match
+                    requirement.match,
+                    requirementItemMatches
                   );
 
                 return {
@@ -845,7 +910,7 @@ export class CraftApp
                   materialId:
                     materialView.materialId,
                   materialImg:
-                    materialView.img,
+                    materialView.img ?? requirementFallbackImg(requirement.match),
                   materialUuid:
                     materialView.uuid,
                   displayLabel:
@@ -865,7 +930,8 @@ export class CraftApp
                             (alternative, altIndex) => {
                               const altMaterialView =
                                 this.#resolveRequirementMaterial(
-                                  alternative.match
+                                  alternative.match,
+                                  requirementItemMatches
                                 );
 
                               return {
@@ -873,7 +939,7 @@ export class CraftApp
                                 materialId:
                                   altMaterialView.materialId,
                                 materialImg:
-                                  altMaterialView.img,
+                                  altMaterialView.img ?? requirementFallbackImg(alternative.match),
                                 materialUuid:
                                   altMaterialView.uuid,
                                 displayLabel:

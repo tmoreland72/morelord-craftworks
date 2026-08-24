@@ -8,6 +8,7 @@ import {
   valuedLootMatches,
   weaponTypeMatches
 } from "../scripts/recipes/recipe-item-match-utils.mjs";
+import { Dnd5eCompendiumItemResolver } from "../scripts/recipes/dnd5e-compendium-item-resolver.mjs";
 import { KIBBLES_RECIPE_SEED } from "../data/kibbles-recipes.seed.mjs";
 import { SRD_51_RECIPES } from "../data/srd-5.1-recipes.mjs";
 import { SRD_52_RECIPES } from "../data/srd-5.2-recipes.mjs";
@@ -42,6 +43,36 @@ assert.equal(recipeItemMatches({ name: "Boots", type: "equipment" }, "boots"), t
 assert.equal(equipmentTypeMatches({ type: "equipment", system: { type: { value: "ring" } } }, "Ring"), true);
 assert.equal(equipmentTypeMatches({ type: "equipment", system: { type: { value: "armor" } } }, "Ring"), false);
 assert.equal(equipmentTypeMatches({ type: "equipment", system: { type: { value: "armor" } } }, "Armor"), true);
+assert.equal(equipmentTypeMatches({ type: "equipment", system: { type: { value: "light" } } }, "Armor"), true);
+assert.equal(equipmentTypeMatches({ type: "equipment", system: { type: { value: "medium" } } }, "Armor"), true);
+assert.equal(equipmentTypeMatches({ type: "equipment", system: { type: { value: "heavy" } } }, "Armor"), true);
+assert.equal(equipmentTypeMatches({ type: "equipment", system: { type: { value: "shield" } } }, "Armor"), false);
+
+const crossSourceResolver = new Dnd5eCompendiumItemResolver();
+crossSourceResolver._bySourceBook.set("Player's Handbook", new Map());
+crossSourceResolver._bySourceBook.set("SRD 5.2", new Map([
+  [crossSourceResolver.normalizeName("Battleaxe"), {
+    name: "Battleaxe",
+    img: "icons/weapons/axes/axe-battle-black.webp",
+    packId: "dnd5e.equipment24",
+    sourceBook: "SRD 5.2"
+  }]
+]));
+assert.equal(
+  (await crossSourceResolver.resolveAny("Battleaxe", {
+    preferredSourceBook: "Player's Handbook"
+  }))?.img,
+  "icons/weapons/axes/axe-battle-black.webp"
+);
+assert.deepEqual(
+  crossSourceResolver.candidateNames("Playing Card Set"),
+  [
+    "Playing Card Set",
+    "Playing Cards",
+    "Playing Cards Set",
+    "Gaming Set (Playing Cards)"
+  ]
+);
 assert.equal(weaponTypeMatches({ type: "weapon", system: { type: { value: "simpleM" } } }, "Simple"), true);
 assert.equal(weaponTypeMatches({ type: "weapon", system: { type: { value: "simpleR" } } }, "Simple"), true);
 assert.equal(weaponTypeMatches({ type: "weapon", system: { type: { value: "martialM" } } }, "Simple"), false);
@@ -125,6 +156,24 @@ const standardMaterialIds = new Set(
   JSON.parse(fs.readFileSync("data/standard-materials.seed.json", "utf8"))
     .map(material => material.materialId)
 );
+const recipeBrowserTemplate = fs.readFileSync("templates/recipe-browser.hbs", "utf8");
+assert.equal(
+  (recipeBrowserTemplate.match(/ml-craftworks-requirement-quantity/g) ?? []).length,
+  2,
+  "Recipe browser must show quantities for requirements and alternatives."
+);
+for (const templatePath of [
+  "templates/recipe-browser.hbs",
+  "templates/craft.hbs",
+  "templates/partials/craft-card.hbs"
+]) {
+  const template = fs.readFileSync(templatePath, "utf8");
+  assert.match(
+    template,
+    /#if output\.showQuantity/,
+    `${templatePath} must hide output quantities of one.`
+  );
+}
 const newlyResolvableMaterialIds = [
   "common-supplies",
   "rare-supplies",

@@ -1005,13 +1005,37 @@
 }
 
 .ml-craftworks .ml-craftworks-requirement-alternatives {
+  display: grid;
+  gap: 5px;
+  width: min(100%, 460px);
+  padding: 9px 11px;
+  border: 1px solid rgba(197, 160, 91, 0.3);
+  border-radius: 7px;
+  background: rgba(197, 160, 91, 0.055);
+}
+
+.ml-craftworks .ml-craftworks-requirement-alternatives-label {
+  margin-bottom: 2px;
+  color: var(--color-text-dark-secondary, currentColor);
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  opacity: .7;
+}
+
+.ml-craftworks .ml-craftworks-requirement-alternatives > .ml-craftworks-requirement-row {
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
 
 .ml-craftworks .ml-craftworks-requirement-or {
-  padding-left: 25px;
+  flex-basis: 100%;
+  margin: 0 0 0 36px;
+  padding: 1px 0;
   font-size: .72rem;
   font-weight: 700;
   opacity: .55;
@@ -1132,20 +1156,30 @@
 /* Recipe requirement logic: OR groups containing AND requirements */
 .ml-craftworks .ml-craftworks-requirement-group-items {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 9px;
 }
 
 .ml-craftworks .ml-craftworks-requirement-group-items > .ml-craftworks-requirement-row,
 .ml-craftworks .ml-craftworks-requirement-group-items > .ml-craftworks-requirement-alternatives {
-  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.ml-craftworks .ml-craftworks-requirement-group-items > .ml-craftworks-requirement-row {
+  display: flex;
   align-items: center;
+}
+
+.ml-craftworks .ml-craftworks-requirement-group-items > .ml-craftworks-requirement-alternatives {
+  display: grid;
 }
 
 .ml-craftworks .ml-craftworks-requirement-group-items > * + *::before {
   content: "AND";
-  margin: 0 7px 0 2px;
+  flex: 0 0 38px;
+  margin: 0 7px 0 0;
   font-size: .7rem;
   font-weight: 800;
   opacity: .55;

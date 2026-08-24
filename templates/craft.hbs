@@ -60,7 +60,7 @@
                   {{#if craftMeta.tool}}<span><i class="fa-solid fa-screwdriver-wrench"></i>{{craftMeta.tool}}</span>{{/if}}
                   {{#if craftMeta.check}}<span><i class="fa-solid fa-dice-d20"></i>{{craftMeta.check}}{{#if craftMeta.activeDc}} · DC {{craftMeta.activeDc}}{{/if}}</span>{{/if}}
                   {{#if craftMeta.hoursRequired}}<span><i class="fa-solid fa-clock"></i>{{craftMeta.hoursRequired}} hours</span>{{/if}}
-                  <span><i class="fa-solid fa-box-open"></i>{{output.label}} ×{{output.quantity}}</span>
+                  <span><i class="fa-solid fa-box-open"></i>{{output.label}}{{#if output.showQuantity}} ×{{output.quantity}}{{/if}}</span>
                 </div>
 
                 {{#if progress}}<div class="ml-craftworks-craft-progress-large"><div><strong>{{progress.successes}} of {{progress.requiredSuccesses}} Successes</strong><span>{{progress.progressHours}} of {{progress.hoursRequired}} hours progress</span></div><span>{{progress.timeSpentHours}} hours spent</span></div>{{/if}}

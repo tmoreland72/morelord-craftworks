@@ -276,6 +276,7 @@
                               {{#each requirementRows}}
                                 {{#if alternativeRows.length}}
                                   <div class="ml-craftworks-requirement-alternatives">
+                                    <span class="ml-craftworks-requirement-alternatives-label">Choose one</span>
                                     {{#each alternativeRows}}
                                       <div class="ml-craftworks-requirement-row" data-document-uuid="{{materialUuid}}">
                                         {{#if materialImg}}
@@ -298,11 +299,12 @@
                                           {{/if}}
                                         {{/if}}
                                         <span class="ml-craftworks-requirement-copy">
-          <strong>{{displayLabel}}</strong>
-          {{#if displayRarity}}
-            <small class="ml-craftworks-requirement-rarity">{{displayRarity}}</small>
-          {{/if}}
-        </span>
+                                          <span class="ml-craftworks-requirement-quantity">{{quantity}} ×</span>
+                                          <strong>{{displayLabel}}</strong>
+                                          {{#if displayRarity}}
+                                            <small class="ml-craftworks-requirement-rarity">{{displayRarity}}</small>
+                                          {{/if}}
+                                        </span>
                                         {{#unless @last}}<span class="ml-craftworks-requirement-or">OR</span>{{/unless}}
                                       </div>
                                     {{/each}}
@@ -329,11 +331,12 @@
                                       {{/if}}
                                     {{/if}}
                                     <span class="ml-craftworks-requirement-copy">
-          <strong>{{displayLabel}}</strong>
-          {{#if displayRarity}}
-            <small class="ml-craftworks-requirement-rarity">{{displayRarity}}</small>
-          {{/if}}
-        </span>
+                                      <span class="ml-craftworks-requirement-quantity">{{quantity}} ×</span>
+                                      <strong>{{displayLabel}}</strong>
+                                      {{#if displayRarity}}
+                                        <small class="ml-craftworks-requirement-rarity">{{displayRarity}}</small>
+                                      {{/if}}
+                                    </span>
                                   </div>
                                 {{/if}}
                               {{/each}}
@@ -383,7 +386,7 @@
                         {{/if}}
                         <div>
                           <strong>{{output.label}}</strong>
-                          <span>×{{output.quantity}}</span>
+                          {{#if output.showQuantity}}<span>×{{output.quantity}}</span>{{/if}}
                         </div>
                       </div>
                     </section>

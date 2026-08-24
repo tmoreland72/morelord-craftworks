@@ -118,6 +118,26 @@ export class Dnd5eCompendiumItemResolver {
     return null;
   }
 
+  async resolveAny(name, { preferredSourceBook = null } = {}) {
+    if (!this._bySourceBook.size) {
+      await this.refresh();
+    }
+
+    const sourceBooks = [
+      preferredSourceBook,
+      ...this._bySourceBook.keys()
+    ].filter((sourceBook, index, values) =>
+      sourceBook && values.indexOf(sourceBook) === index
+    );
+
+    for (const sourceBook of sourceBooks) {
+      const match = await this.resolve(name, { sourceBook });
+      if (match) return match;
+    }
+
+    return null;
+  }
+
   async resolveDocument(name, { sourceBook } = {}) {
     const match = await this.resolve(name, { sourceBook });
     if (!match?.uuid) return null;
@@ -145,6 +165,12 @@ export class Dnd5eCompendiumItemResolver {
   candidateNames(value) {
     const name = String(value ?? "").trim();
     const candidates = [name];
+
+    if (/^playing card set$/i.test(name)) {
+      candidates.push("Playing Cards");
+      candidates.push("Playing Cards Set");
+      candidates.push("Gaming Set (Playing Cards)");
+    }
 
     // SRD 5.2 uses parenthetical naming for the upgraded healing potions:
     // "Potion of Healing (Greater)" rather than Kibbles' source-table label
