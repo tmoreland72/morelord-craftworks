@@ -77,6 +77,9 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
     const packs = [...CONTENT_PACKS]
       .sort((a,b) => Number(a.sort ?? 0) - Number(b.sort ?? 0))
       .map(pack => {
+        const requiredModule = pack.requiredModuleId
+          ? game.modules.get(pack.requiredModuleId)
+          : null;
         const state = craftworks?.contentPacks?.describe(pack.id);
         const requiredFeatures = Array.isArray(pack.requiredFeatures) ? pack.requiredFeatures : [];
         const hasAccess = state?.hasAccess ?? (
@@ -111,6 +114,17 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
             Array.isArray(pack.requiredFeatures)
               ? pack.requiredFeatures[0] ?? null
               : null,
+          setupNotice: hasAccess ? pack.setupNotice ?? null : null,
+          requiredModuleStatus: hasAccess && pack.requiredModuleId
+            ? {
+                active: Boolean(requiredModule?.active),
+                label: requiredModule?.active
+                  ? "Required module detected and enabled."
+                  : requiredModule
+                    ? "Required module is installed but not enabled."
+                    : "Required module is not installed."
+              }
+            : null,
           statusLabel: hasAccess
             ? (pack.premium ? "Premium" : "Available")
             : "Access Required"

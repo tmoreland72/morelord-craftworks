@@ -73,6 +73,18 @@ The GM controls active packs from **Configure Craftworks → Content Packs**.
 Premium pack availability is determined through Morelord Core. An inactive or
 unentitled Content Pack contributes no runtime Craftworks content.
 
+### Monsters of Drakkenheim setup requirement
+
+Access to the **Monsters of Drakkenheim** Craftworks Content Pack does not install
+the official Foundry module or its Actors. To give players the ability to harvest
+Drakkenheim monster material components, the GM must:
+
+1. Install and enable the **Monsters of Drakkenheim** module (`drakkenheim-monsters`).
+2. Create or place monsters using Actors from that module's **Monsters** compendium.
+
+Actors from other compendiums do not provide the official Drakkenheim harvesting
+data required for those material components.
+
 Standard content is shown without an extra source badge in reference browsers.
 Premium content uses a compact **Premium** badge to keep recipe/material displays
 from becoming unnecessarily busy.

@@ -797,6 +797,35 @@
   opacity: .72;
 }
 
+.ml-craftworks .ml-craftworks-pack-requirement {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  margin-top: 10px;
+  padding: 9px 11px;
+  border: 1px solid color-mix(in srgb, var(--ml-color-warning) 65%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--ml-color-warning) 10%, transparent);
+  color: var(--ml-color-warning);
+}
+
+.ml-craftworks .ml-craftworks-pack-requirement[data-state="ready"] {
+  border-color: color-mix(in srgb, var(--ml-color-success) 55%, transparent);
+  background: color-mix(in srgb, var(--ml-color-success) 8%, transparent);
+  color: var(--ml-color-success);
+}
+
+.ml-craftworks .ml-craftworks-pack-requirement div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ml-craftworks .ml-craftworks-pack-requirement span,
+.ml-craftworks .ml-craftworks-pack-requirement small {
+  color: var(--color-text-primary, inherit);
+}
+
 .ml-craftworks .ml-craftworks-toggle-row {
   display: flex;
   align-items: center;

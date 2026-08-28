@@ -95,6 +95,18 @@
               {{#if requiredFeature}}
                 <small><strong>Feature:</strong> {{requiredFeature}}</small>
               {{/if}}
+              {{#if setupNotice}}
+                <div class="ml-craftworks-pack-requirement" data-state="{{#if requiredModuleStatus.active}}ready{{else}}missing{{/if}}">
+                  <i class="fa-solid {{#if requiredModuleStatus.active}}fa-circle-check{{else}}fa-triangle-exclamation{{/if}}"></i>
+                  <div>
+                    <strong>Required Drakkenheim Setup</strong>
+                    <span>{{setupNotice}}</span>
+                    {{#if requiredModuleStatus}}
+                      <small>{{requiredModuleStatus.label}}</small>
+                    {{/if}}
+                  </div>
+                </div>
+              {{/if}}
               <div class="ml-craftworks-pack-counts">
                 <span>{{counts.materials}} materials source</span>
                 <span>{{counts.recipes}} recipes</span>

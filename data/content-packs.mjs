@@ -67,6 +67,8 @@ export const CONTENT_PACKS = [
     shortLabel: "Drakkenheim",
     rulesVersion: "2024",
     description: "Premium Monsters of Drakkenheim materials, monster harvesting data, recipes, and acquisition content.",
+    requiredModuleId: "drakkenheim-monsters",
+    setupNotice: "To give players access to Drakkenheim monster material components, install and enable the Monsters of Drakkenheim module, then create or place monsters using Actors from that module's Monsters compendium.",
     premium: true,
     requiredEntitlements: [],
     requiredFeatures: ["craftworks.content-mod"],
