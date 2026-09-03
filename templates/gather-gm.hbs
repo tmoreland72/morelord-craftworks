@@ -1,7 +1,7 @@
 <section class="ml-app ml-app-shell ml-craftworks app-shell">
   <header class="ml-craftworks-header">
     <h2>Gathering</h2>
-    <p>Start an optional gathering opportunity for every connected player.</p>
+    <p>Start an optional gathering opportunity for selected player characters.</p>
   </header>
 
   {{#if session}}
@@ -45,21 +45,31 @@
         </select>
       </label>
 
-      <fieldset class="ml-craftworks-character-picker">
-        <legend>Player Characters</legend>
-        <p>Choose which connected player characters receive the gathering roll window.</p>
-        <div class="ml-craftworks-character-picker-list">
+      <section class="ml-craftworks-harvest-gm-managed ml-craftworks-harvest-skip-skill-section">
+        <div class="ml-craftworks-harvest-mode-heading">
+          <i class="fa-solid fa-users"></i>
+          Player Characters
+        </div>
+        <p class="ml-craftworks-harvest-preflight-help">
+          Choose which characters take part in this Gathering opportunity.
+        </p>
+        <div class="ml-craftworks-harvest-skip-skill-list">
           {{#each characters}}
-            <label>
+            <label class="ml-craftworks-harvest-skip-skill-row">
               <input type="checkbox" name="characterUuid" value="{{uuid}}" {{#if checked}}checked{{/if}}>
-              <img src="{{img}}" alt="{{name}}">
-              <span><strong>{{name}}</strong><small>{{#if connected}}Connected: {{userName}}{{else}}Offline — no window can be sent{{/if}}</small></span>
+              <span class="ml-craftworks-harvest-skip-character">
+                {{#if img}}<img src="{{img}}" alt="{{name}}">{{/if}}
+                <span>
+                  <strong>{{name}}</strong>
+                  <small>{{#if connected}}{{userName}}{{else}}Offline · Not connected{{/if}}</small>
+                </span>
+              </span>
             </label>
           {{else}}
-      <p class="ml-text ml-craftworks-warning" data-tone="warning">No player character Actors are defined.</p>
+            <p class="ml-text ml-craftworks-warning" data-tone="warning">No player character Actors are defined.</p>
           {{/each}}
         </div>
-      </fieldset>
+      </section>
 
       <div class="ml-actions ml-craftworks-actions">
         <button type="button" data-action="start"><i class="fa-solid fa-seedling"></i> Start Gathering</button>

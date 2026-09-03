@@ -1,5 +1,7 @@
 import { MODULE_TITLE } from "../constants.mjs";
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
+import { bindGeneratorCountControls } from "./generator-count-controls.mjs";
+import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -78,12 +80,17 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
         this.render({ force: true });
       })
     );
+    bindGeneratorCountControls(this.element, {
+      inputSelector: "[data-scroll-level]"
+    });
     this.element.querySelector("[data-action='generate-scrolls']")
       ?.addEventListener("click", event => this.#generate(event));
     this.element.querySelector("[data-action='reroll-scrolls']")
       ?.addEventListener("click", event => this.#generate(event));
     this.element.querySelector("[data-action='award-scrolls']")
       ?.addEventListener("click", event => this.#award(event));
+    this.element.querySelector("[data-action='share-scrolls']")
+      ?.addEventListener("click", event => this.#share(event));
     this.element.querySelectorAll("[data-spell-uuid]").forEach(button =>
       button.addEventListener("click", async event => {
         const document = await fromUuid(event.currentTarget.dataset.spellUuid);
@@ -155,6 +162,22 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
     } catch (error) {
       console.error("Morelord Craftworks | Spell scroll award failed.", error);
       ui.notifications.error(error.message);
+    }
+  }
+
+  async #share(event) {
+    event.preventDefault();
+    if (!this.result.length) return ui.notifications.warn("Generate spell scrolls before sharing them.");
+    try {
+      await AwardChatCardService.post({
+        items: this.result.map(spell => ({ ...spell, linkUuid: spell.uuid, quantity: 1 })),
+        title: "Available Spell Scrolls",
+        subtitle: `${this.result.length} randomly generated spell scroll${this.result.length === 1 ? "" : "s"}`,
+        icon: "fa-solid fa-scroll"
+      });
+      ui.notifications.info("Spell scroll results displayed in chat.");
+    } catch (error) {
+      ui.notifications.error(`Could not display spell scroll results: ${error.message}`);
     }
   }
 }

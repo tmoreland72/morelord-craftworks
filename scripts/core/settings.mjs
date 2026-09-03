@@ -17,6 +17,7 @@ const SETTINGS = Object.freeze({
   GATHER_DC_OVERRIDES: "gatherDcOverrides",
   GATHER_QUANTITY_MULTIPLIER: "gatherQuantityMultiplier",
   GATHER_RARE_BIAS: "gatherRareBias",
+  GATHER_SELECTED_CHARACTER_UUIDS: "gatherSelectedCharacterUuids",
 
   LOOT_ENABLE_MATERIALS: "lootEnableMaterials",
   LOOT_ENABLE_COIN: "lootEnableCoin",
@@ -116,6 +117,11 @@ export function registerSettings() {
   registerString(SETTINGS.GATHER_DC_OVERRIDES, "Gathering Terrain DC Overrides", "{}");
   registerNumber(SETTINGS.GATHER_QUANTITY_MULTIPLIER, "Gathering Quantity Multiplier", 1);
   registerNumber(SETTINGS.GATHER_RARE_BIAS, "Gathering Rare Result Bias (%)", 0);
+  registerClientString(
+    SETTINGS.GATHER_SELECTED_CHARACTER_UUIDS,
+    "Last Gather Player Characters",
+    ""
+  );
 
   registerBoolean(SETTINGS.LOOT_ENABLE_MATERIALS, "Encounter Loot: Materials", true);
   registerBoolean(SETTINGS.LOOT_ENABLE_COIN, "Encounter Loot: Coin", true);

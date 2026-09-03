@@ -37,14 +37,20 @@
               <strong>{{label}}</strong>
               <small>{{available}} available</small>
             </span>
-            <input
-              type="number"
-              min="0"
-              max="{{available}}"
-              step="1"
-              value="{{count}}"
-              data-spellbook-level="{{level}}"
-            >
+            <span class="ml-craftworks-generator-stepper" data-count-stepper>
+              <input
+                type="number"
+                min="0"
+                max="{{available}}"
+                step="1"
+                value="{{count}}"
+                data-spellbook-level="{{level}}"
+              >
+              <span class="ml-craftworks-generator-stepper-controls">
+                <button type="button" data-count-adjust="1" aria-label="Add one {{label}} spell"><i class="fa-solid fa-chevron-up"></i></button>
+                <button type="button" data-count-adjust="-1" aria-label="Remove one {{label}} spell"><i class="fa-solid fa-chevron-down"></i></button>
+              </span>
+            </span>
           </label>
         {{/each}}
       </div>

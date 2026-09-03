@@ -24,7 +24,7 @@ export const CRAFTWORKS_DOCUMENTATION = Object.freeze({
       { title: "Finalize", body: "Claims reserve components. Finalizing awards them to resolved recipients and posts the outcome." }
     ], callouts: [{ tone: "info", icon: "fa-solid fa-window-restore", title: "Stable working view", body: "Claimed creatures remain expanded unless manually collapsed, preventing list jumps during large harvests." }] },
     { id: "acquisition", title: "Gather, Loot, and Hoards", icon: "fa-solid fa-seedling", bullets: [
-      "Gather gives each selected connected character one scene-tracked terrain opportunity.",
+      "Gather uses the same party-priority picker as Harvest and gives each selected connected character an independent scene-tracked terrain opportunity, including multiple characters owned by one user.",
       "Loot generates encounter materials, currency, and special treasure using configured acquisition rules.",
       "Hoard builds a larger lair, vault, or cache reward for a character or Group recipient.",
       "Delerium Search appears when its supported content and access are available."
@@ -36,7 +36,7 @@ export const CRAFTWORKS_DOCUMENTATION = Object.freeze({
       "Enhanced armor, shield, and weapon recipes create the generic +1, +2, or +3 item; the GM configures its final equipment form.",
       "Craftworks Settings manages access, Content Packs, acquisition rules, and compendium synchronization."
     ] },
-    { id: "generators", title: "Item Generators", icon: "fa-solid fa-wand-magic-sparkles", introduction: "Entitled GMs can generate, review, reroll, and award source-aware potions, spell scrolls, and spellbooks. Final awards are summarized in chat." },
+    { id: "generators", title: "Item Generators", icon: "fa-solid fa-wand-magic-sparkles", introduction: "Entitled GMs can generate, review, reroll, and award source-aware potions, spell scrolls, and spellbooks. Responsive quantity grids include visible up/down controls. Potion and scroll drafts can also be displayed in chat without awarding Items, which is useful for shops and public offers." },
     { id: "troubleshooting", title: "Troubleshooting", icon: "fa-solid fa-life-ring", bullets: [
       "For missing content, confirm the Content Pack, entitlement, source module, and Configure Sources selection, then Sync with Compendiums.",
       "If a character receives no acquisition window, confirm the GM included it and a connected user has Owner permission.",

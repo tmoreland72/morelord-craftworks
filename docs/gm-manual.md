@@ -247,9 +247,10 @@ Gather is a GM-started, scene-based opportunity for individual characters.
 1. Open **Craftworks → Gather** on the intended scene.
 2. Select the terrain profile.
 3. Review the displayed DC and active participants.
-4. Start the session.
-5. Players choose an allowed skill and make the configured dnd5e roll, or decline.
-6. Successful results award a material appropriate to the terrain.
+4. Select participants using the same party-priority character picker as Harvest. The previous successful selection is remembered.
+5. Start the session. Every included character owned by a connected user receives an independent window, including multiple characters owned by one user.
+6. Players choose an allowed skill and make the configured dnd5e roll, or decline.
+7. Successful results award a material appropriate to the terrain.
 
 Gather attempts are tracked per character and scene. Reopening the tool does not grant unlimited repeat attempts. Use the GM reset control only when the scene should offer a new opportunity.
 
@@ -302,7 +303,7 @@ Every generated hoard includes potion and spell-scroll rewards in addition to it
 
 ### Potion Generator
 
-Open **Potion Generator**, choose the available generation options, and generate a result from enabled dnd5e sources. Review the linked potion, choose a recipient, and create the award. The source is validated again before the item is delivered.
+Open **Potion Generator**, choose quantities with the numeric fields or visible up/down controls, and generate a result from enabled dnd5e sources. Use **Display Results in Chat** to share a draft—such as a shop's current stock—without creating or awarding Items. To award it, choose a recipient and create the award. The source is validated again before delivery.
 
 ![Potion Generator setup controls the number of random potions to draw.](assets/potion-generator-setup.png)
 
@@ -313,11 +314,12 @@ Open **Potion Generator**, choose the available generation options, and generate
 ### Spell Scroll Generator
 
 1. Open **Spell Scroll Generator**.
-2. Enter the number of scrolls to generate at each level, from cantrip through level 9.
+2. Enter the number of scrolls to generate at each level, from cantrip through level 9, using the numeric fields or up/down controls.
 3. Select **Generate** and review the random spells from enabled compendiums.
 4. Open a source document when you need to inspect a result, or use **Reroll** to replace the draft.
-5. Choose the recipient.
-6. Select **Award Generated Spell Scrolls**.
+5. Optionally select **Display Results in Chat** to share the draft without creating Items.
+6. Choose the recipient.
+7. Select **Award Generated Spell Scrolls**.
 
 Generated scrolls use dnd5e's native scroll conversion, preserve the selected spell's usable mechanics, support levels above 1, and keep a link to the source spell.
 
@@ -331,7 +333,7 @@ Generated scrolls use dnd5e's native scroll conversion, preserve the selected sp
 
 1. Open **Spellbook Generator**.
 2. Name the spellbook.
-3. Enter the desired number of cantrips and spells at each level.
+3. Enter the desired number of cantrips and spells at each level using the numeric fields or up/down controls.
 4. Select **Generate**.
 5. Inspect spell links and use **Reroll** if needed.
 6. Choose a recipient.

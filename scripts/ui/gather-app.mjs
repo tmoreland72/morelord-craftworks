@@ -1,4 +1,7 @@
-import { MODULE_TITLE } from "../constants.mjs";
+import { MODULE_ID, MODULE_TITLE } from "../constants.mjs";
+import { SETTINGS } from "../core/settings.mjs";
+import { getMorelordCoreService } from "../core/morelord-core-api.mjs";
+import { participantsByUser } from "../acquisition/harvest-participants.mjs";
 
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 
@@ -17,7 +20,7 @@ export class GatherApp extends ScrollPreservingApplicationMixin(
 
   static DEFAULT_OPTIONS = {
     id: "morelord-craftworks-gather",
-    classes: ["ml-window", "ml-craftworks-module", "ml-craftworks-window"],
+    classes: ["ml-window", "ml-craftworks-module", "ml-craftworks-window", "ml-craftworks-harvest-modern"],
     position: { width: 800, height: "auto" },
     window: { title: `${MODULE_TITLE} — Gathering`, resizable: true }
   };
@@ -33,26 +36,46 @@ export class GatherApp extends ScrollPreservingApplicationMixin(
 
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
-    const players = game.users.filter(user => user.active && !user.isGM);
     const gatherRecords = this.craftworks.gather.getSceneGatherRecords();
     const characters = game.actors.filter(actor => actor.type === "character");
     if (this.selectedCharacterUuids === null) {
-      this.selectedCharacterUuids = new Set(characters
-        .filter(actor => this.#activeUserForActor(actor))
-        .map(actor => actor.uuid));
+      const stored = String(game.settings.get(MODULE_ID, SETTINGS.GATHER_SELECTED_CHARACTER_UUIDS) ?? "");
+      let selectedUuids = null;
+      if (stored) {
+        try { selectedUuids = JSON.parse(stored); } catch { selectedUuids = null; }
+      }
+      if (Array.isArray(selectedUuids)) {
+        const available = new Set(characters.map(actor => actor.uuid));
+        selectedUuids = selectedUuids.filter(uuid => available.has(uuid));
+        if (!selectedUuids.length) selectedUuids = null;
+      }
+      const defaults = getMorelordCoreService("ui")?.participation
+        ?.listCharacterChoices({ selectedUuids })
+        ?? characters.map(actor => ({
+          uuid: actor.uuid,
+          checked: selectedUuids ? selectedUuids.includes(actor.uuid) : actor.hasPlayerOwner
+        }));
+      this.selectedCharacterUuids = new Set(
+        defaults.filter(entry => entry.checked).map(entry => entry.uuid)
+      );
     }
+    const choices = getMorelordCoreService("ui")?.participation
+      ?.listCharacterChoices({ selectedUuids: [...this.selectedCharacterUuids] })
+      ?? characters.map(actor => ({ uuid: actor.uuid, name: actor.name, img: actor.img }));
+    const sessionParticipants = participantsByUser(this.session?.gatherActorsByUser);
 
     return foundry.utils.mergeObject(context, {
       session: this.session,
       sceneName: canvas.scene?.name ?? "",
       gatherRecordCount: Object.keys(gatherRecords).length,
-      characters: characters.map(actor => {
+      characters: choices.map(choice => {
+        const actor = characters.find(entry => entry.uuid === choice.uuid);
         const user = this.#activeUserForActor(actor);
         return {
-          uuid: actor.uuid,
-          name: actor.name,
-          img: actor.img,
-          checked: this.selectedCharacterUuids.has(actor.uuid),
+          uuid: choice.uuid,
+          name: choice.name,
+          img: choice.img,
+          checked: this.selectedCharacterUuids.has(choice.uuid),
           connected: Boolean(user),
           userName: user?.name ?? null
         };
@@ -61,14 +84,11 @@ export class GatherApp extends ScrollPreservingApplicationMixin(
         ...profile,
         selected: profile.id === this.selectedTerrain
       })),
-      progress: this.session ? players.filter(user => {
-        const actor = this.#characterForUser(user);
-        return !this.session.selectedCharacterUuids
-          || this.session.selectedCharacterUuids.includes(actor?.uuid);
-      }).map(user => {
-        const state = this.session.participants?.[user.id];
+      progress: this.session ? sessionParticipants.map(participant => {
+        const state = this.session.participants?.[participant.actorUuid];
+        const actor = characters.find(entry => entry.uuid === participant.actorUuid);
         return {
-          user: user.name,
+          user: actor?.name ?? game.users.get(participant.userId)?.name ?? "Unknown",
           status: state?.status ?? "waiting",
           total: state?.total ?? null,
           result: state?.result ?? null
@@ -111,22 +131,28 @@ export class GatherApp extends ScrollPreservingApplicationMixin(
         && this.selectedCharacterUuids.has(actor.uuid)
       );
       if (!selectedCharacters.length) throw new Error("Select at least one player character.");
-      const players = [...new Set(
-        selectedCharacters
-          .map(actor => this.#activeUserForActor(actor))
-          .filter(Boolean)
-      )];
+      const gatherActorsByUser = {};
+      for (const actor of selectedCharacters) {
+        const user = this.#activeUserForActor(actor);
+        if (user) (gatherActorsByUser[user.id] ??= []).push(actor.uuid);
+      }
+      const players = Object.keys(gatherActorsByUser).map(id => game.users.get(id)).filter(Boolean);
       if (!players.length) throw new Error("None of the selected player characters has a connected player.");
 
-      this.session = this.craftworks.gather.start(this.selectedTerrain);
+      this.session = this.craftworks.gather.start(this.selectedTerrain, { gatherActorsByUser });
       this.session.selectedCharacterUuids = selectedCharacters.map(actor => actor.uuid);
+      await game.settings.set(
+        MODULE_ID,
+        SETTINGS.GATHER_SELECTED_CHARACTER_UUIDS,
+        JSON.stringify([...this.selectedCharacterUuids])
+      );
 
-      await Promise.all(players.map(user =>
-        this.craftworks.socket.emit(
+      await Promise.all(Object.entries(gatherActorsByUser).flatMap(([userId, actorUuids]) =>
+        actorUuids.map(actorUuid => this.craftworks.socket.emit(
           "gather.open",
-          { session: this.session },
-          { targetUserId: user.id }
-        )
+          { session: this.session, actorUuid },
+          { targetUserId: userId }
+        ))
       ));
 
       await this.render();
@@ -160,16 +186,7 @@ export class GatherApp extends ScrollPreservingApplicationMixin(
     return game.users.find(user =>
       user.active
       && !user.isGM
-      && this.#characterForUser(user)?.id === actor.id
-    ) ?? null;
-  }
-
-  #characterForUser(user) {
-    if (!user) return null;
-    if (user.character) return user.character;
-    return game.actors.find(actor =>
-      actor.type === "character"
-      && Number(actor.ownership?.[user.id] ?? 0) >= 3
+      && (user.character?.uuid === actor.uuid || actor.testUserPermission(user, "OWNER"))
     ) ?? null;
   }
 }

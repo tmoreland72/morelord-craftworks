@@ -119,7 +119,7 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
       potionGeneratorPremium:
         Boolean(this.craftworks.potionGenerator?.hasAccess),
       partyInfo,
-      canOpenDocumentation: Boolean(
+      canOpenDocumentation: game.user.isGM && Boolean(
         getMorelordCoreService("ui")?.documentation?.open
       ),
       canRefreshContent: game.user.isGM

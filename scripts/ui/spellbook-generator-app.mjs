@@ -1,6 +1,7 @@
 import { MODULE_TITLE } from "../constants.mjs";
 
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
+import { bindGeneratorCountControls } from "./generator-count-controls.mjs";
 
 const {
   ApplicationV2,
@@ -174,6 +175,9 @@ export class SpellbookGeneratorApp
         this.render({ force: true });
       })
     );
+    bindGeneratorCountControls(this.element, {
+      inputSelector: "[data-spellbook-level]"
+    });
 
     this.element
       .querySelector(

@@ -49,7 +49,7 @@ export class GatherService {
     return true;
   }
 
-  start(profileId) {
+  start(profileId, { gatherActorsByUser = {} } = {}) {
     const profile = getGatherProfile(profileId, {
       activePackIds: this.#activeGatherPackIds()
     });
@@ -72,6 +72,7 @@ export class GatherService {
         name: profile.name,
         dc: getGatherDC(profile)
       },
+      gatherActorsByUser: foundry.utils.deepClone(gatherActorsByUser),
       participants: {},
       results: []
     });
@@ -79,7 +80,11 @@ export class GatherService {
 
   decline({ sessionId, userId, actorUuid = null }) {
     const session = this.#requireOpen(sessionId);
-    if (session.participants[userId]?.status) {
+    const permittedActors = session.gatherActorsByUser?.[userId] ?? [];
+    if (!(Array.isArray(permittedActors) ? permittedActors : [permittedActors]).includes(actorUuid)) {
+      throw new Error("This character is not part of the Gathering session.");
+    }
+    if (session.participants[actorUuid]?.status) {
       throw new Error("This gathering opportunity is already resolved for that player.");
     }
 
@@ -88,13 +93,17 @@ export class GatherService {
       actorUuid,
       status: "declined"
     };
-    session.participants[userId] = state;
+    session.participants[actorUuid] = state;
     return state;
   }
 
   async attempt({ sessionId, userId, actorUuid, skillId, total }) {
     const session = this.#requireOpen(sessionId);
-    if (session.participants[userId]?.status) {
+    const permittedActors = session.gatherActorsByUser?.[userId] ?? [];
+    if (!(Array.isArray(permittedActors) ? permittedActors : [permittedActors]).includes(actorUuid)) {
+      throw new Error("This character is not part of the Gathering session.");
+    }
+    if (session.participants[actorUuid]?.status) {
       throw new Error("This gathering opportunity is already resolved for that player.");
     }
 
@@ -109,7 +118,7 @@ export class GatherService {
         total: numericTotal,
         status: "failed"
       };
-      session.participants[userId] = failed;
+      session.participants[actorUuid] = failed;
       await this.#recordGatherAttempt(session, failed);
       return failed;
     }
@@ -167,7 +176,7 @@ export class GatherService {
       }
     };
 
-    session.participants[userId] = state;
+    session.participants[actorUuid] = state;
     session.results.push(state.result);
     await this.#recordGatherAttempt(session, state);
     return state;

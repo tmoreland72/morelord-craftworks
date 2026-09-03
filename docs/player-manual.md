@@ -166,6 +166,8 @@ Gather is an individual opportunity tied to the current scene and its terrain.
 4. Make the configured dnd5e roll, or decline the opportunity.
 5. On a success, Craftworks awards an appropriate material from the active terrain content.
 
+The GM selects participating characters using the same party-priority picker as Harvest. If you own multiple included characters, each receives an independently titled Gather window and a separate scene-tracked attempt.
+
 An attempt is tracked for your character on that scene, so closing and reopening the application does not provide another roll. Your GM can reset the scene's Gather state when a new opportunity is appropriate.
 
 ![The player Gather window shows the terrain, DC, available skills, and decline option.](assets/gather-player-ready.png)

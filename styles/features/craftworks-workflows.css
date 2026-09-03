@@ -1461,7 +1461,7 @@
 /* Spellbook Generator */
 .ml-craftworks-spellbook-level-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 7px 12px;
   margin: 12px 0;
 }
@@ -2304,6 +2304,11 @@
   gap: 8px;
 }
 
+.ml-craftworks-potion-rarity-grid,
+.ml-craftworks-generator-count-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .ml-craftworks-potion-rarity-row {
   display: flex;
   align-items: center;
@@ -2534,7 +2539,57 @@
 }
 
 .ml-craftworks-generator-count-row input {
-  width: 90px;
+  width: 54px;
+  min-width: 0;
+  text-align: center;
+}
+
+.ml-craftworks-generator-stepper {
+  display: grid !important;
+  grid-template-columns: minmax(44px, 54px) 28px;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto !important;
+}
+
+.ml-craftworks-generator-stepper button {
+  width: 28px;
+  min-width: 28px;
+  height: 17px;
+  min-height: 17px;
+  padding: 0;
+  line-height: 1;
+}
+
+.ml-craftworks-generator-stepper-controls {
+  display: grid !important;
+  grid-template-rows: 1fr 1fr;
+  gap: 2px;
+  flex: 0 0 auto !important;
+}
+
+.ml-craftworks-generator-stepper input,
+.ml-craftworks-potion-rarity-row .ml-craftworks-generator-stepper input,
+.ml-craftworks-spellbook-level-row .ml-craftworks-generator-stepper input {
+  width: 100%;
+  min-width: 0;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .ml-craftworks-spellbook-level-grid,
+  .ml-craftworks-potion-rarity-grid,
+  .ml-craftworks-generator-count-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .ml-craftworks-spellbook-level-grid,
+  .ml-craftworks-potion-rarity-grid,
+  .ml-craftworks-generator-count-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .ml-craftworks-generator-result-group {

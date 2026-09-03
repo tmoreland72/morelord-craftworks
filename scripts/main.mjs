@@ -300,7 +300,7 @@ Hooks.once("ready", async () => {
   let gmHarvestApp = null;
   const playerHarvestApps = new Map();
   let gmGatherApp = null;
-  let playerGatherApp = null;
+  const playerGatherApps = new Map();
   let gmDeleriumSearchApp = null;
   let playerDeleriumSearchApp = null;
   let gmLootApp = null;
@@ -717,11 +717,14 @@ Hooks.once("ready", async () => {
   });
 
 
-  socket.on("gather.open", async ({ session }) => {
+  socket.on("gather.open", async ({ session, actorUuid }) => {
     if (game.user.isGM) return;
+    if (!actorUuid) throw new Error("Received a Gathering session without a character.");
     const imported = sessions.import(session);
-    if (playerGatherApp?.rendered) await playerGatherApp.close();
-    playerGatherApp = new GatherPlayerApp(api, imported);
+    const existing = playerGatherApps.get(actorUuid);
+    if (existing?.rendered) await existing.close();
+    const playerGatherApp = new GatherPlayerApp(api, imported, actorUuid);
+    playerGatherApps.set(actorUuid, playerGatherApp);
     await playerGatherApp.render({ force: true });
   });
 
@@ -785,17 +788,15 @@ Hooks.once("ready", async () => {
 
   socket.on("gather.state", async ({ sessionId, state }) => {
     if (game.user.isGM) return;
+    const playerGatherApp = playerGatherApps.get(state?.actorUuid);
     if (!playerGatherApp || playerGatherApp.session?.id !== sessionId) return;
     await playerGatherApp.setState(state);
   });
 
   socket.on("gather.complete", async ({ sessionId }) => {
     if (game.user.isGM) return;
-    if (playerGatherApp?.rendered) await playerGatherApp.close();
-    playerGatherApp = null;
-    for (const app of GatherPlayerApp.instances()) {
-      if (app.rendered) await app.close();
-    }
+    for (const app of playerGatherApps.values()) if (app.rendered) await app.close();
+    playerGatherApps.clear();
     ui.notifications.info("Gathering has been completed by the GM.");
   });
 

@@ -13,10 +13,9 @@ export class AwardChatCardService {
     coinLabel = null,
     title = "Items Received",
     subtitle = null,
-    speakerActor = null
+    speakerActor = null,
+    icon = "fa-solid fa-gift"
   } = {}) {
-    if (!recipient) return null;
-
     const normalizedItems = (items ?? [])
       .map(entry => this.#normalizeItem(entry))
       .filter(Boolean);
@@ -33,16 +32,18 @@ export class AwardChatCardService {
       <section class="ml-chat-card ml-craftworks-award-card">
         <header class="ml-craftworks-award-card-header">
           <div class="ml-craftworks-award-card-icon">
-            <i class="fa-solid fa-gift"></i>
+            <i class="${this.#escape(icon)}"></i>
           </div>
           <div class="ml-craftworks-award-card-heading">
             <div class="ml-craftworks-award-card-title">
               ${this.#escape(title)}
             </div>
-            <div class="ml-craftworks-award-card-recipient">
-              <i class="fa-solid fa-user"></i>
-              ${this.#escape(recipient.name)}
-            </div>
+            ${recipient ? `
+              <div class="ml-craftworks-award-card-recipient">
+                <i class="fa-solid fa-user"></i>
+                ${this.#escape(recipient.name)}
+              </div>
+            ` : ""}
             ${
               subtitle
                 ? `<div class="ml-craftworks-award-card-subtitle">${this.#escape(subtitle)}</div>`
@@ -80,7 +81,7 @@ export class AwardChatCardService {
 
     return ChatMessage.create({
       speaker: ChatMessage.getSpeaker({
-        actor: speakerActor ?? recipient
+        actor: speakerActor ?? recipient ?? null
       }),
       content
     });

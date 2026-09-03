@@ -21,7 +21,13 @@
         {{#each levels}}
           <label class="ml-craftworks-generator-count-row">
             <span><strong>{{label}}</strong><small>{{available}} available</small></span>
-            <input type="number" min="0" step="1" value="{{count}}" data-scroll-level="{{level}}">
+            <span class="ml-craftworks-generator-stepper" data-count-stepper>
+              <input type="number" min="0" step="1" value="{{count}}" data-scroll-level="{{level}}">
+              <span class="ml-craftworks-generator-stepper-controls">
+                <button type="button" data-count-adjust="1" aria-label="Add one {{label}} scroll"><i class="fa-solid fa-chevron-up"></i></button>
+                <button type="button" data-count-adjust="-1" aria-label="Remove one {{label}} scroll"><i class="fa-solid fa-chevron-down"></i></button>
+              </span>
+            </span>
           </label>
         {{/each}}
       </div>
@@ -63,6 +69,7 @@
         {{#if partyInfo.valid}}<p class="ml-craftworks-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
         <div class="ml-actions ml-craftworks-actions">
           <button type="button" data-action="reroll-scrolls"><i class="fa-solid fa-arrows-rotate"></i> Reroll</button>
+          <button type="button" data-action="share-scrolls"><i class="fa-solid fa-message"></i> Display Results in Chat</button>
           <button type="button" data-action="award-scrolls"><i class="fa-solid fa-scroll"></i> Award Generated Spell Scrolls</button>
         </div>
       </section>

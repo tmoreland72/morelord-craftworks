@@ -7,10 +7,16 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 export class GatherPlayerApp extends ScrollPreservingApplicationMixin(
   HandlebarsApplicationMixin(ApplicationV2)
 ) {
-  constructor(craftworks, session, options = {}) {
-    super(options);
+  constructor(craftworks, session, actorUuid, options = {}) {
+    const actorName = game.actors.find(actor => actor.uuid === actorUuid)?.name;
+    super({
+      ...options,
+      id: `morelord-craftworks-gather-player-${actorUuid?.split(".").pop() ?? game.user.id}`,
+      window: { ...options.window, title: actorName ? `${MODULE_TITLE} — Gathering — ${actorName}` : `${MODULE_TITLE} — Gathering` }
+    });
     this.craftworks = craftworks;
     this.session = session;
+    this.actorUuid = actorUuid;
     this.gatherState = null;
   }
 
@@ -32,7 +38,7 @@ export class GatherPlayerApp extends ScrollPreservingApplicationMixin(
 
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
-    const actor = this.craftworks.adapter.getActorForUser(game.user);
+    const actor = await fromUuid(this.actorUuid);
     const priorGather = actor
       ? this.craftworks.gather.getGatherRecord(this.session.sceneId, actor.uuid)
       : null;
@@ -67,7 +73,7 @@ export class GatherPlayerApp extends ScrollPreservingApplicationMixin(
 
   async #roll(event) {
     const button = event.currentTarget;
-    const actor = this.craftworks.adapter.getActorForUser(game.user);
+    const actor = await fromUuid(this.actorUuid);
     if (!actor) return ui.notifications.error("Select a token you own or configure a user character first.");
 
     button.disabled = true;
@@ -98,7 +104,7 @@ export class GatherPlayerApp extends ScrollPreservingApplicationMixin(
 
   async #decline(event) {
     event.currentTarget.disabled = true;
-    const actor = this.craftworks.adapter.getActorForUser(game.user);
+    const actor = await fromUuid(this.actorUuid);
     await this.craftworks.socket.emit("gather.decline", {
       sessionId: this.session.id,
       userId: game.user.id,

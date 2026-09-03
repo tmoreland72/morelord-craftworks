@@ -1,6 +1,8 @@
 import { MODULE_TITLE } from "../constants.mjs";
 import { POTION_CATEGORIES, POTION_RARITIES } from "../potions/potion-generator-service.mjs";
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
+import { bindGeneratorCountControls } from "./generator-count-controls.mjs";
+import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -87,6 +89,9 @@ export class PotionGeneratorApp extends ScrollPreservingApplicationMixin(
         this.render({ force: true });
       })
     );
+    bindGeneratorCountControls(this.element, {
+      inputSelector: "[data-potion-rarity]"
+    });
 
     this.element.querySelector("[data-action='generate-potions']")
       ?.addEventListener("click", event => this.#generate(event));
@@ -94,6 +99,8 @@ export class PotionGeneratorApp extends ScrollPreservingApplicationMixin(
       ?.addEventListener("click", event => this.#generate(event));
     this.element.querySelector("[data-action='award-potions']")
       ?.addEventListener("click", event => this.#award(event));
+    this.element.querySelector("[data-action='share-potions']")
+      ?.addEventListener("click", event => this.#share(event));
 
     this.element.querySelectorAll("[data-potion-uuid]").forEach(button =>
       button.addEventListener("click", async event => {
@@ -161,6 +168,22 @@ export class PotionGeneratorApp extends ScrollPreservingApplicationMixin(
       await this.close();
     } catch (error) {
       ui.notifications.error(error.message);
+    }
+  }
+
+  async #share(event) {
+    event.preventDefault();
+    if (!this.result.length) return ui.notifications.warn("Generate potions before sharing them.");
+    try {
+      await AwardChatCardService.post({
+        items: this.result.map(potion => ({ ...potion, linkUuid: potion.uuid, quantity: 1 })),
+        title: "Available Potions",
+        subtitle: `${this.result.length} randomly generated potion${this.result.length === 1 ? "" : "s"}`,
+        icon: "fa-solid fa-flask"
+      });
+      ui.notifications.info("Potion results displayed in chat.");
+    } catch (error) {
+      ui.notifications.error(`Could not display potion results: ${error.message}`);
     }
   }
 }

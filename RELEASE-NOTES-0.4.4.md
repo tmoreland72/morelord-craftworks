@@ -5,6 +5,9 @@ Morelord Craftworks 0.4.4 adds the missing Monsters of Drakkenheim SRD recipes a
 ## Added
 
 - Added an in-Foundry Documentation button to the dashboard, backed by Morelord Core's shared documentation viewer.
+- Added visible quantity controls and responsive three-column layouts to the potion, spell-scroll, and spellbook generators.
+- Added non-awarding chat sharing for generated potion and spell-scroll results.
+- Gather now shares Harvest's participant layout and priority defaults, remembers the last selection, and opens independent windows for multiple characters owned by one connected player.
 - Added Harvest player-character selection with Core-standard party priority, remembered selections, and a session-wide Skip Skill Checks option.
 - Harvest now opens an independent window and tracks independent claims for every selected character, including multiple characters owned by the same connected player.
 - Added all 19 Monsters of Drakkenheim Appendix E SRD recipe variants for enhanced armor, healing and resistance potions, enhanced shields, spell scroll tiers, and enhanced weapons.
@@ -16,6 +19,7 @@ Morelord Craftworks 0.4.4 adds the missing Monsters of Drakkenheim SRD recipes a
 
 ## Improved
 
+- The dashboard Documentation and compendium Refresh actions are now shown only to GMs.
 - Claimed creatures remain expanded in the player Harvest window to prevent disruptive layout shifts during large harvests.
 - Harvest recipe highlights now use the character assigned to that specific Harvest window, including secondary characters controlled by the same player.
 - Finalizing Harvest now clears the completed GM session so reopening Harvest starts a fresh scene scan without requiring Cancel Harvest.
