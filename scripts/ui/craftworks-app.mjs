@@ -1,6 +1,7 @@
 import { MODULE_TITLE } from "../constants.mjs";
 import { isRecipeKnownToActor } from "../core/settings.mjs";
 import { getMorelordCoreService } from "../core/morelord-core-api.mjs";
+import { formatContentSyncSummary } from "../core/content-sync-service.mjs";
 
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 
@@ -120,7 +121,8 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
       partyInfo,
       canOpenDocumentation: Boolean(
         getMorelordCoreService("ui")?.documentation?.open
-      )
+      ),
+      canRefreshContent: game.user.isGM
     }, { inplace: false });
   }
 
@@ -176,7 +178,7 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
       );
 
     this.element.querySelector("[data-action='refresh']")
-      ?.addEventListener("click", () => this.render());
+      ?.addEventListener("click", event => this.#refreshContent(event));
 
     this.element.querySelector("[data-action='open-documentation']")
       ?.addEventListener("click", event => {
@@ -194,6 +196,27 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
       return;
     }
     return fn();
+  }
+
+  async #refreshContent(event) {
+    const button = event.currentTarget;
+    button.disabled = true;
+    const originalHtml = button.innerHTML;
+    button.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin"></i> Refreshing…';
+
+    try {
+      const result = await this.craftworks.syncContent({ reason: "dashboard" });
+      ui.notifications.info(formatContentSyncSummary(result));
+      await this.render({ force: true });
+    } catch (error) {
+      console.error("Morelord Craftworks | Dashboard refresh failed.", error);
+      ui.notifications.error(`Craftworks refresh failed: ${error.message}`);
+    } finally {
+      if (button?.isConnected) {
+        button.disabled = false;
+        button.innerHTML = originalHtml;
+      }
+    }
   }
 
   #openLocations() {

@@ -8,6 +8,14 @@ import {
   getContentPackSettingKey
 } from "../../data/content-packs.mjs";
 
+export function formatContentSyncSummary(result = {}) {
+  return "Craftworks refresh complete: "
+    + `${Number(result.materialCreates ?? 0)} material(s) created, `
+    + `${Number(result.materialUpdates ?? 0)} updated, `
+    + `${Number(result.materialDeletes ?? 0)} removed, `
+    + `${Number(result.recipeCount ?? 0)} recipe(s) indexed.`;
+}
+
 export class ContentSyncService {
   constructor({
     materialInstaller,

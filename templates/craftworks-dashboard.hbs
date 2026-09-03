@@ -11,9 +11,12 @@
           Documentation
         </button>
       {{/if}}
-      <button type="button" data-action="refresh" class="ml-icon-button ml-craftworks-icon-button" title="Refresh" aria-label="Refresh">
-        <i class="fa-solid fa-arrows-rotate"></i>
-      </button>
+      {{#if canRefreshContent}}
+        <button type="button" data-action="refresh" title="Refresh materials and recipes from configured compendiums">
+          <i class="fa-solid fa-arrows-rotate"></i>
+          Refresh
+        </button>
+      {{/if}}
     </div>
   </header>
 
