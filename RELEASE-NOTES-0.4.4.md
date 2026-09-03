@@ -17,6 +17,7 @@ Morelord Craftworks 0.4.4 adds the missing Monsters of Drakkenheim SRD recipes a
 ## Improved
 
 - Claimed creatures remain expanded in the player Harvest window to prevent disruptive layout shifts during large harvests.
+- Harvest recipe highlights now use the character assigned to that specific Harvest window, including secondary characters controlled by the same player.
 - Enhanced armor, shield, and weapon recipes now award the corresponding generic `+1, +2, or +3` compendium item so the GM can configure the completed item appropriately.
 - Crafting projects now pause when their required environment is unavailable and resume when the requirement is met.
 - The dashboard now reports total and ready crafting projects and places Manage Locations with the other GM Tools.

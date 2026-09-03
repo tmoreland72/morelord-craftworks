@@ -122,16 +122,12 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
     const context = await super._prepareContext(options);
     const actor = await this.#getHarvestActor();
 
-    // Recipe marks live on the Crafter actor used by the Craft window.
-    // That actor can differ from adapter.getActorForUser() when the user has
-    // multiple owned characters or is controlling a different token.
-    const markedRecipeActor =
-      this.craftworks.crafterContext?.resolve()
-      ?? actor;
-
-    const markedRecipes = markedRecipeActor
+    // Every Harvest window is bound to one participating character. Recipe
+    // highlights must use that character's own Craft list rather than the
+    // client's global Crafter selection, which may belong to another window.
+    const markedRecipes = actor
       ? this.craftworks.markedRecipes
-          .list(markedRecipeActor)
+          .list(actor)
           .map(recipeId =>
             this.craftworks.recipes.get(recipeId, {
               includeDisabled: true
