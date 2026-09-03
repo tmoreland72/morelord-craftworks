@@ -1,4 +1,5 @@
 import { SystemAdapter } from "../core/system-adapter.mjs";
+import { getMorelordCoreService } from "../core/morelord-core-api.mjs";
 
 export class Dnd5eAdapter extends SystemAdapter {
   constructor({ sourceFilter = null } = {}) {
@@ -94,83 +95,9 @@ export class Dnd5eAdapter extends SystemAdapter {
       configure = true
     } = {}
   ) {
-    if (!actor) {
-      throw new Error(
-        "No actor available for the skill check."
-      );
-    }
-
-    // D&D5e 5.3+ uses a three-part roll API:
-    //   actor.rollSkill(processConfig, dialogConfig, messageConfig)
-    //
-    // Craftworks intentionally leaves configure=true for every player-facing
-    // skill check. This is the native D&D5e configuration dialog that provides
-    // Normal / Advantage / Disadvantage and one-off situational bonuses.
-    if (typeof actor.rollSkill === "function") {
-      const result = await actor.rollSkill(
-        {
-          skill: skillId,
-          target: dc
-        },
-        {
-          configure:
-            Boolean(configure),
-          title: flavor
-        },
-        {
-          create: true,
-          data: {
-            flavor
-          }
-        }
-      );
-
-      if (!result) {
-        return {
-          cancelled: true,
-          total: null,
-          success: null,
-          roll: null
-        };
-      }
-
-      return {
-        cancelled: false,
-        ...normalizeRollResult(result, dc)
-      };
-    }
-
-    const skill =
-      actor.system?.skills?.[skillId];
-
-    if (!skill) {
-      throw new Error(
-        `Skill '${skillId}' is not available on ${actor.name}.`
-      );
-    }
-
-    // Compatibility fallback only. D&D5e worlds should use the native path
-    // above so situational roll configuration remains available.
-    const modifier = Number(
-      skill.total ?? skill.mod ?? 0
-    );
-
-    const roll = await new Roll(
-      `1d20 + ${modifier}`
-    ).evaluate();
-
-    await roll.toMessage({ flavor });
-
-    return {
-      cancelled: false,
-      total: roll.total,
-      success:
-        dc == null
-          ? null
-          : roll.total >= dc,
-      naturalD20: extractNaturalD20(roll),
-      roll
-    };
+    const coreRolls = getMorelordCoreService("rolls");
+    if (!coreRolls?.skill) throw new Error("Morelord Core skill-roll services are unavailable.");
+    return coreRolls.skill(actor, skillId, { dc, flavor, configure, create: true });
   }
 
   getCurrencyCopper(actor) {
@@ -240,51 +167,4 @@ export class Dnd5eAdapter extends SystemAdapter {
     const [created] = await actor.createEmbeddedDocuments("Item", [data]);
     return created;
   }
-}
-
-function normalizeRollResult(result, dc) {
-  const roll = Array.isArray(result)
-    ? result[0]
-    : result?.rolls?.[0] ?? result?.roll ?? result;
-
-  const total = Number(roll?.total ?? result?.total ?? NaN);
-  return {
-    total,
-    success: Number.isFinite(total) && dc != null ? total >= dc : null,
-    naturalD20: extractNaturalD20(roll),
-    roll
-  };
-}
-
-function extractNaturalD20(roll) {
-  if (!roll) return null;
-
-  const dice = Array.from(roll.dice ?? []);
-  const d20 =
-    dice.find(die => Number(die.faces) === 20)
-    ?? Array.from(roll.terms ?? [])
-      .find(term => Number(term.faces) === 20)
-    ?? null;
-
-  if (!d20) return null;
-
-  const results = Array.from(d20.results ?? []);
-  const active =
-    results.find(result =>
-      result?.active !== false
-      && result?.discarded !== true
-    )
-    ?? results.find(result => result?.discarded !== true)
-    ?? results[0]
-    ?? null;
-
-  const value = Number(
-    active?.result
-    ?? active?.value
-    ?? NaN
-  );
-
-  return Number.isFinite(value)
-    ? value
-    : null;
 }

@@ -92,6 +92,18 @@ export class SocketService {
     return this.emit("debug.ping", { message: `Ping from ${game.user.name}` }, { targetUserId });
   }
 
+  async executeAsGm(type, data = {}) {
+    if (!this.ready || !this.socket) {
+      throw new Error("Craftworks socket transport is not ready.");
+    }
+    return this.socket.executeAsGM("dispatch", {
+      type,
+      data: foundry.utils.deepClone(data),
+      senderUserId: game.user.id,
+      sentAt: Date.now()
+    });
+  }
+
   async #receive(payload) {
     if (!payload?.type) return;
 

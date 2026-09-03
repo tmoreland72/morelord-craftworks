@@ -47,6 +47,8 @@ import { CraftingMaterialService } from "./crafting/crafting-material-service.mj
 import { CrafterContextService } from "./crafting/crafter-context-service.mjs";
 import { MarkedRecipeService } from "./crafting/marked-recipe-service.mjs";
 import { CraftingRollService } from "./crafting/crafting-roll-service.mjs";
+import { CraftingEnvironmentService } from "./crafting/crafting-environment-service.mjs";
+import { isCharacterMemberOfGroup } from "./crafting/group-membership.mjs";
 import { CraftworksSettingsApp } from "./ui/craftworks-settings-app.mjs";
 import { MaterialBrowserApp } from "./ui/material-browser-app.mjs";
 import { RecipeBrowserApp } from "./ui/recipe-browser-app.mjs";
@@ -239,11 +241,13 @@ Hooks.once("ready", async () => {
   const toolInspector = new ToolInspector();
   const craftingJobs = new CraftingJobService();
   const craftingRolls = new CraftingRollService();
+  const craftingEnvironment = new CraftingEnvironmentService();
   const crafterContext = new CrafterContextService();
   const markedRecipes = new MarkedRecipeService();
   const craftingMaterials = new CraftingMaterialService({
     materialRegistry: materials,
-    adapter
+    adapter,
+    socket
   });
   const sessions = new AcquisitionSessionManager();
   const harvest = new HarvestService({
@@ -339,6 +343,7 @@ Hooks.once("ready", async () => {
     toolInspector,
     craftingJobs,
     craftingRolls,
+    craftingEnvironment,
     craftingMaterials,
     crafterContext,
     markedRecipes,
@@ -348,6 +353,44 @@ Hooks.once("ready", async () => {
       isPurchasable: isCraftworksPurchasable,
       getMaterialId: getCraftworksMaterialId
     },
+    downtimeIntegration: Object.freeze({
+      getRecipe: recipeId => recipes.get(recipeId, { includeDisabled: true }),
+      listRecipes: () => recipes.all(),
+      getFacilityOptions: () => foundry.utils.deepClone(
+        craftingEnvironment.facilityOptions()
+      ),
+      evaluateEnvironment: (recipeOrId, context = {}) => {
+        const recipe = typeof recipeOrId === "string"
+          ? recipes.get(recipeOrId, { includeDisabled: true })
+          : recipeOrId;
+        if (!recipe) throw new Error("Craftworks recipe not found.");
+        return craftingEnvironment.evaluate(recipe, context);
+      },
+      getProject: async ({ recipeId, crafterUuid, inventoryActorUuid = null }) => {
+        const crafter = await fromUuid(crafterUuid);
+        if (!crafter) return null;
+        return craftingJobs.getProgress(recipeId, crafter, inventoryActorUuid);
+      },
+      listProjects: async ({ crafterUuid, activeOnly = false }) => {
+        const crafter = await fromUuid(crafterUuid);
+        return crafter ? craftingJobs.list(crafter, { activeOnly }) : [];
+      },
+      describeCommission: (recipeOrId, { provider = null, location = null } = {}) => {
+        const recipe = typeof recipeOrId === "string"
+          ? recipes.get(recipeOrId, { includeDisabled: true })
+          : recipeOrId;
+        if (!recipe) throw new Error("Craftworks recipe not found.");
+        return foundry.utils.deepClone({
+          recipeId: recipe.id,
+          name: recipe.name,
+          output: recipe.output,
+          hoursRequired: recipe.craft?.hoursRequired ?? null,
+          environment: recipe.craft?.environment ?? null,
+          provider,
+          location
+        });
+      }
+    }),
     dev: {
       // Compatibility aliases. Production callers should use syncContent().
       installStandardMaterials: () =>
@@ -435,14 +478,18 @@ Hooks.once("ready", async () => {
       recipeBrowserApp = new RecipeBrowserApp(api);
       return recipeBrowserApp.render({ force: true });
     },
-    openCraft: async () => {
+    openCraft: async ({ recipeId = null, crafterActorUuid = null, inventoryActorUuid = null } = {}) => {
+      if (recipeId && craftApp?.rendered) {
+        await craftApp.close();
+        craftApp = null;
+      }
       if (craftApp?.rendered) {
         await craftApp.render({ force: true });
         craftApp.bringToFront();
         return craftApp;
       }
 
-      craftApp = new CraftApp(api);
+      craftApp = new CraftApp(api, { recipeId, crafterActorUuid, inventoryActorUuid });
 
       try {
         return await craftApp.render({ force: true });
@@ -619,6 +666,28 @@ Hooks.once("ready", async () => {
     });
 
     gmHarvestApp?.setSession(session);
+  });
+
+  socket.on("craft.consume-group-materials", async (data, payload) => {
+    if (!game.user.isGM) return { ok: false, error: "A GM must authorize Group inventory changes." };
+    try {
+      const actor = await fromUuid(data.actorUuid);
+      const crafter = await fromUuid(data.crafterUuid);
+      const requestingUser = game.users.get(payload.senderUserId);
+      if (!actor || actor.type !== "group" || !crafter || crafter.type !== "character") {
+        throw new Error("The requested Group inventory or crafter is invalid.");
+      }
+      if (!requestingUser || !crafter.testUserPermission(requestingUser, "OWNER")) {
+        throw new Error("The requesting player does not own this crafter.");
+      }
+      if (!isCharacterMemberOfGroup(crafter, actor)) {
+        throw new Error("The crafter is not a member of this Group actor.");
+      }
+      const consumedMaterials = await craftingMaterials.consume(actor, data.plan, { crafter });
+      return { ok: true, consumedMaterials };
+    } catch (error) {
+      return { ok: false, error: error.message ?? String(error) };
+    }
   });
 
   socket.on("harvest.release-claims", async ({ sessionId, userId }) => {

@@ -199,31 +199,6 @@
                     <div class="ml-craftworks-recipe-heading">
                       <div class="ml-craftworks-recipe-title-line">
                         <h3>{{name}}</h3>
-
-                        <div class="ml-craftworks-recipe-title-actions">
-                          {{#if ../../canManageRecipeVisibility}}
-                            <button type="button"
-                                    class="ml-craftworks-recipe-title-button {{#if isUnknown}}ml-craftworks-recipe-hidden{{/if}}"
-                                    data-action="toggle-recipe-knowledge"
-                                    data-recipe-id="{{id}}"
-                                    title="{{#if isUnknown}}Ingredients are unknown to players{{else}}Ingredients are known to players{{/if}}">
-                              {{#if isUnknown}}
-                                <i class="fa-solid fa-circle-question"></i> Unknown
-                              {{else}}
-                                <i class="fa-solid fa-circle-check"></i> Known
-                              {{/if}}
-                            </button>
-                          {{/if}}
-
-                          <button type="button"
-                                  class="ml-craftworks-recipe-title-button {{#if isMarked}}ml-craftworks-recipe-marked{{/if}}"
-                                  data-action="toggle-mark-recipe"
-                                  data-recipe-id="{{id}}"
-                                  {{#unless canMark}}disabled{{/unless}}>
-                            <i class="fa-{{#if isMarked}}solid{{else}}regular{{/if}} fa-bookmark"></i>
-                            {{markActionLabel}}
-                          </button>
-                        </div>
                       </div>
 
                       <div class="ml-craftworks-recipe-meta">
@@ -231,11 +206,23 @@
                       </div>
                     </div>
 
-                    <div class="ml-craftworks-pills ml-craftworks-recipe-tags">
-                      {{#if showPremiumBadge}}
-                        <span class="ml-craftworks-source-badge">{{sourceBadgeLabel}}</span>
+                    <div class="ml-craftworks-recipe-title-actions">
+                      {{#if ../../canManageRecipeVisibility}}
+                        <button type="button"
+                                class="ml-craftworks-recipe-title-button {{#if isUnknown}}ml-craftworks-recipe-hidden{{else}}is-active{{/if}}"
+                                data-action="toggle-recipe-knowledge"
+                                data-recipe-id="{{id}}"
+                                title="{{#if isUnknown}}Ingredients are unknown to players{{else}}Ingredients are known to players{{/if}}">
+                          {{#if isUnknown}}<i class="fa-regular fa-square"></i> Unknown{{else}}<i class="fa-solid fa-square-check"></i> Known{{/if}}
+                        </button>
                       {{/if}}
-                      {{#each tags}}<span>{{this}}</span>{{/each}}
+                      <button type="button"
+                              class="ml-craftworks-recipe-title-button {{#if isMarked}}ml-craftworks-recipe-marked is-active{{/if}}"
+                              data-action="toggle-mark-recipe"
+                              data-recipe-id="{{id}}"
+                              {{#unless canMark}}disabled{{/unless}}>
+                        <i class="fa-{{#if isMarked}}solid{{else}}regular{{/if}} fa-bookmark"></i> {{markActionLabel}}
+                      </button>
                     </div>
                   </header>
 
@@ -262,6 +249,15 @@
                         <i class="fa-solid fa-clock"></i>
                         {{craftMeta.hoursRequired}} hours
                       </span>
+                    {{/if}}
+                    {{#if ../../canManageRecipeFacilities}}
+                      <span class="ml-craftworks-recipe-facility-controls" data-recipe-facility-controls data-recipe-id="{{id}}">
+                        <i class="fa-solid fa-building"></i><strong>Facility:</strong>
+                        <select data-recipe-facility-type aria-label="Facility type">{{selectOptions @root.facilityTypeOptions selected=craftMeta.facilityType}}</select>
+                        <select data-recipe-facility-tier aria-label="Minimum facility tier" {{#unless craftMeta.facilityType}}disabled{{/unless}}>{{selectOptions @root.facilityTierOptions selected=craftMeta.facilityTier}}</select>
+                      </span>
+                    {{else if craftMeta.facilityType}}
+                      <span><i class="fa-solid fa-building"></i><strong>Facility:</strong> {{craftMeta.facilityTier}} {{craftMeta.facilityType}}</span>
                     {{/if}}
                   </div>
 

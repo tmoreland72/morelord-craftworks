@@ -1,10 +1,28 @@
+import { isCharacterMemberOfGroup } from "../crafting/group-membership.mjs";
+
 export class RecipePlanner {
   constructor({ recipeRegistry, evaluator }) {
     this.recipeRegistry = recipeRegistry;
     this.evaluator = evaluator;
   }
 
-  plan(recipe, actor) {
+  plan(recipe, actor, { includePartyInventory = true } = {}) {
+    if (includePartyInventory && actor?.type === "character") {
+      const candidates = [actor, ...this.#partyGroupsFor(actor)];
+      const plans = candidates.map(inventoryActor => ({
+        inventoryActor,
+        plan: this.plan(recipe, inventoryActor, { includePartyInventory: false })
+      }));
+      const selected = plans.find(entry => entry.plan.ready)
+        ?? plans.find(entry => entry.plan.status === "processing")
+        ?? plans[0];
+      return {
+        ...selected.plan,
+        inventoryActor: selected.inventoryActor,
+        inventoryActorUuid: selected.inventoryActor.uuid
+      };
+    }
+
     const direct = this.evaluator.evaluate(recipe, actor);
 
     if (!actor) {
@@ -96,6 +114,12 @@ export class RecipePlanner {
       selectedGroupIndex: null,
       processingSteps: []
     };
+  }
+
+  #partyGroupsFor(character) {
+    return Array.from(globalThis.game?.actors ?? [])
+      .filter(actor => actor.type === "group")
+      .filter(actor => isCharacterMemberOfGroup(character, actor));
   }
 
   #satisfyRequirement(requirement, inventory, visiting) {

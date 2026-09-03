@@ -4,7 +4,12 @@ import {
 } from "../crafting/crafting-rules.mjs";
 import { CONTENT_PACKS, getContentPack } from "../../data/content-packs.mjs";
 import { CONTENT_PACK_MANIFESTS } from "../../data/packs/manifests.mjs";
-import { isContentPackEnabled } from "../core/settings.mjs";
+import {
+  getRecipeFacilityOverrides,
+  isContentPackEnabled,
+  setRecipeFacilityOverride
+} from "../core/settings.mjs";
+import { normalizeCraftEnvironment } from "../crafting/crafting-environment-service.mjs";
 
 export class RecipeRegistry {
   constructor({
@@ -27,6 +32,7 @@ export class RecipeRegistry {
     ]);
 
     this._recipes.clear();
+    const facilityOverrides = getRecipeFacilityOverrides();
 
     for (const [packId, entries] of sources) {
       if (!Array.isArray(entries)) {
@@ -64,6 +70,7 @@ export class RecipeRegistry {
         }
 
         const recipe = this.#normalizeRecipe(preparedRaw);
+        this.#applyFacilityOverride(recipe, facilityOverrides);
 
         // Manifest order is priority order. Higher-priority content packs
         // intentionally replace lower-priority recipes with the same id.
@@ -131,6 +138,8 @@ export class RecipeRegistry {
         recipe.output?.label,
         recipe.packLabel,
         recipe.rulesVersion,
+        recipe.craft?.environment?.facility?.type,
+        recipe.craft?.environment?.facility?.tier,
         ...(recipe.tags ?? []),
         ...recipe.requirementGroups.flatMap(group =>
           group.requirements.flatMap(req => req.searchText ?? [])
@@ -165,17 +174,28 @@ export class RecipeRegistry {
     return recipe;
   }
 
+  async setFacilityRequirement(recipeId, facility) {
+    const recipe = this._recipes.get(String(recipeId));
+    if (!recipe) throw new Error(`Unknown recipe '${recipeId}'.`);
+
+    const normalized = facility?.type
+      ? normalizeCraftEnvironment({ facility })
+      : normalizeCraftEnvironment({ portable: true });
+    await setRecipeFacilityOverride(recipe.id, normalized.facility);
+    recipe.craft.environment = normalized;
+    return recipe;
+  }
+
+  #applyFacilityOverride(recipe, overrides) {
+    if (!Object.prototype.hasOwnProperty.call(overrides, recipe.id)) return;
+    const facility = overrides[recipe.id];
+    recipe.craft.environment = facility
+      ? normalizeCraftEnvironment({ facility })
+      : normalizeCraftEnvironment({ portable: true });
+  }
+
   async #resolveDnd5eCatalogOutput(raw, sourceBook) {
     const output = raw.output ?? {};
-    const parsed = this.dnd5eItemResolver?.extractQuantityAndName
-      ? this.dnd5eItemResolver.extractQuantityAndName(
-          output.label ?? output.name ?? raw.name,
-          output.quantity ?? 1
-        )
-      : {
-          quantity: Math.max(1, Number(output.quantity ?? 1)),
-          name: String(output.label ?? output.name ?? raw.name)
-        };
 
     if (!this.dnd5eItemResolver) {
       console.warn(
@@ -185,25 +205,50 @@ export class RecipeRegistry {
       return null;
     }
 
-    const item = await this.dnd5eItemResolver.resolve(
-      parsed.name,
-      { sourceBook }
-    );
+    const configuredCandidates = Array.isArray(output.sourceCandidates)
+      ? output.sourceCandidates
+      : [];
+    const candidates = configuredCandidates.length
+      ? configuredCandidates
+      : [{ sourceBook }];
 
-    if (!item) return null;
+    for (const candidate of candidates) {
+      if (candidate.packId && !this.isPackEnabled(candidate.packId)) continue;
 
-    return {
-      ...raw,
-      output: {
-        type: "foundry-item",
-        uuid: item.uuid,
-        quantity: parsed.quantity,
-        label: item.name,
-        img: item.img,
-        sourceBook,
-        sourcePackId: item.packId
-      }
-    };
+      const candidateSourceBook = candidate.sourceBook ?? sourceBook;
+      const parsed = this.dnd5eItemResolver.extractQuantityAndName
+        ? this.dnd5eItemResolver.extractQuantityAndName(
+            candidate.name ?? output.label ?? output.name ?? raw.name,
+            output.quantity ?? 1
+          )
+        : {
+            quantity: Math.max(1, Number(output.quantity ?? 1)),
+            name: String(
+              candidate.name ?? output.label ?? output.name ?? raw.name
+            )
+          };
+      const item = await this.dnd5eItemResolver.resolve(
+        parsed.name,
+        { sourceBook: candidateSourceBook }
+      );
+
+      if (!item) continue;
+
+      return {
+        ...raw,
+        output: {
+          type: "foundry-item",
+          uuid: item.uuid,
+          quantity: parsed.quantity,
+          label: item.name,
+          img: item.img,
+          sourceBook: candidateSourceBook,
+          sourcePackId: item.packId
+        }
+      };
+    }
+
+    return null;
   }
 
   #validateUniqueMaterialOutputs() {
@@ -282,7 +327,10 @@ export class RecipeRegistry {
         skill: null,
         dc: null,
         noToolDc: null,
-        hoursRequired: null
+        hoursRequired: null,
+        checkRequired: true,
+        requiredSuccesses: 0,
+        environment: normalizeCraftEnvironment({})
       };
     }
 
@@ -318,7 +366,8 @@ export class RecipeRegistry {
       checkRequired: raw.checkRequired !== false,
       requiredSuccesses: raw.checkRequired === false
         ? 1
-        : craftingSuccessesRequired(hoursRequired)
+        : craftingSuccessesRequired(hoursRequired),
+      environment: normalizeCraftEnvironment(raw.environment ?? raw)
     };
   }
 

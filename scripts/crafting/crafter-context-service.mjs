@@ -1,3 +1,5 @@
+import { isCharacterMemberOfGroup } from "./group-membership.mjs";
+
 export class CrafterContextService {
   constructor() {
     this.selectedActorUuid = null;
@@ -63,5 +65,16 @@ export class CrafterContextService {
 
     this.selectedActorUuid = actor?.uuid ?? null;
     return actor ?? null;
+  }
+
+  availableInventoryActors(crafter = null) {
+    return game.actors
+      .filter(actor => ["character", "group"].includes(actor.type))
+      .filter(actor =>
+        game.user.isGM
+        || actor.testUserPermission(game.user, "OWNER")
+        || isCharacterMemberOfGroup(crafter, actor)
+      )
+      .sort((a, b) => a.name.localeCompare(b.name));
   }
 }

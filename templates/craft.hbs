@@ -1,10 +1,21 @@
-<section class="ml-app ml-app-shell ml-craftworks-craft ml-craftworks app-shell ml-craftworks-marketplace-browser ml-craftworks-craft-browser">
+<section class="ml-app ml-app-shell ml-craftworks-craft ml-craftworks app-shell ml-craftworks-marketplace-browser ml-craftworks-craft-browser {{#if focusedRecipe}}is-focused-recipe{{/if}}">
   <header class="ml-craftworks-header ml-craftworks-craft-browser-header">
-    <div><h2>Craft</h2><p>Search marked recipes and track crafting in progress.</p></div>
-    {{#if hasCrafter}}<span class="ml-craftworks-craft-result-count">{{recipeCount}} of {{totalRecipeCount}} recipes</span>{{/if}}
+    <div><h2>{{#if focusedRecipe}}Craft Item{{else}}Craft{{/if}}</h2><p>{{#if focusedRecipe}}Review and work on this crafting project.{{else}}Search marked recipes and track crafting in progress.{{/if}}</p></div>
+    {{#unless focusedRecipe}}{{#if hasCrafter}}<span class="ml-craftworks-craft-result-count">{{recipeCount}} of {{totalRecipeCount}} recipes</span>{{/if}}{{/unless}}
   </header>
 
   <div class="ml-craftworks-marketplace-browser-body ml-craftworks-craft-browser-body">
+    {{#if focusedRecipe}}
+    <aside class="ml-craftworks-filter-rail ml-craftworks-craft-filter-rail ml-craftworks-focused-craft-context">
+      <div class="ml-craftworks-market-filter-title"><strong>Crafting Context</strong></div>
+      <section class="ml-craftworks-craft-actor-controls">
+        <label><span>Crafter</span><select name="crafter-actor"><option value="">Choose character…</option>{{#each crafterActors}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
+        {{#if hasCrafter}}
+          <label><span>Ingredient Inventory</span><select name="inventory-actor">{{#each inventoryActors}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}{{#if type}} ({{type}}){{/if}}</option>{{/each}}</select></label>
+        {{/if}}
+      </section>
+    </aside>
+    {{else}}
     <aside class="ml-craftworks-filter-rail ml-craftworks-craft-filter-rail">
       <div class="ml-craftworks-market-filter-title">
         <strong>Craft</strong>
@@ -38,12 +49,13 @@
         </section>
       {{/if}}
     </aside>
+    {{/if}}
 
     <main class="ml-craftworks-marketplace-results ml-craftworks-craft-results">
       {{#unless hasCrafter}}
 <div class="ml-empty-state ml-craftworks-panel ml-craftworks-browser-empty-state"><i class="fa-solid fa-user"></i><p>Choose a crafter to view their marked recipes and crafting progress.</p></div>
       {{else}}
-        <div class="ml-craftworks-craft-results-heading"><div><h2>Recipes</h2><p>Crafting as <strong>{{crafter.name}}</strong> using the selected inventory.</p></div><span>{{recipeCount}} matches</span></div>
+        <div class="ml-craftworks-craft-results-heading"><div><h2>{{#if focusedRecipe}}Craft Item{{else}}Recipes{{/if}}</h2><p>Crafting as <strong>{{crafter.name}}</strong> using the selected inventory.</p></div>{{#unless focusedRecipe}}<span>{{recipeCount}} matches</span>{{/unless}}</div>
         {{#if hasRecipes}}
           <div class="ml-craftworks-craft-card-list ml-craftworks-craft-browser-list">
             {{#each recipes}}
@@ -60,10 +72,12 @@
                   {{#if craftMeta.tool}}<span><i class="fa-solid fa-screwdriver-wrench"></i>{{craftMeta.tool}}</span>{{/if}}
                   {{#if craftMeta.check}}<span><i class="fa-solid fa-dice-d20"></i>{{craftMeta.check}}{{#if craftMeta.activeDc}} · DC {{craftMeta.activeDc}}{{/if}}</span>{{/if}}
                   {{#if craftMeta.hoursRequired}}<span><i class="fa-solid fa-clock"></i>{{craftMeta.hoursRequired}} hours</span>{{/if}}
+                  {{#if craftMeta.environment}}<span><i class="fa-solid fa-location-dot"></i>{{craftMeta.environment}}</span>{{/if}}
                   <span><i class="fa-solid fa-box-open"></i>{{output.label}}{{#if output.showQuantity}} ×{{output.quantity}}{{/if}}</span>
                 </div>
 
                 {{#if progress}}<div class="ml-craftworks-craft-progress-large"><div><strong>{{progress.successes}} of {{progress.requiredSuccesses}} Successes</strong><span>{{progress.progressHours}} of {{progress.hoursRequired}} hours progress</span></div><span>{{progress.timeSpentHours}} hours spent</span></div>{{/if}}
+                {{#unless environment.passed}}<div class="ml-callout" data-tone="warning"><i class="fa-solid fa-location-dot"></i> {{environment.reasons.[0]}}</div>{{/unless}}
 
                 <div class="ml-craftworks-craft-card-body ml-craftworks-craft-list-card-body"><section><h4>Requirements</h4>
                   {{#if requirementsKnown}}
@@ -91,7 +105,7 @@
                   {{#if isCompletePending}}
                     <span class="ml-craftworks-crafting-complete"><i class="fa-solid fa-trophy"></i> Crafting Complete</span><button type="button" data-action="choose-destination" data-recipe-id="{{id}}"><i class="fa-solid fa-box-open"></i> Choose Destination</button>
                   {{else if isActive}}
-                    <span class="ml-craftworks-muted">Materials consumed from {{inventoryActorName}}.</span><button type="button" data-action="craft" data-recipe-id="{{id}}"><i class="fa-solid fa-dice-d20"></i> Roll Crafting Check</button><button type="button" class="ml-craftworks-button-subtle" data-action="cancel-crafting" data-recipe-id="{{id}}"><i class="fa-solid fa-ban"></i> Cancel</button>
+                    <span class="ml-craftworks-muted">Materials consumed from {{inventoryActorName}}.</span>{{#if environment.passed}}<button type="button" data-action="craft" data-recipe-id="{{id}}"><i class="fa-solid fa-dice-d20"></i> Roll Crafting Check</button>{{else}}<span class="ml-craftworks-craft-missing-label"><i class="fa-solid fa-pause"></i> Paused here</span>{{/if}}<button type="button" class="ml-craftworks-button-subtle" data-action="cancel-crafting" data-recipe-id="{{id}}"><i class="fa-solid fa-ban"></i> Cancel</button>
                   {{else if requirementsKnown}}
                     {{#if readiness.ready}}<span class="ml-craftworks-craft-ready-label"><i class="fa-solid fa-circle-check"></i> Ready to Craft</span><button type="button" data-action="craft" data-recipe-id="{{id}}"><i class="fa-solid fa-hammer"></i> Start Crafting</button>{{else}}<span class="ml-craftworks-craft-missing-label"><i class="fa-solid fa-circle-xmark"></i> Missing Requirements</span>{{/if}}
                   {{else}}<span class="ml-craftworks-craft-missing-label"><i class="fa-solid fa-circle-question"></i> Ingredients Unknown</span>{{/if}}

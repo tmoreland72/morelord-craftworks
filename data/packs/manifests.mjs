@@ -3,6 +3,7 @@ import { SRD_51_RECIPES } from "../srd-5.1-recipes.mjs";
 import { PHB_RECIPES } from "../phb-recipes.mjs";
 import { DMG_RECIPES } from "../dmg-recipes.mjs";
 import { MONSTERS_OF_DRAKKENHEIM_RECIPES } from "../monsters-of-drakkenheim-recipes.mjs";
+import { MM_RECIPES } from "./mm/recipes.mjs";
 
 import { STANDARD_HARVEST_PROFILES } from "./standard/harvest.mjs";
 import { STANDARD_GATHERING_PROFILES } from "./standard/gathering.mjs";
@@ -96,7 +97,10 @@ export const CONTENT_PACK_MANIFESTS = [
       seedPath: "data/drakkenheim-materials.seed.json",
       entries: []
     },
-    recipes: MONSTERS_OF_DRAKKENHEIM_RECIPES,
+    recipes: [
+      ...MONSTERS_OF_DRAKKENHEIM_RECIPES,
+      ...MM_RECIPES
+    ],
     harvestProfiles: DRAKKENHEIM_HARVEST_PROFILES,
     gatheringProfiles: DRAKKENHEIM_GATHERING_PROFILES,
     lootTiers: DRAKKENHEIM_LOOT_TIERS,

@@ -37,10 +37,17 @@ export class CraftApp
 ) {
 
   constructor(craftworks, options = {}) {
-    super(options);
+    const {
+      recipeId = null,
+      crafterActorUuid = null,
+      inventoryActorUuid = null,
+      ...applicationOptions
+    } = options;
+    super(applicationOptions);
     this.craftworks = craftworks;
-    this.crafterActorUuid = null;
-    this.inventoryActorUuid = null;
+    this.focusRecipeId = recipeId ? String(recipeId) : null;
+    this.crafterActorUuid = crafterActorUuid;
+    this.inventoryActorUuid = inventoryActorUuid;
     this.sessionLog = [];
     this.search = "";
     this.categoryFilter = "all";
@@ -121,7 +128,7 @@ export class CraftApp
     }
 
     const inventoryActors =
-      this.#availableInventoryActors();
+      this.craftworks.crafterContext.availableInventoryActors(crafter);
 
     if (!crafter) {
       return foundry.utils.mergeObject(
@@ -187,6 +194,7 @@ export class CraftApp
     const allRecipes = queuedRecipeIds
       .map(recipeId => this.craftworks.recipes.get(recipeId, { includeDisabled: true }))
       .filter(Boolean)
+      .filter(recipe => !this.focusRecipeId || recipe.id === this.focusRecipeId)
       .filter(recipe =>
         game.user.isGM
         || activeJobsByRecipe.has(recipe.id)
@@ -215,9 +223,11 @@ export class CraftApp
           ? "ready"
           : "missing";
       card.statusLabel = card.isActive
-        ? "In Progress"
+        ? (card.environment.passed ? "In Progress" : "Paused - Environment")
         : card.readiness.ready
           ? "Ready"
+          : card.readiness.materialsReady && !card.environment.passed
+            ? "Environment Unavailable"
           : card.requirementsKnown
             ? "Missing Materials"
             : "Ingredients Unknown";
@@ -299,7 +309,8 @@ export class CraftApp
         sessionLog: this.sessionLog,
         hasSessionLog:
           this.sessionLog.length > 0,
-        hasActiveFilters: Boolean(this.search || this.categoryFilter !== "all" || this.statusFilter !== "all")
+        hasActiveFilters: Boolean(this.search || this.categoryFilter !== "all" || this.statusFilter !== "all"),
+        focusedRecipe: Boolean(this.focusRecipeId)
       },
       { inplace: false }
     );
@@ -794,7 +805,8 @@ export class CraftApp
     const plannedReadiness =
       this.craftworks.recipePlanner.plan(
         recipe,
-        effectiveInventory
+        effectiveInventory,
+        { includePartyInventory: false }
       );
 
     const readiness =
@@ -805,6 +817,10 @@ export class CraftApp
             status: "unknown",
             requirementGroups: []
           };
+
+    const environment = this.craftworks.craftingEnvironment.evaluate(recipe);
+    readiness.materialsReady = readiness.ready;
+    readiness.ready = readiness.ready && environment.passed;
 
     const progress =
       this.craftworks.craftingJobs
@@ -990,8 +1006,12 @@ export class CraftApp
         ].filter(Boolean).join(" "),
         activeDc: craft.checkRequired === false ? null : activeDc,
         hoursRequired:
-          craft.hoursRequired
+          craft.hoursRequired,
+        environment: environment.mode === "facility"
+          ? `${environment.environment.facility.tier} ${environment.environment.facility.type}`
+          : environment.mode.charAt(0).toUpperCase() + environment.mode.slice(1)
       },
+      environment,
       readiness,
       requirementGroupRows,
       progress,
@@ -1038,6 +1058,13 @@ export class CraftApp
 
     if (!recipe || !inventoryActor) return;
 
+    const environment = this.craftworks.craftingEnvironment.evaluate(recipe);
+    if (!environment.passed) {
+      ui.notifications.warn(environment.reasons[0] ?? "This recipe cannot be worked in the current environment.");
+      await this.render();
+      return;
+    }
+
     let job =
       this.craftworks.craftingJobs.get(
         recipe.id,
@@ -1072,7 +1099,8 @@ export class CraftApp
       const readiness =
         this.craftworks.recipePlanner.plan(
           recipe,
-          inventoryActor
+          inventoryActor,
+          { includePartyInventory: false }
         );
 
       if (!readiness.ready) {
@@ -1110,7 +1138,8 @@ export class CraftApp
         await this.craftworks.craftingMaterials
           .consume(
             inventoryActor,
-            plan
+            plan,
+            { crafter }
           );
 
       job =
@@ -1465,21 +1494,4 @@ export class CraftApp
     return allowed ? actor : null;
   }
 
-  #availableInventoryActors() {
-    return game.actors
-      .filter(actor =>
-        ["character", "group"]
-          .includes(actor.type)
-      )
-      .filter(actor =>
-        game.user.isGM
-        || actor.testUserPermission(
-          game.user,
-          "OWNER"
-        )
-      )
-      .sort((a, b) =>
-        a.name.localeCompare(b.name)
-      );
-  }
 }

@@ -4,9 +4,11 @@
       <h1>Morelord Craftworks</h1>
       <p>Gather, harvest, loot, and understand the materials that drive your crafting economy.</p>
     </div>
-    <button type="button" data-action="refresh" class="ml-icon-button ml-craftworks-icon-button" title="Refresh" aria-label="Refresh">
-      <i class="fa-solid fa-arrows-rotate"></i>
-    </button>
+    <div class="ml-hero__actions ml-actions">
+      <button type="button" data-action="refresh" class="ml-icon-button ml-craftworks-icon-button" title="Refresh" aria-label="Refresh">
+        <i class="fa-solid fa-arrows-rotate"></i>
+      </button>
+    </div>
   </header>
 
   {{#if isGM}}
@@ -101,7 +103,7 @@
         <i class="fa-solid fa-hammer"></i>
         <span class="ml-craftworks-dashboard-card-copy">
           <strong>Craft</strong>
-          <small>Work on recipes you have marked for crafting</small>
+          <small>{{craftingProjectsCount}} crafting {{#if (eq craftingProjectsCount 1)}}project{{else}}projects{{/if}} - {{readyCraftingProjectsCount}} {{#if (eq readyCraftingProjectsCount 1)}}is{{else}}are{{/if}} ready to craft</small>
         </span>
         <i class="fa-solid fa-chevron-right"></i>
       </button>
@@ -118,6 +120,17 @@
       </div>
 
       <div class="ml-craftworks-dashboard-grid">
+        <button type="button"
+                class="ml-card ml-craftworks-dashboard-card"
+                data-action="manage-locations">
+          <i class="fa-solid fa-map-location-dot"></i>
+          <span class="ml-craftworks-dashboard-card-copy">
+            <strong>Manage Locations</strong>
+            <small>Configure settlements and their available facilities</small>
+          </span>
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
         <button type="button"
                 class="ml-card ml-craftworks-dashboard-card"
                 data-action="spell-scroll-generator">

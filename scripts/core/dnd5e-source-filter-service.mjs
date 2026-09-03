@@ -1,3 +1,5 @@
+import { getMorelordCoreService } from "./morelord-core-api.mjs";
+
 export class Dnd5eSourceFilterService {
   get configuration() {
     if (game.system.id !== "dnd5e") return {};
@@ -182,15 +184,8 @@ export class Dnd5eSourceFilterService {
   }
 
   #sourceBookLabel(book) {
-    const sourceBooks =
-      CONFIG?.DND5E?.sourceBooks
-      ?? game?.system?.config?.sourceBooks
-      ?? {};
-    const configured = sourceBooks[book];
-    const label = typeof configured === "object"
-      ? configured.label ?? configured.name ?? configured.title
-      : configured;
-    return game.i18n.localize(String(label ?? book));
+    return getMorelordCoreService("sources")?.resolveBookLabel?.({ book })
+      ?? String(book ?? "");
   }
 
   sortPacks(packs = []) {

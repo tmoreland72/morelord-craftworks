@@ -221,6 +221,14 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     const matchingRecipes = this.#matchingRecipes(crafter);
 
     const hiddenRecipeIds = getHiddenRecipeIds();
+    const facilityOptions = this.craftworks.craftingEnvironment.facilityOptions();
+    const facilityTypeOptions = Object.fromEntries([
+      ["", "No facility requirement"],
+      ...facilityOptions.types.map(type => [type.id, type.name])
+    ]);
+    const facilityTierOptions = Object.fromEntries(
+      facilityOptions.tiers.map(tier => [tier, this.#formatFacilityTier(tier)])
+    );
 
     const totalRecipeCount =
       visibleRecipes.length;
@@ -252,7 +260,11 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       .slice(0, displayLimit);
 
     const preparedRecipes = await Promise.all(recipes.map(async recipe => {
-      const readiness = this.craftworks.recipePlanner.plan(recipe, actor);
+      const readiness = this.craftworks.recipePlanner.plan(
+        recipe,
+        actor,
+        { includePartyInventory: false }
+      );
       const craft = recipe.craft ?? {};
       const checkParts = [
         craft.ability,
@@ -380,6 +392,8 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
           activeDc: activeDc ?? null,
           hoursRequired: craft.hoursRequired ?? null,
           requiredSuccesses: craft.requiredSuccesses ?? 0,
+          facilityType: craft.environment?.facility?.type ?? "",
+          facilityTier: craft.environment?.facility?.tier ?? "common",
           toolStatus: {
             hasActor: Boolean(actor),
             hasTool: toolStatus.hasTool,
@@ -642,6 +656,9 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         selected: candidate.uuid === crafter?.uuid
       })),
       canManageRecipeVisibility: game.user.isGM,
+      canManageRecipeFacilities: game.user.isGM,
+      facilityTypeOptions,
+      facilityTierOptions,
       unknownRecipeCount: hiddenRecipeIds.size
     }, { inplace: false });
   }
@@ -1210,6 +1227,25 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         });
       });
 
+    this.element.querySelectorAll("[data-recipe-facility-type], [data-recipe-facility-tier]")
+      .forEach(select => {
+        select.addEventListener("change", async event => {
+          const controls = event.currentTarget.closest("[data-recipe-facility-controls]");
+          const recipeId = controls?.dataset.recipeId;
+          if (!recipeId || !game.user.isGM) return;
+          const type = controls.querySelector("[data-recipe-facility-type]")?.value ?? "";
+          const tier = controls.querySelector("[data-recipe-facility-tier]")?.value ?? "common";
+          await this.craftworks.recipes.setFacilityRequirement(
+            recipeId,
+            type ? { type, tier } : null
+          );
+          ui.notifications.info(type
+            ? `Facility requirement set to ${this.#formatFacilityTier(tier)} ${type}.`
+            : "Facility requirement removed.");
+          this.render({ force: true });
+        });
+      });
+
     this.element.querySelector("[data-action='mark-all-for-crafting']")?.addEventListener("click", async event => {
       event.preventDefault();
       const crafter = this.#currentCrafter();
@@ -1313,6 +1349,12 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     return game.actors.find(
       actor => actor.uuid === this.actorUuid
     ) ?? null;
+  }
+
+  #formatFacilityTier(tier) {
+    return String(tier ?? "")
+      .replace(/([a-z])([A-Z])/g, "$1 $2")
+      .replace(/^./, character => character.toUpperCase());
   }
 
   #ingredientMaterialsForRecipe(recipe) {
@@ -1797,7 +1839,8 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         ? recipes.filter(recipe =>
             this.craftworks.recipePlanner.plan(
               recipe,
-              actor
+              actor,
+              { includePartyInventory: false }
             ).ready
           )
         : [];
@@ -1987,7 +2030,8 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     if (!job) {
       const readiness = this.craftworks.recipePlanner.plan(
         recipe,
-        inventoryActor
+        inventoryActor,
+        { includePartyInventory: false }
       );
 
       if (!readiness.ready) {
@@ -2231,7 +2275,11 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     if (
       recipe
       && inventoryActor
-      && this.craftworks.recipePlanner.plan(recipe, inventoryActor).ready
+      && this.craftworks.recipePlanner.plan(
+        recipe,
+        inventoryActor,
+        { includePartyInventory: false }
+      ).ready
     ) {
       await this.#rollCraftingCheck(recipeId);
     }

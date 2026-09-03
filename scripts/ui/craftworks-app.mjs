@@ -1,5 +1,6 @@
 import { MODULE_TITLE } from "../constants.mjs";
 import { isRecipeKnownToActor } from "../core/settings.mjs";
+import { getMorelordCoreService } from "../core/morelord-core-api.mjs";
 
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 
@@ -57,6 +58,46 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
       )
       .length;
 
+    const projectCrafters = game.user.isGM
+      ? this.craftworks.crafterContext.availableCharacters()
+      : [crafter].filter(Boolean);
+    let craftingProjectsCount = 0;
+    let readyCraftingProjectsCount = 0;
+
+    for (const projectCrafter of projectCrafters) {
+      const activeJobs = this.craftworks.craftingJobs.list(
+        projectCrafter,
+        { activeOnly: true }
+      );
+      const activeRecipeIds = new Set(activeJobs.map(job => job.recipeId));
+      const craftingProjectIds = new Set([
+        ...this.craftworks.markedRecipes.list(projectCrafter),
+        ...activeRecipeIds
+      ]);
+      const craftingProjects = [...craftingProjectIds]
+        .map(recipeId =>
+          this.craftworks.recipes.get(recipeId, { includeDisabled: true })
+        )
+        .filter(Boolean)
+        .filter(recipe =>
+          game.user.isGM
+          || activeRecipeIds.has(recipe.id)
+          || isRecipeKnownToActor(
+            recipe,
+            projectCrafter,
+            this.craftworks.toolInspector
+          )
+        );
+
+      craftingProjectsCount += craftingProjects.length;
+      readyCraftingProjectsCount += craftingProjects
+        .filter(recipe =>
+          activeRecipeIds.has(recipe.id)
+          || this.craftworks.recipePlanner.plan(recipe, projectCrafter).ready
+        )
+        .length;
+    }
+
     return foundry.utils.mergeObject(context, {
       isGM: game.user.isGM,
       scene: scene ? {
@@ -65,6 +106,8 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
       } : null,
       materialsCount: this.craftworks.materials.size,
       recipesCount,
+      craftingProjectsCount,
+      readyCraftingProjectsCount,
       deadCreatureCount: deadCreatures.length,
       gatherRecordCount: Object.keys(gatherRecords).length,
       deleriumSearchAvailable: Boolean(this.craftworks.deleriumSearch?.hasAccess),
@@ -131,6 +174,9 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
 
     this.element.querySelector("[data-action='refresh']")
       ?.addEventListener("click", () => this.render());
+
+    this.element.querySelector("[data-action='manage-locations']")
+      ?.addEventListener("click", () => this.#openLocations());
   }
 
   #gmAction(fn) {
@@ -139,5 +185,15 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
       return;
     }
     return fn();
+  }
+
+  #openLocations() {
+    if (!game.user.isGM) return;
+    const locations = getMorelordCoreService("locations");
+    if (typeof locations?.open !== "function") {
+      ui.notifications.warn("Morelord Locations is unavailable. Update and enable Morelord Core.");
+      return;
+    }
+    return locations.open();
   }
 }

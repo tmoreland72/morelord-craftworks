@@ -10,9 +10,10 @@ import {
 } from "../recipes/recipe-item-match-utils.mjs";
 
 export class CraftingMaterialService {
-  constructor({ materialRegistry, adapter }) {
+  constructor({ materialRegistry, adapter, socket = null }) {
     this.materialRegistry = materialRegistry;
     this.adapter = adapter;
+    this.socket = socket;
   }
 
   planOptions(recipe, actor) {
@@ -45,10 +46,22 @@ export class CraftingMaterialService {
     return this.#dedupePlans(plans);
   }
 
-  async consume(actor, plan) {
+  async consume(actor, plan, { crafter = null } = {}) {
     if (!actor) throw new Error("Crafting material consumption requires an Actor.");
     if (!plan?.consumptions?.length) {
       throw new Error("Crafting material consumption requires a valid material plan.");
+    }
+
+    if (!game.user.isGM && !actor.isOwner) {
+      const result = await this.socket?.executeAsGm("craft.consume-group-materials", {
+        actorUuid: actor.uuid,
+        crafterUuid: crafter?.uuid ?? null,
+        plan
+      });
+      if (!result?.ok) {
+        throw new Error(result?.error ?? "The GM could not update the Group inventory.");
+      }
+      return result.consumedMaterials;
     }
 
     // Validate against the live Actor before changing anything.

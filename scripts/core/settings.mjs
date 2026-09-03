@@ -29,6 +29,7 @@ const SETTINGS = Object.freeze({
   USE_PARTY_RECIPIENT: "usePartyRecipient",
   PARTY_ACTOR_UUID: "partyActorUuid",
   HIDDEN_RECIPE_IDS: "hiddenRecipeIds",
+  RECIPE_FACILITY_OVERRIDES: "recipeFacilityOverrides",
   SHOW_RECIPES_FOR_PREFERRED_TOOL_PROFICIENCY: "showRecipesForPreferredToolProficiency",
   CONTENT_SYNC_SIGNATURE: "contentSyncSignature",
   CONTENT_SYNC_LAST_AT: "contentSyncLastAt",
@@ -63,6 +64,12 @@ export function registerSettings() {
     SETTINGS.HIDDEN_RECIPE_IDS,
     "Hidden Recipe IDs",
     "[]"
+  );
+
+  registerString(
+    SETTINGS.RECIPE_FACILITY_OVERRIDES,
+    "Recipe Facility Overrides",
+    "{}"
   );
 
   registerBoolean(
@@ -216,6 +223,32 @@ export async function setHiddenRecipeIds(ids) {
 
 export function isRecipeHidden(recipeId) {
   return getHiddenRecipeIds().has(String(recipeId));
+}
+
+export function getRecipeFacilityOverrides() {
+  try {
+    const parsed = JSON.parse(String(
+      game.settings.get(MODULE_ID, SETTINGS.RECIPE_FACILITY_OVERRIDES) ?? "{}"
+    ));
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? parsed
+      : {};
+  } catch {
+    return {};
+  }
+}
+
+export async function setRecipeFacilityOverride(recipeId, facility) {
+  const overrides = getRecipeFacilityOverrides();
+  overrides[String(recipeId)] = facility
+    ? { type: String(facility.type), tier: String(facility.tier) }
+    : null;
+  await game.settings.set(
+    MODULE_ID,
+    SETTINGS.RECIPE_FACILITY_OVERRIDES,
+    JSON.stringify(overrides)
+  );
+  return overrides[String(recipeId)];
 }
 
 export function isRecipeKnownToActor(recipe, actor, toolInspector) {
