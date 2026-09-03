@@ -80,6 +80,28 @@ export class Dnd5eSourceFilterService {
     return true;
   }
 
+  isSourceEnabled(sourceLabel, { itemType = null } = {}) {
+    if (game.system.id !== "dnd5e") return true;
+
+    const normalized = this.#normalizeIdentifier(sourceLabel);
+    const collections = normalized === "srd51"
+      ? (itemType === "spell"
+          ? ["dnd5e.spells"]
+          : ["dnd5e.items", "dnd5e.tradegoods"])
+      : normalized === "srd52"
+        ? (itemType === "spell"
+            ? ["dnd5e.spells24"]
+            : ["dnd5e.equipment24"])
+        : [];
+
+    if (!collections.length) return true;
+
+    // An SRD-labeled document may have been copied into a world or module
+    // compendium. Honor the canonical D&D5e source setting in addition to the
+    // container pack so copied documents cannot bypass Configure Sources.
+    return collections.some(collection => this.isPackEnabled(collection));
+  }
+
   sourceLabelForPack(packOrCollection) {
     const pack =
       typeof packOrCollection === "string"

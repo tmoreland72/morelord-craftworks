@@ -176,6 +176,7 @@ Hooks.once("ready", async () => {
   const spellScrollGenerator = new SpellScrollGeneratorService({
     coreAccess,
     sourceFilter,
+    contentPacks,
     adapter,
     recipientResolver,
     dnd5eItemResolver

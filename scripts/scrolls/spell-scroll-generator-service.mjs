@@ -3,12 +3,14 @@ export class SpellScrollGeneratorService {
   constructor({
     coreAccess = null,
     sourceFilter = null,
+    contentPacks = null,
     adapter = null,
     recipientResolver = null,
     dnd5eItemResolver = null
   } = {}) {
     this.coreAccess = coreAccess;
     this.sourceFilter = sourceFilter;
+    this.contentPacks = contentPacks;
     this.adapter = adapter;
     this.recipientResolver = recipientResolver;
     this.dnd5eItemResolver = dnd5eItemResolver;
@@ -39,6 +41,7 @@ export class SpellScrollGeneratorService {
       .filter(pack =>
         pack.documentName === "Item"
         && this.#packEnabled(pack)
+        && this.#contentPackEnabled(pack)
         && (
           !respectSourceConfiguration
           || !this.sourceFilter
@@ -88,6 +91,14 @@ export class SpellScrollGeneratorService {
         const sourceLabel = this.sourceFilter
           ? await this.sourceFilter.sourceLabelForCompendiumItem(row, { pack })
           : "Craftworks";
+        if (
+          this.sourceFilter?.isSourceEnabled
+          && !this.sourceFilter.isSourceEnabled(sourceLabel, {
+            itemType: row.type
+          })
+        ) continue;
+        if (!this.#contentSourceEnabled(sourceLabel)) continue;
+
         const key = [
           spellLevel,
           String(row.name).toLowerCase(),
@@ -305,5 +316,34 @@ export class SpellScrollGeneratorService {
     // Foundry only exposes packs that are available to the world. Avoid
     // hidden/private packs and let active module/system compendiums participate.
     return pack.visible !== false;
+  }
+
+  #contentPackEnabled(pack) {
+    if (!this.contentPacks) return true;
+
+    const collection = String(pack?.collection ?? "").toLowerCase();
+    const contentPackId = collection === "dnd5e.spells24"
+      ? "srd-5.2"
+      : collection === "dnd5e.spells"
+        ? "srd-5.1"
+        : null;
+
+    return !contentPackId || this.contentPacks.isEnabled(contentPackId);
+  }
+
+  #contentSourceEnabled(sourceLabel) {
+    if (!this.contentPacks) return true;
+
+    const normalized = String(sourceLabel ?? "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "");
+    const contentPackId = normalized === "srd52"
+      ? "srd-5.2"
+      : normalized === "srd51"
+        ? "srd-5.1"
+        : null;
+
+    return !contentPackId || this.contentPacks.isEnabled(contentPackId);
   }
 }

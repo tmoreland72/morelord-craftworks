@@ -398,8 +398,16 @@ export class SpellbookGeneratorApp
   }
 
   #readSchools() {
+    const inputs = [
+      ...this.element.querySelectorAll(
+        "[data-spell-school]"
+      )
+    ];
+    if (!inputs.length) return;
+
     this.selectedSchools = new Set(
-      [...this.element.querySelectorAll("[data-spell-school]:checked")]
+      inputs
+        .filter(input => input.checked)
         .map(input => input.dataset.spellSchool)
     );
   }

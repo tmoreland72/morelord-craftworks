@@ -117,8 +117,14 @@ export class PotionGeneratorApp extends ScrollPreservingApplicationMixin(
   }
 
   #readCategories() {
+    const inputs = [
+      ...this.element.querySelectorAll("[data-potion-category]")
+    ];
+    if (!inputs.length) return;
+
     this.selectedCategories = new Set(
-      [...this.element.querySelectorAll("[data-potion-category]:checked")]
+      inputs
+        .filter(input => input.checked)
         .map(input => input.dataset.potionCategory)
     );
   }
