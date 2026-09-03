@@ -123,7 +123,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
 
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
-    const actor = this.craftworks.adapter.getActorForUser(game.user);
+    const actor = await this.#getHarvestActor();
 
     // Recipe marks live on the Crafter actor used by the Craft window.
     // That actor can differ from adapter.getActorForUser() when the user has
@@ -616,9 +616,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
       return;
     }
 
-    const actor =
-      this.craftworks.adapter
-        .getActorForUser(game.user);
+    const actor = await this.#getHarvestActor();
 
     if (!actor) {
       ui.notifications.error(
@@ -751,6 +749,15 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
       button.innerHTML =
         originalLabel;
     }
+  }
+
+  async #getHarvestActor() {
+    const actorUuid = this.session?.harvestActorsByUser?.[game.user.id];
+    if (actorUuid) {
+      const actor = await fromUuid(actorUuid);
+      if (actor) return actor;
+    }
+    return this.craftworks.adapter.getActorForUser(game.user);
   }
 
   async #claim(event) {

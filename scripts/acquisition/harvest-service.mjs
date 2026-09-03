@@ -161,7 +161,8 @@ export class HarvestService {
 
   async start({
     creatureContexts = null,
-    skipSkillChecks = []
+    skipSkillChecks = [],
+    harvestActorsByUser = {}
   } = {}) {
     let creatures =
       Array.isArray(creatureContexts)
@@ -223,6 +224,7 @@ export class HarvestService {
       creatures,
       participants: {},
       results: [],
+      harvestActorsByUser: foundry.utils.deepClone(harvestActorsByUser ?? {}),
       skipSkillChecks:
         foundry.utils.deepClone(
           skipSkillChecks ?? []

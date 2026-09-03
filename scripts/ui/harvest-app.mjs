@@ -1,4 +1,6 @@
-import { MODULE_TITLE } from "../constants.mjs";
+import { MODULE_ID, MODULE_TITLE } from "../constants.mjs";
+import { getMorelordCoreService } from "../core/morelord-core-api.mjs";
+import { SETTINGS } from "../core/settings.mjs";
 
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 
@@ -14,6 +16,8 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
     this.collapsedCreatures = new Set();
     this.preflightCreatures = null;
     this.selectedPreflightCreatureUuids = new Set();
+    this.selectedCharacterUuids = null;
+    this.skipSkillCheckActorUuids = new Set();
   }
 
   static DEFAULT_OPTIONS = {
@@ -43,8 +47,11 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
 
+    const sessionUserIds = new Set(
+      Object.keys(this.session?.harvestActorsByUser ?? {})
+    );
     const users = game.users
-      .filter(user => !user.isGM && user.active)
+      .filter(user => !user.isGM && user.active && (!this.session || sessionUserIds.has(user.id)))
       .map(user => ({ id: user.id, name: user.name }));
 
     const progress = this.session
@@ -123,64 +130,49 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
             .has(creature.tokenUuid)
       }));
 
-    const playerCharacters = [];
-    const seenActors = new Set();
-
-    for (
-      const user of game.users.filter(
-        entry =>
-          !entry.isGM
-          && entry.active
-      )
-    ) {
-      const candidates = [];
-
-      if (
-        user.character?.type ===
-        "character"
-      ) {
-        candidates.push(user.character);
+    const participation = getMorelordCoreService("ui")?.participation;
+    if (this.selectedCharacterUuids === null) {
+      const stored = String(game.settings.get(MODULE_ID, SETTINGS.HARVEST_SELECTED_CHARACTER_UUIDS) ?? "");
+      let selectedUuids = null;
+      if (stored) {
+        try { selectedUuids = JSON.parse(stored); } catch { selectedUuids = null; }
       }
-
-      for (
-        const actor of game.actors.filter(
-          entry =>
-            entry.type === "character"
-            && entry.testUserPermission(
-              user,
-              "OWNER"
-            )
-        )
-      ) {
-        candidates.push(actor);
+      if (Array.isArray(selectedUuids)) {
+        const availableUuids = new Set(
+          game.actors.filter(actor => actor.type === "character").map(actor => actor.uuid)
+        );
+        selectedUuids = selectedUuids.filter(uuid => availableUuids.has(uuid));
+        if (!selectedUuids.length) selectedUuids = null;
       }
-
-      for (const actor of candidates) {
-        if (seenActors.has(actor.uuid)) {
-          continue;
-        }
-
-        seenActors.add(actor.uuid);
-
-        playerCharacters.push({
-          actorUuid: actor.uuid,
-          actorName: actor.name,
-          actorImg: actor.img,
-          userId: user.id,
-          userName: user.name,
-          isAssigned:
-            user.character?.uuid ===
-            actor.uuid
-        });
-      }
+      const defaults = participation?.listCharacterChoices({ selectedUuids })
+        ?? game.actors.filter(actor => actor.type === "character").map(actor => ({
+          uuid: actor.uuid, name: actor.name, img: actor.img,
+          checked: selectedUuids ? selectedUuids.includes(actor.uuid) : actor.hasPlayerOwner
+        }));
+      this.selectedCharacterUuids = new Set(defaults.filter(entry => entry.checked).map(entry => entry.uuid));
     }
 
-    playerCharacters.sort(
-      (a, b) =>
-        a.actorName.localeCompare(
-          b.actorName
-        )
-    );
+    const choices = participation?.listCharacterChoices({
+      selectedUuids: [...this.selectedCharacterUuids]
+    }) ?? game.actors.filter(actor => actor.type === "character").map(actor => ({
+      uuid: actor.uuid, name: actor.name, img: actor.img,
+      checked: this.selectedCharacterUuids.has(actor.uuid)
+    }));
+    const playerCharacters = choices.map(choice => {
+      const actor = game.actors.get(choice.uuid.split(".").pop())
+        ?? game.actors.find(entry => entry.uuid === choice.uuid);
+      const user = this.#activeUserForActor(actor);
+      return {
+        actorUuid: choice.uuid,
+        actorName: choice.name,
+        actorImg: choice.img,
+        selected: this.selectedCharacterUuids.has(choice.uuid),
+        skipSkillCheck: this.skipSkillCheckActorUuids.has(choice.uuid),
+        connected: Boolean(user),
+        userId: user?.id ?? "",
+        userName: user?.name ?? "Offline"
+      };
+    });
 
     const claimsByCreature = new Map();
 
@@ -334,6 +326,28 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
         }
       }));
 
+    this.element.querySelectorAll("[data-harvest-character-select]")
+      .forEach(input => input.addEventListener("change", event => {
+        const uuid = event.currentTarget.value;
+        if (event.currentTarget.checked) this.selectedCharacterUuids.add(uuid);
+        else {
+          this.selectedCharacterUuids.delete(uuid);
+          this.skipSkillCheckActorUuids.delete(uuid);
+        }
+        const skip = event.currentTarget.closest("[data-harvest-character-row]")?.querySelector("[data-skip-skill-check]");
+        if (skip) {
+          skip.disabled = !event.currentTarget.checked;
+          if (!event.currentTarget.checked) skip.checked = false;
+        }
+      }));
+
+    this.element.querySelectorAll("[data-skip-skill-check]")
+      .forEach(input => input.addEventListener("change", event => {
+        const uuid = event.currentTarget.dataset.actorUuid;
+        if (event.currentTarget.checked) this.skipSkillCheckActorUuids.add(uuid);
+        else this.skipSkillCheckActorUuids.delete(uuid);
+      }));
+
     this.element.querySelector("[data-action='select-all-harvest-creatures']")
       ?.addEventListener("click", event => {
         event.preventDefault();
@@ -397,17 +411,20 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
         );
       }
 
-      const skipSkillChecks =
-        Array.from(
-          this.element.querySelectorAll(
-            "[data-skip-skill-check]:checked"
-          )
-        ).map(input => ({
-          actorUuid:
-            input.dataset.actorUuid,
-          userId:
-            input.dataset.userId
-        }));
+      const selectedCharacters = game.actors.filter(actor =>
+        actor.type === "character" && this.selectedCharacterUuids.has(actor.uuid)
+      );
+      if (!selectedCharacters.length) throw new Error("Select at least one player character.");
+      const harvestActorsByUser = {};
+      for (const actor of selectedCharacters) {
+        const user = this.#activeUserForActor(actor);
+        if (user && !harvestActorsByUser[user.id]) harvestActorsByUser[user.id] = actor.uuid;
+      }
+      const players = Object.keys(harvestActorsByUser).map(id => game.users.get(id)).filter(Boolean);
+      if (!players.length) throw new Error("None of the selected player characters has a connected player.");
+      const skipSkillChecks = Object.entries(harvestActorsByUser)
+        .filter(([, actorUuid]) => this.skipSkillCheckActorUuids.has(actorUuid))
+        .map(([userId, actorUuid]) => ({ userId, actorUuid }));
 
       const selectedCreatureUuids =
         new Set(
@@ -440,11 +457,15 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
       this.session =
         await this.craftworks.harvest.start({
           creatureContexts,
-          skipSkillChecks
+          skipSkillChecks,
+          harvestActorsByUser
         });
 
-      const players = game.users.filter(user => user.active && !user.isGM);
-      if (!players.length) throw new Error("No active player users are connected.");
+      await game.settings.set(
+        MODULE_ID,
+        SETTINGS.HARVEST_SELECTED_CHARACTER_UUIDS,
+        JSON.stringify([...this.selectedCharacterUuids])
+      );
 
       await Promise.all(players.map(user =>
         this.craftworks.socket.emit(
@@ -574,5 +595,15 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
 
     ui.notifications.info("Harvesting completed.");
     await this.close();
+  }
+
+  #activeUserForActor(actor) {
+    if (!actor) return null;
+    return game.users.find(user =>
+      user.active && !user.isGM && (
+        user.character?.uuid === actor.uuid
+        || (!user.character && actor.testUserPermission(user, "OWNER"))
+      )
+    ) ?? null;
   }
 }

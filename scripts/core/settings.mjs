@@ -11,6 +11,7 @@ const SETTINGS = Object.freeze({
   HARVEST_CHOICES_MAX: "harvestChoicesMax",
   HARVEST_RARE_BIAS: "harvestRareBias",
   HARVEST_NAT20_DOUBLE_CLAIM: "harvestNat20DoubleClaim",
+  HARVEST_SELECTED_CHARACTER_UUIDS: "harvestSelectedCharacterUuids",
 
   GATHER_DC_MODIFIER: "gatherDcModifier",
   GATHER_DC_OVERRIDES: "gatherDcOverrides",
@@ -76,6 +77,11 @@ export function registerSettings() {
     SETTINGS.SHOW_RECIPES_FOR_PREFERRED_TOOL_PROFICIENCY,
     "Show Recipes for Preferred Tool Proficiency",
     true
+  );
+  registerClientString(
+    SETTINGS.HARVEST_SELECTED_CHARACTER_UUIDS,
+    "Last Harvest Player Characters",
+    ""
   );
 
   registerString(
@@ -223,6 +229,16 @@ export async function setHiddenRecipeIds(ids) {
 
 export function isRecipeHidden(recipeId) {
   return getHiddenRecipeIds().has(String(recipeId));
+}
+
+function registerClientString(key, name, defaultValue) {
+  game.settings.register(MODULE_ID, key, {
+    name,
+    scope: "client",
+    config: false,
+    type: String,
+    default: defaultValue
+  });
 }
 
 export function getRecipeFacilityOverrides() {
