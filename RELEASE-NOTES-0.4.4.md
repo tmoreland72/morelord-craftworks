@@ -4,7 +4,8 @@ Morelord Craftworks 0.4.4 adds the missing Monsters of Drakkenheim SRD recipes a
 
 ## Added
 
-- Added Harvest player-character selection with Core-standard party priority, remembered selections, and per-character Skip Skill Checks.
+- Added an in-Foundry Documentation button to the dashboard, backed by Morelord Core's shared documentation viewer.
+- Added Harvest player-character selection with Core-standard party priority, remembered selections, and a session-wide Skip Skill Checks option.
 - Harvest now opens an independent window and tracks independent claims for every selected character, including multiple characters owned by the same connected player.
 - Added all 19 Monsters of Drakkenheim Appendix E SRD recipe variants for enhanced armor, healing and resistance potions, enhanced shields, spell scroll tiers, and enhanced weapons.
 - Added entitlement-aware recipe output resolution that prefers enabled premium PHB and DMG content before falling back to SRD 5.2; healing potions can also use SRD 5.1.

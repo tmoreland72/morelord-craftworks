@@ -49,6 +49,8 @@ import { MarkedRecipeService } from "./crafting/marked-recipe-service.mjs";
 import { CraftingRollService } from "./crafting/crafting-roll-service.mjs";
 import { CraftingEnvironmentService } from "./crafting/crafting-environment-service.mjs";
 import { isCharacterMemberOfGroup } from "./crafting/group-membership.mjs";
+import { getMorelordCoreApi } from "./core/morelord-core-api.mjs";
+import { CRAFTWORKS_DOCUMENTATION } from "./documentation/product-documentation.mjs";
 import { CraftworksSettingsApp } from "./ui/craftworks-settings-app.mjs";
 import { MaterialBrowserApp } from "./ui/material-browser-app.mjs";
 import { RecipeBrowserApp } from "./ui/recipe-browser-app.mjs";
@@ -71,6 +73,7 @@ Hooks.once("init", () => {
 });
 
 Hooks.once("ready", () => {
+  getMorelordCoreApi()?.ui?.documentation?.register(CRAFTWORKS_DOCUMENTATION);
   document.addEventListener("click", async event => {
     const row = event.target.closest?.("[data-ml-craftworks-link-target]");
     if (!row) return;

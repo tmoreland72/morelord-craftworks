@@ -295,9 +295,19 @@
             Player Characters
           </div>
           <p class="ml-craftworks-harvest-preflight-help">
-            Choose which characters take part. <strong>Skip Skill Checks</strong>
-            sends that selected character directly to their claimable components.
+            Choose which characters take part in this Harvest.
           </p>
+
+          <label class="ml-craftworks-harvest-skip-skill-row">
+            <span class="ml-craftworks-harvest-skip-character">
+              <i class="fa-solid fa-forward"></i>
+              <span>
+                <strong>Skip Skill Checks</strong>
+                <small>All included characters proceed directly to their claimable components.</small>
+              </span>
+            </span>
+            <input type="checkbox" data-skip-skill-check {{#if skipSkillChecks}}checked{{/if}}>
+          </label>
 
           {{#if playerCharacters.length}}
             <div class="ml-craftworks-harvest-skip-skill-list">
@@ -315,18 +325,6 @@
                         {{userName}}{{#unless connected}} · Not connected{{/unless}}
                       </small>
                     </span>
-                  </span>
-
-                  <span class="ml-craftworks-harvest-skip-toggle">
-                    <span>Skip Skill Checks</span>
-                    <input
-                      type="checkbox"
-                      data-skip-skill-check
-                      data-actor-uuid="{{actorUuid}}"
-                      data-user-id="{{userId}}"
-                      {{#if skipSkillCheck}}checked{{/if}}
-                      {{#unless selected}}disabled{{/unless}}
-                    >
                   </span>
                 </label>
               {{/each}}

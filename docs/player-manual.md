@@ -4,7 +4,7 @@ description: Browse materials and recipes, manage crafting projects, and partici
 slug: morelord-craftworks/player
 product: morelord-craftworks
 audience: player
-version: 0.3.5
+version: 0.4.4
 foundry: 14
 ---
 
@@ -12,7 +12,7 @@ foundry: 14
 
 Morelord Craftworks lets you browse your campaign's materials and recipes, plan crafting projects, work from personal or shared inventories, and take part in Harvest and Gather sessions started by your Game Master.
 
-This manual applies to Morelord Craftworks 0.3.5.
+This manual applies to Morelord Craftworks 0.4.4.
 
 ## Contents
 
@@ -39,7 +39,7 @@ Materials are normal dnd5e loot Items. Their Craftworks identity includes inform
 2. Select the **Morelord Craftworks** control.
 3. Choose **Materials**, **Recipes**, or **Craft** from the dashboard.
 
-Harvest and Gather windows open automatically when the GM starts a session in which your character can participate.
+Harvest and Gather windows open automatically when the GM starts a session in which your character can participate. Use **Documentation** at the top of the dashboard for the current in-Foundry guide.
 
 ![The Craftworks dashboard gives players direct access to Materials, Recipes, and Craft.](assets/craftworks-dashboard.png)
 
@@ -115,6 +115,8 @@ Each crafting attempt represents two hours of work. A successful attempt adds pr
 
 Progress persists between attempts. Recipe cards display the total duration, and the active job records successful progress and total time spent.
 
+Some recipes require a facility supplied by the current Morelord Core Location, such as a forge. A project pauses while that environment is unavailable and resumes when the requirement is met. Crafting projects can also appear in Morelord Downtime and open directly into a focused Craftworks recipe view.
+
 When the job completes, the output is delivered to the selected inventory actor. Foundry Item outputs use their live name and image and can be opened from their linked reference.
 
 If you cancel an active job, Craftworks returns materials consumed when that job began.
@@ -136,13 +138,13 @@ Harvest begins when the GM selects defeated creatures and starts a synchronized 
 
 Each creature uses its own Harvest DC. A success reveals claimable components; a failure consumes your character's attempt for that creature. Previously attempted or resolved creatures are not rolled again.
 
-The GM may choose **Skip Skill Checks** for your character. In that case, you proceed directly to the available choices.
+The GM chooses the characters included in the Harvest and may enable the session-wide **Skip Skill Checks** option. When enabled, every included character proceeds directly to the available choices. If you control multiple included characters, Craftworks opens an independently titled Harvest window for each one; their checks and claims remain separate.
 
 ![The player Harvest window presents the available skill choices and each unresolved creature.](assets/harvest-player-ready.png)
 
 ### Claim a component
 
-Select one of the highlighted components after a success. If your natural d20 was 20 and the world setting permits it, you can receive a second claim.
+Select one of the highlighted components after a success. If your natural d20 was 20 and the world setting permits it, you can receive a second claim. Claimed creatures remain expanded to keep the window from shifting during a large Harvest; you can still collapse a creature manually.
 
 A claim is a reservation, not an immediate inventory award. All participants see it in the shared **Claimed Components** list, and another player cannot take the same reserved component. Materials connected to one of your marked recipes may display **Needed for Crafting**.
 

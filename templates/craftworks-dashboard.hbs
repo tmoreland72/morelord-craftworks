@@ -5,6 +5,12 @@
       <p>Gather, harvest, loot, and understand the materials that drive your crafting economy.</p>
     </div>
     <div class="ml-hero__actions ml-actions">
+      {{#if canOpenDocumentation}}
+        <button type="button" data-action="open-documentation">
+          <i class="fa-solid fa-book-open"></i>
+          Documentation
+        </button>
+      {{/if}}
       <button type="button" data-action="refresh" class="ml-icon-button ml-craftworks-icon-button" title="Refresh" aria-label="Refresh">
         <i class="fa-solid fa-arrows-rotate"></i>
       </button>

@@ -21,7 +21,7 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
     this.preflightCreatures = null;
     this.selectedPreflightCreatureUuids = new Set();
     this.selectedCharacterUuids = null;
-    this.skipSkillCheckActorUuids = new Set();
+    this.skipSkillChecks = false;
   }
 
   static DEFAULT_OPTIONS = {
@@ -172,7 +172,6 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
         actorName: choice.name,
         actorImg: choice.img,
         selected: this.selectedCharacterUuids.has(choice.uuid),
-        skipSkillCheck: this.skipSkillCheckActorUuids.has(choice.uuid),
         connected: Boolean(user),
         userId: user?.id ?? "",
         userName: user?.name ?? "Offline"
@@ -269,6 +268,7 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
       claimedItems,
       deadCreatures,
       playerCharacters,
+      skipSkillChecks: this.skipSkillChecks,
       hasSpecialHarvestItems:
         deadCreatures.some(
           creature =>
@@ -335,23 +335,13 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
       .forEach(input => input.addEventListener("change", event => {
         const uuid = event.currentTarget.value;
         if (event.currentTarget.checked) this.selectedCharacterUuids.add(uuid);
-        else {
-          this.selectedCharacterUuids.delete(uuid);
-          this.skipSkillCheckActorUuids.delete(uuid);
-        }
-        const skip = event.currentTarget.closest("[data-harvest-character-row]")?.querySelector("[data-skip-skill-check]");
-        if (skip) {
-          skip.disabled = !event.currentTarget.checked;
-          if (!event.currentTarget.checked) skip.checked = false;
-        }
+        else this.selectedCharacterUuids.delete(uuid);
       }));
 
-    this.element.querySelectorAll("[data-skip-skill-check]")
-      .forEach(input => input.addEventListener("change", event => {
-        const uuid = event.currentTarget.dataset.actorUuid;
-        if (event.currentTarget.checked) this.skipSkillCheckActorUuids.add(uuid);
-        else this.skipSkillCheckActorUuids.delete(uuid);
-      }));
+    this.element.querySelector("[data-skip-skill-check]")
+      ?.addEventListener("change", event => {
+        this.skipSkillChecks = event.currentTarget.checked;
+      });
 
     this.element.querySelector("[data-action='select-all-harvest-creatures']")
       ?.addEventListener("click", event => {
@@ -429,7 +419,7 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
       if (!players.length) throw new Error("None of the selected player characters has a connected player.");
       const skipSkillChecks = Object.entries(harvestActorsByUser)
         .flatMap(([userId, actorUuids]) => actorUuids
-          .filter(actorUuid => this.skipSkillCheckActorUuids.has(actorUuid))
+          .filter(() => this.skipSkillChecks)
           .map(actorUuid => ({ userId, actorUuid })));
 
       const selectedCreatureUuids =

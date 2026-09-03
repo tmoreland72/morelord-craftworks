@@ -117,7 +117,10 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
         Boolean(this.craftworks.spellbookGenerator?.hasAccess),
       potionGeneratorPremium:
         Boolean(this.craftworks.potionGenerator?.hasAccess),
-      partyInfo
+      partyInfo,
+      canOpenDocumentation: Boolean(
+        getMorelordCoreService("ui")?.documentation?.open
+      )
     }, { inplace: false });
   }
 
@@ -174,6 +177,12 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
 
     this.element.querySelector("[data-action='refresh']")
       ?.addEventListener("click", () => this.render());
+
+    this.element.querySelector("[data-action='open-documentation']")
+      ?.addEventListener("click", event => {
+        event.preventDefault();
+        getMorelordCoreService("ui")?.documentation?.open("morelord-craftworks");
+      });
 
     this.element.querySelector("[data-action='manage-locations']")
       ?.addEventListener("click", () => this.#openLocations());

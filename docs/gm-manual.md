@@ -4,7 +4,7 @@ description: Install, configure, and operate Morelord Craftworks acquisition, cr
 slug: morelord-craftworks/gm
 product: morelord-craftworks
 audience: game-master
-version: 0.3.5
+version: 0.4.4
 foundry: 14
 ---
 
@@ -12,7 +12,7 @@ foundry: 14
 
 Morelord Craftworks gives a dnd5e world a connected system for harvesting creatures, gathering by terrain, generating encounter loot and hoards, managing materials and recipes, and running long-term crafting projects.
 
-This manual applies to Morelord Craftworks 0.3.5, Foundry VTT v14, and dnd5e 5.3 or later.
+This manual applies to Morelord Craftworks 0.4.4, Foundry VTT v14, and dnd5e 5.3 or later.
 
 ## Contents
 
@@ -52,7 +52,7 @@ Premium access is managed by Morelord Core. A content pack may also depend on of
 - dnd5e 5.3 or later
 - Morelord Core 0.1.0 or later
 - SocketLib 1.1.3 or later
-- Morelord Craftworks 0.3.5 or later
+- Morelord Craftworks 0.4.4 or later
 
 ### Install with the manifest
 
@@ -154,7 +154,7 @@ The final Gather DC is the terrain value plus the global modifier.
 
 The Loot settings independently enable materials, coin, and special treasure. Chance modifiers tune the frequency of each category, while material-quantity and coin multipliers adjust result sizes.
 
-Potion and spell-scroll rewards use enabled dnd5e Item sources. In 0.3.5, material components remain the most common results and potions are more common than spell scrolls.
+Potion and spell-scroll rewards use enabled dnd5e Item sources. Material components remain the most common results and potions are more common than spell scrolls.
 
 ## Manage materials and recipes
 
@@ -192,6 +192,10 @@ The **Using Crafter Actor** performs checks and supplies tool possession and pro
 
 Crafting progress belongs to the crafter-and-recipe combination and does not split when the inventory source changes. Each attempt represents two hours. Failed checks consume time but not recipe materials. Recipe durations must be positive multiples of two hours.
 
+Recipes may require a facility tier supplied by the current Morelord Core Location, such as a forge. An active **On the Road** Downtime context overrides the scene location. A job pauses while its facility is unavailable and resumes when the requirement is met. **Manage Locations** is available with the other GM tools on the Craftworks dashboard.
+
+Craftworks exposes marked and active crafting projects to Morelord Downtime. Opening one from Downtime launches a focused Craft window for that crafter and recipe while Craftworks remains authoritative for ingredients, checks, progress, and output.
+
 Craftworks automatically chooses the normal or no-tool DC from confirmed tool possession and proficiency. Some recipes require no check and advance through their defined workflow without inventing one.
 
 ![The Craft workspace separates filtering, crafter and inventory context, requirements, and project progress.](assets/craft-workspace.png)
@@ -208,18 +212,21 @@ Harvest is a synchronized session in which players test their characters against
 4. Include actual harvestable creatures and exclude shopkeepers, traps, or other defeated NPC-based tokens.
 5. Use **Select All** or **Clear All** when useful.
 6. Review creature type, CR, Harvest DC, rarity, components, and special instructions.
-7. Optionally enable **Skip Skill Checks** for individual player characters.
-8. Select **Start Harvest**.
+7. Select the participating player characters. Defaults follow the primary populated party, then player-owned characters, and the last successful selection is remembered.
+8. Optionally enable the single **Skip Skill Checks** option for every included character.
+9. Select **Start Harvest**.
 
 ![The GM Harvest preflight identifies defeated creatures and lets the GM include participants and bypass checks selectively.](assets/harvest-gm-preflight.png)
 
-At least one defeated NPC must be selected. Connected players receive the Harvest application automatically.
+At least one defeated NPC and one player character must be selected. Each selected character controlled by a connected player receives an independent Harvest window. One user controlling two selected characters receives two character-titled windows with separate checks and claims. An included offline character receives no window during that session.
 
 ### Monitor checks and claims
 
 A player chooses one Harvest skill and uses **Roll Harvest Checks**. Craftworks rolls that skill separately against every unresolved creature available to the character. Success exposes component choices; failure consumes that character's attempt for that creature.
 
 A claim reserves a component but does not add it to inventory. All open Harvest windows synchronize reservations, claimants, source creatures, and roll results. Other players cannot reserve the same component.
+
+Claiming does not automatically collapse the creature. The stable expanded list reduces disruptive window movement during large harvests; players can still collapse entries manually.
 
 ![The GM view tracks every participant's checks, outcomes, and component claims in real time.](assets/harvest-gm-results.png)
 
@@ -360,12 +367,15 @@ When its requirements are satisfied, the pack can contribute:
 - rarity-specific Drakkenheim materials
 - exact creature-specific Harvestable Components data
 - Drakkenheim recipes and ingredient relationships
+- all 19 Appendix E SRD recipe variants for enhanced armor, shields, weapons, healing and resistance potions, and spell-scroll tiers
 - Harvest, Gather, Loot, and other content definitions supplied by the pack
 - special harvesting notes that do not fit the ordinary component-claim model
 
 The Materials and Recipes browsers group Drakkenheim filters into concise top-level families, so users can explore the setting content without navigating an unmanageably long flat list.
 
 Drakkenheim content is not isolated in a separate mode. When enabled, its materials, recipes, potions, and spells participate in the same searches and generators as other active sources. Results retain their source attribution: for example, a potion draft can mix core potions with **Trollblood Potion**, **Vampire Blood Potion**, and **Greater Rejuvenation Potion**, while scroll and spellbook drafts can include Drakkenheim spells beside core spells.
+
+Recipe outputs prefer enabled premium PHB or DMG documents when the connected account has access, then fall back to SRD 5.2. Healing potions can also use SRD 5.1. Enhanced armor, shield, and weapon recipes use the generic **+1, +2, or +3** source item; the GM configures the completed item as the intended equipment.
 
 ### Drakkenheim Harvest preflight
 
