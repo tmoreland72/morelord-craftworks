@@ -590,6 +590,15 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
       )
     ));
 
+    // The GM application instance is reused when the dashboard opens Harvest
+    // again. Clear completed session/preflight state so the next open scans the
+    // scene as a fresh Harvest while retaining remembered character choices.
+    this.session = null;
+    this.preflightCreatures = null;
+    this.selectedPreflightCreatureUuids.clear();
+    this.collapsedCreatures.clear();
+    this.skipSkillChecks = false;
+
     ui.notifications.info("Harvesting completed.");
     await this.close();
   }
