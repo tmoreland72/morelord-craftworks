@@ -1,5 +1,6 @@
 import { MODULE_TITLE } from "../constants.mjs";
 import { materialTagsSatisfy } from "../materials/material-match-utils.mjs";
+import { harvestParticipantKey } from "../acquisition/harvest-participants.mjs";
 
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 
@@ -8,10 +9,19 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
   HandlebarsApplicationMixin(ApplicationV2)
 ) {
-  constructor(craftworks, session, options = {}) {
-    super(options);
+  constructor(craftworks, session, actorUuid, options = {}) {
+    const actorName = game.actors.find(actor => actor.uuid === actorUuid)?.name;
+    super({
+      ...options,
+      id: `morelord-craftworks-harvest-player-${actorUuid?.split(".").pop() ?? game.user.id}`,
+      window: {
+        ...options.window,
+        title: actorName ? `${MODULE_TITLE} — Harvest — ${actorName}` : `${MODULE_TITLE} — Harvest`
+      }
+    });
     this.craftworks = craftworks;
     this.session = session;
+    this.actorUuid = actorUuid;
     this.states = {};
     this.focusedCreatureTokenUuid = null;
     this.collapsedCreatures = new Set();
@@ -25,7 +35,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
     for (const creature of session?.creatures ?? []) {
       const state =
         session.participants?.[
-          `${game.user.id}:${creature.tokenUuid}`
+          harvestParticipantKey(this.actorUuid, creature.tokenUuid)
         ]
         ?? null;
 
@@ -34,11 +44,6 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
       this.states[creature.tokenUuid] =
         foundry.utils.deepClone(state);
 
-      if (state.status === "claimed") {
-        this.collapsedCreatures.add(
-          creature.tokenUuid
-        );
-      }
     }
   }
 
@@ -69,7 +74,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
     for (const creature of session?.creatures ?? []) {
       const state =
         session.participants?.[
-          `${game.user.id}:${creature.tokenUuid}`
+          harvestParticipantKey(this.actorUuid, creature.tokenUuid)
         ]
         ?? null;
 
@@ -82,10 +87,6 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
       // to do. Only collapse it after that player's claim sequence is complete.
       if (state.status === "awaiting-claim") {
         this.collapsedCreatures.delete(
-          creature.tokenUuid
-        );
-      } else if (state.status === "claimed") {
-        this.collapsedCreatures.add(
           creature.tokenUuid
         );
       }
@@ -110,10 +111,6 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
     // Successful checks must leave the creature open so the player can claim.
     if (state?.status === "awaiting-claim") {
       this.collapsedCreatures.delete(
-        creatureTokenUuid
-      );
-    } else if (state?.status === "claimed") {
-      this.collapsedCreatures.add(
         creatureTokenUuid
       );
     }
@@ -480,7 +477,11 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
 
   async #releaseClaims({ close = false, reset = false } = {}) {
     try {
-      await this.craftworks.socket.emit("harvest.release-claims", { sessionId: this.session.id, userId: game.user.id });
+      await this.craftworks.socket.emit("harvest.release-claims", {
+        sessionId: this.session.id,
+        userId: game.user.id,
+        actorUuid: this.actorUuid
+      });
       if (close) return this.close();
       if (reset) {
         this.collapsedCreatures.clear();
@@ -752,9 +753,8 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
   }
 
   async #getHarvestActor() {
-    const actorUuid = this.session?.harvestActorsByUser?.[game.user.id];
-    if (actorUuid) {
-      const actor = await fromUuid(actorUuid);
+    if (this.actorUuid) {
+      const actor = await fromUuid(this.actorUuid);
       if (actor) return actor;
     }
     return this.craftworks.adapter.getActorForUser(game.user);
@@ -768,6 +768,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
       sessionId: this.session.id,
       creatureTokenUuid: button.dataset.creature,
       userId: game.user.id,
+      actorUuid: this.actorUuid,
       materialId: button.dataset.material,
       componentId: button.dataset.component || null
     });

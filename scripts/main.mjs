@@ -295,7 +295,7 @@ Hooks.once("ready", async () => {
     spellScrollGenerator
   });
   let gmHarvestApp = null;
-  let playerHarvestApp = null;
+  const playerHarvestApps = new Map();
   let gmGatherApp = null;
   let playerGatherApp = null;
   let gmDeleriumSearchApp = null;
@@ -560,7 +560,7 @@ Hooks.once("ready", async () => {
     ui.notifications.info(`Morelord Craftworks: ${message}`);
   });
 
-  socket.on("harvest.open", async ({ session }) => {
+  socket.on("harvest.open", async ({ session, actorUuid }) => {
     log(`Handling harvest.open for session ${session?.id ?? "missing"}.`);
     if (game.user.isGM) return;
 
@@ -571,12 +571,11 @@ Hooks.once("ready", async () => {
     const imported = sessions.import(session);
     log(`Imported Harvest session ${imported.id} with ${imported.creatures?.length ?? 0} creature(s).`);
 
-    if (playerHarvestApp?.rendered) {
-      await playerHarvestApp.close();
-    }
-
-    playerHarvestApp =
-      new HarvestPlayerApp(api, imported);
+    if (!actorUuid) throw new Error("Received a Harvest session without a character.");
+    const existing = playerHarvestApps.get(actorUuid);
+    if (existing?.rendered) await existing.close();
+    const playerHarvestApp = new HarvestPlayerApp(api, imported, actorUuid);
+    playerHarvestApps.set(actorUuid, playerHarvestApp);
 
     // Constructor hydration loads any pre-seeded automatic-success state.
     // The first client render must still be forced so ApplicationV2 actually
@@ -690,9 +689,9 @@ Hooks.once("ready", async () => {
     }
   });
 
-  socket.on("harvest.release-claims", async ({ sessionId, userId }) => {
+  socket.on("harvest.release-claims", async ({ sessionId, userId, actorUuid }) => {
     if (!game.user.isGM) return;
-    const session = await harvest.releaseClaims(sessionId, userId);
+    const session = await harvest.releaseClaims(sessionId, userId, actorUuid);
     await socket.emit("harvest.session", { session });
     gmHarvestApp?.setSession(session);
     return { released: true };
@@ -700,6 +699,7 @@ Hooks.once("ready", async () => {
 
   socket.on("harvest.state", async ({ sessionId, creatureTokenUuid, state }) => {
     if (game.user.isGM) return;
+    const playerHarvestApp = playerHarvestApps.get(state?.actorUuid);
     if (!playerHarvestApp || playerHarvestApp.session?.id !== sessionId) return;
     await playerHarvestApp.setState(creatureTokenUuid, state);
   });
@@ -707,12 +707,10 @@ Hooks.once("ready", async () => {
   socket.on("harvest.session", async ({ session }) => {
     if (game.user.isGM) return;
     if (!session?.id) return;
-    if (!playerHarvestApp || playerHarvestApp.session?.id !== session.id) return;
-
     const imported = sessions.import(session);
-    await playerHarvestApp.setSession(imported, {
-      preserveFocus: true
-    });
+    await Promise.all([...playerHarvestApps.values()]
+      .filter(app => app.session?.id === session.id)
+      .map(app => app.setSession(imported, { preserveFocus: true })));
   });
 
 
@@ -824,17 +822,8 @@ Hooks.once("ready", async () => {
       }.`
     );
 
-    if (playerHarvestApp?.rendered) {
-      await playerHarvestApp.close();
-    }
-
-    playerHarvestApp = null;
-
-    for (const app of HarvestPlayerApp.instances()) {
-      if (app.rendered) {
-        await app.close();
-      }
-    }
+    for (const app of playerHarvestApps.values()) if (app.rendered) await app.close();
+    playerHarvestApps.clear();
 
     ui.notifications.info(
       "Harvesting was cancelled by the GM."
@@ -846,15 +835,8 @@ Hooks.once("ready", async () => {
 
     log(`Closing Harvest client window for finalized session ${sessionId}.`);
 
-    if (playerHarvestApp?.rendered) {
-      await playerHarvestApp.close();
-    }
-    playerHarvestApp = null;
-
-    // ApplicationV2 tracks live instances directly on the class.
-    for (const app of HarvestPlayerApp.instances()) {
-      if (app.rendered) await app.close();
-    }
+    for (const app of playerHarvestApps.values()) if (app.rendered) await app.close();
+    playerHarvestApps.clear();
 
     ui.notifications.info("Harvesting has been completed by the GM.");
   });

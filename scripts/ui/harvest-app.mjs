@@ -1,6 +1,10 @@
 import { MODULE_ID, MODULE_TITLE } from "../constants.mjs";
 import { getMorelordCoreService } from "../core/morelord-core-api.mjs";
 import { SETTINGS } from "../core/settings.mjs";
+import {
+  harvestParticipantKey,
+  harvestParticipantsByUser
+} from "../acquisition/harvest-participants.mjs";
 
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 
@@ -47,20 +51,21 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
 
-    const sessionUserIds = new Set(
-      Object.keys(this.session?.harvestActorsByUser ?? {})
+    const sessionParticipants = harvestParticipantsByUser(
+      this.session?.harvestActorsByUser
     );
-    const users = game.users
-      .filter(user => !user.isGM && user.active && (!this.session || sessionUserIds.has(user.id)))
-      .map(user => ({ id: user.id, name: user.name }));
 
     const progress = this.session
-      ? users.map(user => ({
-          userId: user.id,
-          user: user.name,
-          completed: (this.session.completedUserIds ?? []).includes(user.id),
+      ? sessionParticipants.map(participant => ({
+          userId: participant.userId,
+          actorUuid: participant.actorUuid,
+          user: game.actors.find(actor => actor.uuid === participant.actorUuid)?.name
+            ?? game.users.get(participant.userId)?.name ?? "Unknown",
+          completed: (this.session.completedParticipantIds ?? []).includes(participant.actorUuid),
           perCreature: this.session.creatures.map(creature => {
-            const state = this.session.participants?.[`${user.id}:${creature.tokenUuid}`];
+            const state = this.session.participants?.[
+              harvestParticipantKey(participant.actorUuid, creature.tokenUuid)
+            ];
             return {
               creature: creature.name,
               status: state?.status ?? "waiting",
@@ -418,13 +423,14 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
       const harvestActorsByUser = {};
       for (const actor of selectedCharacters) {
         const user = this.#activeUserForActor(actor);
-        if (user && !harvestActorsByUser[user.id]) harvestActorsByUser[user.id] = actor.uuid;
+        if (user) (harvestActorsByUser[user.id] ??= []).push(actor.uuid);
       }
       const players = Object.keys(harvestActorsByUser).map(id => game.users.get(id)).filter(Boolean);
       if (!players.length) throw new Error("None of the selected player characters has a connected player.");
       const skipSkillChecks = Object.entries(harvestActorsByUser)
-        .filter(([, actorUuid]) => this.skipSkillCheckActorUuids.has(actorUuid))
-        .map(([userId, actorUuid]) => ({ userId, actorUuid }));
+        .flatMap(([userId, actorUuids]) => actorUuids
+          .filter(actorUuid => this.skipSkillCheckActorUuids.has(actorUuid))
+          .map(actorUuid => ({ userId, actorUuid })));
 
       const selectedCreatureUuids =
         new Set(
@@ -467,12 +473,12 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
         JSON.stringify([...this.selectedCharacterUuids])
       );
 
-      await Promise.all(players.map(user =>
-        this.craftworks.socket.emit(
+      await Promise.all(Object.entries(harvestActorsByUser).flatMap(([userId, actorUuids]) =>
+        actorUuids.map(actorUuid => this.craftworks.socket.emit(
           "harvest.open",
-          { session: this.session },
-          { targetUserId: user.id }
-        )
+          { session: this.session, actorUuid },
+          { targetUserId: userId }
+        ))
       ));
 
       ui.notifications.info(
@@ -521,9 +527,10 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
     event.preventDefault();
 
     const userId = event.currentTarget.dataset.userId;
+    const actorUuid = event.currentTarget.dataset.actorUuid;
     const user = userId ? game.users.get(userId) : null;
 
-    if (!this.session?.id || !user?.active) {
+    if (!this.session?.id || !actorUuid || !user?.active) {
       ui.notifications.warn(
         "That player is no longer connected to this Harvest session."
       );
@@ -532,7 +539,7 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
 
     await this.craftworks.socket.emit(
       "harvest.open",
-      { session: this.session },
+      { session: this.session, actorUuid },
       { targetUserId: user.id }
     );
 
@@ -602,7 +609,7 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
     return game.users.find(user =>
       user.active && !user.isGM && (
         user.character?.uuid === actor.uuid
-        || (!user.character && actor.testUserPermission(user, "OWNER"))
+        || actor.testUserPermission(user, "OWNER")
       )
     ) ?? null;
   }

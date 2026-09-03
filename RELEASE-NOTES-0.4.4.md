@@ -5,6 +5,7 @@ Morelord Craftworks 0.4.4 adds the missing Monsters of Drakkenheim SRD recipes a
 ## Added
 
 - Added Harvest player-character selection with Core-standard party priority, remembered selections, and per-character Skip Skill Checks.
+- Harvest now opens an independent window and tracks independent claims for every selected character, including multiple characters owned by the same connected player.
 - Added all 19 Monsters of Drakkenheim Appendix E SRD recipe variants for enhanced armor, healing and resistance potions, enhanced shields, spell scroll tiers, and enhanced weapons.
 - Added entitlement-aware recipe output resolution that prefers enabled premium PHB and DMG content before falling back to SRD 5.2; healing potions can also use SRD 5.1.
 - Added recipe facility requirements backed by Morelord Core locations and capability tiers.
@@ -14,6 +15,7 @@ Morelord Craftworks 0.4.4 adds the missing Monsters of Drakkenheim SRD recipes a
 
 ## Improved
 
+- Claimed creatures remain expanded in the player Harvest window to prevent disruptive layout shifts during large harvests.
 - Enhanced armor, shield, and weapon recipes now award the corresponding generic `+1, +2, or +3` compendium item so the GM can configure the completed item appropriately.
 - Crafting projects now pause when their required environment is unavailable and resume when the requirement is met.
 - The dashboard now reports total and ready crafting projects and places Manage Locations with the other GM Tools.

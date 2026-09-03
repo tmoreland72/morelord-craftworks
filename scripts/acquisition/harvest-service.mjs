@@ -1,5 +1,6 @@
 import { HARVEST_SKILLS_DND5E, MODULE_ID } from "../constants.mjs";
 import { SETTINGS, getSetting } from "../core/settings.mjs";
+import { harvestParticipantKey } from "./harvest-participants.mjs";
 import { getHarvestChoiceCount, getHarvestDC } from "./harvest-rules.mjs";
 import { findHarvestProfile } from "./harvest-profiles.mjs";
 import { resolveKibblesHarvest } from "./kibbles-harvest-resolver.mjs";
@@ -237,8 +238,7 @@ export class HarvestService {
       }
 
       for (const creature of creatures) {
-        const key =
-          `${entry.userId}:${creature.tokenUuid}`;
+        const key = harvestParticipantKey(entry.actorUuid, creature.tokenUuid);
 
         session.participants[key] =
           this.#buildSuccessfulState({
@@ -296,9 +296,9 @@ export class HarvestService {
     return tokens.length;
   }
 
-  getParticipant(sessionId, userId, creatureTokenUuid) {
+  getParticipant(sessionId, actorUuid, creatureTokenUuid) {
     const session = this.sessions.get(sessionId);
-    return session?.participants?.[`${userId}:${creatureTokenUuid}`] ?? null;
+    return session?.participants?.[harvestParticipantKey(actorUuid, creatureTokenUuid)] ?? null;
   }
 
   #buildChoices(creature, total = null) {
@@ -537,11 +537,15 @@ export class HarvestService {
     const session = this.sessions.get(sessionId);
     if (!session) throw new Error("Harvest session not found.");
     if (session.status !== "open") throw new Error("This harvest session is no longer open.");
+    const permittedActors = session.harvestActorsByUser?.[userId] ?? [];
+    if (!(Array.isArray(permittedActors) ? permittedActors : [permittedActors]).includes(actorUuid)) {
+      throw new Error("This character is not part of the Harvest session.");
+    }
 
     const creature = session.creatures.find(c => c.tokenUuid === creatureTokenUuid);
     if (!creature) throw new Error("Creature is not part of this harvest session.");
 
-    const key = `${userId}:${creature.tokenUuid}`;
+    const key = harvestParticipantKey(actorUuid, creature.tokenUuid);
     if (session.participants[key]?.status) throw new Error("This player has already attempted to harvest this creature.");
 
     const numericTotal = Number(total);
@@ -602,16 +606,17 @@ export class HarvestService {
     sessionId,
     creatureTokenUuid,
     userId,
+    actorUuid,
     materialId,
     componentId = null
   }) {
     const session = this.sessions.get(sessionId);
     if (!session) throw new Error("Harvest session not found.");
 
-    const key = `${userId}:${creatureTokenUuid}`;
+    const key = harvestParticipantKey(actorUuid, creatureTokenUuid);
     const state = session.participants?.[key];
 
-    if (!state || state.status !== "awaiting-claim") {
+    if (!state || state.userId !== userId || state.status !== "awaiting-claim") {
       throw new Error(
         "A successful harvest check is required before claiming."
       );
@@ -823,15 +828,19 @@ export class HarvestService {
     };
   }
 
-  async releaseClaims(sessionId, userId) {
+  async releaseClaims(sessionId, userId, actorUuid = null) {
     const session = this.sessions.get(sessionId);
     if (!session || session.status !== "open") throw new Error("Harvest session not found.");
 
-    session.results = (session.results ?? []).filter(result => result.userId !== userId);
-    session.completedUserIds = (session.completedUserIds ?? []).filter(id => id !== userId);
+    session.results = (session.results ?? []).filter(result =>
+      actorUuid ? result.actorUuid !== actorUuid : result.userId !== userId
+    );
+    session.completedParticipantIds = (session.completedParticipantIds ?? []).filter(id =>
+      actorUuid ? id !== actorUuid : !id.startsWith(`${userId}:`)
+    );
 
     for (const [key, state] of Object.entries(session.participants ?? {})) {
-      if (state?.userId !== userId) continue;
+      if (actorUuid ? state?.actorUuid !== actorUuid : state?.userId !== userId) continue;
       state.claimedComponentIds = [];
       state.claimedMaterialIds = [];
       state.claimedNames = [];
@@ -844,7 +853,7 @@ export class HarvestService {
       state.recipientName = null;
       if (state.choices?.length) state.status = "awaiting-claim";
 
-      const token = await fromUuid(state.creatureTokenUuid ?? key.slice(key.indexOf(":") + 1));
+      const token = await fromUuid(state.creatureTokenUuid);
       if (token && state.actorUuid) {
         const records = foundry.utils.deepClone(token.getFlag(MODULE_ID, HARVEST_FLAG) ?? {});
         delete records[state.actorUuid];
@@ -860,20 +869,20 @@ export class HarvestService {
     const session = this.sessions.get(sessionId);
     if (!session) throw new Error("Harvest session not found.");
 
-    const userIds = new Set(
+    const participants = new Map(
       Object.values(session.participants ?? {})
-        .map(state => state?.userId)
-        .filter(Boolean)
+        .filter(state => state?.userId && state?.actorUuid)
+        .map(state => [state.actorUuid, { userId: state.userId, actorUuid: state.actorUuid }])
     );
-    const completedUserIds = new Set(session.completedUserIds ?? []);
+    const completedParticipantIds = new Set(session.completedParticipantIds ?? []);
     const completed = [];
 
-    for (const userId of userIds) {
-      if (completedUserIds.has(userId)) continue;
+    for (const { userId, actorUuid } of participants.values()) {
+      if (completedParticipantIds.has(actorUuid)) continue;
 
       let isComplete = true;
       for (const creature of session.creatures ?? []) {
-        const state = session.participants?.[`${userId}:${creature.tokenUuid}`];
+        const state = session.participants?.[harvestParticipantKey(actorUuid, creature.tokenUuid)];
         if (!state?.status) {
           isComplete = false;
           break;
@@ -915,14 +924,15 @@ export class HarvestService {
       }
 
       if (!isComplete) continue;
-      completedUserIds.add(userId);
+      completedParticipantIds.add(actorUuid);
       completed.push({
         userId,
+        actorUuid,
         userName: game.users.get(userId)?.name ?? "A player"
       });
     }
 
-    session.completedUserIds = [...completedUserIds];
+    session.completedParticipantIds = [...completedParticipantIds];
     return completed;
   }
 
@@ -1027,8 +1037,7 @@ export class HarvestService {
       result.awarded = true;
       result.awardedAt = Date.now();
 
-      const stateKey =
-        `${result.userId}:${result.creatureTokenUuid}`;
+      const stateKey = harvestParticipantKey(result.actorUuid, result.creatureTokenUuid);
 
       const state =
         session.participants?.[stateKey];
