@@ -517,7 +517,11 @@ try {
     if ($OriginUrl -notmatch [regex]::Escape($Repository)) { throw "Git remote 'origin' does not point to $Repository. Current: $OriginUrl" }
     $InitialStatus = Get-GitOutput -Command { git status --porcelain } -FailureMessage 'Unable to inspect the Git working tree.'
     if (-not [string]::IsNullOrWhiteSpace($InitialStatus)) { throw "The working tree is not clean:`n$InitialStatus" }
-    Invoke-NativeCommand -Command { node tools/check-design-system.mjs } -FailureMessage 'Morelord design-system boundary validation failed.'
+    $DesignSystemChecker = Join-Path (Split-Path $PSScriptRoot -Parent) 'morelord-core\tools\check-design-system.mjs'
+    if (-not (Test-Path -LiteralPath $DesignSystemChecker -PathType Leaf)) {
+        throw "Shared Morelord design-system checker was not found: $DesignSystemChecker"
+    }
+    Invoke-NativeCommand -Command { node $DesignSystemChecker } -FailureMessage 'Morelord design-system boundary validation failed.'
     Invoke-NativeCommand -Command { git fetch origin --tags --prune } -FailureMessage 'Unable to fetch origin.'
     $Behind = [int](Get-GitOutput -Command { git rev-list --count "HEAD..origin/$ReleaseBranch" } -FailureMessage 'Unable to compare local and remote branches.')
     if ($Behind -gt 0) { throw "Local '$ReleaseBranch' is $Behind commit(s) behind origin. Pull before releasing." }
