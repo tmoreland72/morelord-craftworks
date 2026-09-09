@@ -16,12 +16,14 @@ export class RecipeRegistry {
     materialRegistry,
     coreAccess = null,
     contentPacks = null,
-    dnd5eItemResolver = null
+    dnd5eItemResolver = null,
+    customRecipes = null
   }) {
     this.materialRegistry = materialRegistry;
     this.coreAccess = coreAccess;
     this.contentPacks = contentPacks;
     this.dnd5eItemResolver = dnd5eItemResolver;
+    this.customRecipes = customRecipes;
     this._recipes = new Map();
   }
 
@@ -79,13 +81,19 @@ export class RecipeRegistry {
 
     }
 
+    for (const raw of await this.customRecipes?.all?.() ?? []) {
+      const recipe = this.#normalizeRecipe(raw);
+      this.#applyFacilityOverride(recipe, facilityOverrides);
+      this._recipes.set(recipe.id, recipe);
+    }
+
     this.#validateUniqueMaterialOutputs();
 
     return this._recipes.size;
   }
 
   packs({ includeDisabled = true } = {}) {
-    return CONTENT_PACKS
+    const packs = CONTENT_PACKS
       .map(pack => {
         const enabled = isContentPackEnabled(pack.id);
         return {
@@ -97,9 +105,17 @@ export class RecipeRegistry {
         };
       })
       .filter(pack => includeDisabled || pack.enabled);
+    const recipeCount = Array.from(this._recipes.values())
+      .filter(recipe => recipe.packId === "custom-world").length;
+    if (recipeCount) packs.push({
+      id: "custom-world", label: "Custom Recipes", shortLabel: "Custom",
+      rulesVersion: "World", enabled: true, recipeCount
+    });
+    return packs;
   }
 
   isPackEnabled(packId) {
+    if (packId === "custom-world") return true;
     const pack = getContentPack(packId);
     if (!pack) return false;
     if (this.contentPacks) return this.contentPacks.isEnabled(packId);
@@ -110,7 +126,7 @@ export class RecipeRegistry {
   get(recipeId, { includeDisabled = false } = {}) {
     const recipe = this._recipes.get(recipeId) ?? null;
     if (!recipe) return null;
-    if (!includeDisabled && !this.isPackEnabled(recipe.packId)) return null;
+    if (!includeDisabled && !this.#isRecipeEnabled(recipe)) return null;
     return recipe;
   }
 
@@ -119,7 +135,7 @@ export class RecipeRegistry {
 
     if (includeDisabled) return recipes;
 
-    return recipes.filter(recipe => this.isPackEnabled(recipe.packId));
+    return recipes.filter(recipe => this.#isRecipeEnabled(recipe));
   }
 
   search(query = "", { packId = "all" } = {}) {
@@ -172,6 +188,14 @@ export class RecipeRegistry {
 
   decorate(recipe) {
     return recipe;
+  }
+
+  #isRecipeEnabled(recipe) {
+    if (!this.isPackEnabled(recipe.packId)) return false;
+    const requiredPackId = recipe.custom
+      ? recipe.source?.contentPackId
+      : null;
+    return !requiredPackId || this.isPackEnabled(requiredPackId);
   }
 
   async setFacilityRequirement(recipeId, facility) {
@@ -292,15 +316,16 @@ export class RecipeRegistry {
     const packId = String(raw.packId ?? "standard-core");
     const pack = getContentPack(packId);
 
-    if (!pack) {
+    if (!pack && packId !== "custom-world") {
       throw new Error(`Recipe ${raw.id} references unknown recipe pack '${packId}'.`);
     }
 
     return {
       schemaVersion: Number(raw.schemaVersion ?? 1),
       packId,
-      packLabel: pack.label,
-      rulesVersion: pack.rulesVersion,
+      packLabel: pack?.label ?? "Custom Recipes",
+      rulesVersion: pack?.rulesVersion ?? "World",
+      custom: Boolean(raw.custom || packId === "custom-world"),
       id: String(raw.id),
       name: String(raw.name),
       description: String(raw.description ?? ""),
@@ -534,7 +559,8 @@ export class RecipeRegistry {
         label: String(raw.label ?? raw.name ?? "Foundry Item"),
         img: String(raw.img ?? ""),
         sourceBook: raw.sourceBook ? String(raw.sourceBook) : null,
-        sourcePackId: raw.sourcePackId ? String(raw.sourcePackId) : null
+        sourcePackId: raw.sourcePackId ? String(raw.sourcePackId) : null,
+        itemType: raw.itemType ? String(raw.itemType) : null
       };
     }
 

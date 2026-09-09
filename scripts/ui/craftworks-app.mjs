@@ -177,6 +177,11 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
         )
       );
 
+    this.element.querySelector("[data-action='custom-recipes']")
+      ?.addEventListener("click", () => this.#gmAction(
+        () => this.craftworks.openCustomRecipes()
+      ));
+
     this.element.querySelector("[data-action='refresh']")
       ?.addEventListener("click", event => this.#refreshContent(event));
 

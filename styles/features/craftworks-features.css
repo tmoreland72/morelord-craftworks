@@ -1,3 +1,27 @@
 /* Feature stylesheet aggregator; import order is cascade order. */
 @import url("./craftworks-foundation.css");
 @import url("./craftworks-workflows.css");
+.ml-custom-recipe-row { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .5rem 0; border-bottom: 1px solid var(--ml-border-subtle); }
+.ml-custom-recipe-row > img { width: 36px; height: 36px; object-fit: cover; }
+.ml-custom-recipe-row > span:nth-child(2) { display: grid; flex: 1; min-width: 0; }
+.ml-recipe-output-picker { width: 100%; height: auto; min-height: 64px; display: flex; align-items: center; justify-content: flex-start; gap: .75rem; padding: .5rem; }
+.ml-recipe-output-picker img { width: 48px; height: 48px; object-fit: cover; }
+.ml-recipe-output-picker span { display: grid; flex: 1; text-align: left; }
+.ml-recipe-logic-group { border: 1px solid var(--ml-border-subtle); padding: .65rem; margin: .65rem 0; position: relative; }
+.ml-recipe-logic-group > header { display: flex; justify-content: space-between; align-items: center; }
+.ml-recipe-or { display: block; text-align: center; margin-top: -.25rem; }
+.ml-recipe-selected-material { display: grid; grid-template-columns: 32px 1fr 100px auto; align-items: center; gap: .5rem; padding: .35rem 0; }
+.ml-recipe-selected-material img { width: 32px; height: 32px; object-fit: cover; }
+.ml-recipe-picker-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .4rem; }
+.ml-recipe-picker-row { height: auto; display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; text-align: left; gap: .5rem; padding: .4rem; cursor: pointer; }
+.ml-recipe-picker-results img { width: 40px; height: 40px; object-fit: cover; }
+.ml-recipe-picker-results span { display: grid; min-width: 0; }
+.ml-recipe-picker-pages { display: flex; align-items: center; justify-content: center; gap: .75rem; margin-top: .75rem; }
+@media (max-width: 720px) { .ml-recipe-picker-results { grid-template-columns: 1fr; } }
+
+/* Recipe selection uses the window as its only scroll surface. */
+.ml-craftworks-module.ml-craftworks-window .window-content:has(.ml-recipe-picker) { overflow-y: auto !important; overflow-x: hidden !important; }
+.ml-craftworks-module.ml-craftworks-window .ml-recipe-picker,
+.ml-craftworks-module.ml-craftworks-window .ml-recipe-picker > .ml-craftworks-marketplace-browser-body,
+.ml-craftworks-module.ml-craftworks-window .ml-recipe-picker .ml-craftworks-filter-rail,
+.ml-craftworks-module.ml-craftworks-window .ml-recipe-picker .ml-craftworks-marketplace-results { height: auto !important; max-height: none !important; overflow: visible !important; }

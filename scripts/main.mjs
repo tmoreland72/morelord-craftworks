@@ -27,6 +27,7 @@ import { DeleriumSearchPlayerApp } from "./ui/delerium-search-player-app.mjs";
 import { LootApp } from "./ui/loot-app.mjs";
 import { HoardApp } from "./ui/hoard-app.mjs";
 import { RecipeRegistry } from "./recipes/recipe-registry.mjs";
+import { CustomRecipeService } from "./recipes/custom-recipe-service.mjs";
 import { Dnd5eCompendiumItemResolver } from "./recipes/dnd5e-compendium-item-resolver.mjs";
 import { SpellScrollGeneratorService } from "./scrolls/spell-scroll-generator-service.mjs";
 import { SpellScrollCatalogInstaller } from "./scrolls/spell-scroll-catalog-installer.mjs";
@@ -54,6 +55,7 @@ import { CRAFTWORKS_DOCUMENTATION } from "./documentation/product-documentation.
 import { CraftworksSettingsApp } from "./ui/craftworks-settings-app.mjs";
 import { MaterialBrowserApp } from "./ui/material-browser-app.mjs";
 import { RecipeBrowserApp } from "./ui/recipe-browser-app.mjs";
+import { CustomRecipeApp } from "./ui/custom-recipe-app.mjs";
 import { CraftworksApp } from "./ui/craftworks-app.mjs";
 import { CraftApp } from "./ui/craft-app.mjs";
 import {
@@ -199,11 +201,13 @@ Hooks.once("ready", async () => {
     recipientResolver
   });
 
+  const customRecipes = new CustomRecipeService({ materialRegistry: materials });
   const recipes = new RecipeRegistry({
     materialRegistry: materials,
     coreAccess,
     contentPacks,
-    dnd5eItemResolver
+    dnd5eItemResolver,
+    customRecipes
   });
   contentSync.setRuntimeServices({
     dnd5eItemResolver,
@@ -308,6 +312,7 @@ Hooks.once("ready", async () => {
   let gmHoardApp = null;
   let materialBrowserApp = null;
   let recipeBrowserApp = null;
+  let customRecipeApp = null;
   let spellScrollGeneratorApp = null;
   let spellbookGeneratorApp = null;
   let potionGeneratorApp = null;
@@ -327,6 +332,7 @@ Hooks.once("ready", async () => {
     hoard,
     specialTreasure,
     recipes,
+    customRecipes,
     dnd5eItemResolver,
     sourceFilter,
     spellScrollGenerator,
@@ -481,6 +487,12 @@ Hooks.once("ready", async () => {
       if (recipeBrowserApp?.rendered) await recipeBrowserApp.close();
       recipeBrowserApp = new RecipeBrowserApp(api);
       return recipeBrowserApp.render({ force: true });
+    },
+    openCustomRecipes: async ({ drakkenheim = false } = {}) => {
+      if (!game.user.isGM) throw new Error("Only a GM can manage custom recipes.");
+      if (customRecipeApp?.rendered) await customRecipeApp.close();
+      customRecipeApp = new CustomRecipeApp(api, { drakkenheim });
+      return customRecipeApp.render({ force: true });
     },
     openCraft: async ({ recipeId = null, crafterActorUuid = null, inventoryActorUuid = null } = {}) => {
       if (recipeId && craftApp?.rendered) {
