@@ -7,6 +7,7 @@ export class AcquisitionSessionManager {
     const session = {
       id: randomID(),
       createdAt: Date.now(),
+      gmUserId: game.user.id,
       status: "open",
       ...foundry.utils.deepClone(data)
     };

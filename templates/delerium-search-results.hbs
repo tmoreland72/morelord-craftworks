@@ -1,14 +1,8 @@
 <section class="ml-app ml-app-shell ml-craftworks app-shell ml-craftworks-search-results">
-  <header class="ml-craftworks-header">
-    <h2>Delerium Search Results</h2>
-    <p>{{session.zone.name}} · {{session.successes}} successes · {{session.failures}} failures</p>
-  </header>
+  <header class="ml-hero"><i class="fa-solid fa-hammer ml-hero__icon"></i><div class="ml-hero__body"><h1>Delerium Search Results</h1><p>{{session.zone.name}} · {{session.successes}} successes · {{session.failures}} failures</p></div><div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header>
 
-<div class="ml-text ml-craftworks-panel ml-craftworks-search-outcome {{#if session.randomEncounter}}ml-craftworks-warning{{else}}ml-craftworks-success{{/if}}" data-tone="{{#if session.randomEncounter}}warning{{else}}success{{/if}}">
-    <i class="fa-solid {{#if session.randomEncounter}}fa-triangle-exclamation{{else}}fa-shield-check{{/if}}"></i>
-    <div>
-      <h3>{{encounterTitle}}</h3>
-      <p>{{encounterText}}</p>
+<div class="ml-surface ml-stack" data-gap="3">
+    <div class="ml-section-heading"><div><h2>{{encounterTitle}}</h2><p>{{encounterText}}</p></div></div>
       {{#if session.randomEncounter}}
         {{#if encountersActive}}
           <button type="button" data-action="open-encounters"><i class="fa-solid fa-hydra"></i> Open Morelord Encounters</button>
@@ -17,34 +11,25 @@
           {{#unless encountersInstalled}}<button type="button" data-action="get-encounters"><i class="fa-solid fa-arrow-up-right-from-square"></i> Get Morelord Encounters</button>{{/unless}}
         {{/if}}
       {{/if}}
-    </div>
   </div>
 
-  <div class="ml-craftworks-panel">
-    {{#if hasReward}}
-      {{#if hasResult}}
-        <div class="ml-craftworks-award-summary">
-          <img src="{{session.result.img}}" alt="{{session.result.name}}">
-          <div><strong>{{session.result.quantity}} × {{session.result.name}}</strong><br><span>Awarded to {{session.result.recipientName}}.</span></div>
-        </div>
-      {{else}}
-        <div class="ml-craftworks-delerium-result">
-          <img src="{{session.reward.img}}" alt="{{session.reward.name}}">
-          <div><h3>{{session.reward.name}}</h3><p>{{#if quantityRequiresRoll}}Roll {{session.reward.formula}} to determine the quantity found.{{else}}The party found one shard. Choose where to send it.{{/if}}</p></div>
-        </div>
-        <label class="ml-craftworks-recipient-field">
-          <span>Send Delerium To</span>
-          <select name="recipientUuid">
-            {{#each recipients}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
-          </select>
-        </label>
-        <div class="ml-actions ml-craftworks-actions">
-          <button type="button" data-action="roll-award" {{#unless canAward}}disabled{{/unless}}><i class="fa-solid {{#if quantityRequiresRoll}}fa-dice{{else}}fa-box-open{{/if}}"></i> {{awardButtonLabel}}</button>
-        </div>
-{{#unless recipients.length}}<p class="ml-text ml-craftworks-failure" data-tone="danger">No player character or group Actor is available.</p>{{/unless}}
-      {{/if}}
+  <section class="ml-surface ml-stack" data-gap="3">
+    <div class="ml-section-heading"><div><h2>What the Party Found</h2><p>Review the rewards earned by this search.</p></div></div>
+    {{#if hasResult}}
+      {{#each awardedItems}}<div class="ml-item-row" data-document-uuid="{{sourceUuid}}"><img src="{{img}}" alt="{{name}}"><span class="ml-stack" data-gap="1"><strong>{{quantity}} × {{name}}</strong><small>Awarded to {{recipientName}}.</small></span></div>{{/each}}
+    {{else if hasReward}}
+      <p>All rewards up to {{session.successes}} successes are included.</p>
+      {{#each rewards}}<div class="ml-item-row" data-document-uuid="{{sourceUuid}}"><img src="{{img}}" alt="{{name}}"><span class="ml-stack" data-gap="1"><strong>{{name}}</strong><small>Quantity: {{formula}}</small></span></div>{{/each}}
     {{else}}
-      <div class="ml-craftworks-search-outcome"><i class="fa-solid fa-magnifying-glass"></i><div><h3>No Delerium Found</h3><p>The party did not accumulate enough successes to find chips, fragments, or a shard.</p></div></div>
+      <p>No delerium was found. The party needs at least three successes.</p>
     {{/if}}
-  </div>
+  </section>
+  {{#if hasReward}}{{#unless hasResult}}
+    <section class="ml-surface ml-stack" data-gap="3">
+      <div class="ml-section-heading"><div><h2>Recipient</h2><p>Choose the character or party inventory that receives these items.</p></div></div>
+      <label><span>Recipient</span><select name="recipientUuid"><option value="">Choose character or group…</option>{{#each recipients}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
+      {{#unless recipients.length}}<p class="ml-text" data-tone="danger">No player character or group Actor is available.</p>{{/unless}}
+    </section>
+    <footer class="ml-page-footer ml-actions"><button type="button" data-action="roll-award" {{#unless canAward}}disabled{{/unless}}><i class="fa-solid fa-dice"></i> Roll &amp; Award All Delerium</button></footer>
+  {{/unless}}{{/if}}
 </section>

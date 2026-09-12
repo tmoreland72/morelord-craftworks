@@ -14,6 +14,7 @@ const REWARDS = Object.freeze([
 
 export class DeleriumSearchService {
   constructor({ adapter, recipientResolver, sessions, contentPacks, sourceFilter }) {
+    this.awardingSessions = new Set();
     this.adapter = adapter;
     this.recipientResolver = recipientResolver;
     this.sessions = sessions;
@@ -73,20 +74,15 @@ export class DeleriumSearchService {
 
   async finalize(sessionId) {
     const session = this.#requireOpen(sessionId);
-    const reward = REWARDS.find(entry => session.successes >= entry.min) ?? null;
-    let resolvedReward = null;
-    if (reward) {
+    const rewards = REWARDS.filter(entry => session.successes >= entry.min).toReversed();
+    const resolvedRewards = [];
+    for (const reward of rewards) {
       const source = await this.#resolveSourceItem(reward.name);
       if (!source) throw new Error(`${reward.name} was not found in the enabled Monsters of Drakkenheim Item compendiums.`);
-      resolvedReward = {
-        sourceUuid: source.uuid,
-        name: source.name,
-        img: source.img,
-        formula: reward.formula,
-        rarity: source.system?.rarity ?? null
-      };
+      resolvedRewards.push({ sourceUuid: source.uuid, name: source.name, img: source.img,
+        formula: reward.formula, rarity: source.system?.rarity ?? null });
     }
-    session.reward = resolvedReward;
+    session.rewards = resolvedRewards;
     session.result = null;
     session.randomEncounter = session.failures >= 2;
     session.status = "complete";
@@ -98,40 +94,43 @@ export class DeleriumSearchService {
     const session = this.sessions.get(sessionId);
     if (!session) throw new Error("Delerium search session not found.");
     if (session.status !== "complete") throw new Error("Finalize the delerium search before awarding its result.");
-    if (!session.reward) throw new Error("This search did not find any delerium to award.");
+    if (!session.rewards?.length) throw new Error("This search did not find any delerium to award.");
     if (session.result) throw new Error("This search result has already been awarded.");
-
-    const recipient = recipientUuid ? await fromUuid(recipientUuid) : null;
-    if (!recipient || !["character", "group"].includes(recipient.type)) {
-      throw new Error("Choose a valid party or character recipient.");
+    if (this.awardingSessions.has(sessionId)) throw new Error("This search is already being awarded.");
+    if (session.results.length && session.results[0].recipientUuid !== recipientUuid) {
+      throw new Error("Finish awarding this search to the original recipient.");
     }
-    const source = await fromUuid(session.reward.sourceUuid) ?? await this.#resolveSourceItem(session.reward.name);
-    if (!source) throw new Error(`${session.reward.name} is no longer available in the enabled compendiums.`);
-
-    const roll = await new Roll(session.reward.formula).evaluate();
-    await roll.toMessage({
-      flavor: `Delerium Search — ${session.reward.name}`,
-      speaker: ChatMessage.getSpeaker({ actor: recipient })
-    });
-    const quantity = Number(roll.total);
-    const item = await this.adapter.addItemToActor(recipient, source, quantity);
-    await AwardChatCardService.post({
-      recipient,
-      items: [{ document: source, uuid: source.uuid, quantity, rarity: source.system?.rarity }],
-      title: "Delerium Found"
-    });
-    const result = {
-      sourceUuid: source.uuid,
-      name: source.name,
-      img: source.img,
-      quantity,
-      itemUuid: item.uuid,
-      recipientName: recipient.name,
-      recipientUuid: recipient.uuid
-    };
-    session.result = result;
-    session.results.push(result);
-    return result;
+    this.awardingSessions.add(sessionId);
+    try {
+      const recipient = recipientUuid ? await fromUuid(recipientUuid) : null;
+      if (!recipient || !["character", "group"].includes(recipient.type)) throw new Error("Choose a valid party or character recipient.");
+      // Resolve every source before changing the recipient's inventory.
+      const sources = await Promise.all(session.rewards.map(async reward => {
+        const source = await fromUuid(reward.sourceUuid) ?? await this.#resolveSourceItem(reward.name);
+        if (!source) throw new Error(`${reward.name} is no longer available in the enabled compendiums.`);
+        return source;
+      }));
+      for (const [index, reward] of session.rewards.entries()) {
+        if (session.results.some(result => result.sourceUuid === reward.sourceUuid)) continue;
+        if (reward.quantity == null) {
+          const roll = await new Roll(reward.formula).evaluate();
+          await roll.toMessage({ flavor: `Delerium Search — ${reward.name}`, speaker: ChatMessage.getSpeaker({ actor: recipient }) });
+          reward.quantity = Number(roll.total);
+        }
+        const source = sources[index];
+        const item = await this.adapter.addItemToActor(recipient, source, reward.quantity);
+        // Record each completed delivery so retries cannot duplicate earlier rewards.
+        session.results.push({ sourceUuid: source.uuid, name: source.name, img: source.img,
+          quantity: reward.quantity, itemUuid: item.uuid, recipientName: recipient.name, recipientUuid: recipient.uuid });
+      }
+      session.result = { items: [...session.results], recipientName: recipient.name, recipientUuid: recipient.uuid };
+      await AwardChatCardService.post({ recipient, items: session.results.map(result => ({
+        document: sources.find(source => source.uuid === result.sourceUuid), uuid: result.sourceUuid, quantity: result.quantity
+      })), title: "Delerium Found" });
+      return session.result;
+    } finally {
+      this.awardingSessions.delete(sessionId);
+    }
   }
 
   #requireOpen(sessionId) {
@@ -148,10 +147,8 @@ export class DeleriumSearchService {
       pack.documentName === "Item"
       && (this.sourceFilter?.isPackEnabled(pack) ?? true)
     )) {
-      const sourceLabel = String(this.sourceFilter?.sourceLabelForPack(pack) ?? "").toLowerCase();
-      const packageText = [pack.collection, pack.title, pack.metadata?.packageName, pack.metadata?.label]
-        .filter(Boolean).join(" ").toLowerCase();
-      if (!sourceLabel.includes("drakkenheim") && !packageText.includes("drakkenheim")) continue;
+      if (pack.metadata?.packageName !== "drakkenheim-monsters"
+        && !String(pack.collection).startsWith("drakkenheim-monsters.")) continue;
       const index = await pack.getIndex({ fields: ["system.source"] });
       for (const entry of index) {
         if (String(entry.name ?? "").trim().toLowerCase() === normalizedName) {

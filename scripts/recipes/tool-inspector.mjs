@@ -1,3 +1,4 @@
+import { normalizeArtisanTool, resolveArtisanToolId } from "./artisan-tools.mjs";
 export class ToolInspector {
   inspect(actor, requiredToolName) {
     const required = String(requiredToolName ?? "").trim();
@@ -13,13 +14,14 @@ export class ToolInspector {
       };
     }
 
-    const normalizedRequired = this.#normalize(required);
+    const normalizedRequired = normalizeArtisanTool(required);
+    const toolId = resolveArtisanToolId(required);
 
     const candidates = Array.from(actor.items ?? [])
-      .filter(item => item?.type === "tool")
+      .filter(item => item?.type === "tool" && Number(item.system?.quantity ?? 1) > 0)
       .map(item => ({
         item,
-        normalizedName: this.#normalize(item.name)
+        normalizedName: normalizeArtisanTool(item.name)
       }));
 
     const exact = candidates.find(entry =>
@@ -37,7 +39,7 @@ export class ToolInspector {
       ? Number(fallback.item.system?.proficient ?? 0) > 0
       : false;
 
-    const actorProficient = this.#actorHasToolProficiency(
+    const actorProficient = Number(actor.system?.tools?.[toolId]?.value ?? 0) > 0 || this.#actorHasToolProficiency(
       actor,
       required,
       normalizedRequired,
@@ -48,6 +50,7 @@ export class ToolInspector {
 
     return {
       requiredTool: required,
+      toolId,
       hasTool,
       proficient,
       qualifiesForNormalDc: hasTool && proficient,
@@ -73,7 +76,7 @@ export class ToolInspector {
 
     const normalizedCandidates = new Set(
       values
-        .map(value => this.#normalize(value))
+        .map(value => normalizeArtisanTool(value))
         .filter(Boolean)
     );
 
@@ -153,15 +156,4 @@ export class ToolInspector {
     }
   }
 
-  #normalize(value) {
-    return String(value ?? "")
-      .toLowerCase()
-      .replace(/[’']s\b/g, "")
-      .replace(/[’']/g, "")
-      .replace(/\btools?\b/g, "")
-      .replace(/\bsupplies\b/g, "")
-      .replace(/[^a-z0-9]+/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-  }
 }

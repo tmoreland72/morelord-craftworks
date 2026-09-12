@@ -99,7 +99,12 @@ export class CustomRecipeService {
       if (!Array.isArray(group.requirements) || !group.requirements.length) {
         throw new Error(`Custom recipe '${recipe.name}' contains an empty logical option.`);
       }
-      for (const requirement of group.requirements) {
+      const choices = group.requirements.flatMap(requirement => {
+        if (requirement?.type !== "alternatives") return [requirement];
+        if (!Array.isArray(requirement.alternatives) || !requirement.alternatives.length) throw new Error("Each OR group requires at least one material choice.");
+        return requirement.alternatives;
+      });
+      for (const requirement of choices) {
         if (!requirement?.match?.materialId || !Number.isFinite(Number(requirement.quantity))
           || Number(requirement.quantity) < 1) {
           throw new Error(`Custom recipe '${recipe.name}' contains an invalid material requirement.`);
@@ -112,8 +117,9 @@ export class CustomRecipeService {
         }
       }
     }
+    if (drakkenheim) recipe.craft = { ...recipe.craft, checkRequired: false, dc: null, hoursRequired: 0 };
     const hours = Number(recipe.craft?.hoursRequired ?? 2);
-    if (!Number.isFinite(hours) || hours < 2 || hours % 2 !== 0) {
+    if (!drakkenheim && (!Number.isFinite(hours) || hours < 2 || hours % 2 !== 0)) {
       throw new Error(`Custom recipe '${recipe.name}' crafting time must be a positive multiple of 2 hours.`);
     }
     recipe.output.type = "foundry-item";

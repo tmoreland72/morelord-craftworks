@@ -5,11 +5,9 @@ import {
 import { CONTENT_PACKS, getContentPack } from "../../data/content-packs.mjs";
 import { CONTENT_PACK_MANIFESTS } from "../../data/packs/manifests.mjs";
 import {
-  getRecipeFacilityOverrides,
-  isContentPackEnabled,
-  setRecipeFacilityOverride
+  isContentPackEnabled
 } from "../core/settings.mjs";
-import { normalizeCraftEnvironment } from "../crafting/crafting-environment-service.mjs";
+import { normalizeCraftEnvironment, recipeFacilityEnvironment } from "../crafting/crafting-environment-service.mjs";
 
 export class RecipeRegistry {
   constructor({
@@ -34,7 +32,6 @@ export class RecipeRegistry {
     ]);
 
     this._recipes.clear();
-    const facilityOverrides = getRecipeFacilityOverrides();
 
     for (const [packId, entries] of sources) {
       if (!Array.isArray(entries)) {
@@ -72,7 +69,7 @@ export class RecipeRegistry {
         }
 
         const recipe = this.#normalizeRecipe(preparedRaw);
-        this.#applyFacilityOverride(recipe, facilityOverrides);
+        recipe.craft.environment = recipeFacilityEnvironment(recipe);
 
         // Manifest order is priority order. Higher-priority content packs
         // intentionally replace lower-priority recipes with the same id.
@@ -82,8 +79,9 @@ export class RecipeRegistry {
     }
 
     for (const raw of await this.customRecipes?.all?.() ?? []) {
-      const recipe = this.#normalizeRecipe(raw);
-      this.#applyFacilityOverride(recipe, facilityOverrides);
+      const item = raw.output?.uuid && typeof fromUuid === "function" ? await fromUuid(raw.output.uuid) : null;
+      const recipe = this.#normalizeRecipe({ ...raw, output: { ...raw.output, rarity: item?.system?.rarity ?? raw.output?.rarity ?? raw.rarity } });
+      recipe.craft.environment = recipeFacilityEnvironment(recipe);
       this._recipes.set(recipe.id, recipe);
     }
 
@@ -198,26 +196,6 @@ export class RecipeRegistry {
     return !requiredPackId || this.isPackEnabled(requiredPackId);
   }
 
-  async setFacilityRequirement(recipeId, facility) {
-    const recipe = this._recipes.get(String(recipeId));
-    if (!recipe) throw new Error(`Unknown recipe '${recipeId}'.`);
-
-    const normalized = facility?.type
-      ? normalizeCraftEnvironment({ facility })
-      : normalizeCraftEnvironment({ portable: true });
-    await setRecipeFacilityOverride(recipe.id, normalized.facility);
-    recipe.craft.environment = normalized;
-    return recipe;
-  }
-
-  #applyFacilityOverride(recipe, overrides) {
-    if (!Object.prototype.hasOwnProperty.call(overrides, recipe.id)) return;
-    const facility = overrides[recipe.id];
-    recipe.craft.environment = facility
-      ? normalizeCraftEnvironment({ facility })
-      : normalizeCraftEnvironment({ portable: true });
-  }
-
   async #resolveDnd5eCatalogOutput(raw, sourceBook) {
     const output = raw.output ?? {};
 
@@ -266,6 +244,7 @@ export class RecipeRegistry {
           quantity: parsed.quantity,
           label: item.name,
           img: item.img,
+          rarity: item.rarity ?? item.system?.rarity ?? raw.rarity ?? null,
           sourceBook: candidateSourceBook,
           sourcePackId: item.packId
         }
@@ -338,13 +317,14 @@ export class RecipeRegistry {
           : null,
       tags: Array.isArray(raw.tags) ? raw.tags.map(String) : [],
       source: raw.source ?? null,
-      craft: this.#normalizeCraft(raw.craft),
+      craft: this.#normalizeCraft(raw.craft, raw.packId === "monsters-of-drakkenheim" || raw.source?.contentPackId === "monsters-of-drakkenheim"),
       requirementGroups: this.#normalizeRequirementGroups(raw, raw.id),
       output: this.#normalizeOutput(raw.output, raw.id)
     };
   }
 
-  #normalizeCraft(raw) {
+  #normalizeCraft(raw, drakkenheim = false) {
+    if (drakkenheim) raw = { ...raw, dc: null, noToolDc: null, hoursRequired: 0, checkRequired: false };
     if (!raw) {
       return {
         tool: null,
@@ -363,9 +343,7 @@ export class RecipeRegistry {
       ? null
       : Math.max(1, Number(raw.dc));
 
-    const noToolDc = raw.noToolDc == null
-      ? (dc == null ? null : dc + 5)
-      : Math.max(1, Number(raw.noToolDc));
+    const noToolDc = dc; // Legacy field retained for saved recipe compatibility; no DC penalty.
 
     const hoursRequired = raw.hoursRequired == null
       ? null
@@ -373,6 +351,7 @@ export class RecipeRegistry {
 
     if (
       hoursRequired != null
+      && !drakkenheim
       && !isValidCraftingDuration(hoursRequired)
     ) {
       throw new Error(
@@ -558,6 +537,7 @@ export class RecipeRegistry {
         fallbackImg: raw.img ? String(raw.img) : null,
         label: String(raw.label ?? raw.name ?? "Foundry Item"),
         img: String(raw.img ?? ""),
+        rarity: raw.rarity ? String(raw.rarity) : null,
         sourceBook: raw.sourceBook ? String(raw.sourceBook) : null,
         sourcePackId: raw.sourcePackId ? String(raw.sourcePackId) : null,
         itemType: raw.itemType ? String(raw.itemType) : null

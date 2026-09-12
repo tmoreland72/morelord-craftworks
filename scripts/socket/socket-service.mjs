@@ -92,16 +92,22 @@ export class SocketService {
     return this.emit("debug.ping", { message: `Ping from ${game.user.name}` }, { targetUserId });
   }
 
-  async executeAsGm(type, data = {}) {
+  async executeAsGm(type, data = {}, { gmUserId = null } = {}) {
     if (!this.ready || !this.socket) {
       throw new Error("Craftworks socket transport is not ready.");
     }
-    return this.socket.executeAsGM("dispatch", {
+    const payload = {
       type,
       data: foundry.utils.deepClone(data),
       senderUserId: game.user.id,
       sentAt: Date.now()
-    });
+    };
+    if (gmUserId) {
+      const owner = game.users.get(gmUserId);
+      if (!owner?.isGM || !owner.active) throw new Error("The GM who started this session must be connected.");
+      return this.socket.executeAsUser("dispatch", gmUserId, payload);
+    }
+    return this.socket.executeAsGM("dispatch", payload);
   }
 
   async #receive(payload) {

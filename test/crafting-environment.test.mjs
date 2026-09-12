@@ -4,7 +4,8 @@ import {
   CraftingEnvironmentService,
   evaluateCraftingEnvironment,
   getCraftingFacilityOptions,
-  normalizeCraftEnvironment
+  normalizeCraftEnvironment,
+  recipeFacilityEnvironment
 } from "../scripts/crafting/crafting-environment-service.mjs";
 
 const tiers = ["common", "uncommon", "rare", "veryRare", "legendary"];
@@ -16,6 +17,28 @@ const locationApi = {
   }
 };
 const recipe = { craft: { environment: { facility: { type: "forge", tier: "rare" } } } };
+
+test("all Drakkenheim recipes require an equal-or-higher Workshop regardless of tool settings", () => {
+  for (const source of [{ packId: "monsters-of-drakkenheim" }, { source: { contentPackId: "monsters-of-drakkenheim" } }]) {
+    const recipe = { ...source, output: { rarity: "rare" }, craft: { tool: null } };
+    recipe.craft.environment = recipeFacilityEnvironment(recipe, { "": "", "Smith's Tools": "forge" });
+    assert.deepEqual(recipe.craft.environment.facility, { type: "workshop", tier: "rare" });
+    assert.equal(recipe.craft.environment.portable, false);
+    for (const [capabilities, passed] of [[[], false], [[{ type: "workshop", tier: "uncommon" }], false], [[{ type: "workshop", tier: "rare" }], true], [[{ type: "workshop", tier: "veryRare" }], true]]) {
+      assert.equal(evaluateCraftingEnvironment(recipe, { location: { capabilities } }, locationApi).passed, passed);
+    }
+  }
+});
+
+test("tool rules use the output rarity, allow higher facilities, and support no requirement", () => {
+  const configured = { "Smith's Tools": "forge", "Alchemist's Supplies": "" };
+  const smith = { rarity: "common", output: { rarity: "uncommon" }, craft: { tool: "Smith's Tools" } };
+  smith.craft.environment = recipeFacilityEnvironment(smith, configured);
+  assert.deepEqual(smith.craft.environment.facility, { type: "forge", tier: "uncommon" });
+  assert.equal(evaluateCraftingEnvironment(smith, { location: { capabilities: [{ type: "forge", tier: "rare" }] } }, locationApi).passed, true);
+  assert.equal(evaluateCraftingEnvironment(smith, { location: { capabilities: [{ type: "forge", tier: "common" }] } }, locationApi).passed, false);
+  assert.equal(recipeFacilityEnvironment({ craft: { tool: "Alchemist's Supplies" }, rarity: "rare" }, configured).portable, true);
+});
 
 test("Rare Forge recipe fails in Emberwood and works in Neverwinter", () => {
   const emberwood = { settlementType: "village", capabilities: [{ type: "forge", tier: "common" }] };

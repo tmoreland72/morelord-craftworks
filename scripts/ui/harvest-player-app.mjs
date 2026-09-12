@@ -22,6 +22,9 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
     this.craftworks = craftworks;
     this.session = session;
     this.actorUuid = actorUuid;
+    this.participantUserId = game.user.isGM
+      ? Object.entries(session.harvestActorsByUser ?? {}).find(([, actors]) => (Array.isArray(actors) ? actors : [actors]).includes(actorUuid))?.[0] ?? game.user.id
+      : game.user.id;
     this.states = {};
     this.focusedCreatureTokenUuid = null;
     this.collapsedCreatures = new Set();
@@ -45,6 +48,10 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
         foundry.utils.deepClone(state);
 
     }
+  }
+
+  #sendToGm(type, data) {
+    return this.craftworks.socket.executeAsGm(type, data, { gmUserId: this.session.gmUserId });
   }
 
   static DEFAULT_OPTIONS = {
@@ -188,7 +195,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
         (this.session.results ?? [])
           .filter(result =>
             result.creatureTokenUuid === creature.tokenUuid
-            && result.userId === game.user.id
+            && result.userId === this.participantUserId
           )
           .map(result => [result.componentId, result])
       );
@@ -236,7 +243,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
             claimed:
               Boolean(globalClaim),
             claimedByCurrentUser:
-              globalClaim?.userId === game.user.id,
+              globalClaim?.userId === this.participantUserId,
             claimantName:
               globalClaim?.actorName
               ?? globalClaim?.userName
@@ -290,7 +297,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
     const skillChecksBypassed = Boolean(
       actor
       && (this.session.skipSkillChecks ?? []).some(entry =>
-        entry?.userId === game.user.id
+        entry?.userId === this.participantUserId
         && entry?.actorUuid === actor.uuid
       )
     );
@@ -473,9 +480,9 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
 
   async #releaseClaims({ close = false, reset = false } = {}) {
     try {
-      await this.craftworks.socket.emit("harvest.release-claims", {
+      await this.#sendToGm("harvest.release-claims", {
         sessionId: this.session.id,
-        userId: game.user.id,
+        userId: this.participantUserId,
         actorUuid: this.actorUuid
       });
       if (close) return this.close();
@@ -512,9 +519,9 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
       </div>
     `;
 
-    await foundry.applications.api.DialogV2.prompt({
+    await foundry.applications.api.DialogV2.prompt({ classes: ["ml-window", "ml-craftworks-module"],
       window: { title: "Matching Crafting Recipes" },
-      content,
+      content: `<div><div class="ml-app ml-app-shell ml-dialog-shell">${content}</div></div>`,
       ok: { label: "Close" }
     });
   }
@@ -693,7 +700,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
           creatureTokenUuid:
             creature.tokenUuid,
           userId:
-            game.user.id,
+            this.participantUserId,
           actorUuid:
             actor.uuid,
           skillId,
@@ -727,13 +734,13 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
         return;
       }
 
-      await this.craftworks.socket.emit(
+      await this.#sendToGm(
         "harvest.batch-attempt",
         {
           sessionId:
             this.session.id,
           userId:
-            game.user.id,
+            this.participantUserId,
           attempts
         }
       );
@@ -760,10 +767,10 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
     const button = event.currentTarget;
     button.disabled = true;
 
-    await this.craftworks.socket.emit("harvest.claim", {
+    await this.#sendToGm("harvest.claim", {
       sessionId: this.session.id,
       creatureTokenUuid: button.dataset.creature,
-      userId: game.user.id,
+      userId: this.participantUserId,
       actorUuid: this.actorUuid,
       materialId: button.dataset.material,
       componentId: button.dataset.component || null

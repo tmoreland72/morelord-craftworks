@@ -1,3 +1,4 @@
+import { ARTISAN_TOOLS, getCraftingFacilityRules } from "../crafting/crafting-environment-service.mjs";
 import { MODULE_ID, MODULE_TITLE } from "../constants.mjs";
 import {
   SETTINGS,
@@ -197,6 +198,10 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
     return foundry.utils.mergeObject(context, {
       core,
       contentSyncStatus,
+      facilityRules: [...new Set([...ARTISAN_TOOLS, ...(craftworks?.recipes.all() ?? []).map(recipe => recipe.craft?.tool).filter(Boolean)])].sort().map(tool => ({
+        tool, selected: getCraftingFacilityRules()[tool] ?? ""
+      })),
+      facilityOptions: Object.fromEntries([["", "No facility required"], ...(craftworks?.craftingEnvironment.facilityOptions().types ?? []).map(type => [type.id, type.name])]),
 
       packs,
       groups,
@@ -386,6 +391,8 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
     }
 
     await setGatherDcOverrides(gatherDcOverrides);
+    const facilityRules = Object.fromEntries([...data.entries()].filter(([name]) => name.startsWith("facility:")).map(([name, value]) => [name.slice(9), String(value)]));
+    await game.settings.set(MODULE_ID, SETTINGS.CRAFTING_FACILITY_RULES, JSON.stringify(facilityRules));
 
     for (const pack of CONTENT_PACKS) {
       const key = getContentPackSettingKey(pack.id);

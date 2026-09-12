@@ -1,15 +1,10 @@
 <section class="ml-app ml-app-shell ml-craftworks app-shell ml-craftworks-browser-shell ml-craftworks-marketplace-browser">
-  <header class="ml-craftworks-header">
-    <div>
-      <h2>Recipes</h2>
-      <p>Browse recipes, discover requirements, and mark recipes for Craft.</p>
-    </div>
-  </header>
+  <header class="ml-hero"><i class="fa-solid fa-hammer ml-hero__icon"></i><div class="ml-hero__body"><h1>Recipes</h1><p>Browse recipes, discover requirements, and mark recipes for Craft.</p></div>
+  <div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header>
 
   <div class="ml-craftworks-marketplace-browser-body">
-    <aside class="ml-craftworks-filter-rail">
-      <div class="ml-craftworks-market-filter-title">
-        <strong>Filters</strong>
+    <aside class="ml-surface ml-craftworks-filter-rail ml-stack" data-gap="3">
+      <div class="ml-section-heading"><div><h2>Filters</h2><p>Narrow the catalog to the entries you want to use.</p></div>
         <button type="button"
                 class="ml-icon-button ml-craftworks-icon-button"
                 data-action="clear-recipe-filters"
@@ -33,8 +28,8 @@
         <span><i class="fa-solid fa-square-minus"></i> Exclude</span>
       </div>
 
-      <section class="ml-craftworks-filter-group">
-        <h3>Knowledge</h3>
+      <section class="ml-section ml-craftworks-filter-group">
+        <div class="ml-section-heading"><div><h2>Knowledge</h2><p>Filter recipes by the selected character’s knowledge.</p></div></div>
         <div class="ml-craftworks-tristate-list">
           {{#each knowledgeFilters}}
             <button type="button"
@@ -43,14 +38,15 @@
                     data-filter-group="knowledge"
                     data-filter-value="{{id}}">
               <span>{{label}}</span>
+              <small>{{count}}</small>
               <i class="fa-solid {{#if included}}fa-plus{{else if excluded}}fa-minus{{else}}fa-circle{{/if}}"></i>
             </button>
           {{/each}}
         </div>
       </section>
 
-      <section class="ml-craftworks-filter-group">
-        <h3>Content Pack</h3>
+      <section class="ml-section ml-craftworks-filter-group">
+        <div class="ml-section-heading"><div><h2>Content Pack</h2><p>Include or exclude entries from enabled content packs.</p></div></div>
         <div class="ml-craftworks-tristate-list">
           {{#each packs}}
             <button type="button"
@@ -66,8 +62,8 @@
         </div>
       </section>
 
-      <section class="ml-craftworks-filter-group">
-        <h3>Category</h3>
+      <section class="ml-section ml-craftworks-filter-group">
+        <div class="ml-section-heading"><div><h2>Category</h2><p>Filter the available entries by category.</p></div></div>
         <div class="ml-craftworks-tristate-list">
           {{#each categories}}
             <button type="button"
@@ -76,14 +72,15 @@
                     data-filter-group="category"
                     data-filter-value="{{id}}">
               <span>{{label}}</span>
+              <small>{{count}}</small>
               <i class="fa-solid {{#if included}}fa-plus{{else if excluded}}fa-minus{{else}}fa-circle{{/if}}"></i>
             </button>
           {{/each}}
         </div>
       </section>
 
-      <section class="ml-craftworks-filter-group">
-        <h3>Preferred Artisan Tool</h3>
+      <section class="ml-section ml-craftworks-filter-group">
+        <div class="ml-section-heading"><div><h2>Preferred Artisan Tool</h2><p>Filter recipes by their preferred crafting tool.</p></div></div>
         <div class="ml-craftworks-tristate-list">
           {{#each toolFilters}}
             <button type="button"
@@ -99,8 +96,8 @@
         </div>
       </section>
 
-      <section class="ml-craftworks-filter-group">
-        <h3>Rarity</h3>
+      <section class="ml-section ml-craftworks-filter-group">
+        <div class="ml-section-heading"><div><h2>Rarity</h2><p>Filter entries by rarity.</p></div></div>
         <div class="ml-craftworks-tristate-list">
           {{#each ingredientRarities}}
             <button type="button"
@@ -117,8 +114,8 @@
       </section>
 
       {{#each ingredientTagGroups}}
-      <section class="ml-craftworks-filter-group ml-craftworks-filter-subsection">
-        <h3>{{label}}</h3>
+      <section class="ml-section ml-craftworks-filter-group ml-craftworks-filter-subsection">
+        <div class="ml-section-heading"><div><h2>{{label}}</h2><p>Browse the entries in this group.</p></div></div>
         <div class="ml-craftworks-tristate-list">
           {{#each options}}
             <button type="button"
@@ -127,6 +124,7 @@
                     data-filter-group="tag"
                     data-filter-value="{{id}}">
               <span>{{label}}</span>
+              <small>{{count}}</small>
               <i class="fa-solid {{#if included}}fa-plus{{else if excluded}}fa-minus{{else}}fa-circle{{/if}}"></i>
             </button>
           {{/each}}
@@ -135,14 +133,14 @@
       {{/each}}
 </aside>
 
-    <main class="ml-craftworks-marketplace-results">
+    <main class="ml-surface ml-craftworks-marketplace-results ml-stack" data-gap="3">
       {{#if canManageRecipeVisibility}}
         <div class="ml-craftworks-recipe-visibility-toolbar">
           <span>
             <i class="fa-solid fa-circle-question"></i>
             {{unknownRecipeCount}} recipe(s) with unknown ingredients
           </span>
-          <div class="ml-actions ml-craftworks-actions">
+          <div class="ml-actions">
             <button type="button" data-action="mark-all-recipes-unknown">
               <i class="fa-solid fa-circle-question"></i> Mark Context Unknown
             </button>
@@ -153,10 +151,7 @@
         </div>
       {{/if}}
 
-      <div class="ml-craftworks-market-results-heading">
-        <h2>Recipes</h2>
-        <span>{{prospectiveCount}} matches</span>
-      </div>
+      <div class="ml-section-heading"><div><h2>Recipes</h2><p>Browse the entries matching the selected filters.</p></div><span>{{prospectiveCount}} matches</span></div>
 
       {{#if overDisplayLimit}}
         <div class="ml-craftworks-market-limit-message">
@@ -170,8 +165,8 @@
           </div>
         </div>
       {{/if}}
-  <div class="ml-craftworks-panel ml-craftworks-recipe-mark-context">
-    <i class="fa-solid fa-bookmark"></i>
+  <div class="ml-surface ml-section ml-craftworks-panel ml-craftworks-recipe-mark-context ml-stack" data-gap="3">
+    <div class="ml-section-heading"><div><h2>Crafting Character</h2><p>Choose the character whose crafting list you want to manage.</p></div></div>
     <label class="ml-craftworks-recipe-crafter-selector">
       <span>Mark recipes for</span>
       <select name="crafter">
@@ -189,12 +184,13 @@
 
   <div class="ml-craftworks-reference-list ml-craftworks-browser-results">
       {{#if hasRecipes}}
+        {{#if hasToolChecks}}<p class="hint">Tool checks have disadvantage if the crafter lacks the tool in inventory or its proficiency. The DC stays the same.</p>{{/if}}
         {{#each recipeGroups}}
           <section class="ml-craftworks-recipe-category-group">
-            <h3 class="ml-craftworks-recipe-category-heading">{{label}}</h3>
+            <div class="ml-section-heading"><div><h2>{{label}}</h2><p>Browse the entries in this group.</p></div></div>
             <div class="ml-craftworks-recipe-category-list">
               {{#each recipes}}
-                <article class="ml-craftworks-recipe-card">
+                <article class="ml-card ml-craftworks-recipe-card">
                   <header class="ml-craftworks-recipe-header">
                     <div class="ml-craftworks-recipe-heading">
                       <div class="ml-craftworks-recipe-title-line">
@@ -231,12 +227,12 @@
                   {{/if}}
 
                   <div class="ml-craftworks-recipe-craft-meta">
-                    {{#if craftMeta.tool}}
+                    {{#unless craftMeta.check}}{{#if craftMeta.tool}}
                       <span>
                         <i class="fa-solid fa-screwdriver-wrench"></i>
                         <strong>Tool:</strong> {{craftMeta.tool}}
                       </span>
-                    {{/if}}
+                    {{/if}}{{/unless}}
                     {{#if craftMeta.check}}
                       <span>
                         <i class="fa-solid fa-dice-d20"></i>
@@ -250,15 +246,7 @@
                         {{craftMeta.hoursRequired}} hours
                       </span>
                     {{/if}}
-                    {{#if ../../canManageRecipeFacilities}}
-                      <span class="ml-craftworks-recipe-facility-controls" data-recipe-facility-controls data-recipe-id="{{id}}">
-                        <i class="fa-solid fa-building"></i><strong>Facility:</strong>
-                        <select data-recipe-facility-type aria-label="Facility type">{{selectOptions @root.facilityTypeOptions selected=craftMeta.facilityType}}</select>
-                        <select data-recipe-facility-tier aria-label="Minimum facility tier" {{#unless craftMeta.facilityType}}disabled{{/unless}}>{{selectOptions @root.facilityTierOptions selected=craftMeta.facilityTier}}</select>
-                      </span>
-                    {{else if craftMeta.facilityType}}
-                      <span><i class="fa-solid fa-building"></i><strong>Facility:</strong> {{craftMeta.facilityTier}} {{craftMeta.facilityType}}</span>
-                    {{/if}}
+                    <span><i class="fa-solid fa-building"></i><strong>Facility:</strong> {{#if craftMeta.facilityType}}{{craftMeta.facilityTier}} or higher {{craftMeta.facilityType}}{{else}}No facility required{{/if}}</span>
                   </div>
 
                   <div class="ml-craftworks-recipe-grid">
@@ -356,7 +344,7 @@
 
                     <section class="ml-craftworks-recipe-block">
                       <h4>Produces</h4>
-                      <div class="ml-craftworks-recipe-output-card ml-craftworks-recipe-output-compact" data-document-uuid="{{outputDocumentUuid}}">
+                      <div class="ml-card ml-craftworks-recipe-output-card ml-craftworks-recipe-output-compact" data-document-uuid="{{outputDocumentUuid}}">
                         {{#if output.img}}
                           {{#if outputMaterialId}}
                             <button type="button"
@@ -393,7 +381,7 @@
           </section>
         {{/each}}
       {{else}}
-        <div class="ml-craftworks-panel">
+        <div class="ml-empty-state">
           <p>No recipes match the current filters.</p>
         </div>
       {{/if}}

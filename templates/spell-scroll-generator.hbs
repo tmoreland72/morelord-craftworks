@@ -1,14 +1,11 @@
 <section class="ml-app ml-app-shell ml-craftworks app-shell ml-craftworks-spell-scroll-generator">
-  <header class="ml-craftworks-header">
-    <div>
-      <h2>Spell Scroll Generator</h2>
-      <p>Choose how many scrolls of each spell level to generate from enabled D&amp;D5e compendium sources. Each draw is random and duplicates are allowed.</p>
-    </div>
-  </header>
+  <header class="ml-hero"><i class="fa-solid fa-hammer ml-hero__icon"></i><div class="ml-hero__body"><h1>Spell Scroll Generator</h1><p>Choose how many scrolls of each spell level to generate from enabled D&amp;D5e compendium sources. Each draw is random and duplicates are allowed.</p></div>
+  <div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header>
 
   {{#if hasAccess}}
     {{#unless hasResult}}
-    <section class="ml-craftworks-panel">
+    <section class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3">
+      <div class="ml-section-heading"><div><h2>Generation Options</h2><p>Choose the available options and quantities to generate.</p></div></div>
       <fieldset class="ml-craftworks-generator-constraints">
         <legend>Schools of Magic <small>(all selected by default)</small></legend>
         <div class="ml-craftworks-generator-option-grid">
@@ -31,15 +28,16 @@
           </label>
         {{/each}}
       </div>
-      <div class="ml-actions ml-craftworks-actions">
+      <footer class="ml-page-footer ml-actions">
         <button type="button" data-action="generate-scrolls"><i class="fa-solid fa-dice"></i> Generate</button>
-      </div>
+      </footer>
     </section>
     {{/unless}}
 
     {{#if hasResult}}
-      <section class="ml-craftworks-panel ml-craftworks-generator-preview">
-        <h3><i class="fa-solid fa-scroll"></i> {{resultCount}} Generated Spell Scrolls</h3>
+      <section class="ml-surface ml-section ml-craftworks-panel ml-craftworks-generator-preview ml-stack" data-gap="3">
+        <div class="ml-section-heading"><div><h2><i class="fa-solid fa-scroll"></i> {{resultCount}} Generated Spell Scrolls</h2><p>Review and customize the generated items.</p></div></div>
+        <div class="ml-actions"><button type="button" data-action="add-result"><i class="fa-solid fa-plus"></i> Add Spell Scroll</button></div>
         <div class="ml-craftworks-generator-results">
           {{#each resultGroups}}
             <div class="ml-craftworks-generator-result-group">
@@ -49,6 +47,8 @@
                   <div class="ml-craftworks-generator-result-row" data-document-uuid="{{uuid}}">
                     <img src="{{img}}" alt="{{name}}">
                     <span><strong>{{name}}</strong><small>{{sourceLabel}}</small></span>
+                    <label><span>Quantity</span><input type="number" min="1" step="1" value="{{quantity}}" data-result-quantity="{{resultIndex}}" aria-label="Quantity of {{name}}"></label>
+                    <button type="button" data-remove-result="{{resultIndex}}" aria-label="Remove {{name}}" title="Remove {{name}}"><i class="fa-solid fa-trash"></i></button>
                     <button type="button" data-spell-uuid="{{uuid}}" title="Open {{name}}"><i class="fa-solid fa-up-right-from-square"></i></button>
                   </div>
                 {{/each}}
@@ -58,8 +58,8 @@
         </div>
       </section>
 
-      <section class="ml-craftworks-panel">
-        <h3>Recipient</h3>
+      <section class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3">
+        <div class="ml-section-heading"><div><h2>Recipient</h2><p>Choose the character or party inventory that receives these items.</p></div></div>
         <label>Recipient
           <select name="recipient">
             <option value="">Choose character or group…</option>
@@ -67,14 +67,14 @@
           </select>
         </label>
         {{#if partyInfo.valid}}<p class="ml-craftworks-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
-        <div class="ml-actions ml-craftworks-actions">
+        <footer class="ml-page-footer ml-actions">
           <button type="button" data-action="reroll-scrolls"><i class="fa-solid fa-arrows-rotate"></i> Reroll</button>
           <button type="button" data-action="share-scrolls"><i class="fa-solid fa-message"></i> Display Results in Chat</button>
           <button type="button" data-action="award-scrolls"><i class="fa-solid fa-scroll"></i> Award Generated Spell Scrolls</button>
-        </div>
+        </footer>
       </section>
     {{/if}}
   {{else}}
-    <div class="ml-craftworks-panel"><p class="ml-text ml-craftworks-warning" data-tone="premium">Spell Scroll Generator is a premium Craftworks feature.</p></div>
+    <div class="ml-empty-state"><p class="ml-text ml-craftworks-warning" data-tone="premium">Spell Scroll Generator is a premium Craftworks feature.</p></div>
   {{/if}}
 </section>

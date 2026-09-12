@@ -49,6 +49,21 @@ test("custom recipe exports are versioned and portable", () => {
   assert.equal(payload.recipes[0].id, "custom-compendium-test-items-item-sword");
 });
 
+test("custom recipes preserve AND groups with OR material choices and validate every choice", () => {
+  environment();
+  const entry = recipe();
+  entry.requirementGroups[0].requirements.push({ type: "alternatives", alternatives: [
+    { quantity: 1, match: { materialId: "spine" } },
+    { quantity: 1, match: { materialId: "ribs" } }
+  ] });
+  const service = new CustomRecipeService();
+  assert.deepEqual(JSON.parse(service.export(entry)).recipes[0].requirementGroups, entry.requirementGroups);
+  entry.requirementGroups[0].requirements[1].alternatives[1].quantity = 0;
+  assert.throws(() => service.export(entry), /invalid material/);
+  entry.requirementGroups[0].requirements[1].alternatives = [];
+  assert.throws(() => service.export(entry), /at least one material choice/);
+});
+
 test("import identifies conflicts by output UUID and supports skip and replace", async () => {
   environment([recipe("custom-compendium-test-items-item-sword")]);
   const service = new CustomRecipeService();

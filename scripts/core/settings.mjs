@@ -13,6 +13,8 @@ const SETTINGS = Object.freeze({
   HARVEST_NAT20_DOUBLE_CLAIM: "harvestNat20DoubleClaim",
   HARVEST_SELECTED_CHARACTER_UUIDS: "harvestSelectedCharacterUuids",
 
+  DELERIUM_SEARCH_DEFAULTS: "deleriumSearchDefaults",
+
   GATHER_DC_MODIFIER: "gatherDcModifier",
   GATHER_DC_OVERRIDES: "gatherDcOverrides",
   GATHER_QUANTITY_MULTIPLIER: "gatherQuantityMultiplier",
@@ -31,6 +33,7 @@ const SETTINGS = Object.freeze({
   USE_PARTY_RECIPIENT: "usePartyRecipient",
   PARTY_ACTOR_UUID: "partyActorUuid",
   HIDDEN_RECIPE_IDS: "hiddenRecipeIds",
+  CRAFTING_FACILITY_RULES: "craftingFacilityRules",
   RECIPE_FACILITY_OVERRIDES: "recipeFacilityOverrides",
   SHOW_RECIPES_FOR_PREFERRED_TOOL_PROFICIENCY: "showRecipesForPreferredToolProficiency",
   CONTENT_SYNC_SIGNATURE: "contentSyncSignature",
@@ -49,6 +52,8 @@ export function registerSettings() {
   });
 
   registerContentPackSettings();
+  registerString(SETTINGS.CRAFTING_FACILITY_RULES, "Crafting Facility Rules", "{}");
+  registerString(SETTINGS.DELERIUM_SEARCH_DEFAULTS, "Delerium Search Defaults", "{}");
 
   registerBoolean(
     SETTINGS.USE_PARTY_RECIPIENT,
@@ -191,7 +196,8 @@ function registerString(key, name, defaultValue) {
     scope: "world",
     config: false,
     type: String,
-    default: defaultValue
+    default: defaultValue,
+    onChange: key === SETTINGS.CRAFTING_FACILITY_RULES ? () => globalThis.MorelordCraftworks?.recipes.loadStandardSeed() : undefined
   });
 }
 

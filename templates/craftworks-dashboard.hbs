@@ -1,5 +1,6 @@
 <section class="ml-app ml-app-shell ml-craftworks-dashboard ml-craftworks app-shell ml-craftworks-dashboard">
-  <header class="ml-hero ml-craftworks-hero ml-craftworks-dashboard-hero">
+  <header class="ml-hero">
+    <i class="fa-solid fa-hammer ml-hero__icon"></i>
     <div class="ml-hero__body">
       <h1>Morelord Craftworks</h1>
       <p>Gather, harvest, loot, and understand the materials that drive your crafting economy.</p>
@@ -11,25 +12,22 @@
           Documentation
         </button>
       {{/if}}
-      {{#if canRefreshContent}}
+
+    </div>
+  </header>
+  {{#if canRefreshContent}}<div class="ml-actions">
         <button type="button" data-action="refresh" title="Refresh materials and recipes from configured compendiums">
           <i class="fa-solid fa-arrows-rotate"></i>
           Refresh
         </button>
-      {{/if}}
-    </div>
-  </header>
+</div>{{/if}}
 
   {{#if isGM}}
-    <section class="ml-section ml-craftworks-dashboard-section">
-      <div class="ml-section-heading ml-craftworks-dashboard-section-header">
+    <section class="ml-surface ml-section ml-craftworks-dashboard-section ml-stack" data-gap="3">
+      <div class="ml-section-heading">
         <div>
           <h2>Acquire</h2>
-          {{#if scene}}
-            <p>Current scene: <strong>{{scene.name}}</strong></p>
-          {{else}}
-            <p>No active scene.</p>
-          {{/if}}
+          <p>Harvest creatures, gather materials, search for delerium, and collect treasure.</p>
         </div>
       </div>
 
@@ -81,8 +79,8 @@
     </section>
   {{/if}}
 
-  <section class="ml-section ml-craftworks-dashboard-section">
-    <div class="ml-section-heading ml-craftworks-dashboard-section-header">
+  <section class="ml-surface ml-section ml-craftworks-dashboard-section ml-stack" data-gap="3">
+    <div class="ml-section-heading">
       <div>
         <h2>Craft</h2>
         <p>Review materials and find recipes for the items you want to create.</p>
@@ -120,8 +118,8 @@
   </section>
 
   {{#if isGM}}
-    <section class="ml-section ml-craftworks-dashboard-section">
-      <div class="ml-section-heading ml-craftworks-dashboard-section-header">
+    <section class="ml-surface ml-section ml-craftworks-dashboard-section ml-stack" data-gap="3">
+      <div class="ml-section-heading">
         <div>
           <h2>Tools</h2>
           <p>GM utilities for crafting and generated treasure.</p>
@@ -201,11 +199,8 @@
 
 
   {{else}}
-    <section class="ml-section ml-craftworks-dashboard-section">
-      <div class="ml-craftworks-panel">
-        <i class="fa-solid fa-circle-info"></i>
-        <span>Acquisition sessions are started by the GM. Materials and Recipes are available as reference tools.</span>
-      </div>
+    <section class="ml-surface ml-section ml-craftworks-dashboard-section ml-stack" data-gap="3">
+      <div class="ml-section-heading"><div><h2>Player Resources</h2><p>Acquisition sessions are started by the GM. Materials and Recipes are available as reference tools.</p></div></div>
     </section>
   {{/if}}
 

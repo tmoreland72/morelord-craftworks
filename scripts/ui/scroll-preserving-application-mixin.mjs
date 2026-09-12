@@ -7,6 +7,9 @@ export function ScrollPreservingApplicationMixin(Base) {
     async _onRender(context, options) {
       await super._onRender?.(context, options);
 
+      this.element?.querySelector("[data-action='open-module-documentation']")
+        ?.addEventListener("click", () => globalThis.MorelordCore?.ui?.documentation?.open("morelord-craftworks"));
+
       this.element?.querySelectorAll("[data-document-uuid]")
         .forEach(element => element.addEventListener("click", async event => {
           const nestedControl = event.target.closest("button, a, input, select, textarea");

@@ -180,8 +180,15 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     const rarityFilters =
       this.#buildRarityFilters(visibleRecipes);
 
-    const rawIngredientTags =
-      this.#ingredientTags(visibleRecipes);
+    // Count each recipe once per tag using one material catalog snapshot.
+    const ingredientTagCounts = new Map();
+    const materialCatalog = this.craftworks.materials.all();
+    for (const recipe of visibleRecipes) {
+      for (const tag of this.#ingredientTags([recipe], materialCatalog)) {
+        ingredientTagCounts.set(tag, (ingredientTagCounts.get(tag) ?? 0) + 1);
+      }
+    }
+    const rawIngredientTags = [...ingredientTagCounts.keys()];
     const ingredientTagGroups = buildMaterialTagGroups(rawIngredientTags, {
       included: this.selectedIngredientTags,
       excluded: this.excludedIngredientTags
@@ -222,14 +229,6 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
 
     const hiddenRecipeIds = getHiddenRecipeIds();
     const facilityOptions = this.craftworks.craftingEnvironment.facilityOptions();
-    const facilityTypeOptions = Object.fromEntries([
-      ["", "No facility requirement"],
-      ...facilityOptions.types.map(type => [type.id, type.name])
-    ]);
-    const facilityTierOptions = Object.fromEntries(
-      facilityOptions.tiers.map(tier => [tier, this.#formatFacilityTier(tier)])
-    );
-
     const totalRecipeCount =
       visibleRecipes.length;
     const prospectiveCount = matchingRecipes.length;
@@ -267,8 +266,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       );
       const craft = recipe.craft ?? {};
       const checkParts = [
-        craft.ability,
-        craft.skill ? `(${craft.skill})` : null
+        craft.checkRequired === false ? "No check" : (craft.tool || craft.skill || craft.ability)
       ].filter(Boolean);
 
       const toolStatus = {
@@ -296,7 +294,12 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
 
       if (recipe.output?.type === "foundry-item") {
         try {
-          outputDocument = await fromUuid(recipe.output.uuid);
+          // Compendium index metadata is sufficient for a reference card. Load the
+          // full Item only when opened or crafted; world Items still resolve live.
+          const indexed = recipe.output;
+          outputDocument = indexed.uuid.startsWith("Compendium.") && indexed.label && indexed.img
+            ? { uuid: indexed.uuid, name: indexed.label, img: indexed.img, documentName: "Item" }
+            : await fromUuid(indexed.uuid);
         } catch (error) {
           console.warn(
             `Morelord Craftworks | Unable to resolve recipe output ${recipe.output.uuid}`,
@@ -388,12 +391,11 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
           tool: craft.tool ?? null,
           check: checkParts.join(" ") || null,
           dc: craft.dc ?? null,
-          noToolDc: craft.noToolDc ?? null,
           activeDc: activeDc ?? null,
           hoursRequired: craft.hoursRequired ?? null,
           requiredSuccesses: craft.requiredSuccesses ?? 0,
-          facilityType: craft.environment?.facility?.type ?? "",
-          facilityTier: craft.environment?.facility?.tier ?? "common",
+          facilityType: facilityOptions.types.find(type => type.id === craft.environment?.facility?.type)?.name ?? craft.environment?.facility?.type ?? "",
+          facilityTier: this.#formatFacilityTier(craft.environment?.facility?.tier ?? "common"),
           toolStatus: {
             hasActor: Boolean(actor),
             hasTool: toolStatus.hasTool,
@@ -401,7 +403,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
             qualifiesForNormalDc: toolStatus.qualifiesForNormalDc,
             matchedItemName: toolStatus.matchedItemName ?? null,
             warningText: actor && !toolStatus.qualifiesForNormalDc
-              ? "DC is higher without the recommended tool or proficiency."
+              ? "Disadvantage without the required tool or proficiency."
               : null
           }
         },
@@ -425,7 +427,8 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
             const materialView =
               this.#resolveRequirementMaterial(
                 requirement.match,
-                requirementItemMatches
+                requirementItemMatches,
+                materialCatalog
               );
 
             return {
@@ -450,7 +453,8 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
                     const altMaterialView =
                       this.#resolveRequirementMaterial(
                         alternative.match,
-                        requirementItemMatches
+                        requirementItemMatches,
+                        materialCatalog
                       );
 
                     return {
@@ -509,6 +513,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       selectedIngredientTags: this.selectedIngredientTags,
       onlyCraftable: this.onlyCraftable,
       canFilterCraftable: Boolean(actor),
+      hasToolChecks: preparedRecipes.some(recipe => recipe.craftMeta.tool && recipe.craft.checkRequired !== false),
 
       packFilterLabel: this.selectedPackIds.length
         ? `${this.selectedPackIds.length} selected`
@@ -572,7 +577,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         })
       ),
 
-      ingredientTagGroups,
+      ingredientTagGroups: ingredientTagGroups.map(group => ({ ...group, options: group.options.map(option => ({ ...option, count: ingredientTagCounts.get(option.id) ?? 0 })) })),
 
       categories: Array.from(
         new Set(
@@ -584,6 +589,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         .sort()
         .map(category => ({
           id: category,
+          count: visibleRecipes.filter(recipe => recipe.category === category).length,
           label: category
             .split("-")
             .map(part => part.charAt(0).toUpperCase() + part.slice(1))
@@ -606,6 +612,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         {
           id: "known",
           label: "Known",
+          count: visibleRecipes.filter(recipe => game.user.isGM ? !hiddenRecipeIds.has(recipe.id) : isRecipeKnownToActor(recipe, crafter, this.craftworks.toolInspector)).length,
           state:
             this.knownFilterState,
           included:
@@ -616,6 +623,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         {
           id: "unknown",
           label: "Unknown",
+          count: visibleRecipes.filter(recipe => game.user.isGM ? hiddenRecipeIds.has(recipe.id) : !isRecipeKnownToActor(recipe, crafter, this.craftworks.toolInspector)).length,
           state:
             this.unknownFilterState,
           included:
@@ -656,14 +664,11 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         selected: candidate.uuid === crafter?.uuid
       })),
       canManageRecipeVisibility: game.user.isGM,
-      canManageRecipeFacilities: game.user.isGM,
-      facilityTypeOptions,
-      facilityTierOptions,
       unknownRecipeCount: hiddenRecipeIds.size
     }, { inplace: false });
   }
 
-  #resolveRequirementMaterial(match, requirementItemMatches = new Map()) {
+  #resolveRequirementMaterial(match, requirementItemMatches = new Map(), materialCatalog = this.craftworks.materials.all()) {
     if (!match) {
       return {
         materialId: null,
@@ -705,8 +710,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       const normalizedItemName = String(match.itemName)
         .trim()
         .toLowerCase();
-      const material = this.craftworks.materials
-        .all()
+      const material = materialCatalog
         .find(entry =>
           String(entry.name ?? "").trim().toLowerCase()
           === normalizedItemName
@@ -729,8 +733,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         );
 
     const matches =
-      this.craftworks.materials
-        .all()
+      materialCatalog
         .filter(material => {
           if (
             match.rarity
@@ -1087,13 +1090,13 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
               <p>Craftworks uses this character's ability modifier, recommended tool possession/proficiency, crafting progress, and check result. Materials can come from a different inventory actor.</p>
             `;
 
-          await foundry.applications.api.DialogV2.prompt({
+          await foundry.applications.api.DialogV2.prompt({ classes: ["ml-window", "ml-craftworks-module"],
             window: {
               title: kind === "inventory"
                 ? "Using Actor Inventory"
                 : "Using Crafter Actor"
             },
-            content,
+            content: `<div><div class="ml-app ml-app-shell ml-dialog-shell">${content}</div></div>`,
             ok: {
               label: "Close"
             }
@@ -1227,25 +1230,6 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         });
       });
 
-    this.element.querySelectorAll("[data-recipe-facility-type], [data-recipe-facility-tier]")
-      .forEach(select => {
-        select.addEventListener("change", async event => {
-          const controls = event.currentTarget.closest("[data-recipe-facility-controls]");
-          const recipeId = controls?.dataset.recipeId;
-          if (!recipeId || !game.user.isGM) return;
-          const type = controls.querySelector("[data-recipe-facility-type]")?.value ?? "";
-          const tier = controls.querySelector("[data-recipe-facility-tier]")?.value ?? "common";
-          await this.craftworks.recipes.setFacilityRequirement(
-            recipeId,
-            type ? { type, tier } : null
-          );
-          ui.notifications.info(type
-            ? `Facility requirement set to ${this.#formatFacilityTier(tier)} ${type}.`
-            : "Facility requirement removed.");
-          this.render({ force: true });
-        });
-      });
-
     this.element.querySelector("[data-action='mark-all-for-crafting']")?.addEventListener("click", async event => {
       event.preventDefault();
       const crafter = this.#currentCrafter();
@@ -1295,52 +1279,6 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       });
 
 
-    this.element.querySelectorAll("[data-action='craft-in-process']")
-      .forEach(element => {
-        element.addEventListener("click", async event => {
-          event.preventDefault();
-          event.stopPropagation();
-
-          this.crafterUuid =
-            event.currentTarget.dataset.crafterUuid
-            || this.crafterUuid;
-
-          this.actorUuid =
-            event.currentTarget.dataset.inventoryActorUuid
-            || this.actorUuid;
-
-          await this.#rollCraftingCheck(
-            event.currentTarget.dataset.recipeId
-          );
-        });
-      });
-
-    this.element.querySelectorAll("[data-action='craft-check']")
-      .forEach(element => {
-        element.addEventListener("click", async event => {
-          event.preventDefault();
-          event.stopPropagation();
-          await this.#rollCraftingCheck(event.currentTarget.dataset.recipeId);
-        });
-      });
-
-    this.element.querySelectorAll("[data-action='cancel-crafting']")
-      .forEach(element => {
-        element.addEventListener("click", async event => {
-          event.preventDefault();
-          event.stopPropagation();
-          await this.#cancelCrafting(event.currentTarget.dataset.recipeId);
-        });
-      });
-
-    this.element.querySelectorAll("[data-action='craft-again']")
-      .forEach(element => {
-        element.addEventListener("click", async event => {
-          event.preventDefault();
-          event.stopPropagation();
-          await this.#craftAgain(event.currentTarget.dataset.recipeId);
-        });
-      });
   }
 
   #currentInventoryActor() {
@@ -1357,7 +1295,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       .replace(/^./, character => character.toUpperCase());
   }
 
-  #ingredientMaterialsForRecipe(recipe) {
+  #ingredientMaterialsForRecipe(recipe, materialCatalog = null) {
     if (
       !game.user.isGM
       && !isRecipeKnownToActor(
@@ -1382,7 +1320,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       const requiredTags = (match.tags ?? [])
         .map(tag => String(tag).toLowerCase());
 
-      for (const material of this.craftworks.materials.all()) {
+      for (const material of materialCatalog ?? this.craftworks.materials.all()) {
         if (
           itemName
           && String(material.name ?? "").trim().toLowerCase() !== itemName
@@ -1595,12 +1533,12 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       : [];
   }
 
-  #ingredientTags(recipes = this.craftworks.recipes.all()) {
+  #ingredientTags(recipes = this.craftworks.recipes.all(), materialCatalog = null) {
     return Array.from(
       new Set(
         recipes
           .flatMap(recipe =>
-            this.#ingredientMaterialsForRecipe(recipe)
+            this.#ingredientMaterialsForRecipe(recipe, materialCatalog)
               .flatMap(material => material.tags ?? [])
               .map(tag => String(tag).toLowerCase())
           )
@@ -1979,319 +1917,6 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         !hasCriteria
       );
     }
-  }
-
-  async #rollCraftingCheck(recipeId) {
-    const recipe = this.craftworks.recipes.get(
-      recipeId,
-      { includeDisabled: true }
-    );
-    if (!recipe) {
-      ui.notifications.warn("Craftworks could not find that recipe.");
-      return;
-    }
-
-    let inventoryActor = this.actorUuid
-      ? await fromUuid(this.actorUuid)
-      : null;
-    const crafter = this.crafterUuid
-      ? await fromUuid(this.crafterUuid)
-      : null;
-
-    if (!inventoryActor || !crafter) {
-      ui.notifications.warn("Select both an inventory actor and a crafter.");
-      return;
-    }
-
-    let job = this.craftworks.craftingJobs.get(
-      recipe.id,
-      crafter,
-      inventoryActor.uuid
-    );
-
-    // dev.71-dev.75 jobs tracked progress before material consumption existed.
-    // Start fresh rather than silently granting unfunded crafting progress.
-    if (job && !job.materialsConsumed && !job.outputAwarded) {
-      await this.craftworks.craftingJobs.clear(
-        recipe.id,
-        crafter
-      );
-      job = null;
-      ui.notifications.info(
-        `${recipe.name}: previous test progress was cleared so materials can be consumed correctly.`
-      );
-    }
-
-    if (job?.outputAwarded) {
-      await this.#craftAgain(recipe.id);
-      return;
-    }
-
-    if (!job) {
-      const readiness = this.craftworks.recipePlanner.plan(
-        recipe,
-        inventoryActor,
-        { includePartyInventory: false }
-      );
-
-      if (!readiness.ready) {
-        ui.notifications.warn(
-          "The selected inventory does not currently satisfy this recipe."
-        );
-        await this.render({ force: true });
-        return;
-      }
-
-      const plans = this.craftworks.craftingMaterials.planOptions(
-        recipe,
-        inventoryActor
-      );
-
-      if (!plans.length) {
-        ui.notifications.warn(
-          "Craftworks could not determine a valid material-consumption path."
-        );
-        return;
-      }
-
-      const plan = plans.length === 1
-        ? plans[0]
-        : await this.#chooseMaterialPlan(recipe, plans);
-
-      if (!plan) return;
-
-      const consumedMaterials =
-        await this.craftworks.craftingMaterials.consume(
-          inventoryActor,
-          plan
-        );
-
-      job = await this.craftworks.craftingJobs.start({
-        recipeId: recipe.id,
-        crafter,
-        inventoryActorUuid: inventoryActor.uuid,
-        hoursRequired: recipe.craft?.hoursRequired,
-        consumedMaterials,
-        materialPlanSummary: plan.summary
-      });
-
-      ui.notifications.info(
-        `${recipe.name}: crafting started. Materials consumed from ${inventoryActor.name}.`
-      );
-    } else if (job.inventoryActorUuid) {
-      const storedInventory = await fromUuid(
-        job.inventoryActorUuid
-      );
-
-      if (storedInventory) {
-        inventoryActor = storedInventory;
-      }
-    }
-
-    const toolStatus = this.craftworks.toolInspector?.inspect(
-      crafter,
-      recipe.craft?.tool
-    ) ?? {
-      hasTool: false,
-      proficient: false,
-      qualifiesForNormalDc: false
-    };
-
-    const dc = toolStatus.qualifiesForNormalDc
-      ? recipe.craft?.dc
-      : recipe.craft?.noToolDc;
-
-    if (dc == null) {
-      ui.notifications.warn("This recipe does not define a crafting DC.");
-      return;
-    }
-
-    const result = await this.craftworks.craftingRolls.roll({
-      recipe,
-      crafter,
-      dc,
-      toolStatus
-    });
-
-    if (result?.cancelled) {
-      ui.notifications.info(
-        `${recipe.name}: crafting roll cancelled. No crafting attempt was spent.`
-      );
-      await this.render();
-      return;
-    }
-
-    let progress = await this.craftworks.craftingJobs.recordAttempt(
-      recipe.id,
-      crafter,
-      inventoryActor.uuid,
-      { success: result.success }
-    );
-
-    if (progress.complete && !progress.outputAwarded) {
-      try {
-        const awarded = await this.craftworks.craftingMaterials.awardOutput(
-          inventoryActor,
-          recipe
-        );
-
-        progress = await this.craftworks.craftingJobs.markOutputAwarded(
-          recipe.id,
-          crafter,
-          inventoryActor.uuid
-        );
-
-        ui.notifications.info(
-          `${recipe.name} complete: ${awarded.quantity} × ${awarded.label} added to ${inventoryActor.name}.`
-        );
-      } catch (error) {
-        console.error(
-          "Morelord Craftworks | Failed to award crafting output.",
-          error
-        );
-
-        ui.notifications.error(
-          `${recipe.name}: checks are complete, but the output could not be awarded. `
-          + `No additional crafting roll is required.`
-        );
-      }
-    } else if (result.success) {
-      ui.notifications.info(
-        `${recipe.name}: success (${progress.successes} of ${progress.requiredSuccesses}).`
-      );
-    } else {
-      ui.notifications.warn(
-        `${recipe.name}: crafting check failed; 2 hours were spent with no progress.`
-      );
-    }
-
-    await this.render({ force: true });
-  }
-
-  async #chooseMaterialPlan(recipe, plans) {
-    const options = plans.map((plan, index) => `
-      <label class="ml-craftworks-crafting-plan-option">
-        <input
-          type="radio"
-          name="plan"
-          value="${index}"
-          ${index === 0 ? "checked" : ""}
-        >
-        <span>${this.#escapeHtml(plan.summary)}</span>
-      </label>
-    `).join("");
-
-    const formData = await foundry.applications.api.DialogV2.input({
-      window: {
-        title: `Choose Materials — ${recipe.name}`
-      },
-      content: `
-        <p>More than one valid material path is available. Choose which materials to use.</p>
-        <div class="ml-craftworks-crafting-plan-options">
-          ${options}
-        </div>
-      `,
-      ok: {
-        label: "Use Materials"
-      }
-    });
-
-    if (!formData) return null;
-
-    const index = Number(formData.plan);
-    return plans[index] ?? null;
-  }
-
-  async #cancelCrafting(recipeId) {
-    const crafter = this.crafterUuid
-      ? await fromUuid(this.crafterUuid)
-      : null;
-
-    if (!crafter) return;
-
-    const job = this.craftworks.craftingJobs.get(
-      recipeId,
-      crafter,
-      this.actorUuid
-    );
-
-    if (!job) return;
-
-    if (job.outputAwarded) {
-      ui.notifications.warn(
-        "Completed crafting cannot be canceled because the output has already been awarded."
-      );
-      return;
-    }
-
-    const inventoryActor = job.inventoryActorUuid
-      ? await fromUuid(job.inventoryActorUuid)
-      : null;
-
-    if (
-      inventoryActor
-      && job.materialsConsumed
-      && job.consumedMaterials?.length
-    ) {
-      await this.craftworks.craftingMaterials.refund(
-        inventoryActor,
-        job.consumedMaterials
-      );
-    }
-
-    await this.craftworks.craftingJobs.clear(
-      recipeId,
-      crafter
-    );
-
-    ui.notifications.info(
-      inventoryActor
-        ? `Crafting canceled. Consumed materials were returned to ${inventoryActor.name}.`
-        : "Crafting canceled."
-    );
-
-    await this.render({ force: true });
-  }
-
-  async #craftAgain(recipeId) {
-    const crafter = this.crafterUuid
-      ? await fromUuid(this.crafterUuid)
-      : null;
-
-    if (!crafter) return;
-
-    await this.craftworks.craftingJobs.clear(
-      recipeId,
-      crafter
-    );
-
-    await this.render({ force: true });
-
-    const recipe = this.craftworks.recipes.get(recipeId);
-    const inventoryActor = this.actorUuid
-      ? await fromUuid(this.actorUuid)
-      : null;
-
-    if (
-      recipe
-      && inventoryActor
-      && this.craftworks.recipePlanner.plan(
-        recipe,
-        inventoryActor,
-        { includePartyInventory: false }
-      ).ready
-    ) {
-      await this.#rollCraftingCheck(recipeId);
-    }
-  }
-
-  #escapeHtml(value) {
-    return String(value ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
   }
 
   #availableActors() {

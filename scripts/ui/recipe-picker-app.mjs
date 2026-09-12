@@ -1,25 +1,21 @@
 import { MODULE_TITLE } from "../constants.mjs";
-import { getMorelordCoreService } from "../core/morelord-core-api.mjs";
+import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 const CRAFTABLE_ITEM_TYPES = ["equipment", "consumable", "container", "tool", "weapon"];
 const FILTER_KEYS = ["source", "type", "rarity", "category"];
 
-export class RecipePickerApp extends HandlebarsApplicationMixin(ApplicationV2) {
-  constructor(craftworks, { kind, drakkenheim = false, onSelect } = {}) {
+export class RecipePickerApp extends ScrollPreservingApplicationMixin(HandlebarsApplicationMixin(ApplicationV2)) {
+  constructor(craftworks, { kind, drakkenheim = false, onSelect, catalog = null, title = null, filterLabels = {} } = {}) {
     super();
     this.craftworks = craftworks; this.kind = kind; this.drakkenheim = drakkenheim; this.onSelect = onSelect;
     this.search = ""; this.included = Object.fromEntries(FILTER_KEYS.map(key => [key, new Set()]));
     this.excluded = Object.fromEntries(FILTER_KEYS.map(key => [key, new Set()]));
-    this.page = 1; this.catalog = null; this.searchTimer = null; this.restoreSearchFocus = false;
+    this.pickerTitle = title; this.filterLabels = filterLabels; this.customCatalog = catalog !== null;
+    this.page = 1; this.catalog = catalog; this.searchTimer = null; this.restoreSearchFocus = false;
   }
   static DEFAULT_OPTIONS = { id: "morelord-craftworks-recipe-picker", classes: ["ml-window", "ml-craftworks-module", "ml-craftworks-window"],
     position: { width: 1000, height: 780 }, window: { title: `${MODULE_TITLE} — Select`, resizable: true } };
   static PARTS = { content: { template: "modules/morelord-craftworks/templates/recipe-picker.hbs" } };
-
-  render(options = {}) {
-    const preserve = getMorelordCoreService("ui")?.renderPreservingScroll;
-    return preserve ? preserve(this, () => super.render(options)) : super.render(options);
-  }
 
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
@@ -30,15 +26,16 @@ export class RecipePickerApp extends HandlebarsApplicationMixin(ApplicationV2) {
     });
     const pageSize = 40, pages = Math.max(1, Math.ceil(filtered.length / pageSize)); this.page = Math.min(this.page, pages);
     const facets = key => {
-      const fixed = key === "type" && this.kind !== "material" ? CRAFTABLE_ITEM_TYPES : [];
+      const fixed = key === "type" && this.kind !== "material" && !this.customCatalog ? CRAFTABLE_ITEM_TYPES : [];
       const values = [...new Set([...fixed, ...this.catalog.map(row => key === "source" ? row.sourceLabel : row[key]).filter(Boolean)])];
       values.sort(key === "rarity" ? (a, b) => this.#rarityRank(a) - this.#rarityRank(b) || String(a).localeCompare(String(b)) : undefined);
       return values.map(value => ({
-        value, label: this.#label(value), included: this.included[key].has(value), excluded: this.excluded[key].has(value),
+        value, label: key === "source" ? value : this.#label(value), included: this.included[key].has(value), excluded: this.excluded[key].has(value),
         count: this.catalog.filter(row => (key === "source" ? row.sourceLabel : row[key]) === value).length
       }));
     };
-    return foundry.utils.mergeObject(context, { title: this.kind === "material" ? "Select Material" : "Select Output Item", materialMode: this.kind === "material",
+    return foundry.utils.mergeObject(context, { title: this.pickerTitle ?? (this.kind === "material" ? "Select Material" : "Select Output Item"), materialMode: this.kind === "material" || this.customCatalog,
+      typeLabel: this.filterLabels.type ?? "Type", rarityLabel: this.filterLabels.rarity ?? "Rarity", categoryLabel: this.filterLabels.category ?? "Category",
       search: this.search, sources: facets("source"), types: facets("type"), rarities: facets("rarity"), categories: facets("category"),
       rows: filtered.slice((this.page - 1) * pageSize, this.page * pageSize), resultCount: filtered.length, page: this.page, pages,
       previousPage: Math.max(1, this.page - 1), nextPage: Math.min(pages, this.page + 1), hasPrevious: this.page > 1, hasNext: this.page < pages
@@ -93,10 +90,7 @@ export class RecipePickerApp extends HandlebarsApplicationMixin(ApplicationV2) {
       let index; try { index = await pack.getIndex({ fields: ["img", "type", "system.rarity", "system.source"] }); } catch { continue; }
       for (const item of index) {
         if (!CRAFTABLE_ITEM_TYPES.includes(item.type)) continue;
-        const rawSource = item.system?.source;
-        const sourceBook = typeof rawSource === "object" ? rawSource?.book : rawSource;
-        const sourceLabel = getMorelordCoreService("sources")?.resolveBookLabel?.({ book: sourceBook, pack })
-          ?? this.craftworks.sourceFilter.sourceLabelForItem(item, { pack });
+        const sourceLabel = await this.craftworks.sourceFilter.sourceLabelForCompendiumItem(item, { pack });
         rows.push({ id: `${pack.collection}.${item._id}`, uuid: item.uuid ?? `Compendium.${pack.collection}.Item.${item._id}`, name: item.name, img: item.img,
           type: item.type, rarity: String(item.system?.rarity ?? ""), category: "", sourceLabel });
       }

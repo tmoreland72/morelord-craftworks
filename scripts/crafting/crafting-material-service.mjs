@@ -46,10 +46,30 @@ export class CraftingMaterialService {
     return this.#dedupePlans(plans);
   }
 
-  async consume(actor, plan, { crafter = null } = {}) {
+  async consume(actor, plan, { crafter = null, recipe = null } = {}) {
     if (!actor) throw new Error("Crafting material consumption requires an Actor.");
     if (!plan?.consumptions?.length) {
       throw new Error("Crafting material consumption requires a valid material plan.");
+    }
+
+    if (actor.combinedActors) {
+      if (!game.user.isGM) {
+        const result = await this.socket.executeAsGm("craft.consume-combined-materials", { crafterUuid: crafter.uuid, recipeId: recipe.id, plan });
+        if (!result?.ok) throw new Error(result?.error ?? "The GM could not update crafting inventories.");
+        return result.consumedMaterials;
+      }
+      const parts = actor.combinedActors.map(source => ({ source, plan: { ...plan, consumptions: plan.consumptions.filter(entry => entry.actorUuid === source.uuid) } })).filter(part => part.plan.consumptions.length);
+      for (const { source, plan: portion } of parts) for (const entry of portion.consumptions) {
+        if (Number(source.items.get(entry.itemId)?.system?.quantity ?? 0) < entry.quantity) throw new Error(`${source.name} no longer has enough ${entry.name}.`);
+      }
+      const consumed = [];
+      try {
+        for (const { source, plan: portion } of parts) consumed.push(...await this.consume(source, portion, { crafter, recipe }));
+      } catch (error) {
+        await this.refund(crafter, consumed);
+        throw error;
+      }
+      return consumed;
     }
 
     if (!game.user.isGM && !actor.isOwner) {
@@ -65,6 +85,7 @@ export class CraftingMaterialService {
     }
 
     // Validate against the live Actor before changing anything.
+    if (plan.consumptions.some(entry => !Number.isSafeInteger(entry.quantity) || entry.quantity < 1)) throw new Error("Material quantities must be positive whole numbers.");
     for (const consumption of plan.consumptions) {
       const item = actor.items.get(consumption.itemId);
       const current = Number(item?.system?.quantity ?? 0);
@@ -76,6 +97,7 @@ export class CraftingMaterialService {
       }
     }
 
+    const snapshots = new Map(plan.consumptions.map(entry => [entry.itemId, actor.items.get(entry.itemId).toObject()]));
     const updates = [];
     const deletes = [];
 
@@ -103,17 +125,33 @@ export class CraftingMaterialService {
     }
 
     return plan.consumptions.map(entry => ({
+      actorUuid: actor.uuid,
+      itemData: snapshots.get(entry.itemId),
       materialId: entry.materialId,
       name: entry.name,
       quantity: entry.quantity
     }));
   }
 
-  async refund(actor, consumedMaterials = []) {
+  async refund(actor, consumedMaterials = [], { crafter = null, recipeId = null } = {}) {
     if (!actor) return;
 
+    if (!game.user.isGM && consumedMaterials.some(entry => entry.actorUuid && entry.actorUuid !== actor.uuid)) {
+      const result = await this.socket.executeAsGm("craft.refund-combined-materials", { crafterUuid: crafter?.uuid ?? actor.uuid, recipeId });
+      if (!result?.ok) throw new Error(result?.error ?? "The GM could not return crafting materials.");
+      return;
+    }
     for (const entry of consumedMaterials) {
-      if (!entry?.materialId || !entry.quantity) continue;
+      if (!entry.quantity) continue;
+      const recipient = entry.actorUuid ? await fromUuid(entry.actorUuid) : actor;
+      if (!recipient) throw new Error(`Cannot return materials: inventory ${entry.actorUuid} is missing.`);
+      if (entry.itemData) {
+        const data = foundry.utils.deepClone(entry.itemData);
+        delete data._id;
+        await this.adapter.addItemToActor(recipient, new CONFIG.Item.documentClass(data), Number(entry.quantity));
+        continue;
+      }
+      if (!entry.materialId) continue;
 
       const source = await this.materialRegistry.resolveItem(entry.materialId);
       if (!source) {
@@ -124,7 +162,7 @@ export class CraftingMaterialService {
       }
 
       await this.adapter.addItemToActor(
-        actor,
+        recipient,
         source,
         Number(entry.quantity)
       );
@@ -206,6 +244,7 @@ export class CraftingMaterialService {
 
       return {
         item,
+        actorUuid: item.parent?.uuid ?? actor.uuid,
         itemId: item.id,
         itemUuid: item.uuid,
         name: item.name,
@@ -353,7 +392,7 @@ export class CraftingMaterialService {
       if (remaining <= 0) break;
 
       const live = next.find(
-        entry => entry.itemId === candidate.itemId
+        entry => entry.itemId === candidate.itemId && entry.actorUuid === candidate.actorUuid
       );
 
       if (!live) continue;
@@ -369,6 +408,7 @@ export class CraftingMaterialService {
       remaining -= use;
 
       consumptions.push({
+        actorUuid: live.actorUuid,
         itemId: live.itemId,
         itemUuid: live.itemUuid,
         materialId: live.materialId,
@@ -491,13 +531,13 @@ export class CraftingMaterialService {
     const merged = new Map();
 
     for (const entry of consumptions) {
-      const current = merged.get(entry.itemId);
+      const current = merged.get(`${entry.actorUuid}|${entry.itemId}`);
 
       if (current) {
         current.quantity += entry.quantity;
       } else {
         merged.set(
-          entry.itemId,
+          `${entry.actorUuid}|${entry.itemId}`,
           { ...entry }
         );
       }
@@ -515,7 +555,7 @@ export class CraftingMaterialService {
         [...plan.consumptions]
           .sort((a, b) => a.itemId.localeCompare(b.itemId))
           .map(entry => [
-            entry.itemId,
+            entry.actorUuid, entry.itemId,
             entry.quantity
           ])
       );

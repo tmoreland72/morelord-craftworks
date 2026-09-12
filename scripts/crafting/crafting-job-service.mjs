@@ -112,6 +112,7 @@ export class CraftingJobService {
       materialPlanSummary: found.job.materialPlanSummary ?? null,
       outputAwarded: found.job.outputAwarded === true,
       completedAt: found.job.completedAt ?? null,
+      completedWithoutCheck: found.job.completedWithoutCheck === true,
       startedAt: found.job.startedAt ?? null,
       updatedAt: found.job.updatedAt ?? null
     };
@@ -135,6 +136,7 @@ export class CraftingJobService {
         successes: job.successes,
         attempts: job.attempts
       }),
+      ...(job.completedWithoutCheck ? { complete: true, requiredSuccesses: 0, progressHours: Number(job.hoursRequired ?? 0), timeSpentHours: Number(job.hoursRequired ?? 0) } : {}),
       recipeId: job.recipeId,
       crafterUuid: crafter.uuid,
       inventoryActorUuid: job.inventoryActorUuid ?? null,
@@ -268,7 +270,8 @@ export class CraftingJobService {
   async completeWithoutCheck(
     recipeId,
     crafter,
-    inventoryActorUuid = null
+    inventoryActorUuid = null,
+    hoursRequired = null
   ) {
     const jobs = this.#jobs(crafter);
     const key = this.#key(recipeId);
@@ -290,6 +293,8 @@ export class CraftingJobService {
       ...existing,
       successes: 1,
       attempts: 0,
+      completedWithoutCheck: true,
+      hoursRequired: hoursRequired ?? existing.hoursRequired,
       updatedAt: Date.now()
     };
 
@@ -313,7 +318,7 @@ export class CraftingJobService {
       ...progress,
       requiredSuccesses: 1,
       successes: 1,
-      progressHours: Math.max(0, Number(existing.hoursRequired ?? 0)),
+      progressHours: Math.max(0, Number(job.hoursRequired ?? 0)),
       timeSpentHours: Math.max(0, Number(existing.hoursRequired ?? 0)),
       complete: true
     };

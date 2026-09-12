@@ -7,7 +7,13 @@ Craftworks separates **content packs** from the core module so campaigns can ena
 only the material, recipe, harvesting, gathering, and loot content appropriate for
 that world.
 
+## User documentation
+
+See the [GM manual](docs/gm-manual.md) and [player manual](docs/player-manual.md) for current workflows. Potion and scroll drafts support individual removal and additions through the full filtered catalog picker. Availability counts follow category and school selections. Delerium Search awards Monsters of Drakkenheim compendium items through the Recipient selector. Page sections use the bordered, shaded Morelord Core surfaces used by Downtime.
+
 ## Support baseline
+
+The Recipes browser counts ingredient tags in one pass per recipe using a shared material-catalog snapshot for each refresh. Reference cards use indexed compendium output names and images; full Items are loaded when opened or crafted. World Items and compendium outputs missing display metadata still resolve on refresh. Filter counts rebuild from the current catalog, so material edits do not leave a persistent cache stale.
 
 - Foundry Virtual Tabletop v14
 - D&D5e 5.3+
@@ -27,13 +33,10 @@ Current Standard functionality includes:
 - Craftworks material Items stored in normal actor inventories
 - searchable Materials browser
 - searchable Recipes browser grouped by crafting category
-- recipe workflow context (inventory/crafter) is presented in its own panel above browsing controls
-- large Materials and Recipes catalogs use an explicit filter-and-search workflow rather than rendering every record
-- browsers show total catalog size plus a live prospective result count, capped visually at `500+`
-- Recipe browser filters include Content Pack, Category, ingredient rarity, ingredient material tag, and current-inventory craftability
-- `Only Show Craftable Recipes` evaluates requirements against the selected Using Actor Inventory
-- changing a query filter hides stale results until Search is run again
-- Using Crafter Actor is always visible and may differ from the selected inventory actor
+- the Recipe browser selects a crafter for marking goals; the Craft workspace selects the crafter and ingredient inventory
+- large Materials and Recipes catalogs use live search and include/exclude filters
+- browsers count the full matching catalog while limiting rendered cards
+- Recipe browser filters include knowledge, Content Pack, Category, Preferred Artisan Tool, and rarity
 - recipe reference details including tools, checks, normal/no-tool DCs, and crafting-hour requirements
 - Craftworks-wide crafting attempts representing 2 hours of work each
 - failed crafting checks consume time but do not consume recipe materials
@@ -180,8 +183,9 @@ the Recipe browser exposes a Craft action.
 - a failure adds time spent but no crafting progress and loses no additional materials
 - crafting progress is persisted on the Crafter Actor and keyed by recipe
 - changing the displayed material inventory does not create a separate progress track
-- the inventory actor used when the job began remains the material/output destination for that job
-- Cancel Crafting refunds the materials consumed at job start
+- players automatically combine their character and member Group inventories; GMs retain explicit inventory selection
+- consumed ingredients retain their origin so cancellation returns them to the correct inventories
+- Cancel Crafting refunds the materials consumed at job start to their original inventories
 - when the required successes are reached, Craftworks automatically awards the recipe output
 - Craftworks material outputs and Foundry Item UUID outputs are both supported
 - Standard finished-item recipes must resolve to real D&D5e compendium Items; unmatched Kibbles-specific/homebrew finished items are excluded
@@ -211,40 +215,9 @@ Craftworks uses a common timing model for recipe execution:
 Recipes may define their total `hoursRequired`. Craftworks should use source-backed
 values where available rather than inventing recipe durations.
 
-## Future development
+## Custom recipes
 
-### GM homebrew content
-
-Homebrew authoring is planned as a **Standard/free** Craftworks feature.
-
-The intended model is a world-specific **Homebrew** Content Pack that is always
-available to the GM and is not premium-gated.
-
-Planned homebrew material support includes:
-
-- creating and editing Craftworks materials/components
-- name, image, rarity, category, processing stage, and tags
-- normal D&D5e value and Craftworks purchasable metadata
-- acquisition configuration for Harvesting, Gathering, and Encounter Loot
-- use in normal Craftworks recipe matching and inventory workflows
-
-Planned homebrew recipe support includes:
-
-- exact material requirements
-- tag/category/rarity/stage matching
-- quantities and `sameMaterial` requirements
-- multiple required ingredients
-- alternative ingredient requirements
-- processing recipes that output another Craftworks material
-- finished recipes that output an existing Foundry Item
-- normal Recipe browser visibility with a clear Homebrew source label
-
-Homebrew definitions should eventually support JSON import/export so GMs can move
-custom Craftworks content between worlds and share community content packs.
-
-The same data model used by homebrew authoring should remain compatible with
-Morelord-authored Content Packs so recipe/material definitions do not require
-separate runtime systems.
+GMs can create and edit standard or supported Drakkenheim recipes, select output Items and materials through the full catalog picker, define AND requirements and OR alternatives, and import/export recipe JSON. See the [GM manual](docs/gm-manual.md#create-and-manage-custom-recipes) for the current workflow. General-purpose homebrew material authoring remains future work.
 
 ## Development release history
 
@@ -297,13 +270,7 @@ Recipe cards display descriptive source labels such as `SRD 5.2`, `SRD 5.1`,
 
 ### Catalog query filters
 
-Recipe catalog filters are checkbox-based multi-select controls. Selecting more
-than one value within a filter uses OR semantics within that filter, while
-different filter groups are combined with AND semantics. Content Pack selectors
-only list enabled packs that currently contain records.
-
-The Material browser uses the same multi-select Content Pack behavior. Search
-text keeps the user's exact caret/selection across live-count rerenders.
+Recipe and material catalog facets cycle through neutral, include, and exclude states. Included values within a group use OR semantics; separate groups combine with AND semantics. Search text and source facets apply to the full enabled catalog.
 
 
 ### Spell Scroll Generator
@@ -473,3 +440,5 @@ Publish the release:
 ```powershell
 .\release.ps1 -Version 0.1.0
 ```
+
+Crafting facility requirements are configured per artisan tool in module Settings. Recipe cards show the resulting requirement, with the crafted item’s rarity as the minimum facility tier; higher tiers qualify. Both crafting DCs and all recipe filter counts are visible. The recipe editor begins with Item to Be Crafted and supports mandatory AND groups containing OR material choices. Offline Harvest and Gather characters can be played by the GM. Potion and scroll draft quantities default to one and may be edited before sharing or awarding.

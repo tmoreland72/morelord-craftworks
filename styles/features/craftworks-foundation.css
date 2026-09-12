@@ -1,8 +1,6 @@
 /* Craftworks-owned feature styles. Shared primitives live in Morelord Core. */
-.ml-craftworks.app-shell { padding: 12px; }
-.ml-craftworks .ml-craftworks-header h2 { margin: 0 0 4px; }
-.ml-craftworks .ml-craftworks-header p { margin: 0 0 12px; opacity: 0.8; }
-.ml-craftworks .ml-craftworks-panel { border: 1px solid var(--color-border-light-2); border-radius: 6px; padding: 12px; margin-bottom: 10px; }
+
+.ml-craftworks .ml-craftworks-panel { margin: 0; }
 .ml-craftworks .ml-craftworks-creature { display: flex; gap: 12px; align-items: center; padding: 8px 0; }
 .ml-craftworks .ml-craftworks-creature img { width: 56px; height: 56px; object-fit: cover; border: 0; border-radius: 4px; }
 .ml-craftworks .ml-craftworks-creature h3, .ml-craftworks .ml-craftworks-creature h4 { margin: 0 0 3px; }
@@ -15,10 +13,9 @@
 .ml-craftworks .ml-craftworks-choice { display: grid; grid-template-columns: 40px 1fr; grid-template-rows: auto auto; gap: 0 8px; align-items: center; text-align: left; min-height: 56px; }
 .ml-craftworks .ml-craftworks-choice img { grid-row: 1 / 3; width: 40px; height: 40px; object-fit: cover; border: 0; }
 .ml-craftworks .ml-craftworks-choice small { opacity: .7; text-transform: capitalize; }
-.ml-craftworks .ml-craftworks-progress-user { display: grid; gap: 3px; padding: 6px 0; border-bottom: 1px solid var(--color-border-light-2); }
+.ml-craftworks .ml-craftworks-progress-user { display: grid; gap: 3px; padding: 6px 0; border-bottom: 1px solid var(--ml-color-border); }
 .ml-craftworks .ml-craftworks-progress-user:last-child { border-bottom: 0; }
 .ml-craftworks .ml-craftworks-progress-user span { padding-left: 12px; opacity: .85; }
-.ml-craftworks .ml-craftworks-actions { display: flex; justify-content: flex-end; margin-top: 10px; }
 
 .ml-craftworks .ml-craftworks-delerium-rewards { display: grid; gap: 0; }
 .ml-craftworks .ml-craftworks-delerium-rewards > div {
@@ -26,7 +23,7 @@
   grid-template-columns: minmax(145px, auto) 1fr;
   gap: 14px;
   padding: 9px 0;
-  border-bottom: 1px solid var(--color-border-light-2);
+  border-bottom: 1px solid var(--ml-color-border);
 }
 .ml-craftworks .ml-craftworks-delerium-rewards > div:last-child { border-bottom: 0; }
 .ml-craftworks .ml-craftworks-delerium-rewards span { opacity: .85; }
@@ -34,14 +31,14 @@
 .ml-craftworks .ml-craftworks-character-picker { margin: 14px 0 0; padding: 10px; }
 .ml-craftworks .ml-craftworks-character-picker > p { margin: 0 0 8px; opacity: .85; }
 .ml-craftworks .ml-craftworks-character-picker-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 7px; }
-.ml-craftworks .ml-craftworks-character-picker-list > label { display: grid; grid-template-columns: auto 32px 1fr; align-items: center; gap: 8px; padding: 7px; border: 1px solid var(--color-border-light-2); border-radius: 4px; }
+.ml-craftworks .ml-craftworks-character-picker-list > label { display: grid; grid-template-columns: auto 32px 1fr; align-items: center; gap: 8px; padding: 7px; border: 1px solid var(--ml-color-border); border-radius: 4px; }
 .ml-craftworks .ml-craftworks-character-picker-list input { margin: 0; }
 .ml-craftworks .ml-craftworks-character-picker-list img { width: 32px; height: 32px; object-fit: cover; border: 0; }
 .ml-craftworks .ml-craftworks-character-picker-list span { display: grid; gap: 2px; }
 .ml-craftworks .ml-craftworks-character-picker-list small { opacity: .7; }
 
 .ml-craftworks .ml-craftworks-dead-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
-.ml-craftworks .ml-craftworks-dead-list span { display: inline-flex; align-items: center; gap: 6px; padding: 4px 7px; border: 1px solid var(--color-border-light-2); border-radius: 4px; }
+.ml-craftworks .ml-craftworks-dead-list span { display: inline-flex; align-items: center; gap: 6px; padding: 4px 7px; border: 1px solid var(--ml-color-border); border-radius: 4px; }
 .ml-craftworks .ml-craftworks-dead-list img { width: 24px; height: 24px; object-fit: cover; border: 0; }
 
 
@@ -50,34 +47,11 @@
   padding: 0;
 }
 
-.ml-craftworks-window .ml-craftworks.app-shell {
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
 
-.ml-craftworks-window .ml-craftworks-header {
-  border-bottom: 1px solid var(--color-border-light-2);
-  padding-bottom: 8px;
-}
 
-.ml-craftworks-window .ml-craftworks-panel {
-  background: color-mix(in srgb, var(--color-cool-5) 8%, transparent);
-}
-
-.ml-craftworks-window button {
-  min-height: 32px;
-}
 
 .ml-craftworks-window .ml-craftworks-skill-row button {
   flex: 1 1 140px;
-}
-
-.ml-craftworks-window .ml-craftworks-actions {
-  position: sticky;
-  bottom: 0;
-  padding-top: 8px;
 }
 
 .ml-craftworks .ml-craftworks-result {
@@ -107,11 +81,10 @@
 }
 
 .ml-craftworks .ml-craftworks-reference-list{display:flex;flex-direction:column;gap:8px;overflow:auto}
-.ml-craftworks .ml-craftworks-reference-card{display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:start;padding:10px;border:1px solid var(--color-border-light-2);border-radius:6px}
+.ml-craftworks .ml-craftworks-reference-card{display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:start;}
 .ml-craftworks .ml-craftworks-reference-card>img{width:48px;height:48px;object-fit:cover;border:0}
 .ml-craftworks .ml-craftworks-reference-title{display:flex;justify-content:space-between;gap:12px}.ml-craftworks .ml-craftworks-reference-title span{opacity:.7}
-.ml-craftworks .ml-craftworks-pills{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}.ml-craftworks .ml-craftworks-pills span{border:1px solid var(--color-border-light-2);border-radius:999px;padding:2px 7px;font-size:.85em}
-.ml-craftworks .ml-craftworks-recipe-card{padding:12px;border:1px solid var(--color-border-light-2);border-radius:6px}.ml-craftworks .ml-craftworks-recipe-card h3{margin:0}.ml-craftworks .ml-craftworks-recipe-card header span{opacity:.7}
+.ml-craftworks .ml-craftworks-pills{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}.ml-craftworks .ml-craftworks-pills span{border:1px solid var(--ml-color-border);border-radius:999px;padding:2px 7px;font-size: var(--ml-font-size-sm)}.ml-craftworks .ml-craftworks-recipe-card h3{margin:0}.ml-craftworks .ml-craftworks-recipe-card header span{opacity:.7}
 .ml-craftworks .ml-craftworks-recipe-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:10px}
 .ml-craftworks .ml-craftworks-recipe-line{display:flex;align-items:center;gap:7px;margin:5px 0}.ml-craftworks .ml-craftworks-recipe-line img{width:28px;height:28px;object-fit:cover;border:0}
 
@@ -128,8 +101,6 @@
   display: flex;
   flex-direction: column;
 }
-
-.ml-craftworks-window .ml-craftworks-browser-shell > .ml-craftworks-header,
 .ml-craftworks-window .ml-craftworks-browser-shell > .ml-craftworks-panel {
   flex: 0 0 auto;
 }
@@ -159,23 +130,6 @@
   overflow-y: auto;
   overflow-x: hidden;
 }
-
-.ml-craftworks .ml-craftworks-dashboard-hero {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  border-bottom: 1px solid var(--color-border-light-2);
-  padding-bottom: 14px;
-}
-
-.ml-craftworks .ml-craftworks-dashboard-hero h1 {
-  margin: 0 0 4px;
-  font-size: 2rem;
-}
-
-.ml-craftworks .ml-craftworks-dashboard-hero p,
-.ml-craftworks .ml-craftworks-dashboard-section-header p,
 .ml-craftworks .ml-craftworks-dashboard-storage p {
   margin: 0;
   opacity: 0.78;
@@ -207,13 +161,12 @@
   height: auto;
   min-height: 78px;
   max-height: none;
-  padding: 12px;
   text-align: left;
   white-space: normal;
 }
 
 .ml-craftworks .ml-craftworks-dashboard-card > i:first-child {
-  font-size: 1.4rem;
+  font-size: var(--ml-font-size-title);
   text-align: center;
 }
 
@@ -225,7 +178,7 @@
 }
 
 .ml-craftworks .ml-craftworks-dashboard-card-copy strong {
-  font-size: 1.05rem;
+  font-size: var(--ml-font-size-body);
 }
 
 .ml-craftworks .ml-craftworks-dashboard-card-copy small {
@@ -235,15 +188,9 @@
   overflow-wrap: anywhere;
 }
 
-.ml-craftworks .ml-craftworks-dashboard-section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
 
-.ml-craftworks .ml-craftworks-dashboard-section h2 {
-  margin: 4px 0 0;
-}
+
+
 
 .ml-craftworks .ml-craftworks-dashboard-storage {
   display: flex;
@@ -252,7 +199,7 @@
 }
 
 .ml-craftworks .ml-craftworks-dashboard-storage > i {
-  font-size: 1.3rem;
+  font-size: var(--ml-font-size-title);
 }
 
 @media (max-width: 700px) {
@@ -280,7 +227,7 @@
   gap: 12px;
   align-items: center;
   padding: 8px 0;
-  border-bottom: 1px solid var(--color-border-light-2);
+  border-bottom: 1px solid var(--ml-color-border);
 }
 
 .ml-craftworks .ml-craftworks-loot-roll > div:first-child {
@@ -308,7 +255,7 @@
 .ml-craftworks .ml-craftworks-special-treasure {
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 1px solid var(--color-border-light-2);
+  border-top: 1px solid var(--ml-color-border);
 }
 
 @media (max-width: 700px) {
@@ -343,13 +290,13 @@
   gap: 8px;
   min-height: 30px;
   padding: 5px 8px;
-  border-top: 1px solid var(--color-border-light-2);
-  font-size: 0.86rem;
+  border-top: 1px solid var(--ml-color-border);
+  font-size: var(--ml-font-size-sm);
   opacity: 0.82;
 }
 
 .ml-craftworks .ml-craftworks-dashboard-storage-status > i {
-  font-size: 0.95rem;
+  font-size: var(--ml-font-size-body);
 }
 
 .ml-craftworks .ml-craftworks-dashboard-storage-status .ml-craftworks-warning {
@@ -375,9 +322,6 @@
   flex-direction: column;
   gap: 10px;
   min-width: 0;
-  padding: 14px;
-  border: 1px solid var(--color-border-light-2);
-  border-radius: 6px;
 }
 
 .ml-craftworks .ml-craftworks-recipe-header {
@@ -394,7 +338,7 @@
 
 .ml-craftworks .ml-craftworks-recipe-heading h3 {
   margin: 0;
-  font-size: 1.35rem;
+  font-size: var(--ml-font-size-title);
   line-height: 1.15;
 }
 
@@ -403,7 +347,7 @@
   flex-wrap: wrap;
   gap: 6px 12px;
   margin-top: 4px;
-  font-size: 0.88rem;
+  font-size: var(--ml-font-size-body);
   opacity: 0.72;
   text-transform: capitalize;
 }
@@ -433,7 +377,7 @@
 
 .ml-craftworks .ml-craftworks-recipe-block h4 {
   margin: 0 0 7px;
-  font-size: 0.95rem;
+  font-size: var(--ml-font-size-body);
 }
 
 .ml-craftworks .ml-craftworks-requirement-list {
@@ -452,7 +396,7 @@
 
 .ml-craftworks .ml-craftworks-requirement-row > i {
   margin-top: 0.25em;
-  font-size: 0.55rem;
+  font-size: var(--ml-font-size-xs);
   opacity: 0.6;
 }
 
@@ -479,7 +423,7 @@
 .ml-craftworks .ml-craftworks-recipe-output-placeholder {
   display: grid;
   place-items: center;
-  border: 1px solid var(--color-border-light-2);
+  border: 1px solid var(--ml-color-border);
   opacity: 0.6;
 }
 
@@ -495,7 +439,7 @@
 }
 
 .ml-craftworks .ml-craftworks-recipe-output-copy span {
-  font-size: 0.82rem;
+  font-size: var(--ml-font-size-sm);
   opacity: 0.7;
 }
 
@@ -536,7 +480,7 @@
   padding: 2px 7px;
   border: 1px solid currentColor;
   border-radius: 999px;
-  font-size: 0.76rem;
+  font-size: var(--ml-font-size-sm);
   white-space: nowrap;
 }
 
@@ -557,7 +501,7 @@
 .ml-craftworks .ml-craftworks-requirement-row small {
   display: block;
   margin-top: 2px;
-  font-size: 0.78rem;
+  font-size: var(--ml-font-size-sm);
   opacity: 0.68;
 }
 
@@ -577,7 +521,7 @@
   flex-direction: column;
   gap: 5px;
   padding: 8px 10px;
-  border: 1px dashed var(--color-border-light-2);
+  border: 1px dashed var(--ml-color-border);
   border-radius: 5px;
 }
 
@@ -591,7 +535,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 5px 10px;
-  font-size: 0.82rem;
+  font-size: var(--ml-font-size-sm);
   opacity: 0.82;
 }
 
@@ -624,9 +568,9 @@
   display: inline-flex;
   align-items: center;
   padding: 1px 6px;
-  border: 1px solid var(--color-border-light-2);
+  border: 1px solid var(--ml-color-border);
   border-radius: 999px;
-  font-size: 0.76rem;
+  font-size: var(--ml-font-size-sm);
   line-height: 1.4;
 }
 
@@ -637,12 +581,12 @@
 .ml-craftworks .ml-craftworks-content-pack-heading { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
 .ml-craftworks .ml-craftworks-content-pack-heading h3 { margin:0 0 3px; }
 .ml-craftworks .ml-craftworks-content-pack-heading p { margin:0; opacity:.78; }
-.ml-craftworks .ml-craftworks-content-pack-status { display:inline-flex; align-items:center; padding:2px 8px; border:1px solid currentColor; border-radius:999px; font-size:.76rem; white-space:nowrap; }
+.ml-craftworks .ml-craftworks-content-pack-status { display:inline-flex; align-items:center; padding:2px 8px; border:1px solid currentColor; border-radius:999px; font-size: var(--ml-font-size-sm); white-space:nowrap; }
 .ml-craftworks .ml-craftworks-content-pack-premium { color:var(--ml-color-accent); }
 .ml-craftworks .ml-craftworks-content-pack-free { opacity:.75; }
-.ml-craftworks .ml-craftworks-content-pack-meta { margin-top:5px; font-size:.8rem; opacity:.66; }
+.ml-craftworks .ml-craftworks-content-pack-meta { margin-top:5px; font-size: var(--ml-font-size-sm); opacity:.66; }
 .ml-craftworks .ml-craftworks-content-pack-toggle { display:flex; align-items:center; gap:8px; white-space:nowrap; }
-.ml-craftworks .ml-craftworks-content-pack-footer { flex:0 0 auto; padding-top:8px; font-size:.82rem; opacity:.72; }
+.ml-craftworks .ml-craftworks-content-pack-footer { flex:0 0 auto; padding-top:8px; font-size: var(--ml-font-size-sm); opacity:.72; }
 @media (max-width:650px) {
   .ml-craftworks .ml-craftworks-content-pack { grid-template-columns:1fr; }
   .ml-craftworks .ml-craftworks-content-pack-toggle { justify-content:flex-end; }
@@ -668,43 +612,16 @@
 
 .ml-craftworks .ml-craftworks-settings-section {
   margin-bottom: 18px;
-  padding: 14px;
-  border: 1px solid var(--color-border-light-2);
-  border-radius: 7px;
-}
-
-.ml-craftworks .ml-craftworks-settings-section-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 14px;
-  margin-bottom: 12px;
-}
-
-.ml-craftworks .ml-craftworks-settings-section-heading h3 {
-  margin: 0 0 3px;
-  font-size: 1.15rem;
-}
-
-.ml-craftworks .ml-craftworks-settings-section-heading p {
-  margin: 0;
-  opacity: 0.72;
 }
 
 .ml-craftworks .ml-craftworks-settings-subsection {
   margin-top: 14px;
   padding-top: 12px;
-  border-top: 1px solid var(--color-border-light-2);
+  border-top: 1px solid var(--ml-color-border);
 }
 
 .ml-craftworks .ml-craftworks-settings-subsection h4 {
   margin: 0 0 9px;
-}
-
-.ml-craftworks .ml-craftworks-setting-card {
-  padding: 10px 12px;
-  border: 1px solid var(--color-border-light-2);
-  border-radius: 6px;
 }
 
 .ml-craftworks .ml-craftworks-setting-card p {
@@ -753,7 +670,7 @@
   gap: 5px;
   align-items: baseline;
   margin-bottom: 10px;
-  font-size: .86rem;
+  font-size: var(--ml-font-size-sm);
 }
 
 .ml-craftworks .ml-craftworks-content-pack-list {
@@ -785,7 +702,7 @@
   padding: 2px 7px;
   border: 1px solid currentColor;
   border-radius: 999px;
-  font-size: .74rem;
+  font-size: var(--ml-font-size-xs);
   white-space: nowrap;
 }
 
@@ -823,7 +740,7 @@
 
 .ml-craftworks .ml-craftworks-pack-requirement span,
 .ml-craftworks .ml-craftworks-pack-requirement small {
-  color: var(--color-text-primary, inherit);
+  color: var(--ml-color-text, inherit);
 }
 
 .ml-craftworks .ml-craftworks-toggle-row {
@@ -843,7 +760,7 @@
   display: flex;
   justify-content: flex-end;
   padding: 10px 0 2px;
-  background: var(--color-cool-5-90, rgba(10,10,16,.94));
+  background: var(--ml-color-window, color-mix(in srgb, var(--ml-color-window) 94%, transparent));
 }
 
 @media (max-width: 720px) {
@@ -854,10 +771,6 @@
   .ml-craftworks .ml-craftworks-setting-row,
   .ml-craftworks .ml-craftworks-content-pack {
     grid-template-columns: 1fr;
-  }
-
-  .ml-craftworks .ml-craftworks-settings-section-heading {
-    flex-direction: column;
   }
 }
 
@@ -891,7 +804,7 @@
 /* Morelord Core entitlement status */
 .ml-craftworks .ml-craftworks-core-premium {
   color: var(--ml-color-accent);
-  font-weight: 700;
+  font-weight: var(--ml-font-weight-bold);
 }
 
 .ml-craftworks .ml-craftworks-core-diagnostics {
@@ -899,7 +812,7 @@
   flex-wrap: wrap;
   gap: 4px 14px;
   margin: -4px 0 10px;
-  font-size: 0.78rem;
+  font-size: var(--ml-font-size-sm);
   opacity: 0.72;
 }
 
@@ -909,7 +822,7 @@
   flex-wrap: wrap;
   gap: 3px 10px;
   margin-top: 5px;
-  font-size: .75rem;
+  font-size: var(--ml-font-size-xs);
   opacity: .66;
 }
 
@@ -937,7 +850,7 @@
   flex-wrap: wrap;
   gap: 5px 14px;
   padding: 6px 2px 8px;
-  font-size: .82rem;
+  font-size: var(--ml-font-size-sm);
   opacity: .78;
 }
 
@@ -946,11 +859,11 @@
 }
 
 .ml-craftworks .ml-craftworks-material-owned {
-  border-color: var(--color-border-highlight, var(--color-border-light-2));
+  border-color: var(--ml-color-focus, var(--ml-color-border));
 }
 
 .ml-craftworks .ml-craftworks-owned-pill {
-  font-weight: 700;
+  font-weight: var(--ml-font-weight-bold);
 }
 
 @media (max-width: 760px) {
@@ -1002,9 +915,9 @@
   gap: 6px 14px;
   margin: 7px 0 9px;
   padding: 7px 9px;
-  border: 1px solid var(--color-border-light-2);
+  border: 1px solid var(--ml-color-border);
   border-radius: 4px;
-  font-size: .82rem;
+  font-size: var(--ml-font-size-sm);
 }
 
 .ml-craftworks .ml-craftworks-recipe-craft-meta span {
@@ -1021,8 +934,8 @@
 /* Recipe requirement availability */
 .ml-craftworks .ml-craftworks-requirement-count {
   margin-left: 4px;
-  font-size: .92em;
-  font-weight: 700;
+  font-size: var(--ml-font-size-body);
+  font-weight: var(--ml-font-weight-bold);
 }
 
 .ml-craftworks .ml-craftworks-requirement-count-ok {
@@ -1038,16 +951,16 @@
   gap: 5px;
   width: min(100%, 460px);
   padding: 9px 11px;
-  border: 1px solid rgba(197, 160, 91, 0.3);
+  border: 1px solid color-mix(in srgb, var(--ml-color-accent) 30%, transparent);
   border-radius: 7px;
-  background: rgba(197, 160, 91, 0.055);
+  background: color-mix(in srgb, var(--ml-color-accent) 6%, transparent);
 }
 
 .ml-craftworks .ml-craftworks-requirement-alternatives-label {
   margin-bottom: 2px;
-  color: var(--color-text-dark-secondary, currentColor);
-  font-size: .68rem;
-  font-weight: 800;
+  color: var(--ml-color-muted, currentColor);
+  font-size: var(--ml-font-size-xs);
+  font-weight: var(--ml-font-weight-heavy);
   letter-spacing: .06em;
   text-transform: uppercase;
   opacity: .7;
@@ -1065,8 +978,8 @@
   flex-basis: 100%;
   margin: 0 0 0 36px;
   padding: 1px 0;
-  font-size: .72rem;
-  font-weight: 700;
+  font-size: var(--ml-font-size-xs);
+  font-weight: var(--ml-font-weight-bold);
   opacity: .55;
 }
 
@@ -1096,11 +1009,11 @@
 }
 
 .ml-craftworks .ml-craftworks-output-material-link {
-  font-weight: 700;
+  font-weight: var(--ml-font-weight-bold);
 }
 
 .ml-craftworks .ml-craftworks-material-focused {
-  outline: 2px solid var(--color-border-highlight, currentColor);
+  outline: 2px solid var(--ml-color-focus, currentColor);
   outline-offset: -2px;
 }
 
@@ -1134,12 +1047,12 @@
   width: 28px;
   height: 28px;
   object-fit: cover;
-  border: 1px solid var(--color-border-light-2);
+  border: 1px solid var(--ml-color-border);
   border-radius: 4px;
 }
 
 .ml-craftworks .ml-craftworks-material-icon-link:focus-visible img {
-  outline: 1px solid var(--color-border-highlight, currentColor);
+  outline: 1px solid var(--ml-color-focus, currentColor);
   outline-offset: 1px;
 }
 
@@ -1149,14 +1062,14 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  border: 1px solid var(--color-border-light-2);
+  border: 1px solid var(--ml-color-border);
   border-radius: 4px;
   opacity: .75;
 }
 
 .ml-craftworks .ml-craftworks-requirement-quantity,
 .ml-craftworks .ml-craftworks-recipe-output-quantity {
-  font-weight: 700;
+  font-weight: var(--ml-font-weight-bold);
   white-space: nowrap;
 }
 
@@ -1166,7 +1079,6 @@
   gap: 6px;
   width: auto;
   min-width: 0;
-  padding: 5px 7px;
 }
 
 .ml-craftworks .ml-craftworks-output-icon-link {
@@ -1209,19 +1121,19 @@
   content: "AND";
   flex: 0 0 38px;
   margin: 0 7px 0 0;
-  font-size: .7rem;
-  font-weight: 800;
+  font-size: var(--ml-font-size-xs);
+  font-weight: var(--ml-font-weight-heavy);
   opacity: .55;
 }
 
 .ml-craftworks .ml-craftworks-requirement-group-or {
   margin: 6px 0;
   padding: 3px 0;
-  border-top: 1px solid var(--color-border-light-2);
-  border-bottom: 1px solid var(--color-border-light-2);
+  border-top: 1px solid var(--ml-color-border);
+  border-bottom: 1px solid var(--ml-color-border);
   text-align: center;
-  font-size: .75rem;
-  font-weight: 800;
+  font-size: var(--ml-font-size-xs);
+  font-weight: var(--ml-font-weight-heavy);
   opacity: .7;
 }
 
@@ -1250,20 +1162,7 @@
 
 .ml-craftworks .ml-craftworks-recipe-category-group + .ml-craftworks-recipe-category-group {
   margin-top: 8px;
-  border-top: 1px solid var(--color-border-light-2);
-}
-
-.ml-craftworks .ml-craftworks-recipe-category-heading {
-  margin: 0 2px;
-  padding-top: 10px;
-  border: 0;
-  font-size: 1.6rem;
-  line-height: 1.1;
-  color: var(--ml-color-muted);
-}
-
-.ml-craftworks .ml-craftworks-recipe-category-group:first-child .ml-craftworks-recipe-category-heading {
-  padding-top: 0;
+  border-top: 1px solid var(--ml-color-border);
 }
 
 .ml-craftworks .ml-craftworks-recipe-category-list {
@@ -1297,7 +1196,7 @@
 }
 
 .ml-craftworks .ml-craftworks-foundry-output-link:focus-visible img {
-  outline: 1px solid var(--color-border-highlight, currentColor);
+  outline: 1px solid var(--ml-color-focus, currentColor);
   outline-offset: 1px;
 }
 
@@ -1352,7 +1251,7 @@
   gap: 12px;
   align-items: end;
   padding-top: 8px;
-  border-top: 1px solid var(--color-border-light-2);
+  border-top: 1px solid var(--ml-color-border);
 }
 
 .ml-craftworks .ml-craftworks-recipe-toolbar-stack label {
@@ -1438,7 +1337,7 @@
   align-items: center;
   gap: 5px;
   color: var(--ml-color-success);
-  font-weight: 700;
+  font-weight: var(--ml-font-weight-bold);
 }
 
 
@@ -1449,9 +1348,9 @@
   gap: 5px;
   width: fit-content;
   padding: 5px 8px;
-  border: 1px solid var(--color-border-light-2);
+  border: 1px solid var(--ml-color-border);
   border-radius: 5px;
-  font-size: .86rem;
+  font-size: var(--ml-font-size-sm);
 }
 
 .ml-craftworks .ml-craftworks-crafting-progress > i {
@@ -1476,7 +1375,7 @@
   align-items: center;
   gap: 8px;
   padding: 7px 8px;
-  border: 1px solid var(--color-border-light-2);
+  border: 1px solid var(--ml-color-border);
   border-radius: 5px;
 }
 
@@ -1486,7 +1385,7 @@
 
 .ml-craftworks .ml-craftworks-crafting-material-summary {
   opacity: .68;
-  font-size: .94em;
+  font-size: var(--ml-font-size-body);
 }
 
 
@@ -1499,7 +1398,7 @@
   gap: 12px;
   margin: 8px 0 10px;
   padding: 7px 10px;
-  border: 1px solid var(--color-border-light-2);
+  border: 1px solid var(--ml-color-border);
   border-radius: 5px;
 }
 
@@ -1654,7 +1553,7 @@
   align-items: center;
   min-height: 32px;
   padding: 5px 9px;
-  border: 1px solid var(--color-border-light-2);
+  border: 1px solid var(--ml-color-border);
   border-radius: 4px;
   cursor: pointer;
   user-select: none;
@@ -1684,10 +1583,10 @@
   max-height: 260px;
   overflow: auto;
   padding: 5px;
-  border: 1px solid var(--color-border-light-2);
+  border: 1px solid var(--ml-color-border);
   border-radius: 4px;
-  background: var(--color-bg-option, var(--color-cool-5-90));
-  box-shadow: 0 3px 10px rgb(0 0 0 / 30%);
+  background: var(--ml-color-surface-sunken, var(--ml-color-window));
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--ml-color-window) 30%, transparent);
 }
 
 .ml-craftworks .ml-craftworks-multiselect-menu > label {
@@ -1700,7 +1599,7 @@
 }
 
 .ml-craftworks .ml-craftworks-multiselect-menu > label:hover {
-  background: rgb(255 255 255 / 7%);
+  background: var(--ml-color-surface-raised);
 }
 
 .ml-craftworks .ml-craftworks-multiselect-menu input[type="checkbox"] {
@@ -1956,7 +1855,7 @@
   width: 100%;
   margin-top: 2px;
   padding-top: 10px;
-  border-top: 1px solid var(--color-border-light-2);
+  border-top: 1px solid var(--ml-color-border);
 }
 
 .ml-craftworks .ml-craftworks-recipe-query-summary {
@@ -2005,7 +1904,7 @@
   background: transparent;
   box-shadow: none;
   color: var(--ml-color-accent);
-  font-size: .9rem;
+  font-size: var(--ml-font-size-body);
   line-height: 1;
 }
 
@@ -2032,12 +1931,12 @@
 .ml-craftworks .ml-craftworks-in-process-section {
   margin-top: 18px;
   padding-top: 14px;
-  border-top: 1px solid var(--color-border-light-2);
+  border-top: 1px solid var(--ml-color-border);
 }
 
 .ml-craftworks .ml-craftworks-in-process-heading {
   margin: 0 0 9px;
-  font-size: 1.35rem;
+  font-size: var(--ml-font-size-title);
 }
 
 .ml-craftworks .ml-craftworks-in-process-list {
@@ -2062,7 +1961,7 @@
 
 .ml-craftworks .ml-craftworks-in-process-name {
   margin-right: 8px;
-  font-size: 1.05rem;
+  font-size: var(--ml-font-size-body);
 }
 
 .ml-craftworks .ml-craftworks-in-process-source {
@@ -2074,7 +1973,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 5px 14px;
-  font-size: .84rem;
+  font-size: var(--ml-font-size-sm);
 }
 
 .ml-craftworks .ml-craftworks-in-process-context {
@@ -2117,11 +2016,11 @@
   align-items: center;
   gap: 10px;
   padding-bottom: 8px;
-  border-bottom: 1px solid var(--color-border-light-2);
+  border-bottom: 1px solid var(--ml-color-border);
 }
 
 .ml-craftworks-chat-card > header > i {
-  font-size: 1.6rem;
+  font-size: var(--ml-font-size-title);
 }
 
 .ml-craftworks-chat-card > header h3 {
@@ -2130,7 +2029,7 @@
 
 .ml-craftworks-chat-card > header span {
   opacity: .7;
-  font-size: .85rem;
+  font-size: var(--ml-font-size-sm);
 }
 
 .ml-craftworks-chat-section h4 {
@@ -2182,10 +2081,10 @@
 
 .ml-craftworks .ml-craftworks-special-item-link:focus-visible {
   border-color: var(
-    --color-border-highlight,
-    var(--color-border-light-2)
+    --ml-color-focus,
+    var(--ml-color-border)
   );
-  background: rgb(255 255 255 / 5%);
+  background: var(--ml-color-surface);
 }
 
 .ml-craftworks .ml-craftworks-special-item-link > img {
@@ -2203,7 +2102,7 @@
 
 .ml-craftworks .ml-craftworks-special-item-copy > span {
   opacity: .7;
-  font-size: .82rem;
+  font-size: var(--ml-font-size-sm);
 }
 
 .ml-craftworks .ml-craftworks-special-item-link > i {
@@ -2241,7 +2140,7 @@
   gap: 12px;
   margin-bottom: 10px;
   padding: 8px 10px;
-  border: 1px solid var(--color-border-light-2);
+  border: 1px solid var(--ml-color-border);
   border-radius: 5px;
 }
 
@@ -2250,10 +2149,6 @@
   align-items: center;
   gap: 6px;
   opacity: .78;
-}
-
-.ml-craftworks .ml-craftworks-recipe-visibility-toolbar .ml-craftworks-actions {
-  margin: 0;
 }
 
 .ml-craftworks .ml-craftworks-recipe-visibility-toolbar button {
@@ -2278,7 +2173,7 @@
   font-family: inherit;
   font-size: inherit;
   font-style: normal;
-  font-weight: 400;
+  font-weight: var(--ml-font-weight-normal);
   line-height: inherit;
   opacity: 1;
   white-space: nowrap;
@@ -2290,7 +2185,7 @@
 
 .ml-craftworks .ml-craftworks-recipe-title-button:hover,
 .ml-craftworks .ml-craftworks-recipe-title-button:focus-visible {
-  background: rgba(197, 160, 91, 0.09) !important;
+  background: color-mix(in srgb, var(--ml-color-accent) 9%, transparent) !important;
 }
 
 .ml-craftworks .ml-craftworks-recipe-card:has(.ml-craftworks-recipe-hidden) {
@@ -2301,10 +2196,6 @@
   .ml-craftworks .ml-craftworks-recipe-visibility-toolbar {
     align-items: stretch;
     flex-direction: column;
-  }
-
-  .ml-craftworks .ml-craftworks-recipe-visibility-toolbar .ml-craftworks-actions {
-    flex-wrap: wrap;
   }
 }
 
@@ -2382,7 +2273,7 @@
   justify-content: space-between;
   width: 100%;
   padding: 10px 12px;
-  font-size: 1rem;
+  font-size: var(--ml-font-size-body);
 }
 
 .ml-craftworks .ml-craftworks-craft-section-header > span {
@@ -2401,13 +2292,6 @@
   margin-top: 8px;
 }
 
-.ml-craftworks .ml-craftworks-craft-card {
-  padding: 14px;
-  border: 1px solid var(--color-border-light-2);
-  border-radius: 8px;
-  background: rgb(0 0 0 / 4%);
-}
-
 .ml-craftworks .ml-craftworks-craft-card-header {
   display: flex;
   align-items: flex-start;
@@ -2424,7 +2308,7 @@
 
 .ml-craftworks .ml-craftworks-craft-card-title h3 {
   margin: 0 0 4px;
-  font-size: 1.3rem;
+  font-size: var(--ml-font-size-title);
 }
 
 .ml-craftworks .ml-craftworks-craft-card-image,
@@ -2450,8 +2334,8 @@
   gap: 8px 18px;
   margin: 12px 0;
   padding: 8px 0;
-  border-top: 1px solid var(--color-border-light-2);
-  border-bottom: 1px solid var(--color-border-light-2);
+  border-top: 1px solid var(--ml-color-border);
+  border-bottom: 1px solid var(--ml-color-border);
 }
 
 .ml-craftworks .ml-craftworks-craft-card-meta span {
@@ -2499,16 +2383,16 @@
   min-width: 0;
   margin: 4px 0;
   padding: 8px;
-  border: 1px solid rgba(197, 160, 91, 0.42);
+  border: 1px solid color-mix(in srgb, var(--ml-color-accent) 42%, transparent);
   border-radius: 7px;
-  background: rgba(197, 160, 91, 0.035);
+  background: color-mix(in srgb, var(--ml-color-accent) 4%, transparent);
 }
 
 .ml-craftworks .ml-craftworks-craft-alternative-group > legend {
   padding: 0 7px;
-  color: rgba(232, 205, 151, 0.92);
-  font-size: 12px;
-  font-weight: 700;
+  color: color-mix(in srgb, var(--ml-color-accent) 92%, transparent);
+  font-size: var(--ml-font-size-xs);
+  font-weight: var(--ml-font-weight-bold);
   text-transform: uppercase;
   letter-spacing: .04em;
 }
@@ -2518,9 +2402,9 @@
   align-items: center;
   gap: 8px;
   padding: 3px 8px;
-  color: #d8a64c;
-  font-size: 10px;
-  font-weight: 800;
+  color: var(--ml-color-accent);
+  font-size: var(--ml-font-size-xs);
+  font-weight: var(--ml-font-weight-heavy);
   letter-spacing: .08em;
 }
 
@@ -2528,7 +2412,7 @@
 .ml-craftworks .ml-craftworks-craft-alternative-or::after {
   content: "";
   flex: 1 1 auto;
-  border-top: 1px solid rgba(216, 166, 76, 0.32);
+  border-top: 1px solid color-mix(in srgb, var(--ml-color-accent) 32%, transparent);
 }
 
 .ml-craftworks .ml-craftworks-craft-output {
@@ -2556,7 +2440,7 @@
   padding: 10px;
   margin-bottom: 12px;
   border-radius: 6px;
-  background: rgb(80 120 190 / 10%);
+  background: color-mix(in srgb, var(--ml-color-info) 10%, transparent);
 }
 
 .ml-craftworks .ml-craftworks-craft-progress-large > div {
@@ -2577,11 +2461,11 @@
 }
 
 .ml-craftworks .ml-craftworks-craft-ready-label {
-  font-weight: 700;
+  font-weight: var(--ml-font-weight-bold);
 }
 
 .ml-craftworks .ml-craftworks-craft-missing-label {
-  font-weight: 700;
+  font-weight: var(--ml-font-weight-bold);
 }
 
 .ml-craftworks .ml-craftworks-craft-session-log {
@@ -2595,22 +2479,11 @@
   grid-template-columns: 80px 180px minmax(0, 1fr);
   gap: 8px;
   padding: 7px 9px;
-  border-bottom: 1px solid var(--color-border-light-2);
+  border-bottom: 1px solid var(--ml-color-border);
 }
 
 .ml-craftworks .ml-craftworks-craft-log-time {
   opacity: .65;
-}
-
-.ml-craftworks .ml-craftworks-craft-completion-hero {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 14px;
-}
-
-.ml-craftworks .ml-craftworks-craft-completion-hero > i {
-  font-size: 2.4rem;
 }
 
 .ml-craftworks .ml-craftworks-craft-completion-item {
@@ -2637,7 +2510,7 @@
 
 .ml-craftworks .ml-craftworks-craft-completion-summary h3 {
   margin: 0 0 8px;
-  font-size: 1.45rem;
+  font-size: var(--ml-font-size-title);
 }
 
 .ml-craftworks .ml-craftworks-craft-completion-description {
@@ -2712,9 +2585,9 @@
   flex: 0 0 auto;
   padding: 5px 10px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.07);
-  font-size: 0.78rem;
-  font-weight: 700;
+  background: color-mix(in srgb, var(--ml-color-text) 7%, transparent);
+  font-size: var(--ml-font-size-sm);
+  font-weight: var(--ml-font-weight-bold);
 }
 
 .ml-craftworks .ml-craftworks-craft-browser-body {
@@ -2736,7 +2609,7 @@
   gap: 10px;
   margin-bottom: 16px;
   padding-bottom: 16px;
-  border-bottom: 1px solid rgba(197, 160, 91, 0.22);
+  border-bottom: 1px solid color-mix(in srgb, var(--ml-color-accent) 22%, transparent);
 }
 
 .ml-craftworks .ml-craftworks-craft-actor-controls label {
@@ -2747,29 +2620,11 @@
 .ml-craftworks .ml-craftworks-craft-actor-controls label > span,
 .ml-craftworks .ml-craftworks-craft-session-summary h3 {
   margin: 0;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: var(--ml-font-size-xs);
+  font-weight: var(--ml-font-weight-bold);
   letter-spacing: .04em;
   text-transform: uppercase;
   opacity: .8;
-}
-
-.ml-craftworks .ml-craftworks-craft-results-heading {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 14px;
-  margin-bottom: 12px;
-}
-
-.ml-craftworks .ml-craftworks-craft-results-heading h2,
-.ml-craftworks .ml-craftworks-craft-results-heading p {
-  margin: 0;
-}
-
-.ml-craftworks .ml-craftworks-craft-results-heading p {
-  margin-top: 3px;
-  opacity: .72;
 }
 
 .ml-craftworks .ml-craftworks-craft-browser-list {
@@ -2778,7 +2633,7 @@
 }
 
 .ml-craftworks .ml-craftworks-craft-list-card {
-  border-left: 3px solid rgba(180, 180, 180, .4);
+  border-left: 3px solid color-mix(in srgb, var(--ml-color-text) 40%, transparent);
 }
 
 .ml-craftworks .ml-craftworks-craft-list-card.is-ready { border-left-color: var(--ml-color-success); }
@@ -2792,9 +2647,9 @@
   flex: 0 0 auto;
   padding: 4px 8px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, .06);
-  font-size: .72rem;
-  font-weight: 700;
+  background: color-mix(in srgb, var(--ml-color-text) 6%, transparent);
+  font-size: var(--ml-font-size-xs);
+  font-weight: var(--ml-font-weight-bold);
   white-space: nowrap;
 }
 
@@ -2822,7 +2677,7 @@
 .ml-craftworks .ml-craftworks-craft-session-summary {
   margin-top: 16px;
   padding-top: 14px;
-  border-top: 1px solid rgba(197, 160, 91, 0.22);
+  border-top: 1px solid color-mix(in srgb, var(--ml-color-accent) 22%, transparent);
 }
 
 .ml-craftworks .ml-craftworks-craft-session-summary .ml-craftworks-craft-session-log {
@@ -2834,7 +2689,7 @@
   grid-template-columns: 1fr;
   gap: 2px;
   padding: 7px 0;
-  font-size: .72rem;
+  font-size: var(--ml-font-size-xs);
 }
 
 @media (max-width: 800px) {

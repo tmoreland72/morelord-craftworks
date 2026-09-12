@@ -392,7 +392,7 @@ export class HarvestService {
 
     const activePartySize = Math.max(
       1,
-      game.users.filter(user => user.active && !user.isGM).length
+      (globalThis.MorelordCore?.users?.list() ?? game.users).filter(user => user.active && !user.isGM).length
     );
 
     const selectedCandidates = Array.isArray(creature.sharedChoiceMaterialIds)

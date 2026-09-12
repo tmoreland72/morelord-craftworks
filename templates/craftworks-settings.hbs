@@ -1,19 +1,10 @@
 <section class="ml-app ml-app-shell ml-craftworks-settings ml-craftworks app-shell ml-craftworks-settings-shell">
-  <header class="ml-craftworks-header">
-    <div>
-      <h2>Morelord Craftworks Settings</h2>
-      <p>Configure content, material acquisition, recipe behavior, and crafting for this world.</p>
-    </div>
-  </header>
+  <header class="ml-hero"><i class="fa-solid fa-hammer ml-hero__icon"></i><div class="ml-hero__body"><h1>Morelord Craftworks Settings</h1><p>Configure content, material acquisition, recipe behavior, and crafting for this world.</p></div>
+  <div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header>
 
   <form class="ml-craftworks-settings-form">
-    <section class="ml-settings-section ml-craftworks-settings-section">
-      <div class="ml-settings-section__heading ml-craftworks-settings-section-heading">
-        <div>
-          <h3><i class="fa-solid fa-boxes-stacked"></i> Content Packs</h3>
-          <p>Choose which Craftworks content packs are active in this world.</p>
-        </div>
-      </div>
+    <section class="ml-surface ml-settings-section ml-stack" data-gap="3">
+      <div class="ml-section-heading"><div><h2><i class="fa-solid fa-boxes-stacked"></i> Content Packs</h2><p>Choose which Craftworks content packs are active in this world.</p></div></div>
 
       <section class="ml-access-card" data-state="{{#if core.connected}}active{{else}}locked{{/if}}">
         <div class="ml-access-card__icon">
@@ -52,7 +43,7 @@
         </div>
       </section>
 
-      <div class="ml-surface ml-craftworks-setting-card ml-craftworks-content-sync-card">
+      <div class="ml-card ml-craftworks-setting-card ml-craftworks-content-sync-card">
         <div>
           <strong>
             <i class="fa-solid fa-database"></i>
@@ -82,7 +73,7 @@
 
       <div class="ml-craftworks-content-pack-list">
         {{#each packs}}
-          <article class="ml-surface ml-craftworks-setting-card ml-craftworks-content-pack">
+          <article class="ml-card ml-craftworks-setting-card ml-craftworks-content-pack">
             <div>
               <div class="ml-craftworks-content-pack-heading">
                 <h4>{{label}}</h4>
@@ -131,13 +122,8 @@
       </div>
     </section>
 
-    <section class="ml-settings-section ml-craftworks-settings-section">
-      <div class="ml-settings-section__heading ml-craftworks-settings-section-heading">
-        <div>
-          <h3><i class="fa-solid fa-gem"></i> Materials</h3>
-          <p>Configure acquisition, recipients, Harvesting, Gathering, and Encounter Loot. Available materials and acquisition profiles come only from active Content Packs.</p>
-        </div>
-      </div>
+    <section class="ml-surface ml-settings-section ml-stack" data-gap="3">
+      <div class="ml-section-heading"><div><h2><i class="fa-solid fa-gem"></i> Materials</h2><p>Configure acquisition, recipients, Harvesting, Gathering, and Encounter Loot. Available materials and acquisition profiles come only from active Content Packs.</p></div></div>
 
       <div class="ml-craftworks-settings-subsection">
         <h4>Material Storage</h4>
@@ -264,16 +250,16 @@
       </div>
     </section>
 
-    <section class="ml-settings-section ml-craftworks-settings-section">
-      <div class="ml-settings-section__heading ml-craftworks-settings-section-heading">
+    <section class="ml-surface ml-settings-section ml-stack" data-gap="3">
+      <div class="ml-section-heading">
         <div>
-          <h3><i class="fa-solid fa-scroll"></i> Recipes</h3>
+          <h2><i class="fa-solid fa-scroll"></i> Recipes</h2>
           <p>Recipe availability is controlled by the Content Packs section above.</p>
         </div>
         <span class="ml-craftworks-settings-summary">{{recipeCount}} active recipe(s)</span>
       </div>
 
-      <div class="ml-surface ml-craftworks-setting-card">
+      <div class="ml-card ml-craftworks-setting-card">
         <label class="ml-craftworks-setting-row">
           <span>
             <strong>Reveal Recipes from Preferred Tool Proficiency</strong>
@@ -285,10 +271,10 @@
       </div>
     </section>
 
-    <section class="ml-settings-section ml-craftworks-settings-section">
-      <div class="ml-settings-section__heading ml-craftworks-settings-section-heading">
+    <section class="ml-surface ml-settings-section ml-stack" data-gap="3">
+      <div class="ml-section-heading">
         <div>
-          <h3><i class="fa-solid fa-hammer"></i> Crafting</h3>
+          <h2><i class="fa-solid fa-hammer"></i> Crafting</h2>
           <p>Crafting execution belongs to Craftworks Premium.</p>
         </div>
         {{#if premiumCraftingAvailable}}
@@ -298,15 +284,15 @@
         {{/if}}
       </div>
 
-      <div class="ml-surface ml-craftworks-setting-card">
-        <p>
-          Crafting execution settings will appear here as premium crafting workflows are implemented.
-          The current development build provides recipe reference, readiness, and processing planning only.
-        </p>
+      <p>Choose the location activity required for each artisan tool, or allow crafting anywhere. Required facilities must match or exceed the rarity of the item to be crafted.</p>
+      <div class="ml-stack" data-gap="3">
+        {{#each facilityRules}}
+          <label><span>{{tool}}</span><select name="facility:{{tool}}">{{selectOptions @root.facilityOptions selected=selected}}</select></label>
+        {{/each}}
       </div>
     </section>
 
-    <footer class="ml-craftworks-settings-footer">
+    <footer class="ml-page-footer ml-actions">
       <button type="button" data-action="save">
         <i class="fa-solid fa-floppy-disk"></i> Save Changes
       </button>

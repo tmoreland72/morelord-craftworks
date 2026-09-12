@@ -84,10 +84,13 @@ export class GatherApp extends ScrollPreservingApplicationMixin(
         ...profile,
         selected: profile.id === this.selectedTerrain
       })),
-      progress: this.session ? sessionParticipants.map(participant => {
+      progress: this.session ? sessionParticipants.filter(participant => !globalThis.MorelordCore?.users?.isIgnored(participant.userId)).map(participant => {
         const state = this.session.participants?.[participant.actorUuid];
         const actor = characters.find(entry => entry.uuid === participant.actorUuid);
         return {
+          actorUuid: participant.actorUuid,
+          userId: participant.userId,
+          gmRoll: !state?.status && (!game.users.get(participant.userId)?.active || game.users.get(participant.userId)?.isGM),
           user: actor?.name ?? game.users.get(participant.userId)?.name ?? "Unknown",
           status: state?.status ?? "waiting",
           total: state?.total ?? null,
@@ -100,6 +103,7 @@ export class GatherApp extends ScrollPreservingApplicationMixin(
   async _onRender(context, options) {
     await super._onRender(context, options);
 
+    this.element.querySelectorAll("[data-gm-gather]").forEach(button => button.addEventListener("click", () => this.craftworks.socket.emit("gather.open", { session: this.session, actorUuid: button.dataset.gmGather }, { targetUserId: game.user.id })));
     this.element.querySelector("[name='terrain']")
       ?.addEventListener("change", event => {
         this.selectedTerrain = event.currentTarget.value;
@@ -134,10 +138,9 @@ export class GatherApp extends ScrollPreservingApplicationMixin(
       const gatherActorsByUser = {};
       for (const actor of selectedCharacters) {
         const user = this.#activeUserForActor(actor);
-        if (user) (gatherActorsByUser[user.id] ??= []).push(actor.uuid);
+        (gatherActorsByUser[user?.id ?? game.user.id] ??= []).push(actor.uuid);
       }
       const players = Object.keys(gatherActorsByUser).map(id => game.users.get(id)).filter(Boolean);
-      if (!players.length) throw new Error("None of the selected player characters has a connected player.");
 
       this.session = this.craftworks.gather.start(this.selectedTerrain, { gatherActorsByUser });
       this.session.selectedCharacterUuids = selectedCharacters.map(actor => actor.uuid);
@@ -164,7 +167,7 @@ export class GatherApp extends ScrollPreservingApplicationMixin(
   async #finalize() {
     if (!this.session) return;
     const session = this.craftworks.gather.finalize(this.session.id);
-    const players = game.users.filter(user => user.active && !user.isGM);
+    const players = (globalThis.MorelordCore?.users?.list() ?? game.users).filter(user => user.active);
 
     await Promise.all(players.map(user =>
       this.craftworks.socket.emit(
@@ -182,11 +185,6 @@ export class GatherApp extends ScrollPreservingApplicationMixin(
   }
 
   #activeUserForActor(actor) {
-    if (!actor) return null;
-    return game.users.find(user =>
-      user.active
-      && !user.isGM
-      && (user.character?.uuid === actor.uuid || actor.testUserPermission(user, "OWNER"))
-    ) ?? null;
+    return globalThis.MorelordCore.users.activePlayerForActor(actor);
   }
 }

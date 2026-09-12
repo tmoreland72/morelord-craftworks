@@ -1,11 +1,5 @@
 <div class="ml-app ml-app-shell ml-craftworks-harvest-shell ml-craftworks-harvest-modern">
-  <header class="ml-craftworks-harvest-header">
-    <div class="ml-craftworks-harvest-title">
-      <div>
-        <h1><i class="fa-solid fa-scalpel"></i> Harvesting</h1>
-        <div class="ml-craftworks-harvest-scene">{{session.sceneName}}</div>
-      </div>
-    </div>
+  <header class="ml-hero"><i class="fa-solid fa-scalpel ml-hero__icon"></i><div class="ml-hero__body"><h1>Harvesting</h1><p>Resolve your harvest checks and choose components from {{session.sceneName}}.</p></div><div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header><div class="ml-stack">
 
     {{#if actor}}
       <div class="ml-craftworks-harvest-user">
@@ -82,11 +76,11 @@
         </section>
       {{/if}}
     {{/if}}
-  </header>
+  </div>
 
-  <main class="ml-craftworks-harvest-creatures">
+  <main class="ml-craftworks-harvest-creatures ml-stack" data-gap="3">
     {{#each creatures}}
-      <section class="ml-craftworks-harvest-creature {{#if isCollapsed}}ml-craftworks-harvest-creature-collapsed{{/if}}" data-creature-token="{{tokenUuid}}">
+      <section class="ml-card ml-craftworks-harvest-creature {{#if isCollapsed}}ml-craftworks-harvest-creature-collapsed{{/if}}" data-creature-token="{{tokenUuid}}">
         <header class="ml-craftworks-harvest-creature-header">
           {{#if img}}<img class="ml-craftworks-harvest-creature-image" src="{{img}}" alt="{{name}}">{{/if}}
           <div class="ml-craftworks-harvest-creature-info">
@@ -244,19 +238,13 @@
       </section>
     {{/each}}
 
-    <section class="ml-craftworks-harvest-claimed-section">
-      <div class="ml-craftworks-harvest-claimed-heading">
-        <div>
-          <i class="fa-solid fa-box-open"></i>
-          <span>Claimed Components</span>
-        </div>
-        <span class="ml-craftworks-harvest-claimed-count">{{summary.claimed}}</span>
-      </div>
+    <section class="ml-surface ml-section ml-stack" data-gap="3">
+      <div class="ml-section-heading"><div><h2>Claimed Components</h2><p>Review the {{summary.claimed}} components claimed during this harvest.</p></div></div>
 
       {{#if claimedItems.length}}
         <div class="ml-craftworks-harvest-claimed-list">
           {{#each claimedItems}}
-            <article class="ml-craftworks-harvest-claimed-item {{#if neededForCrafting}}ml-craftworks-harvest-claimed-needed{{/if}}" data-document-uuid="{{linkUuid}}">
+            <article class="ml-card ml-craftworks-harvest-claimed-item {{#if neededForCrafting}}ml-craftworks-harvest-claimed-needed{{/if}}" data-document-uuid="{{linkUuid}}">
               <button
                 type="button"
                 class="ml-craftworks-harvest-claimed-image-link"
@@ -315,9 +303,9 @@
     </section>
   </main>
 
-  <footer class="ml-craftworks-harvest-footer">
+  <footer class="ml-page-footer ml-actions">
     <div class="ml-craftworks-harvest-footer-status"><span>{{summary.completed}} of {{summary.creatures}} creature attempts resolved</span></div>
-    <div class="ml-actions ml-craftworks-actions">
+    <div class="ml-actions">
       <button type="button" data-action="cancel-claims"><i class="fa-solid fa-ban"></i> Cancel</button>
       <button type="button" data-action="reset-claims"><i class="fa-solid fa-rotate-left"></i> Reset</button>
       <button type="button" data-action="done-claims"><i class="fa-solid fa-check"></i> Done</button>

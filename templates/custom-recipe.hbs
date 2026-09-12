@@ -1,12 +1,13 @@
 <section class="ml-app ml-app-shell ml-craftworks ml-recipe-manager">
-  <header class="ml-hero"><div class="ml-hero__body"><h2>Recipe Manager</h2><p>Create and manage recipes unique to this world.</p></div></header>
-  <div class="ml-toolbar ml-craftworks-actions">
+  <header class="ml-hero"><i class="fa-solid fa-hammer ml-hero__icon"></i><div class="ml-hero__body"><h1>Recipe Manager</h1><p>Create and manage recipes unique to this world.</p></div><div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header>
+  <div class="ml-actions ml-toolbar">
     <button type="button" class="ml-button" data-tone="accent" data-action="new"><i class="fa-solid fa-plus"></i> New Recipe</button>
     {{#if drakkenheimAvailable}}<button type="button" class="ml-button" data-action="new-drakkenheim"><i class="fa-solid fa-skull"></i> New Drakkenheim Recipe</button>{{/if}}
     <button type="button" class="ml-button" data-action="export-all"><i class="fa-solid fa-file-export"></i> Export All</button>
     <button type="button" class="ml-button" data-action="import"><i class="fa-solid fa-file-import"></i> Import</button><input type="file" accept="application/json,.json" data-import-file hidden>
   </div>
-  <section class="ml-craftworks-panel ml-recipe-manager-list">
+  <section class="ml-surface ml-section ml-craftworks-panel ml-recipe-manager-list ml-stack" data-gap="3">
+    <div class="ml-section-heading"><div><h2>Custom Recipes</h2><p>Manage recipes created or imported for this world.</p></div></div>
     {{#if hasRecipes}}<div class="ml-resource-list">{{#each recipes}}<article class="ml-resource-item ml-custom-recipe-row">
       <img src="{{output.img}}" alt=""><span><strong>{{name}}</strong><small>{{outputLabel}}{{#if drakkenheim}} · Drakkenheim{{/if}}</small>{{#unless outputResolved}}<small class="ml-text" data-tone="warning">Output Item unresolved</small>{{/unless}}{{#if missingMaterials}}<small class="ml-text" data-tone="warning">{{missingMaterials}} material(s) unresolved</small>{{/if}}</span>
       <span class="ml-resource-actions"><button type="button" class="ml-icon-button" data-edit-recipe="{{id}}" title="Edit" aria-label="Edit {{name}}"><i class="fa-solid fa-pen"></i></button><button type="button" class="ml-icon-button" data-export-recipe="{{id}}" title="Export" aria-label="Export {{name}}"><i class="fa-solid fa-file-export"></i></button><button type="button" class="ml-icon-button ml-button" data-tone="danger" data-delete-recipe="{{id}}" title="Delete" aria-label="Delete {{name}}"><i class="fa-solid fa-trash"></i></button></span>

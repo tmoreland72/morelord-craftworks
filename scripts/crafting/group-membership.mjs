@@ -15,3 +15,11 @@ export function isCharacterMemberOfGroup(character, group) {
     return values.some(value => identifiers.has(value));
   });
 }
+
+/** Inventory view only: original Item documents retain their owning Actor. */
+export function combinedCraftingInventory(character) {
+  if (!character) return null;
+  const actors = [character, ...Array.from(game.actors ?? []).filter(actor => isCharacterMemberOfGroup(character, actor))];
+  return { uuid: character.uuid, type: "combined", name: actors.map(actor => actor.name).join(" + "),
+    combinedActors: actors, items: actors.flatMap(actor => Array.from(actor.items ?? [])) };
+}

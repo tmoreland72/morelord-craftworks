@@ -1,3 +1,5 @@
+import { generatorQuantity } from "../core/generator-quantity.mjs";
+import { RecipePickerApp } from "./recipe-picker-app.mjs";
 import { MODULE_TITLE } from "../constants.mjs";
 import { POTION_CATEGORIES, POTION_RARITIES } from "../potions/potion-generator-service.mjs";
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
@@ -14,6 +16,8 @@ export class PotionGeneratorApp extends ScrollPreservingApplicationMixin(
     this.craftworks = craftworks;
     this.counts = Object.fromEntries(POTION_RARITIES.map(rarity => [rarity.id, 0]));
     this.result = [];
+    this.hasDraft = false;
+    this.selectedRecipientUuid = null;
     this.selectedCategories = new Set(POTION_CATEGORIES.map(category => category.id));
   }
 
@@ -40,7 +44,7 @@ export class PotionGeneratorApp extends ScrollPreservingApplicationMixin(
       .map(actor => ({
         uuid: actor.uuid,
         name: actor.name,
-        selected: actor.uuid === partyInfo.actorUuid
+        selected: actor.uuid === (this.selectedRecipientUuid ?? partyInfo.actorUuid)
       }))
       .sort((a, b) => a.name.localeCompare(b.name));
 
@@ -52,7 +56,7 @@ export class PotionGeneratorApp extends ScrollPreservingApplicationMixin(
 
     const resultGroups = POTION_RARITIES.map(rarity => ({
       ...rarity,
-      potions: this.result.filter(potion => potion.rarity === rarity.id)
+      potions: this.result.map((item, resultIndex) => ({ ...item, quantity: item.quantity ?? 1, resultIndex })).filter(potion => potion.rarity === rarity.id)
     })).filter(group => group.potions.length);
 
     return foundry.utils.mergeObject(context, {
@@ -63,7 +67,7 @@ export class PotionGeneratorApp extends ScrollPreservingApplicationMixin(
         selected: this.selectedCategories.has(category.id)
       })),
       resultGroups,
-      hasResult: this.result.length > 0,
+      hasResult: this.hasDraft,
       resultCount: this.result.length,
       partyInfo,
       actors
@@ -72,6 +76,15 @@ export class PotionGeneratorApp extends ScrollPreservingApplicationMixin(
 
   async _onRender(context, options) {
     await super._onRender(context, options);
+    this.element.querySelectorAll("[data-result-quantity]").forEach(input => input.addEventListener("input", () => {
+      this.result[Number(input.dataset.resultQuantity)].quantity = input.value;
+    }));
+    this.element.querySelector("[name='recipient']")?.addEventListener("change", event => { this.selectedRecipientUuid = event.currentTarget.value; });
+    this.element.querySelectorAll("[data-remove-result]").forEach(button => button.addEventListener("click", async () => {
+      this.result.splice(Number(button.dataset.removeResult), 1);
+      await this.render({ force: true });
+    }));
+    this.element.querySelector("[data-action='add-result']")?.addEventListener("click", () => this.#addResult());
 
     this.element.querySelectorAll("[data-potion-rarity]").forEach(input =>
       input.addEventListener("change", event => {
@@ -110,6 +123,22 @@ export class PotionGeneratorApp extends ScrollPreservingApplicationMixin(
     );
   }
 
+  async #addResult() {
+    try {
+      const items = await this.craftworks.potionGenerator.availablePotions();
+      const catalog = items.map(item => ({ ...item, id: item.uuid, type: "potion", category: POTION_CATEGORIES.find(category => category.id === item.category)?.label ?? item.category }));
+      await new RecipePickerApp(this.craftworks, {
+        kind: "item", title: "Add Potion", catalog,
+        filterLabels: { category: "Potion Category" },
+        onSelect: async row => {
+          this.result.push({ ...items.find(item => item.uuid === row.uuid) });
+          this.hasDraft = true;
+          await this.render({ force: true });
+        }
+      }).render({ force: true });
+    } catch (error) { ui.notifications.error(error.message); }
+  }
+
   #readCounts() {
     this.element.querySelectorAll("[data-potion-rarity]").forEach(input => {
       this.counts[input.dataset.potionRarity] = Math.max(0, Math.floor(Number(input.value ?? 0)));
@@ -146,6 +175,7 @@ export class PotionGeneratorApp extends ScrollPreservingApplicationMixin(
       this.result = await this.craftworks.potionGenerator.generate(this.counts, {
         categories: [...this.selectedCategories]
       });
+      this.hasDraft = true;
       await this.render({ force: true });
     } catch (error) {
       ui.notifications.error(error.message);
@@ -170,7 +200,7 @@ export class PotionGeneratorApp extends ScrollPreservingApplicationMixin(
         potions: this.result,
         fallbackActorUuid
       });
-      ui.notifications.info(`${this.result.length} potion(s) added to ${result.recipient.name}.`);
+      ui.notifications.info(`${this.result.reduce((sum, row) => sum + generatorQuantity(row.quantity ?? 1), 0)} potion(s) added to ${result.recipient.name}.`);
       await this.close();
     } catch (error) {
       ui.notifications.error(error.message);
@@ -182,7 +212,7 @@ export class PotionGeneratorApp extends ScrollPreservingApplicationMixin(
     if (!this.result.length) return ui.notifications.warn("Generate potions before sharing them.");
     try {
       await AwardChatCardService.post({
-        items: this.result.map(potion => ({ ...potion, linkUuid: potion.uuid, quantity: 1 })),
+        items: this.result.map(potion => ({ ...potion, linkUuid: potion.uuid, quantity: generatorQuantity(potion.quantity ?? 1) })),
         title: "Available Potions",
         subtitle: `${this.result.length} randomly generated potion${this.result.length === 1 ? "" : "s"}`,
         icon: "fa-solid fa-flask"

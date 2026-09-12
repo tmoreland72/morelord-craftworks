@@ -1,3 +1,4 @@
+import { combinedCraftingInventory } from "../crafting/group-membership.mjs";
 import { MODULE_TITLE } from "../constants.mjs";
 import { CraftCompletionApp } from "./craft-completion-app.mjs";
 import {
@@ -170,7 +171,7 @@ export class CraftApp
       this.inventoryActorUuid = crafter.uuid;
     }
 
-    const inventoryActor =
+    const inventoryActor = !game.user.isGM ? combinedCraftingInventory(crafter) :
       this.inventoryActorUuid
         ? await fromUuid(this.inventoryActorUuid)
         : null;
@@ -287,6 +288,8 @@ export class CraftApp
         canChooseCrafter:
           game.user.isGM
           || crafterActors.length > 1,
+        combinedInventoryName: !game.user.isGM ? inventoryActor?.name : null,
+        canChooseInventory: game.user.isGM,
         inventoryActorUuid:
           this.inventoryActorUuid,
         inventoryActors:
@@ -403,9 +406,18 @@ export class CraftApp
       .forEach(element => {
         element.addEventListener(
           "click",
-          () => this.#craft(
-            element.dataset.recipeId
-          )
+          async () => {
+            if (element.disabled) return;
+            element.disabled = true;
+            try {
+              await this.#craft(element.dataset.recipeId);
+            } catch (error) {
+              console.error("Morelord Craftworks | Crafting failed", error);
+              ui.notifications.error(`Crafting failed: ${error.message ?? error}`);
+            } finally {
+              element.disabled = false;
+            }
+          }
         );
       });
 
@@ -789,6 +801,8 @@ export class CraftApp
         ?? inventoryActor;
     }
 
+    if (!game.user.isGM && !job) effectiveInventory = combinedCraftingInventory(crafter);
+
     const recipeUnknown =
       isRecipeHidden(recipe.id);
 
@@ -842,10 +856,7 @@ export class CraftApp
         qualifiesForNormalDc: false
       };
 
-    const activeDc =
-      toolStatus.qualifiesForNormalDc
-        ? craft.dc
-        : craft.noToolDc;
+    const activeDc = craft.dc;
 
     let output = {
       ...recipe.output
@@ -998,12 +1009,8 @@ export class CraftApp
         checkRequired: craft.checkRequired !== false,
         check: craft.checkRequired === false
           ? "No check"
-          : [
-          craft.ability,
-          craft.skill
-            ? `(${craft.skill})`
-            : null
-        ].filter(Boolean).join(" "),
+          : (craft.tool || craft.skill || craft.ability),
+        disadvantage: Boolean(craft.checkRequired !== false && craft.tool && (!toolStatus.hasTool || !toolStatus.proficient)),
         activeDc: craft.checkRequired === false ? null : activeDc,
         hoursRequired:
           craft.hoursRequired,
@@ -1051,7 +1058,7 @@ export class CraftApp
         { includeDisabled: true }
       );
 
-    let inventoryActor =
+    let inventoryActor = !game.user.isGM ? combinedCraftingInventory(crafter) :
       this.inventoryActorUuid
         ? await fromUuid(this.inventoryActorUuid)
         : crafter;
@@ -1139,7 +1146,7 @@ export class CraftApp
           .consume(
             inventoryActor,
             plan,
-            { crafter }
+            { crafter, recipe }
           );
 
       job =
@@ -1166,14 +1173,14 @@ export class CraftApp
           .completeWithoutCheck(
             recipe.id,
             crafter,
-            inventoryActor.uuid
+            inventoryActor.uuid,
+            recipe.craft.hoursRequired
           );
 
       this.#log({
         recipe,
         text:
-          `Crafting completed after ${recipe.craft?.hoursRequired ?? 8} hours `
-          + `at the required workshop; no crafting check was required.`,
+          `Crafting completed at the required workshop; no crafting check was required.`,
         kind: "success"
       });
 
@@ -1199,10 +1206,7 @@ export class CraftApp
         qualifiesForNormalDc: false
       };
 
-    const dc =
-      toolStatus.qualifiesForNormalDc
-        ? recipe.craft?.dc
-        : recipe.craft?.noToolDc;
+    const dc = recipe.craft?.dc;
 
     const result =
       await this.craftworks.craftingRolls.roll({
@@ -1344,7 +1348,8 @@ export class CraftApp
       await this.craftworks.craftingMaterials
         .refund(
           inventoryActor,
-          job.consumedMaterials
+          job.consumedMaterials,
+          { crafter, recipeId }
         );
     }
 
@@ -1424,16 +1429,16 @@ export class CraftApp
 
     const formData =
       await foundry.applications.api
-        .DialogV2.input({
+        .DialogV2.input({ classes: ["ml-window", "ml-craftworks-module"],
           window: {
             title:
               `Choose Materials — ${recipe.name}`
           },
-          content: `
+          content: `<div><div class="ml-app ml-app-shell ml-dialog-shell">
             <p>More than one valid material path is available. Choose which materials to consume.</p>
             <div class="ml-craftworks-crafting-plan-options">
               ${options}
-            </div>
+            </div></div></div>
           `,
           ok: {
             label: "Use Materials"

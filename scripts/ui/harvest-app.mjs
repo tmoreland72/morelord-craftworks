@@ -56,8 +56,9 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
     );
 
     const progress = this.session
-      ? sessionParticipants.map(participant => ({
+      ? sessionParticipants.filter(participant => !globalThis.MorelordCore?.users?.isIgnored(participant.userId)).map(participant => ({
           userId: participant.userId,
+          gmRoll: !game.users.get(participant.userId)?.active || game.users.get(participant.userId)?.isGM,
           actorUuid: participant.actorUuid,
           user: game.actors.find(actor => actor.uuid === participant.actorUuid)?.name
             ?? game.users.get(participant.userId)?.name ?? "Unknown",
@@ -413,10 +414,9 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
       const harvestActorsByUser = {};
       for (const actor of selectedCharacters) {
         const user = this.#activeUserForActor(actor);
-        if (user) (harvestActorsByUser[user.id] ??= []).push(actor.uuid);
+        (harvestActorsByUser[user?.id ?? game.user.id] ??= []).push(actor.uuid);
       }
       const players = Object.keys(harvestActorsByUser).map(id => game.users.get(id)).filter(Boolean);
-      if (!players.length) throw new Error("None of the selected player characters has a connected player.");
       const skipSkillChecks = Object.entries(harvestActorsByUser)
         .flatMap(([userId, actorUuids]) => actorUuids
           .filter(() => this.skipSkillChecks)
@@ -488,7 +488,7 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
       // If a Harvest session is currently open, replace it with a fresh session
       // so both GM progress and all player windows return to an unattempted state.
       if (this.session?.status === "open") {
-        const players = game.users.filter(user => user.active && !user.isGM);
+        const players = (globalThis.MorelordCore?.users?.list() ?? game.users).filter(user => user.active);
 
         this.session = await this.craftworks.harvest.start();
 
@@ -520,7 +520,7 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
     const actorUuid = event.currentTarget.dataset.actorUuid;
     const user = userId ? game.users.get(userId) : null;
 
-    if (!this.session?.id || !actorUuid || !user?.active) {
+    if (!this.session?.id || !actorUuid) {
       ui.notifications.warn(
         "That player is no longer connected to this Harvest session."
       );
@@ -530,11 +530,11 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
     await this.craftworks.socket.emit(
       "harvest.open",
       { session: this.session, actorUuid },
-      { targetUserId: user.id }
+      { targetUserId: user?.active && !user.isGM ? user.id : game.user.id }
     );
 
     ui.notifications.info(
-      `Reopened the active Harvest window for ${user.name}.`
+      `Reopened the active Harvest window for ${user?.name ?? "GM"}.`
     );
   }
 
@@ -549,8 +549,8 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
       this.session = null;
 
       const players =
-        game.users.filter(
-          user => user.active && !user.isGM
+        (globalThis.MorelordCore?.users?.list() ?? game.users).filter(
+          user => user.active
         );
 
       await Promise.all(
@@ -580,7 +580,7 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
       await this.craftworks.harvest.finalize(
         this.session.id
       );
-    const players = game.users.filter(user => user.active && !user.isGM);
+    const players = (globalThis.MorelordCore?.users?.list() ?? game.users).filter(user => user.active);
 
     await Promise.all(players.map(user =>
       this.craftworks.socket.emit(
@@ -604,12 +604,6 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
   }
 
   #activeUserForActor(actor) {
-    if (!actor) return null;
-    return game.users.find(user =>
-      user.active && !user.isGM && (
-        user.character?.uuid === actor.uuid
-        || actor.testUserPermission(user, "OWNER")
-      )
-    ) ?? null;
+    return globalThis.MorelordCore.users.activePlayerForActor(actor);
   }
 }

@@ -4,7 +4,7 @@ description: Install, configure, and operate Morelord Craftworks acquisition, cr
 slug: morelord-craftworks/gm
 product: morelord-craftworks
 audience: game-master
-version: 0.4.4
+version: 0.4.6
 foundry: 14
 ---
 
@@ -12,7 +12,7 @@ foundry: 14
 
 Morelord Craftworks gives a dnd5e world a connected system for harvesting creatures, gathering by terrain, generating encounter loot and hoards, managing materials and recipes, and running long-term crafting projects.
 
-This manual applies to Morelord Craftworks 0.4.4, Foundry VTT v14, and dnd5e 5.3 or later.
+This manual applies to Morelord Craftworks 0.4.6, Foundry VTT v14, and dnd5e 5.3 or later.
 
 ## Contents
 
@@ -52,7 +52,7 @@ Premium access is managed by Morelord Core. A content pack may also depend on of
 - dnd5e 5.3 or later
 - Morelord Core 0.1.0 or later
 - SocketLib 1.1.3 or later
-- Morelord Craftworks 0.4.4 or later
+- Morelord Craftworks 0.4.6 or later
 
 ### Install with the manifest
 
@@ -78,6 +78,8 @@ Open **Token Controls** on the left side of a scene and select the **Morelord Cr
 | **Tools** | Potion Generator, Spell Scroll Generator, Spellbook Generator |
 
 Acquisition and generator tools are GM-operated. Players can use the reference and crafting tools available to them and receive interactive Harvest or Gather windows when the GM starts a session.
+
+Every Craftworks page has a **Documentation** button. Sections use the shared title and description layout; the page scrolls as a whole, with bottom actions in a separate footer. Recipe dialogs and catalog pickers use the same Core styling.
 
 ![The Morelord Craftworks dashboard groups acquisition, crafting, and generator tools.](assets/craftworks-dashboard.png)
 
@@ -176,6 +178,10 @@ Materials can be filtered by source pack, rarity, category, processing stage, an
 
 ![Drakkenheim materials are organized into concise setting-specific families.](assets/materials-drakkenheim-families.png)
 
+Every recipe filter displays its catalog count, including Knowledge, Content Pack, Category, Preferred Artisan Tool, Rarity, and ingredient tags. Counts describe the visible enabled catalog.
+
+Craftworks crafting checks use the listed artisan tool at the recipe’s DC. Missing either the tool in the crafter’s inventory or its proficiency imposes disadvantage; it never increases the DC. The underlying ability still supplies the tool roll modifier and can be chosen in the native roll dialog. Recipes with an explicit skill and no tool retain that skill. Monsters of Drakkenheim recipes, including custom Drakkenheim recipes, require no crafting roll: supply the materials and use a Workshop of the item’s rarity or higher, then choose Craft Item. This Workshop requirement is independent of artisan-tool settings. Craftworks does not track a fixed duration for Drakkenheim crafting; the book describes a short narrative period that the GM can narrate as appropriate.
+
 ### Control recipe knowledge
 
 Recipes are either **Known** or **Unknown**. An Unknown recipe remains discoverable and can be marked as a crafting goal, but its ingredient requirements are concealed from players and a player cannot begin a new job from it.
@@ -186,17 +192,23 @@ Use **Mark Context Known** or **Mark Context Unknown** to update only the recipe
 
 ![Drakkenheim recipes remain visibly attributed while using the normal Craftworks recipe workflow.](assets/recipes-drakkenheim.png)
 
+### Create and manage custom recipes
+
+Open **Recipe Manager** from the dashboard. Choose **New Recipe**, or **New Drakkenheim Recipe** when that content is available. The first section, **Item to Be Crafted**, selects the item with the full filtered catalog picker. Then set its quantity, artisan tool, crafting hours, tool ability, and DC. **Add Required Group (AND)** adds another mandatory requirement. **Add Material Choice (OR)** offers another material within that group. For example: Animus AND (Spine OR Ribs) AND Dust. Existing alternative complete recipes retain their original logic when edited. Save the recipe to make it available in the catalog.
+
+The manager supports editing, deleting, exporting individual recipes or all recipes, and importing JSON. Import conflicts can be skipped or replaced. Standard and Drakkenheim recipes keep their material catalogs separate.
+
 ### Understand crafting context
 
-The **Using Crafter Actor** performs checks and supplies tool possession and proficiency. The **Using Actor Inventory** supplies ingredients and receives the output. These can be different actors, so a character can craft from a shared Group inventory.
+The **Crafter** performs checks and supplies tool possession and proficiency. The **Ingredient Inventory** supplies ingredients and receives the output. GMs retain the inventory selector. For players, Craft automatically combines the selected character’s inventory with all Groups that character belongs to; ingredients may be split between those inventories. Other characters’ inventories are excluded. Cancellation returns ingredients to their original inventories.
 
 Crafting progress belongs to the crafter-and-recipe combination and does not split when the inventory source changes. Each attempt represents two hours. Failed checks consume time but not recipe materials. Recipe durations must be positive multiples of two hours.
 
-Recipes may require a facility tier supplied by the current Morelord Core Location, such as a forge. An active **On the Road** Downtime context overrides the scene location. A job pauses while its facility is unavailable and resumes when the requirement is met. **Manage Locations** is available with the other GM tools on the Craftworks dashboard.
+In **Settings → Crafting**, choose the Core location activity required for each artisan tool, or **No facility required**. For example, Smith’s Tools can require a Forge while Alchemist’s Supplies can work anywhere. Recipes display this requirement instead of individual facility selectors. The minimum tier comes from the crafted item’s rarity; an Uncommon item can use an Uncommon, Rare, Very Rare, or Legendary facility. An active **On the Road** Downtime context overrides the scene location. A job pauses while its facility is unavailable and resumes when the requirement is met. **Manage Locations** is available with the other GM tools on the Craftworks dashboard.
 
 Craftworks exposes marked and active crafting projects to Morelord Downtime. Opening one from Downtime launches a focused Craft window for that crafter and recipe while Craftworks remains authoritative for ingredients, checks, progress, and output.
 
-Craftworks automatically chooses the normal or no-tool DC from confirmed tool possession and proficiency. Some recipes require no check and advance through their defined workflow without inventing one.
+Standard Craftworks recipes advance through two-hour crafting attempts. Successful checks advance progress; failed checks spend time without advancing progress or consuming additional materials. Recipe cards show the artisan tool and recipe DC. Missing tool possession or proficiency imposes disadvantage at that same DC. Drakkenheim recipes complete without a roll once their requirements are met.
 
 ![The Craft workspace separates filtering, crafter and inventory context, requirements, and project progress.](assets/craft-workspace.png)
 
@@ -218,7 +230,7 @@ Harvest is a synchronized session in which players test their characters against
 
 ![The GM Harvest preflight identifies defeated creatures and lets the GM include participants and bypass checks selectively.](assets/harvest-gm-preflight.png)
 
-At least one defeated NPC and one player character must be selected. Each selected character controlled by a connected player receives an independent Harvest window. One user controlling two selected characters receives two character-titled windows with separate checks and claims. An included offline character receives no window during that session.
+At least one defeated NPC and one player character must be selected. Each selected character controlled by a connected player receives an independent Harvest window. One user controlling two selected characters receives two character-titled windows with separate checks and claims. Offline characters receive a character-specific window on the GM’s client. Use **Roll as GM** to open it again and make checks or choose components on their behalf.
 
 ### Monitor checks and claims
 
@@ -248,7 +260,7 @@ Gather is a GM-started, scene-based opportunity for individual characters.
 2. Select the terrain profile.
 3. Review the displayed DC and active participants.
 4. Select participants using the same party-priority character picker as Harvest. The previous successful selection is remembered.
-5. Start the session. Every included character owned by a connected user receives an independent window, including multiple characters owned by one user.
+5. Start the session. Connected players receive independent character windows. Offline characters open on the GM’s client; **Roll as GM** reopens their Gathering window. The character’s skills and inventory recipient are used in either case.
 6. Players choose an allowed skill and make the configured dnd5e roll, or decline.
 7. Successful results award a material appropriate to the terrain.
 
@@ -299,9 +311,23 @@ Every generated hoard includes potion and spell-scroll rewards in addition to it
 
 ![The final hoard card records what the chosen recipient received.](assets/hoard-award-chat-card.png)
 
+## Delerium Search
+
+Enable the Monsters of Drakkenheim Content Pack and its installed source module, then open **Delerium Search** under **Acquire**. Choose an area and participating characters. Connected players roll Arcana, Investigation, or Survival; the GM can roll for offline characters. The search takes one hour per quarter-mile hex. Outer City checks are DC 15; Inner City checks are DC 20. A success earns one success, or two when beating the DC by 5 or rolling a natural 20. Two failed character checks trigger a random encounter.
+
+Use **Save as Default** to remember the search area and selected characters for future searches.
+
+**What the Party Finds** lists cumulative rewards: 0–2 successes find nothing; 3 successes find 3d6 chips; 4 successes find 3d6 chips **and** 1d6 fragments; 5 or more find both of those rewards **and** one shard. Click the dice buttons for reference rolls in chat. These reference rolls do not award items or set the final quantity.
+
+Select **Finalize Search**, choose a character or party Group under **Recipient**, and use **Roll & Award All Delerium**. This rolls each quantity and awards all earned original Delerium Chip, Fragment, and Shard items from the **Monsters of Drakkenheim** Item compendium. Open a reward to inspect its source document. A result can only be awarded once; if a delivery fails partway through, retry with the same recipient to finish the remaining rewards. When an encounter is required, the results window can open Morelord Encounters if it is active.
+
 ## Use the item generators
 
+Each potion or scroll result defaults to **Quantity 1**. Change the result’s Quantity to award multiple copies of that item, such as three Potions of Healing. Sharing in chat and awarding both use the edited quantities. Quantities must be positive whole numbers; rerolling replaces the draft.
+
 ### Potion Generator
+
+Category changes immediately update the available counts for every rarity, including zero when all categories are disabled.
 
 Open **Potion Generator**, choose quantities with the numeric fields or visible up/down controls, and generate a result from enabled dnd5e sources. Use **Display Results in Chat** to share a draft—such as a shop's current stock—without creating or awarding Items. To award it, choose a recipient and create the award. The source is validated again before delivery.
 
@@ -312,6 +338,8 @@ Open **Potion Generator**, choose quantities with the numeric fields or visible 
 ![The potion award card records quantities, rarities, and recipient.](assets/potion-award-chat-card.png)
 
 ### Spell Scroll Generator
+
+School selections immediately update the available counts at every level. No schools selected means zero available spells.
 
 1. Open **Spell Scroll Generator**.
 2. Enter the number of scrolls to generate at each level, from cantrip through level 9, using the numeric fields or up/down controls.
@@ -328,6 +356,12 @@ Generated scrolls use dnd5e's native scroll conversion, preserve the selected sp
 ![Generated scrolls are grouped by level and retain visible source attribution.](assets/spell-scroll-generator-results.png)
 
 ![The spell-scroll award card shows the created Items, rarities, quantities, and recipient.](assets/spell-scroll-award-chat-card.png)
+
+### Customize potion and scroll results
+
+Use **Add Potion** or **Add Spell Scroll** in the results section to open the same full catalog picker used by custom recipes. Search by name and use the include/exclude filters for source, type, rarity or spell level, and potion category or school. All matching entries remain accessible through pagination. Source filters use Morelord Core book names, consolidating page references and generic pack labels while keeping editions distinct. The picker uses enabled sources and lets you choose entries outside the random-generation filters.
+
+Use an item's trash button to remove that individual entry; duplicates are separate entries. An empty draft remains open so you can add replacements. Your Recipient selection stays selected while editing. Sharing and awarding use the edited draft; **Reroll** replaces it using the original generation settings.
 
 ### Spellbook Generator
 
@@ -410,7 +444,7 @@ If the official Drakkenheim creature or harvesting data cannot be resolved, Craf
 
 ### A player does not receive Harvest or Gather
 
-- Confirm the player is connected.
+- For an offline character, use **Roll as GM** in the session progress list. For delivery to a player client, confirm the player is connected.
 - Confirm the player has an assigned or owned character.
 - Confirm SocketLib is active for the world.
 - Confirm Craftworks is enabled and loaded for both clients.
@@ -433,7 +467,7 @@ Confirm its compendium remains enabled in dnd5e **Configure Sources**. Craftwork
 
 ### A recipe reports missing materials
 
-Check the selected **Using Actor Inventory**. A requirement can depend on canonical material identity, quantity, rarity, category, stage, tags, alternatives, or several units of the same material—not only the displayed item name.
+Check the selected **Ingredient Inventory**. A requirement can depend on canonical material identity, quantity, rarity, category, stage, tags, alternatives, or several units of the same material—not only the displayed item name.
 
 ## Support
 

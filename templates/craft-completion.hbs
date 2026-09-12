@@ -1,11 +1,10 @@
 <section class="ml-app ml-app-shell ml-craftworks app-shell ml-craftworks-craft-completion">
-  <header class="ml-craftworks-craft-completion-hero">
-    <i class="fa-solid fa-trophy"></i>
-    <div>
-      <h2>Crafting Success!</h2>
+  <header class="ml-hero">
+    <i class="fa-solid fa-trophy ml-hero__icon"></i>
+    <div class="ml-hero__body"><h1>Crafting Success!</h1>
       <p>{{crafterName}} successfully completed {{recipeName}}.</p>
     </div>
-  </header>
+  <div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header>
 
   <div class="ml-craftworks-craft-completion-item" data-document-uuid="{{itemUuid}}">
     <button type="button"
@@ -27,12 +26,12 @@
   </div>
 
   {{#if description}}
-    <div class="ml-craftworks-panel ml-craftworks-craft-completion-description">
+    <div class="ml-surface ml-section ml-craftworks-panel ml-craftworks-craft-completion-description ml-stack" data-gap="3">
       {{{description}}}
     </div>
   {{/if}}
 
-  <div class="ml-craftworks-craft-completion-actions">
+  <footer class="ml-page-footer ml-actions">
     <button type="button"
             class="ml-craftworks-primary-action"
             data-action="place-self">
@@ -47,7 +46,7 @@
         Place in {{partyActor.name}} Inventory
       </button>
     {{/if}}
-  </div>
+  </footer>
 
   <p class="ml-craftworks-muted">
     The crafted Item is not placed anywhere until you choose a destination.

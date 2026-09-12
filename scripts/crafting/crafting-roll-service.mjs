@@ -1,3 +1,4 @@
+import { resolveArtisanToolId } from "../recipes/artisan-tools.mjs";
 export class CraftingRollService {
   async roll({
     recipe,
@@ -18,15 +19,20 @@ export class CraftingRollService {
     }
 
     const craft = recipe.craft ?? {};
+    if (craft.checkRequired === false || recipe.packId === "monsters-of-drakkenheim" || recipe.source?.contentPackId === "monsters-of-drakkenheim") {
+      return { cancelled: false, success: true, roll: null, rollType: "none", dc: null };
+    }
+    const disadvantage = Boolean(craft.tool && (!toolStatus?.hasTool || !toolStatus?.proficient));
     const abilityId =
       this.#abilityId(craft.ability);
     const skillId =
-      this.#skillId(craft.skill);
+      craft.tool ? null : this.#skillId(craft.skill);
     const toolId =
-      this.#toolId(
-        craft.tool,
-        toolStatus
-      );
+      resolveArtisanToolId(craft.tool, toolStatus);
+
+    if (craft.tool && !toolId && game.system.id === "dnd5e") {
+      throw new Error(`Unable to resolve artisan tool: ${craft.tool}`);
+    }
 
     if (!abilityId) {
       throw new Error(
@@ -36,7 +42,7 @@ export class CraftingRollService {
       );
     }
 
-    const target = Number(dc);
+    const target = Number(craft.dc ?? dc);
     const title = this.#title({
       recipe,
       craft,
@@ -72,16 +78,11 @@ export class CraftingRollService {
       nativeResult = await crafter.rollToolCheck({
         tool: toolId,
         ability: abilityId,
-        dialog: {
-          configure: true,
-          title
-        },
-        message: {
-          create: true
-        }
-      });
+        ...(disadvantage ? { disadvantage: true } : {})
+      }, { configure: true, options: { window: { title } } }, { create: true });
     } else if (
       game.system.id === "dnd5e"
+      && !craft.tool
       && typeof crafter.rollAbilityCheck === "function"
     ) {
       rollType = "ability";
@@ -223,7 +224,7 @@ export class CraftingRollService {
     });
 
     const roll = await new Roll(
-      `1d20 + ${modifier}`
+      `${recipe.craft?.tool && (!toolStatus?.hasTool || !toolStatus?.proficient) ? "2d20kl" : "1d20"} + ${modifier}`
     ).evaluate();
 
     const success = Number.isFinite(dc)
@@ -358,101 +359,6 @@ export class CraftingRollService {
     };
 
     return legacy[needle] ?? null;
-  }
-
-  #toolId(name, toolStatus) {
-    if (!name) return null;
-
-    const needle = this.#normalizeTool(name);
-
-    const candidateIds = [
-      toolStatus?.toolId,
-      toolStatus?.matchedToolId
-    ]
-      .filter(Boolean);
-
-    if (candidateIds.length) {
-      return String(candidateIds[0]);
-    }
-
-    const configSources = [
-      CONFIG.DND5E?.tools,
-      CONFIG.DND5E?.toolIds
-    ].filter(Boolean);
-
-    for (const source of configSources) {
-      for (
-        const [id, config]
-        of Object.entries(source)
-      ) {
-        const values = [
-          id,
-          config?.label,
-          config?.name,
-          config
-        ]
-          .filter(value =>
-            typeof value === "string"
-          )
-          .map(value =>
-            this.#normalizeTool(
-              game.i18n.localize(value)
-            )
-          );
-
-        if (
-          values.some(value =>
-            value === needle
-          )
-        ) {
-          return id;
-        }
-      }
-    }
-
-    // Some D&D5e tool Items expose the system tool key/type directly.
-    const matchedItemUuid =
-      toolStatus?.matchedItemUuid;
-
-    if (matchedItemUuid) {
-      const matchedItem =
-        globalThis.fromUuidSync?.(matchedItemUuid);
-
-      const embeddedCandidates = [
-        matchedItem?.system?.tool,
-        matchedItem?.system?.type?.value,
-        matchedItem?.system?.identifier,
-        matchedItem?.system?.source?.identifier
-      ]
-        .filter(Boolean)
-        .map(String);
-
-      const configuredKeys = new Set(
-        configSources.flatMap(source =>
-          Object.keys(source)
-        )
-      );
-
-      const configured = embeddedCandidates.find(
-        candidate =>
-          configuredKeys.has(candidate)
-      );
-
-      if (configured) return configured;
-    }
-
-    return null;
-  }
-
-  #normalizeTool(value) {
-    return String(value ?? "")
-      .toLowerCase()
-      .replace(/[’']/g, "")
-      .replace(/\btools?\b/g, "")
-      .replace(/\bsupplies\b/g, "")
-      .replace(/[^a-z0-9]+/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
   }
 
   #legacyModifier({

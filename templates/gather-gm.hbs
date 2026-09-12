@@ -1,20 +1,17 @@
 <section class="ml-app ml-app-shell ml-craftworks app-shell">
-  <header class="ml-craftworks-header">
-    <h2>Gathering</h2>
-    <p>Start an optional gathering opportunity for selected player characters.</p>
-  </header>
+  <header class="ml-hero"><i class="fa-solid fa-hammer ml-hero__icon"></i><div class="ml-hero__body"><h1>Gathering</h1><p>Start an optional gathering opportunity for selected player characters.</p></div><div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header>
 
   {{#if session}}
-    <div class="ml-craftworks-panel">
-      <h3>{{session.terrain.name}}</h3>
-      <p>{{session.sceneName}} • Gathering DC {{session.terrain.dc}}</p>
+    <div class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3">
+      <div class="ml-section-heading"><div><h2>{{session.terrain.name}}</h2><p>{{session.sceneName}} • Gathering DC {{session.terrain.dc}}</p></div></div>
     </div>
 
-    <div class="ml-craftworks-panel">
-      <h3>Player Progress</h3>
+    <div class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3">
+      <div class="ml-section-heading"><div><h2>Player Progress</h2><p>Review each character’s participation and resolved checks.</p></div></div>
       {{#each progress}}
         <div class="ml-craftworks-progress-user">
           <strong>{{user}}</strong>
+          {{#if gmRoll}}<button type="button" data-gm-gather="{{actorUuid}}"><i class="fa-solid fa-dice-d20"></i> Roll as GM</button>{{/if}}
           <span>{{status}}{{#if total}} [{{total}}]{{/if}}</span>
           {{#if result}}
             <span class="ml-craftworks-result" data-document-uuid="{{result.itemUuid}}"><img src="{{result.img}}" alt="{{result.name}}"> {{result.name}} ×{{result.quantity}}</span>
@@ -24,12 +21,12 @@
       {{/each}}
     </div>
 
-    <footer class="ml-actions ml-craftworks-actions">
+    <footer class="ml-page-footer ml-actions">
       <button type="button" data-action="finalize"><i class="fa-solid fa-flag-checkered"></i> Finalize Gathering</button>
     </footer>
   {{else}}
-    <div class="ml-craftworks-panel">
-      <h3>{{sceneName}}</h3>
+    <div class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3">
+      <div class="ml-section-heading"><div><h2>{{sceneName}}</h2><p>Configure this opportunity for the current scene.</p></div></div>
       {{#if gatherRecordCount}}
         <p>{{gatherRecordCount}} character(s) have already used their gathering opportunity on this scene.</p>
       {{else}}
@@ -45,25 +42,17 @@
         </select>
       </label>
 
-      <section class="ml-craftworks-harvest-gm-managed ml-craftworks-harvest-skip-skill-section">
-        <div class="ml-craftworks-harvest-mode-heading">
-          <i class="fa-solid fa-users"></i>
-          Player Characters
-        </div>
-        <p class="ml-craftworks-harvest-preflight-help">
-          Choose which characters take part in this Gathering opportunity.
-        </p>
-        <div class="ml-craftworks-harvest-skip-skill-list">
+      <section class="ml-surface ml-section ml-stack" data-gap="3">
+        <div class="ml-section-heading"><div><h2>Player Characters</h2><p>Choose which characters take part in this Gathering opportunity.</p></div></div>
+        <div class="ml-actor-choice-grid">
           {{#each characters}}
-            <label class="ml-craftworks-harvest-skip-skill-row">
+            <label class="ml-actor-choice">
               <input type="checkbox" name="characterUuid" value="{{uuid}}" {{#if checked}}checked{{/if}}>
-              <span class="ml-craftworks-harvest-skip-character">
-                {{#if img}}<img src="{{img}}" alt="{{name}}">{{/if}}
-                <span>
+                <img src="{{img}}" alt="{{name}}">
+                <span class="ml-stack" data-gap="1">
                   <strong>{{name}}</strong>
                   <small>{{#if connected}}{{userName}}{{else}}Offline · Not connected{{/if}}</small>
                 </span>
-              </span>
             </label>
           {{else}}
             <p class="ml-text ml-craftworks-warning" data-tone="warning">No player character Actors are defined.</p>
@@ -71,9 +60,9 @@
         </div>
       </section>
 
-      <div class="ml-actions ml-craftworks-actions">
+      <footer class="ml-page-footer ml-actions">
         <button type="button" data-action="start"><i class="fa-solid fa-seedling"></i> Start Gathering</button>
-      </div>
+      </footer>
     </div>
   {{/if}}
 </section>

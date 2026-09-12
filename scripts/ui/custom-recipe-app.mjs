@@ -66,7 +66,7 @@ export class CustomRecipeApp extends ScrollPreservingApplicationMixin(Handlebars
     }
   }
   async #delete(id) {
-    if (!await foundry.applications.api.DialogV2.confirm({ window: { title: "Delete Custom Recipe" }, content: "<p>Delete this custom recipe?</p>" })) return;
+    if (!await foundry.applications.api.DialogV2.confirm({ classes: ["ml-window", "ml-craftworks-module"], window: { title: "Delete Custom Recipe" }, content: "<div><div class=\"ml-app ml-app-shell ml-dialog-shell\"><p>Delete this custom recipe?</p></div></div>" })) return;
     await this.craftworks.customRecipes.delete(id); await this.craftworks.recipes.loadStandardSeed(); await this.render({ force: true });
   }
   async #exportAll() {
@@ -77,9 +77,9 @@ export class CustomRecipeApp extends ScrollPreservingApplicationMixin(Handlebars
   async #import(event) {
     const file = event.currentTarget.files?.[0]; if (!file) return;
     try {
-      const conflict = await foundry.applications.api.DialogV2.prompt({
+      const conflict = await foundry.applications.api.DialogV2.prompt({ classes: ["ml-window", "ml-craftworks-module"],
         window: { title: "Import Custom Recipes" },
-        content: `<div class="ml-dialog-shell"><label>When an output Item already has a recipe<select name="conflict"><option value="skip">Skip existing recipe</option><option value="replace">Replace existing recipe</option></select></label></div>`,
+        content: `<div><div class="ml-app ml-app-shell ml-dialog-shell"><label>When an output Item already has a recipe<select name="conflict"><option value="skip">Skip existing recipe</option><option value="replace">Replace existing recipe</option></select></label></div></div>`,
         ok: { label: "Import", callback: (_event, _button, dialog) => dialog.element.querySelector("[name='conflict']")?.value ?? "skip" },
         rejectClose: false
       });

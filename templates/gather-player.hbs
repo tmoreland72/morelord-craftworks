@@ -1,8 +1,5 @@
 <section class="ml-app ml-app-shell ml-craftworks app-shell">
-  <header class="ml-craftworks-header">
-    <h2>Gathering Opportunity</h2>
-    <p>{{session.terrain.name}} • DC {{session.terrain.dc}} • {{session.sceneName}}</p>
-  </header>
+  <header class="ml-hero"><i class="fa-solid fa-hammer ml-hero__icon"></i><div class="ml-hero__body"><h1>Gathering Opportunity</h1><p>{{session.terrain.name}} • DC {{session.terrain.dc}} • {{session.sceneName}}</p></div><div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header>
 
   {{#if actor}}
     <div class="ml-craftworks-actor ml-craftworks-player-actor"><img src="{{actor.img}}" alt="{{actor.name}}"><strong>{{actor.name}}</strong></div>
@@ -11,7 +8,8 @@
   {{/if}}
 
   {{#if state}}
-    <div class="ml-craftworks-panel">
+    <div class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3">
+      <div class="ml-section-heading"><div><h2>Gathering Check</h2><p>Review or resolve your character’s gathering opportunity.</p></div></div>
       {{#if (eq state.status "declined")}}
         <p>You declined this gathering opportunity.</p>
       {{/if}}
@@ -25,18 +23,19 @@
       {{/if}}
     </div>
   {{else}}
-      <div class="ml-craftworks-panel">
+      <div class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3">
+      <div class="ml-section-heading"><div><h2>Gathering Check</h2><p>Review or resolve your character’s gathering opportunity.</p></div></div>
         <p>Gathering is optional. Choose a skill or decline.</p>
         <div class="ml-craftworks-player-skill-grid">
           {{#each skills}}
             <button type="button" data-action="roll" data-skill="{{id}}"><i class="fa-solid fa-dice-d20"></i><span>{{label}}</span><strong>{{modifierLabel}}</strong></button>
           {{/each}}
         </div>
-        <button class="ml-craftworks-player-decline" type="button" data-action="decline"><i class="fa-solid fa-ban"></i> Decline</button>
+
       </div>
   {{/if}}
 
-  <footer class="ml-actions ml-craftworks-actions">
+  <footer class="ml-page-footer ml-actions">{{#unless state}}<button class="ml-craftworks-player-decline" type="button" data-action="decline"><i class="fa-solid fa-ban"></i> Decline</button>{{/unless}}
     <button type="button" data-action="close"><i class="fa-solid fa-xmark"></i> Close</button>
   </footer>
 </section>

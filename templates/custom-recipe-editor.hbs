@@ -1,25 +1,53 @@
-<section class="ml-app ml-app-shell ml-craftworks ml-recipe-editor">
-  <header class="ml-hero"><div class="ml-hero__body"><h2>{{#if editing}}Edit{{else}}New{{/if}} {{#if drakkenheim}}Drakkenheim {{/if}}Recipe</h2><p>The output Item supplies the recipe name and its UUID creates the unique recipe ID.</p></div></header>
-  <form>
-    <section class="ml-craftworks-panel"><div class="ml-craftworks-settings-grid">
-      <label><span>Artisan Tool</span><select name="tool"><option value="">No tool</option>{{#each tools}}<option value="{{label}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
-      <label><span>Crafting Hours</span><input type="number" name="hoursRequired" min="2" step="2" value="{{form.hoursRequired}}"></label>
-    </div><label><span>Description</span><textarea name="description" rows="3">{{form.description}}</textarea></label></section>
-    <fieldset class="ml-field-group"><legend>Skill Check</legend>
-      <label><span>Ability</span><select name="ability">{{#each abilities}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{value}}</option>{{/each}}</select></label>
-      <div class="ml-field-group__controls"><label><span>With Tool DC</span><input type="number" name="dc" min="1" value="{{form.dc}}"></label><label><span>Without Tool DC</span><input type="number" name="noToolDc" min="1" value="{{form.noToolDc}}"></label></div>
-    </fieldset>
-    <section class="ml-craftworks-panel"><h3>Output Item</h3>
-      {{#if output}}<article class="ml-list-button ml-recipe-output-picker" data-document-uuid="{{output.uuid}}" title="Open {{output.name}}"><img src="{{output.img}}"><span><strong>{{output.name}}</strong><small>Click the Item to open its sheet</small></span><button type="button" class="ml-button" data-action="select-output"><i class="fa-solid fa-arrow-right-arrow-left"></i> Change</button></article>{{else}}<button type="button" class="ml-list-button ml-recipe-output-picker" data-action="select-output"><i class="fa-solid fa-box-open"></i><span><strong>Select Output Item</strong><small>Browse and filter enabled compendium Items</small></span></button>{{/if}}
-      <label><span>Output Quantity</span><input type="number" name="outputQuantity" min="1" value="{{form.outputQuantity}}"></label>
+<section class="ml-app ml-app-shell">
+  <header class="ml-hero"><i class="fa-solid fa-hammer ml-hero__icon"></i><div class="ml-hero__body"><h1>{{#if editing}}Edit{{else}}New{{/if}} {{#if drakkenheim}}Drakkenheim {{/if}}Recipe</h1><p>Choose the item to craft, the required materials, and the crafting checks.</p></div><div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header>
+  <form class="ml-stack">
+    <section class="ml-surface ml-stack" data-gap="3">
+      <div class="ml-section-heading"><div><h2>Item to Be Crafted</h2><p>Choose the item and quantity produced by this recipe.</p></div></div>
+      {{#if output}}
+        <article class="ml-card ml-item-row" data-document-uuid="{{output.uuid}}" title="Open {{output.name}}">
+          <img src="{{output.img}}" alt="{{output.name}}"><span class="ml-stack" data-gap="1"><strong>{{output.name}}</strong><small>Click the item to open its sheet.</small></span>
+          <button type="button" data-action="select-output"><i class="fa-solid fa-arrow-right-arrow-left"></i> Change</button>
+        </article>
+      {{else}}
+        <div class="ml-actions"><button type="button" data-action="select-output"><i class="fa-solid fa-box-open"></i> Select Item to Be Crafted</button></div>
+      {{/if}}
+      <label><span>Quantity to Craft</span><input type="number" name="outputQuantity" min="1" value="{{form.outputQuantity}}"></label>
     </section>
-    <section class="ml-craftworks-panel"><h3>Materials</h3><p class="ml-craftworks-muted">Materials inside an option are combined with AND. Additional options are combined with OR.</p>
-      {{#each groups}}<div class="ml-card ml-recipe-logic-group">{{#if showOr}}<strong class="ml-recipe-or">OR</strong>{{/if}}<header><strong>Option {{number}} (AND)</strong>{{#if showOr}}<button type="button" class="ml-icon-button ml-button" data-tone="danger" data-remove-group="{{groupIndex}}" aria-label="Remove option {{number}}"><i class="fa-solid fa-trash"></i></button>{{/if}}</header>
-        {{#each materials}}<div class="ml-recipe-selected-material" data-document-uuid="{{uuid}}" title="Open {{name}}"><img src="{{img}}"><span>{{name}}</span><label>Qty <input type="number" min="1" value="{{quantity}}" data-material-quantity="{{groupIndex}}:{{materialIndex}}"></label><button type="button" class="ml-icon-button" data-group="{{groupIndex}}" data-remove-material="{{materialIndex}}" aria-label="Remove {{name}}"><i class="fa-solid fa-xmark"></i></button></div>{{/each}}
-        <button type="button" class="ml-button" data-add-material="{{groupIndex}}"><i class="fa-solid fa-plus"></i> Add Material</button>
-      </div>{{/each}}
-      <button type="button" class="ml-button" data-action="add-or-group"><i class="fa-solid fa-code-branch"></i> Add OR Option</button>
+    <section class="ml-surface ml-stack" data-gap="3">
+      <div class="ml-section-heading"><div><h2>Recipe Details</h2><p>Set the tools, time, and description for this recipe.</p></div></div>
+      <div class="ml-grid" data-columns="2">
+        <label><span>Artisan Tool</span><select name="tool"><option value="">No tool</option>{{#each tools}}<option value="{{label}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
+        {{#unless drakkenheim}}<label><span>Crafting Hours</span><input type="number" name="hoursRequired" min="2" step="2" value="{{form.hoursRequired}}"></label>{{/unless}}
+      </div>
+      <label><span>Description</span><textarea name="description" rows="3">{{form.description}}</textarea></label>
     </section>
-    <div class="ml-actions ml-craftworks-actions"><button type="button" class="ml-button" data-tone="accent" data-action="save"><i class="fa-solid fa-floppy-disk"></i> Save Recipe</button></div>
+    <section class="ml-surface ml-stack" data-gap="3">
+      <div class="ml-section-heading"><div><h2>Crafting Check</h2><p>{{#if drakkenheim}}Requires a Workshop of the item’s rarity or higher. No roll or tracked crafting time is required.{{else}}Use the artisan tool at this DC; missing tools or proficiency impose disadvantage.{{/if}}</p></div></div>
+      {{#unless drakkenheim}}<label><span>Tool Ability</span><select name="ability">{{#each abilities}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{value}}</option>{{/each}}</select></label>
+      <div class="ml-grid" data-columns="2">
+        <label><span>DC</span><input type="number" name="dc" min="1" value="{{form.dc}}"></label>
+      </div>{{/unless}}
+    </section>
+
+    <section class="ml-surface ml-stack" data-gap="3">
+      <div class="ml-section-heading"><div><h2>Materials</h2><p>Every group is required (AND). Within each group, choose one material (OR).</p></div></div>
+      {{#each groups}}
+        {{#if variantStart}}<p>OR — alternative complete recipe</p>{{/if}}
+        <div class="ml-card ml-stack">
+          <div class="ml-cluster"><strong>Required Group {{number}} (AND)</strong>{{#if showOr}}<button type="button" class="ml-icon-button ml-button" data-tone="danger" data-remove-group="{{groupIndex}}" aria-label="Remove option {{number}}"><i class="fa-solid fa-trash"></i></button>{{/if}}</div>
+          {{#each materials}}
+            {{#unless @first}}<strong>OR</strong>{{/unless}}
+            <div class="ml-item-row" data-document-uuid="{{uuid}}" title="Open {{name}}">
+              <img src="{{img}}" alt="{{name}}"><span class="ml-stack"><strong>{{name}}</strong></span>
+              <label><span>Quantity</span><input type="number" min="1" value="{{quantity}}" data-material-quantity="{{groupIndex}}:{{materialIndex}}"></label>
+              <button type="button" class="ml-icon-button ml-button" data-tone="danger" data-group="{{groupIndex}}" data-remove-material="{{materialIndex}}" aria-label="Remove {{name}}"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+          {{/each}}
+          <div class="ml-actions"><button type="button" data-add-material="{{groupIndex}}"><i class="fa-solid fa-plus"></i> Add Material Choice (OR)</button></div>
+        </div>
+      {{/each}}
+      <div class="ml-actions"><button type="button" data-action="add-and-group"><i class="fa-solid fa-code-branch"></i> Add Required Group (AND)</button></div>
+    </section>
+    <footer class="ml-page-footer ml-actions"><button type="button" class="ml-button" data-tone="accent" data-action="save"><i class="fa-solid fa-floppy-disk"></i> Save Recipe</button></footer>
   </form>
 </section>

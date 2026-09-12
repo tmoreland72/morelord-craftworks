@@ -1,11 +1,9 @@
 <section class="ml-app ml-app-shell ml-craftworks app-shell ml-craftworks-browser-shell">
-  <header class="ml-craftworks-header">
-    <h2>Treasure Hoard</h2>
-    <p>Create accumulated treasure for a lair, vault, cache, strongbox, treasure room, or similar location.</p>
-  </header>
+  <header class="ml-hero"><i class="fa-solid fa-hammer ml-hero__icon"></i><div class="ml-hero__body"><h1>Treasure Hoard</h1><p>Create accumulated treasure for a lair, vault, cache, strongbox, treasure room, or similar location.</p></div><div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header>
 
   {{#unless result}}
-    <div class="ml-craftworks-panel">
+    <div class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3">
+      <div class="ml-section-heading"><div><h2>Hoard Options</h2><p>Choose the challenge tier used to generate this treasure hoard.</p></div></div>
       <label>
         Hoard Challenge Tier
         <select name="profile">
@@ -17,14 +15,14 @@
 
       <p class="ml-craftworks-muted">Higher tiers generate substantially more coin, more Craftworks material rolls, and a greater chance of special treasure.</p>
 
-      <button type="button" data-action="roll">
+      <footer class="ml-page-footer ml-actions"><button type="button" data-action="roll">
         <i class="fa-solid fa-dice-d20"></i> Generate Hoard
-      </button>
+      </button></footer>
     </div>
   {{else}}
-    <div class="ml-craftworks-browser-results">
-      <div class="ml-craftworks-panel">
-        <h3>{{result.profileLabel}} Hoard</h3>
+    <div class="ml-craftworks-browser-results ml-stack" data-gap="3">
+      <div class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3">
+        <div class="ml-section-heading"><div><h2>{{result.profileLabel}} Hoard</h2><p>Review and customize the generated treasure hoard.</p></div></div>
 
         <div class="ml-craftworks-result-toolbar">
           <button type="button" data-action="delete-result-items"><i class="fa-solid fa-trash"></i> Delete Marked</button>
@@ -135,8 +133,8 @@
 
       </div>
 
-      <div class="ml-craftworks-panel">
-        <h3>Recipient</h3>
+      <div class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3">
+        <div class="ml-section-heading"><div><h2>Recipient</h2><p>Choose the character or party inventory that receives these items.</p></div></div>
 
         <label>
           Reward Recipient
@@ -149,7 +147,7 @@
         </label>
         {{#if partyInfo.valid}}<p class="ml-craftworks-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
 
-        <div class="ml-actions ml-craftworks-actions">
+        <footer class="ml-page-footer ml-actions">
           <button type="button" data-action="send-chat">
             <i class="fa-solid fa-message"></i> Send to Chat
           </button>
@@ -159,7 +157,7 @@
           <button type="button" data-action="award" {{#unless result.found}}disabled{{/unless}}>
             <i class="fa-solid fa-box-open"></i> Award Hoard
           </button>
-        </div>
+        </footer>
       </div>
     </div>
   {{/unless}}

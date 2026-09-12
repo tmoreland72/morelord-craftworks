@@ -1,16 +1,22 @@
-import { MODULE_TITLE } from "../constants.mjs";
+import { MODULE_ID, MODULE_TITLE } from "../constants.mjs";
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 import { DeleriumSearchResultsApp } from "./delerium-search-results-app.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 export class DeleriumSearchApp extends ScrollPreservingApplicationMixin(HandlebarsApplicationMixin(ApplicationV2)) {
-  constructor(craftworks, options = {}) { super(options); this.craftworks = craftworks; this.session = null; this.selectedZone = "outer"; this.selectedCharacterUuids = null; }
+  constructor(craftworks, options = {}) { super(options); this.craftworks = craftworks; this.session = null; this.selectedZone = null; this.selectedCharacterUuids = null; }
   static DEFAULT_OPTIONS = { id: "morelord-craftworks-delerium-search", classes: ["ml-window", "ml-craftworks-module", "ml-craftworks-window"], position: { width: 800, height: "auto" }, window: { title: `${MODULE_TITLE} — Delerium Search`, resizable: true } };
   static PARTS = { content: { template: "modules/morelord-craftworks/templates/delerium-search-gm.hbs" } };
   setSession(session) { this.session = session; return this.render(); }
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
     const characters = game.actors.filter(actor => actor.type === "character");
+    if (this.selectedZone === null) {
+      let defaults = {};
+      try { defaults = JSON.parse(game.settings.get(MODULE_ID, "deleriumSearchDefaults") || "{}"); } catch { /* Use normal defaults if an old setting is invalid. */ }
+      this.selectedZone = ["outer", "inner"].includes(defaults?.zoneId) ? defaults.zoneId : "outer";
+      if (Array.isArray(defaults?.characterUuids)) this.selectedCharacterUuids = new Set(defaults.characterUuids.filter(uuid => characters.some(actor => actor.uuid === uuid)));
+    }
     if (this.selectedCharacterUuids === null) this.selectedCharacterUuids = new Set(characters.filter(actor => this.#activeUserForActor(actor)).map(actor => actor.uuid));
     const skills = this.craftworks.deleriumSearch.getSkillOptions();
     return foundry.utils.mergeObject(context, {
@@ -41,8 +47,21 @@ export class DeleriumSearchApp extends ScrollPreservingApplicationMixin(Handleba
   }
   async _onRender(context, options) {
     await super._onRender(context, options);
+    this.element.querySelectorAll("[data-party-finds-roll]").forEach(button => button.addEventListener("click", async () => {
+      try {
+        const roll = await new Roll(button.dataset.partyFindsRoll).evaluate();
+        await roll.toMessage({ flavor: "Delerium Search — What the Party Finds" });
+      } catch (error) { ui.notifications.error(error.message); }
+    }));
     this.element.querySelector("[name='zone']")?.addEventListener("change", event => { this.selectedZone = event.currentTarget.value; });
     this.element.querySelectorAll("[name='characterUuid']").forEach(input => input.addEventListener("change", event => event.currentTarget.checked ? this.selectedCharacterUuids.add(event.currentTarget.value) : this.selectedCharacterUuids.delete(event.currentTarget.value)));
+    this.element.querySelector("[data-action='save-defaults']")?.addEventListener("click", async () => {
+      try {
+        if (!game.user.isGM) throw new Error("Only a GM can save search defaults.");
+        await game.settings.set(MODULE_ID, "deleriumSearchDefaults", JSON.stringify({ zoneId: this.selectedZone, characterUuids: [...this.selectedCharacterUuids] }));
+        ui.notifications.info("Delerium Search defaults saved.");
+      } catch (error) { ui.notifications.error(error.message); }
+    });
     this.element.querySelector("[data-action='start']")?.addEventListener("click", () => this.#start());
     this.element.querySelector("[data-action='finalize']")?.addEventListener("click", () => this.#finalize());
     this.element.querySelectorAll("[data-action='gm-roll']")
@@ -108,7 +127,7 @@ export class DeleriumSearchApp extends ScrollPreservingApplicationMixin(Handleba
     if (!this.session) return;
     try {
       const session = await this.craftworks.deleriumSearch.finalize(this.session.id);
-      const players = game.users.filter(user => user.active && !user.isGM);
+      const players = (globalThis.MorelordCore?.users?.list() ?? game.users).filter(user => user.active && !user.isGM);
       await Promise.all(players.map(user => this.craftworks.socket.emit("delerium-search.complete", { session }, { targetUserId: user.id })));
       this.session = null;
       await this.close();
@@ -117,20 +136,7 @@ export class DeleriumSearchApp extends ScrollPreservingApplicationMixin(Handleba
   }
 
   #activeUserForActor(actor) {
-    if (!actor) return null;
-    return game.users.find(user =>
-      user.active
-      && !user.isGM
-      && this.#characterForUser(user)?.id === actor.id
-    ) ?? null;
+    return globalThis.MorelordCore.users.activePlayerForActor(actor);
   }
 
-  #characterForUser(user) {
-    if (!user) return null;
-    if (user.character) return user.character;
-    return game.actors.find(actor =>
-      actor.type === "character"
-      && Number(actor.ownership?.[user.id] ?? 0) >= 3
-    ) ?? null;
-  }
 }

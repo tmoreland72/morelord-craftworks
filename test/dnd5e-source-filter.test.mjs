@@ -22,5 +22,27 @@ test("SRD item provenance honors disabled canonical D&D5e packs", () => {
 
   assert.equal(filter.isSourceEnabled("SRD 5.1", { itemType: "spell" }), false);
   assert.equal(filter.isSourceEnabled("SRD 5.2", { itemType: "spell" }), false);
+  assert.equal(filter.isSourceEnabled("System Reference Document 5.1", { itemType: "spell" }), false);
+  assert.equal(filter.isSourceEnabled("System Reference Document 5.2", { itemType: "spell" }), false);
   assert.equal(filter.isSourceEnabled("Player's Handbook"), true);
+});
+
+test("every source shape and pack fallback delegates to the Core resolver", async () => {
+  const calls = [];
+  globalThis.game = { modules: new Map([["morelord-core", { api: { sources: {
+    resolveBookLabel: options => { calls.push(options); return "Core Canonical Book"; }
+  } } }]]) };
+  globalThis.foundry = { utils: { getProperty: (value, path) => path.split(".").reduce((entry, key) => entry?.[key], value) } };
+  const filter = new Dnd5eSourceFilterService();
+  const pack = { collection: "module.spells", metadata: { label: "Character Classes" } };
+  for (const source of ["PHB Pg. 220", { custom: "PHB Pg. 228" }, { book: "PHB" }]) {
+    assert.equal(await filter.sourceLabelForCompendiumItem({ system: { source } }, { pack }), "Core Canonical Book");
+  }
+  assert.equal(filter.sourceLabelForPack(pack), "Core Canonical Book");
+  assert.deepEqual(calls, [
+    { book: "PHB Pg. 220", custom: "", pack },
+    { book: "", custom: "PHB Pg. 228", pack },
+    { book: "PHB", custom: "", pack },
+    { pack }
+  ]);
 });

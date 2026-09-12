@@ -1,15 +1,10 @@
 <section class="ml-app ml-app-shell ml-craftworks app-shell ml-craftworks-browser-shell ml-craftworks-marketplace-browser">
-  <header class="ml-craftworks-header">
-    <div>
-      <h2>Materials</h2>
-      <p>Reference Craftworks materials, acquisition methods, values, recipes, and inventory quantities.</p>
-    </div>
-  </header>
+  <header class="ml-hero"><i class="fa-solid fa-hammer ml-hero__icon"></i><div class="ml-hero__body"><h1>Materials</h1><p>Reference Craftworks materials, acquisition methods, values, recipes, and inventory quantities.</p></div>
+  <div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header>
 
   <div class="ml-craftworks-marketplace-browser-body">
-    <aside class="ml-craftworks-filter-rail">
-      <div class="ml-craftworks-market-filter-title">
-        <strong>Filters</strong>
+    <aside class="ml-surface ml-craftworks-filter-rail ml-stack" data-gap="3">
+      <div class="ml-section-heading"><div><h2>Filters</h2><p>Narrow the catalog to the entries you want to use.</p></div>
         <button type="button"
                 class="ml-icon-button ml-craftworks-icon-button"
                 data-action="clear-material-filters"
@@ -39,8 +34,8 @@
         <span><i class="fa-solid fa-square-minus"></i> Exclude</span>
       </div>
 
-      <section class="ml-craftworks-filter-group">
-        <h3>Content Pack</h3>
+      <section class="ml-section ml-craftworks-filter-group">
+        <div class="ml-section-heading"><div><h2>Content Pack</h2><p>Include or exclude entries from enabled content packs.</p></div></div>
         <div class="ml-craftworks-tristate-list">
           {{#each packs}}
             <button type="button"
@@ -57,8 +52,8 @@
         </div>
       </section>
 
-      <section class="ml-craftworks-filter-group">
-        <h3>Rarity</h3>
+      <section class="ml-section ml-craftworks-filter-group">
+        <div class="ml-section-heading"><div><h2>Rarity</h2><p>Filter entries by rarity.</p></div></div>
         <div class="ml-craftworks-tristate-list">
           {{#each rarities}}
             <button type="button"
@@ -74,8 +69,8 @@
       </section>
 
       {{#each tagGroups}}
-      <section class="ml-craftworks-filter-group ml-craftworks-filter-subsection">
-        <h3>{{label}}</h3>
+      <section class="ml-section ml-craftworks-filter-group ml-craftworks-filter-subsection">
+        <div class="ml-section-heading"><div><h2>{{label}}</h2><p>Browse the entries in this group.</p></div></div>
         <div class="ml-craftworks-tristate-list">
           {{#each options}}
             <button type="button"
@@ -93,11 +88,8 @@
 
 </aside>
 
-    <main class="ml-craftworks-marketplace-results">
-      <div class="ml-craftworks-market-results-heading">
-        <h2>Materials</h2>
-        <span>{{prospectiveCount}} matches</span>
-      </div>
+    <main class="ml-surface ml-craftworks-marketplace-results ml-stack" data-gap="3">
+      <div class="ml-section-heading"><div><h2>Materials</h2><p>Browse the entries matching the selected filters.</p></div><span>{{prospectiveCount}} matches</span></div>
 
       {{#if overDisplayLimit}}
         <div class="ml-craftworks-market-limit-message">
@@ -113,7 +105,7 @@
       {{/if}}
         <div class="ml-craftworks-reference-list ml-craftworks-browser-results">
           {{#each materials}}
-      <article class="ml-craftworks-reference-card ml-craftworks-material-card {{#if owned}}ml-craftworks-material-owned{{/if}} {{#if focused}}ml-craftworks-material-focused{{/if}}" data-document-uuid="{{uuid}}">
+      <article class="ml-card ml-craftworks-reference-card ml-craftworks-material-card {{#if owned}}ml-craftworks-material-owned{{/if}} {{#if focused}}ml-craftworks-material-focused{{/if}}" data-document-uuid="{{uuid}}">
         <img src="{{img}}" alt="{{name}}">
 
         <div class="ml-craftworks-reference-main">
@@ -159,7 +151,7 @@
         </div>
       </article>
           {{else}}
-            <div class="ml-craftworks-panel">
+            <div class="ml-empty-state">
               <p>No materials match the current filters.</p>
             </div>
           {{/each}}

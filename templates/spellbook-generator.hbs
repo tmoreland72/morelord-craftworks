@@ -1,17 +1,14 @@
 <section class="ml-app ml-app-shell ml-craftworks app-shell ml-craftworks-spellbook-generator">
-  <header class="ml-craftworks-header">
-    <div>
-      <h2>Spellbook Generator</h2>
-      <p>
+  <header class="ml-hero"><i class="fa-solid fa-hammer ml-hero__icon"></i><div class="ml-hero__body"><h1>Spellbook Generator</h1><p>
         Choose how many spells of each level the recovered spellbook contains.
         Generate a random draft, reroll until satisfied, then create the book.
-      </p>
-    </div>
-  </header>
+      </p></div>
+  <div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header>
 
   {{#if hasAccess}}
     {{#unless hasResult}}
-    <section class="ml-craftworks-panel">
+    <section class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3">
+      <div class="ml-section-heading"><div><h2>Generation Options</h2><p>Choose the available options and quantities to generate.</p></div></div>
       <label class="ml-craftworks-spellbook-name">
         <span>Spellbook Name</span>
         <input
@@ -55,7 +52,7 @@
         {{/each}}
       </div>
 
-      <div class="ml-actions ml-craftworks-actions">
+      <footer class="ml-page-footer ml-actions">
         <button
           type="button"
           data-action="generate-spellbook"
@@ -64,16 +61,13 @@
           Generate
         </button>
 
-      </div>
+      </footer>
     </section>
     {{/unless}}
 
     {{#if hasResult}}
-      <section class="ml-craftworks-panel ml-craftworks-spellbook-preview">
-        <div class="ml-craftworks-spellbook-preview-heading">
-          <i class="fa-solid fa-book"></i>
-          <h3>{{bookName}}</h3>
-        </div>
+      <section class="ml-surface ml-section ml-craftworks-panel ml-craftworks-spellbook-preview ml-stack" data-gap="3">
+        <div class="ml-section-heading"><div><h2>{{bookName}}</h2><p>Review and customize the spells in this generated book.</p></div></div>
 
         <div class="ml-craftworks-spellbook-results-scroll">
           {{#each resultGroups}}
@@ -110,8 +104,8 @@
         </div>
       </section>
 
-      <section class="ml-craftworks-panel">
-        <h3>Recipient</h3>
+      <section class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3">
+        <div class="ml-section-heading"><div><h2>Recipient</h2><p>Choose the character or party inventory that receives these items.</p></div></div>
 
         <label>
           Recipient
@@ -124,7 +118,7 @@
         </label>
         {{#if partyInfo.valid}}<p class="ml-craftworks-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
 
-        <div class="ml-actions ml-craftworks-actions">
+        <footer class="ml-page-footer ml-actions">
           <button type="button" data-action="reroll-spellbook">
             <i class="fa-solid fa-arrows-rotate"></i>
             Reroll
@@ -136,11 +130,11 @@
             <i class="fa-solid fa-book"></i>
             Create & Award Spellbook
           </button>
-        </div>
+        </footer>
       </section>
     {{/if}}
   {{else}}
-    <div class="ml-craftworks-panel">
+    <div class="ml-empty-state">
       <p class="ml-text ml-craftworks-warning" data-tone="warning">
         Spellbook Generator requires premium Craftworks access.
       </p>

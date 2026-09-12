@@ -1,3 +1,4 @@
+import { combinedCraftingInventory } from "./crafting/group-membership.mjs";
 import { MODULE_ID } from "./constants.mjs";
 import { log } from "./core/logger.mjs";
 import {
@@ -153,7 +154,7 @@ Hooks.once("ready", async () => {
   // Only one connected GM should perform world-compendium writes. Other GMs
   // and players simply index the already-synchronized world packs.
   const activeGms =
-    game.users
+    (globalThis.MorelordCore?.users?.list() ?? game.users)
       .filter(user =>
         user.active
         && user.isGM
@@ -578,13 +579,12 @@ Hooks.once("ready", async () => {
 
   socket.on("harvest.open", async ({ session, actorUuid }) => {
     log(`Handling harvest.open for session ${session?.id ?? "missing"}.`);
-    if (game.user.isGM) return;
 
     if (!session?.id) {
       throw new Error("Received a Harvest session without a valid session id.");
     }
 
-    const imported = sessions.import(session);
+    const imported = game.user.isGM ? sessions.get(session.id) ?? session : sessions.import(session);
     log(`Imported Harvest session ${imported.id} with ${imported.creatures?.length ?? 0} creature(s).`);
 
     if (!actorUuid) throw new Error("Received a Harvest session without a character.");
@@ -610,12 +610,13 @@ Hooks.once("ready", async () => {
       `Harvest attempt resolved for ${data.creatureTokenUuid}: `
       + `${state.status}${state.choices ? ` (${state.choices.length} choice(s))` : ""}.`
     );
-    socket.emit("harvest.state", {
+    if (game.users.get(data.userId)?.active && data.userId !== game.user.id) await socket.emit("harvest.state", {
       sessionId: data.sessionId,
       creatureTokenUuid: data.creatureTokenUuid,
       state
     }, { targetUserId: data.userId });
     await harvest.updatePlayerCompletions(data.sessionId);
+    await playerHarvestApps.get(data.actorUuid)?.setState(data.creatureTokenUuid, state);
     gmHarvestApp?.setSession(sessions.get(data.sessionId));
   });
 
@@ -659,9 +660,8 @@ Hooks.once("ready", async () => {
         }
       );
 
-      gmHarvestApp?.setSession(
-        authoritative
-      );
+      for (const app of playerHarvestApps.values()) if (app.session?.id === sessionId) await app.setSession(authoritative, { preserveFocus: true });
+      gmHarvestApp?.setSession(authoritative);
     }
   );
 
@@ -680,7 +680,44 @@ Hooks.once("ready", async () => {
       session
     });
 
+    for (const app of playerHarvestApps.values()) if (app.session?.id === session.id) await app.setSession(session, { preserveFocus: true });
     gmHarvestApp?.setSession(session);
+  });
+
+  socket.on("craft.consume-combined-materials", async (data, payload) => {
+    if (!game.user.isGM) return { ok: false };
+    try {
+      const crafter = await fromUuid(data.crafterUuid);
+      const user = game.users.get(payload.senderUserId);
+      if (!crafter || crafter.type !== "character" || !user || !crafter.testUserPermission(user, "OWNER")) throw new Error("The requesting player does not own this crafter.");
+      const recipe = recipes.get(data.recipeId);
+      if (!recipe) throw new Error("Recipe unavailable.");
+      const environment = craftingEnvironment.evaluate(recipe);
+      if (!environment.passed) throw new Error(environment.reasons[0]);
+      const inventory = combinedCraftingInventory(crafter);
+      const signature = plan => JSON.stringify(plan.consumptions.map(entry => [entry.actorUuid, entry.itemId, entry.quantity]).sort());
+      const plan = craftingMaterials.planOptions(recipe, inventory).find(candidate => signature(candidate) === signature(data.plan));
+      if (!plan) throw new Error("The combined inventory no longer satisfies this material plan.");
+      return { ok: true, consumedMaterials: await craftingMaterials.consume(inventory, plan, { crafter, recipe }) };
+    } catch (error) { return { ok: false, error: error.message }; }
+  });
+
+  socket.on("craft.refund-combined-materials", async (data, payload) => {
+    if (!game.user.isGM) return { ok: false };
+    try {
+      const crafter = await fromUuid(data.crafterUuid);
+      const user = game.users.get(payload.senderUserId);
+      if (!crafter || !user || !crafter.testUserPermission(user, "OWNER")) throw new Error("The requesting player does not own this crafter.");
+      const job = new CraftingJobService().get(data.recipeId, crafter);
+      if (!job || job.outputAwarded || !job.materialsConsumed) throw new Error("This project has no materials to return.");
+      for (const entry of job.consumedMaterials ?? []) {
+        const origin = entry.actorUuid ? await fromUuid(entry.actorUuid) : crafter;
+        if (!origin || (origin.uuid !== crafter.uuid && !isCharacterMemberOfGroup(crafter, origin))) throw new Error("Material origin is not an inventory belonging to this crafter or party.");
+      }
+      await craftingMaterials.refund(crafter, job.consumedMaterials);
+      await craftingJobs.clear(data.recipeId, crafter);
+      return { ok: true };
+    } catch (error) { return { ok: false, error: error.message }; }
   });
 
   socket.on("craft.consume-group-materials", async (data, payload) => {
@@ -709,21 +746,20 @@ Hooks.once("ready", async () => {
     if (!game.user.isGM) return;
     const session = await harvest.releaseClaims(sessionId, userId, actorUuid);
     await socket.emit("harvest.session", { session });
+    for (const app of playerHarvestApps.values()) if (app.session?.id === session.id) await app.setSession(session, { preserveFocus: true });
     gmHarvestApp?.setSession(session);
     return { released: true };
   });
 
   socket.on("harvest.state", async ({ sessionId, creatureTokenUuid, state }) => {
-    if (game.user.isGM) return;
     const playerHarvestApp = playerHarvestApps.get(state?.actorUuid);
     if (!playerHarvestApp || playerHarvestApp.session?.id !== sessionId) return;
     await playerHarvestApp.setState(creatureTokenUuid, state);
   });
 
   socket.on("harvest.session", async ({ session }) => {
-    if (game.user.isGM) return;
     if (!session?.id) return;
-    const imported = sessions.import(session);
+    const imported = game.user.isGM ? sessions.get(session.id) ?? session : sessions.import(session);
     await Promise.all([...playerHarvestApps.values()]
       .filter(app => app.session?.id === session.id)
       .map(app => app.setSession(imported, { preserveFocus: true })));
@@ -731,9 +767,8 @@ Hooks.once("ready", async () => {
 
 
   socket.on("gather.open", async ({ session, actorUuid }) => {
-    if (game.user.isGM) return;
     if (!actorUuid) throw new Error("Received a Gathering session without a character.");
-    const imported = sessions.import(session);
+    const imported = game.user.isGM ? sessions.get(session.id) ?? session : sessions.import(session);
     const existing = playerGatherApps.get(actorUuid);
     if (existing?.rendered) await existing.close();
     const playerGatherApp = new GatherPlayerApp(api, imported, actorUuid);
@@ -776,38 +811,38 @@ Hooks.once("ready", async () => {
     if (playerDeleriumSearchApp?.rendered) await playerDeleriumSearchApp.close();
     playerDeleriumSearchApp = null;
     if (session.randomEncounter) ui.notifications.warn("Two or more characters failed: the search triggers a Random Encounter.");
-    ui.notifications.info(session.reward ? `The search located ${session.reward.name}; the GM is resolving the award.` : "The delerium search found nothing.");
+    ui.notifications.info(session.rewards?.length ? `The search located ${session.rewards.map(reward => reward.name).join(", ")}; the GM is resolving the awards.` : "The delerium search found nothing.");
   });
 
   socket.on("gather.attempt", async data => {
     if (!game.user.isGM) return;
     const state = await gather.attempt(data);
-    await socket.emit("gather.state", {
+    if (game.users.get(data.userId)?.active && data.userId !== game.user.id) await socket.emit("gather.state", {
       sessionId: data.sessionId,
       state
     }, { targetUserId: data.userId });
+    await playerGatherApps.get(data.actorUuid)?.setState(state);
     gmGatherApp?.setSession(sessions.get(data.sessionId));
   });
 
   socket.on("gather.decline", async data => {
     if (!game.user.isGM) return;
     const state = gather.decline(data);
-    await socket.emit("gather.state", {
+    if (game.users.get(data.userId)?.active && data.userId !== game.user.id) await socket.emit("gather.state", {
       sessionId: data.sessionId,
       state
     }, { targetUserId: data.userId });
+    await playerGatherApps.get(data.actorUuid)?.setState(state);
     gmGatherApp?.setSession(sessions.get(data.sessionId));
   });
 
   socket.on("gather.state", async ({ sessionId, state }) => {
-    if (game.user.isGM) return;
     const playerGatherApp = playerGatherApps.get(state?.actorUuid);
     if (!playerGatherApp || playerGatherApp.session?.id !== sessionId) return;
     await playerGatherApp.setState(state);
   });
 
   socket.on("gather.complete", async ({ sessionId }) => {
-    if (game.user.isGM) return;
     for (const app of playerGatherApps.values()) if (app.rendered) await app.close();
     playerGatherApps.clear();
     ui.notifications.info("Gathering has been completed by the GM.");
@@ -831,7 +866,6 @@ Hooks.once("ready", async () => {
   });
 
   socket.on("harvest.cancel", async ({ sessionId }) => {
-    if (game.user.isGM) return;
 
     log(
       `Closing Harvest client window for cancelled session ${
@@ -848,7 +882,6 @@ Hooks.once("ready", async () => {
   });
 
   socket.on("harvest.complete", async ({ sessionId }) => {
-    if (game.user.isGM) return;
 
     log(`Closing Harvest client window for finalized session ${sessionId}.`);
 

@@ -1,4 +1,4 @@
-<article class="ml-craftworks-craft-card">
+<article class="ml-card ml-craftworks-craft-card">
   <header class="ml-craftworks-craft-card-header">
     <div class="ml-craftworks-craft-card-title">
       {{#if output.img}}
@@ -39,17 +39,17 @@
   </header>
 
   <div class="ml-craftworks-craft-card-meta">
-    {{#if craftMeta.tool}}
+    {{#unless craftMeta.check}}{{#if craftMeta.tool}}
       <span>
         <i class="fa-solid fa-screwdriver-wrench"></i>
         {{craftMeta.tool}}
       </span>
-    {{/if}}
+    {{/if}}{{/unless}}
     {{#if craftMeta.check}}
       <span>
         <i class="fa-solid fa-dice-d20"></i>
         {{craftMeta.check}}
-        {{#if craftMeta.activeDc}} · DC {{craftMeta.activeDc}}{{/if}}
+        {{#if craftMeta.disadvantage}} · Disadvantage{{/if}}{{#if craftMeta.activeDc}} · DC {{craftMeta.activeDc}}{{/if}}
       </span>
     {{/if}}
     {{#if craftMeta.hoursRequired}}
@@ -150,7 +150,7 @@
       {{/if}}
     </section>
 
-    <section class="ml-craftworks-craft-output-panel">
+    <section class="ml-card ml-craftworks-craft-output-panel">
       <h4>Produces</h4>
       <div class="ml-craftworks-craft-output">
         {{#if output.img}}

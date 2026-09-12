@@ -17,7 +17,14 @@ export class GatherPlayerApp extends ScrollPreservingApplicationMixin(
     this.craftworks = craftworks;
     this.session = session;
     this.actorUuid = actorUuid;
-    this.gatherState = null;
+    this.participantUserId = game.user.isGM
+      ? Object.entries(session.gatherActorsByUser ?? {}).find(([, actors]) => (Array.isArray(actors) ? actors : [actors]).includes(actorUuid))?.[0] ?? game.user.id
+      : game.user.id;
+    this.gatherState = session.participants?.[actorUuid] ?? null;
+  }
+
+  #sendToGm(type, data) {
+    return this.craftworks.socket.executeAsGm(type, data, { gmUserId: this.session.gmUserId });
   }
 
   static DEFAULT_OPTIONS = {
@@ -89,9 +96,9 @@ export class GatherPlayerApp extends ScrollPreservingApplicationMixin(
         return;
       }
 
-      await this.craftworks.socket.emit("gather.attempt", {
+      await this.#sendToGm("gather.attempt", {
         sessionId: this.session.id,
-        userId: game.user.id,
+        userId: this.participantUserId,
         actorUuid: actor.uuid,
         skillId,
         total: roll.total
@@ -105,9 +112,9 @@ export class GatherPlayerApp extends ScrollPreservingApplicationMixin(
   async #decline(event) {
     event.currentTarget.disabled = true;
     const actor = await fromUuid(this.actorUuid);
-    await this.craftworks.socket.emit("gather.decline", {
+    await this.#sendToGm("gather.decline", {
       sessionId: this.session.id,
-      userId: game.user.id,
+      userId: this.participantUserId,
       actorUuid: actor?.uuid ?? null
     });
   }

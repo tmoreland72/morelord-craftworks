@@ -52,7 +52,7 @@ export class Dnd5eCompendiumItemResolver {
         let index;
         try {
           index = await pack.getIndex({
-            fields: ["name", "img", "type"]
+            fields: ["name", "img", "type", "system.rarity"]
           });
         } catch (error) {
           console.warn(
@@ -74,6 +74,7 @@ export class Dnd5eCompendiumItemResolver {
             name: entry.name,
             img: entry.img ?? "",
             type: entry.type ?? null,
+            rarity: entry.system?.rarity ?? null,
             packId: collection,
             sourceBook
           });

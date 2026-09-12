@@ -1,12 +1,9 @@
 <section class="ml-app ml-app-shell ml-craftworks app-shell ml-craftworks-browser-shell">
-  <header class="ml-craftworks-header">
-    <h2>Encounter Loot</h2>
-    <p>Resolve materials and coin from every dead creature, plus one rare special-treasure check for the encounter.</p>
-  </header>
+  <header class="ml-hero"><i class="fa-solid fa-hammer ml-hero__icon"></i><div class="ml-hero__body"><h1>Encounter Loot</h1><p>Resolve materials and coin from every dead creature, plus one rare special-treasure check for the encounter.</p></div><div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header>
 
   {{#unless session}}
-    <div class="ml-craftworks-panel">
-      <h3>Dead Creatures</h3>
+    <div class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3">
+      <div class="ml-section-heading"><div><h2>Dead Creatures</h2><p>Select the defeated creatures that contribute to encounter loot.</p></div></div>
       {{#if creatures.length}}
         <p>Select only the defeated NPC tokens that should contribute to this Encounter Loot roll.</p>
         <div class="ml-craftworks-loot-selection-actions">
@@ -31,19 +28,19 @@
           {{/each}}
         </div>
 
-        <div class="ml-actions ml-craftworks-actions">
+        <footer class="ml-page-footer ml-actions">
           <button type="button" data-action="roll">
             <i class="fa-solid fa-dice-d20"></i> Roll Encounter Loot
           </button>
-        </div>
+        </footer>
       {{else}}
       <p class="ml-text ml-craftworks-warning" data-tone="warning">No dead creatures were found on the current scene.</p>
       {{/if}}
     </div>
   {{else}}
-    <div class="ml-craftworks-browser-results">
-      <div class="ml-craftworks-panel">
-        <h3>Corpse Results</h3>
+    <div class="ml-craftworks-browser-results ml-stack" data-gap="3">
+      <div class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3">
+        <div class="ml-section-heading"><div><h2>Corpse Results</h2><p>Review the materials and coin rolled for each defeated creature.</p></div></div>
         <div class="ml-craftworks-loot-roll-list">
         {{#each session.result.rolls}}
           <div class="ml-craftworks-loot-roll">
@@ -85,8 +82,8 @@
         </div>
       </div>
 
-      <div class="ml-craftworks-panel">
-        <h3>Encounter Haul</h3>
+      <div class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3">
+        <div class="ml-section-heading"><div><h2>Encounter Haul</h2><p>Review and customize the combined encounter rewards.</p></div></div>
 
         <div class="ml-craftworks-result-toolbar">
           <button type="button" data-action="delete-result-items"><i class="fa-solid fa-trash"></i> Delete Marked</button>
@@ -194,8 +191,8 @@
 
       </div>
 
-      <div class="ml-craftworks-panel">
-        <h3>Recipient</h3>
+      <div class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3">
+        <div class="ml-section-heading"><div><h2>Recipient</h2><p>Choose the character or party inventory that receives these items.</p></div></div>
         <label>
           Reward Recipient
           <select name="recipient">
@@ -205,17 +202,16 @@
         </label>
         {{#if partyInfo.valid}}<p class="ml-craftworks-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
 
-        <div class="ml-actions ml-craftworks-actions">
+        <footer class="ml-page-footer ml-actions">
           <button type="button" data-action="reroll-loot"><i class="fa-solid fa-dice"></i> Reroll</button>
           <button type="button" data-action="reset-loot"><i class="fa-solid fa-rotate-left"></i> Reset</button>
           <button type="button" data-action="award" {{#unless session.result.found}}disabled{{/unless}}>
             <i class="fa-solid fa-box-open"></i> Award Encounter Loot
           </button>
-        </div>
-
         {{#unless session.result.found}}
           <button type="button" data-action="finish">Finish</button>
         {{/unless}}
+        </footer>
       </div>
     </div>
   {{/unless}}

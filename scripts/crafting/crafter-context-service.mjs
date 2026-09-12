@@ -72,7 +72,7 @@ export class CrafterContextService {
       .filter(actor => ["character", "group"].includes(actor.type))
       .filter(actor =>
         game.user.isGM
-        || actor.testUserPermission(game.user, "OWNER")
+        || actor.uuid === crafter?.uuid
         || isCharacterMemberOfGroup(crafter, actor)
       )
       .sort((a, b) => a.name.localeCompare(b.name));

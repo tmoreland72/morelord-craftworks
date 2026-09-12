@@ -1,9 +1,10 @@
+import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 import { MODULE_TITLE } from "../constants.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 const ENCOUNTERS_MODULE_ID = "morelord-encounters";
 const ENCOUNTERS_PRODUCT_URL = "https://morelord.com/products/morelord-encounters";
 
-export class DeleriumSearchResultsApp extends HandlebarsApplicationMixin(ApplicationV2) {
+export class DeleriumSearchResultsApp extends ScrollPreservingApplicationMixin(HandlebarsApplicationMixin(ApplicationV2)) {
   constructor(craftworks, session, options = {}) {
     super(options);
     this.craftworks = craftworks;
@@ -48,14 +49,12 @@ export class DeleriumSearchResultsApp extends HandlebarsApplicationMixin(Applica
 
     return foundry.utils.mergeObject(context, {
       session: this.session,
-      hasReward: Boolean(this.session.reward),
+      hasReward: Boolean(this.session.rewards?.length),
       hasResult: Boolean(this.session.result),
-      quantityRequiresRoll: Boolean(this.session.reward && this.session.reward.formula !== "1"),
-      awardButtonLabel: this.session.reward?.formula === "1"
-        ? "Award 1 Shard"
-        : `Roll ${this.session.reward?.formula ?? ""} & Award`,
+      rewards: this.session.rewards ?? [],
+      awardedItems: this.session.result?.items ?? [],
       recipients,
-      canAward: Boolean(this.session.reward && !this.session.result && recipients.length),
+      canAward: Boolean(this.session.rewards?.length && !this.session.result && recipients.length),
       encounterTitle: this.session.randomEncounter ? "Random Encounter Required" : "No Random Encounter",
       encounterText: this.session.randomEncounter
         ? "Two or more characters failed their checks. Resolve a random encounter for this search."

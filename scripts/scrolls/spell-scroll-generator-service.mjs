@@ -1,3 +1,4 @@
+import { generatorQuantity } from "../core/generator-quantity.mjs";
 import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
 export class SpellScrollGeneratorService {
   constructor({
@@ -60,7 +61,7 @@ export class SpellScrollGeneratorService {
         index = await pack.getIndex({
           fields: [
             "name", "img", "type", "system.level", "system.school",
-            "system.source.book", "system.source.custom"
+            "system.source"
           ]
         });
       } catch (error) {
@@ -176,6 +177,7 @@ export class SpellScrollGeneratorService {
     spellUuid,
     level,
     fallbackActorUuid = null,
+    quantity = 1,
     postChatCard = true
   } = {}) {
     if (!this.hasAccess) {
@@ -184,6 +186,7 @@ export class SpellScrollGeneratorService {
       );
     }
 
+    quantity = generatorQuantity(quantity);
     const fallback = fallbackActorUuid
       ? await fromUuid(fallbackActorUuid)
       : null;
@@ -204,7 +207,7 @@ export class SpellScrollGeneratorService {
     const created = await this.adapter.addItemToActor(
       recipient,
       temporary,
-      1
+      quantity
     );
 
     if (postChatCard) {
@@ -213,7 +216,7 @@ export class SpellScrollGeneratorService {
         items: [{
           document: created,
           linkUuid: spell.uuid,
-          quantity: 1,
+          quantity,
           rarity: created.system?.rarity
         }],
         title: "Spell Scroll Received",
@@ -222,6 +225,7 @@ export class SpellScrollGeneratorService {
     }
 
     return {
+      quantity,
       item: created,
       recipient,
       spell,
@@ -280,11 +284,13 @@ export class SpellScrollGeneratorService {
       );
     }
 
+    spells = spells.map(spell => ({ ...spell, quantity: generatorQuantity(spell.quantity ?? 1) }));
     const awarded = [];
     let recipient = null;
 
     for (const spell of spells) {
       const result = await this.createAndAwardScroll({
+        quantity: spell.quantity,
         spellUuid: spell.uuid,
         level: Number(spell.level ?? 0),
         fallbackActorUuid:
@@ -302,11 +308,11 @@ export class SpellScrollGeneratorService {
       items: awarded.map(result => ({
         document: result.item,
         linkUuid: result.spell.uuid,
-        quantity: 1,
+        quantity: result.quantity,
         rarity: result.item.system?.rarity
       })),
       title: "Spell Scrolls Received",
-      subtitle: `${awarded.length} scroll${awarded.length === 1 ? "" : "s"} generated`
+      subtitle: `${awarded.reduce((sum, row) => sum + row.quantity, 0)} scrolls generated`
     });
 
     return { recipient, items: awarded, spells };
@@ -337,7 +343,8 @@ export class SpellScrollGeneratorService {
     const normalized = String(sourceLabel ?? "")
       .trim()
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "");
+      .replace(/[^a-z0-9]+/g, "")
+      .replace("systemreferencedocument", "srd");
     const contentPackId = normalized === "srd52"
       ? "srd-5.2"
       : normalized === "srd51"

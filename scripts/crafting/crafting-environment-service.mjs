@@ -1,6 +1,23 @@
 import { getMorelordCoreService } from "../core/morelord-core-api.mjs";
 
-const VALID_TIERS = new Set(["common", "uncommon", "rare", "veryRare", "legendary"]);
+const VALID_TIERS = new Set(["common", "uncommon", "rare", "veryRare", "legendary", "artifact"]);
+
+export const CRAFTING_FACILITY_RULES = "craftingFacilityRules";
+export const ARTISAN_TOOLS = ["Alchemist's Supplies", "Brewer's Supplies", "Calligrapher's Supplies", "Carpenter's Tools", "Cobbler's Tools", "Cook's Utensils", "Glassblower's Tools", "Jeweler's Tools", "Leatherworker's Tools", "Mason's Tools", "Painter's Supplies", "Potter's Tools", "Smith's Tools", "Tinker's Tools", "Weaver's Tools", "Woodcarver's Tools"];
+export function getCraftingFacilityRules() {
+  try {
+    const rules = JSON.parse(game.settings.get("morelord-craftworks", CRAFTING_FACILITY_RULES) || "{}");
+    return rules && typeof rules === "object" && !Array.isArray(rules) ? rules : {};
+  }
+  catch { return {}; }
+}
+export function recipeFacilityEnvironment(recipe, rules = getCraftingFacilityRules()) {
+  const drakkenheim = recipe?.packId === "monsters-of-drakkenheim" || recipe?.source?.contentPackId === "monsters-of-drakkenheim";
+  const type = drakkenheim ? "workshop" : rules[recipe?.craft?.tool ?? ""] ?? "";
+  const rarity = String(recipe?.output?.rarity ?? recipe?.rarity ?? "common").replace(/[^a-z]/gi, "").toLowerCase();
+  const tier = rarity === "veryrare" ? "veryRare" : VALID_TIERS.has(rarity) ? rarity : "common";
+  return normalizeCraftEnvironment({ facility: type ? { type, tier } : null });
+}
 
 export function getCraftingFacilityOptions(locationApi = null) {
   const types = locationApi?.listCapabilities?.() ?? [];
@@ -47,6 +64,9 @@ export function evaluateCraftingEnvironment(recipe, context = {}, locationApi = 
     if (!locationApi?.evaluate && !locationApi?.evaluateRequirements) {
       return { passed: false, mode: "facility", environment, location, reasons: ["Morelord Core Location services are unavailable."] };
     }
+    if (locationApi.capabilityTiers && !Array.from(locationApi.capabilityTiers).includes(environment.facility.tier)) {
+      return { passed: false, mode: "facility", environment, location, reasons: [`No ${environment.facility.tier} facility tier is available in Core.`] };
+    }
     const requirement = { kind: "capability", ...environment.facility };
     const result = locationApi.evaluate
       ? locationApi.evaluate([requirement], { ...context, location })
@@ -71,7 +91,7 @@ export class CraftingEnvironmentService {
 
   evaluate(recipe, context = {}) {
     return evaluateCraftingEnvironment(
-      recipe,
+      recipe?.id ? { ...recipe, craft: { ...recipe.craft, environment: recipeFacilityEnvironment(recipe) } } : recipe,
       this.#activeDowntimeContext(context),
       this.locationApi
     );

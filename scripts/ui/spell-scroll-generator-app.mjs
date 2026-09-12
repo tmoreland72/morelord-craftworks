@@ -1,3 +1,5 @@
+import { generatorQuantity } from "../core/generator-quantity.mjs";
+import { RecipePickerApp } from "./recipe-picker-app.mjs";
 import { MODULE_TITLE } from "../constants.mjs";
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 import { bindGeneratorCountControls } from "./generator-count-controls.mjs";
@@ -13,6 +15,8 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
     this.craftworks = craftworks;
     this.counts = Object.fromEntries(Array.from({ length: 10 }, (_, level) => [level, 0]));
     this.result = [];
+    this.hasDraft = false;
+    this.selectedRecipientUuid = null;
     this.selectedSchools = null;
   }
 
@@ -39,18 +43,18 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
       .map(actor => ({
         uuid: actor.uuid,
         name: actor.name,
-        selected: actor.uuid === partyInfo.actorUuid
+        selected: actor.uuid === (this.selectedRecipientUuid ?? partyInfo.actorUuid)
       }))
       .sort((a, b) => a.name.localeCompare(b.name));
     const levels = Array.from({ length: 10 }, (_, level) => ({
       level,
       label: level === 0 ? "Cantrips" : `Level ${level}`,
       count: Number(this.counts[level] ?? 0),
-      available: allSpells.filter(spell => Number(spell.level ?? 0) === level).length
+      available: allSpells.filter(spell => Number(spell.level ?? 0) === level && this.selectedSchools.has(spell.school)).length
     }));
     const resultGroups = levels.map(entry => ({
       ...entry,
-      spells: this.result.filter(spell => Number(spell.level ?? 0) === entry.level)
+      spells: this.result.map((item, resultIndex) => ({ ...item, quantity: item.quantity ?? 1, resultIndex })).filter(spell => Number(spell.level ?? 0) === entry.level)
     })).filter(group => group.spells.length);
 
     return foundry.utils.mergeObject(context, {
@@ -59,7 +63,7 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
       schools: schools.map(school => ({ ...school, selected: this.selectedSchools.has(school.id) })),
       resultGroups,
       resultCount: this.result.length,
-      hasResult: this.result.length > 0,
+      hasResult: this.hasDraft,
       partyInfo,
       actors
     }, { inplace: false });
@@ -67,6 +71,15 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
 
   async _onRender(context, options) {
     await super._onRender(context, options);
+    this.element.querySelectorAll("[data-result-quantity]").forEach(input => input.addEventListener("input", () => {
+      this.result[Number(input.dataset.resultQuantity)].quantity = input.value;
+    }));
+    this.element.querySelector("[name='recipient']")?.addEventListener("change", event => { this.selectedRecipientUuid = event.currentTarget.value; });
+    this.element.querySelectorAll("[data-remove-result]").forEach(button => button.addEventListener("click", async () => {
+      this.result.splice(Number(button.dataset.removeResult), 1);
+      await this.render({ force: true });
+    }));
+    this.element.querySelector("[data-action='add-result']")?.addEventListener("click", () => this.#addResult());
     this.element.querySelectorAll("[data-scroll-level]").forEach(input =>
       input.addEventListener("change", event => {
         this.counts[Number(event.currentTarget.dataset.scrollLevel)] = Math.max(0, Math.floor(Number(event.currentTarget.value ?? 0)));
@@ -97,6 +110,22 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
         document?.sheet?.render(true);
       })
     );
+  }
+
+  async #addResult() {
+    try {
+      const items = await this.craftworks.spellScrollGenerator.availableSpells({ dedupe: false });
+      const catalog = items.map(item => ({ ...item, id: item.uuid, type: "spell", rarity: `Level ${item.level}`, category: game.i18n.localize(CONFIG.DND5E?.spellSchools?.[item.school]?.label ?? CONFIG.DND5E?.spellSchools?.[item.school] ?? item.school) }));
+      await new RecipePickerApp(this.craftworks, {
+        kind: "item", title: "Add Spell Scroll", catalog,
+        filterLabels: { rarity: "Spell Level", category: "School of Magic" },
+        onSelect: async row => {
+          this.result.push({ ...items.find(item => item.uuid === row.uuid) });
+          this.hasDraft = true;
+          await this.render({ force: true });
+        }
+      }).render({ force: true });
+    } catch (error) { ui.notifications.error(error.message); }
   }
 
   #readCounts() {
@@ -141,6 +170,7 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
       this.result = await this.craftworks.spellScrollGenerator.generate(this.counts, {
         schools: [...this.selectedSchools]
       });
+      this.hasDraft = true;
       await this.render({ force: true });
     } catch (error) {
       ui.notifications.error(error.message);
@@ -163,7 +193,7 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
         spells: this.result,
         fallbackActorUuid
       });
-      ui.notifications.info(`${this.result.length} spell scroll(s) added to ${awarded.recipient.name}.`);
+      ui.notifications.info(`${this.result.reduce((sum, row) => sum + generatorQuantity(row.quantity ?? 1), 0)} spell scroll(s) added to ${awarded.recipient.name}.`);
       await this.close();
     } catch (error) {
       console.error("Morelord Craftworks | Spell scroll award failed.", error);
@@ -176,7 +206,7 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
     if (!this.result.length) return ui.notifications.warn("Generate spell scrolls before sharing them.");
     try {
       await AwardChatCardService.post({
-        items: this.result.map(spell => ({ ...spell, linkUuid: spell.uuid, quantity: 1 })),
+        items: this.result.map(spell => ({ ...spell, linkUuid: spell.uuid, quantity: generatorQuantity(spell.quantity ?? 1) })),
         title: "Available Spell Scrolls",
         subtitle: `${this.result.length} randomly generated spell scroll${this.result.length === 1 ? "" : "s"}`,
         icon: "fa-solid fa-scroll"

@@ -1,3 +1,4 @@
+import { generatorQuantity } from "../core/generator-quantity.mjs";
 import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
 
 export const POTION_RARITIES = [
@@ -55,7 +56,7 @@ export class PotionGeneratorService {
         index = await pack.getIndex({
           fields: [
             "name", "img", "type", "system.type.value", "system.rarity",
-            "system.source.book", "system.source.custom"
+            "system.source"
           ]
         });
       } catch (error) {
@@ -97,7 +98,7 @@ export class PotionGeneratorService {
   async availableCounts({ categories = null } = {}) {
     const counts = Object.fromEntries(POTION_RARITIES.map(rarity => [rarity.id, 0]));
     for (const potion of await this.availablePotions()) {
-      if (categories?.length && !categories.includes(potion.category)) continue;
+      if (categories && !categories.includes(potion.category)) continue;
       counts[potion.rarity] += 1;
     }
     return counts;
@@ -142,7 +143,7 @@ export class PotionGeneratorService {
     const grouped = new Map();
     for (const potion of potions) {
       const entry = grouped.get(potion.uuid) ?? { potion, quantity: 0 };
-      entry.quantity += 1;
+      entry.quantity += generatorQuantity(potion.quantity ?? 1);
       grouped.set(potion.uuid, entry);
     }
 
@@ -163,7 +164,7 @@ export class PotionGeneratorService {
       recipient,
       items: awarded,
       title: "Potions Received",
-      subtitle: `${potions.length} potion${potions.length === 1 ? "" : "s"} generated`
+      subtitle: `${awarded.reduce((sum, row) => sum + row.quantity, 0)} potions generated`
     });
 
     return { recipient, items: awarded, potions };

@@ -83,7 +83,7 @@ export class Dnd5eSourceFilterService {
   isSourceEnabled(sourceLabel, { itemType = null } = {}) {
     if (game.system.id !== "dnd5e") return true;
 
-    const normalized = this.#normalizeIdentifier(sourceLabel);
+    const normalized = this.#normalizeIdentifier(sourceLabel).replace("systemreferencedocument", "srd");
     const collections = normalized === "srd51"
       ? (itemType === "spell"
           ? ["dnd5e.spells"]
@@ -108,82 +108,14 @@ export class Dnd5eSourceFilterService {
         ? game.packs.get(packOrCollection)
         : packOrCollection;
 
-    const collection = String(
-      pack?.collection
-      ?? packOrCollection
-      ?? ""
-    ).toLowerCase();
-
-    if (
-      collection === "dnd5e.equipment24"
-      || collection === "dnd5e.spells24"
-    ) {
-      return "SRD 5.2";
-    }
-
-    if (
-      collection === "dnd5e.items"
-      || collection === "dnd5e.tradegoods"
-      || collection === "dnd5e.spells"
-    ) {
-      return "SRD 5.1";
-    }
-
-    const candidates = [
-      pack?.metadata?.sourceBook,
-      pack?.metadata?.book,
-      pack?.metadata?.label,
-      pack?.title,
-      pack?.metadata?.name
-    ];
-
-    for (const candidate of candidates) {
-      const label = this.#usableSourceLabel(candidate);
-      if (label) return label;
-    }
-
-    const packageName = pack?.metadata?.packageName ?? pack?.metadata?.package;
-    const packageTitle = game.modules?.get(packageName)?.title;
-
-    return this.#usableSourceLabel(packageTitle) ?? "Unknown Source";
+    return getMorelordCoreService("sources")?.resolveBookLabel?.({ pack }) ?? "Unknown Source";
   }
 
   sourceLabelForItem(itemData, { pack = null } = {}) {
     const source = foundry.utils.getProperty(itemData, "system.source");
-    const book = typeof source === "object" && source ? source.book : null;
-    const custom = typeof source === "object" && source ? source.custom : null;
-
-    if (book) {
-      const label = this.#usableSourceLabel(this.#sourceBookLabel(book));
-      if (label) return label;
-    }
-
-    const customLabel = this.#usableSourceLabel(custom);
-    if (customLabel) return customLabel;
-    const stringLabel = typeof source === "string"
-      ? this.#usableSourceLabel(source)
-      : null;
-    if (stringLabel) return stringLabel;
-
-    const packSourceBook = pack?.metadata?.sourceBook;
-    if (packSourceBook) {
-      const label = this.#usableSourceLabel(this.#sourceBookLabel(packSourceBook));
-      if (label) return label;
-    }
-
-    const collection = String(pack?.collection ?? "").toLowerCase();
-    if (collection === "dnd5e.equipment24" || collection === "dnd5e.spells24") {
-      return "SRD 5.2";
-    }
-    if (
-      collection === "dnd5e.items"
-      || collection === "dnd5e.tradegoods"
-      || collection === "dnd5e.spells"
-    ) {
-      return "SRD 5.1";
-    }
-
-    return this.sourceLabelForPack(pack);
+    const book = typeof source === "string" ? source : source?.book ?? "";
+    const custom = typeof source === "object" ? source?.custom ?? "" : "";
+    return getMorelordCoreService("sources")?.resolveBookLabel?.({ book, custom, pack }) ?? "Unknown Source";
   }
 
   async sourceLabelForCompendiumItem(itemData, { pack = null } = {}) {
@@ -203,11 +135,6 @@ export class Dnd5eSourceFilterService {
     }
 
     return this.sourceLabelForPack(pack);
-  }
-
-  #sourceBookLabel(book) {
-    return getMorelordCoreService("sources")?.resolveBookLabel?.({ book })
-      ?? String(book ?? "");
   }
 
   sortPacks(packs = []) {
@@ -359,24 +286,4 @@ export class Dnd5eSourceFilterService {
       .replace(/[^a-z0-9]+/g, "");
   }
 
-  #usableSourceLabel(value) {
-    const raw = String(value ?? "").trim();
-    if (!raw) return null;
-
-    const normalized = raw
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, " ")
-      .trim();
-
-    const genericPackLabels = new Set([
-      "item", "items", "equipment", "spell", "spells", "monster", "monsters",
-      "actor", "actors", "journal", "journals", "table", "tables", "roll tables",
-      "adventure", "adventures", "class", "classes", "feature", "features"
-    ]);
-
-    if (genericPackLabels.has(normalized)) return null;
-    if (/^(?:d d|dnd)\s*5e\s*srd\s*5\s*2$/.test(normalized)) return "SRD 5.2";
-    if (/^(?:d d|dnd)\s*5e\s*srd\s*5\s*1$/.test(normalized)) return "SRD 5.1";
-    return raw;
-  }
 }
