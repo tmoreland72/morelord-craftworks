@@ -284,21 +284,15 @@
           </label>
 
           {{#if playerCharacters.length}}
-            <div class="ml-craftworks-harvest-skip-skill-list">
+            <div class="ml-actor-choice-grid">
               {{#each playerCharacters}}
-                <label class="ml-craftworks-harvest-skip-skill-row" data-harvest-character-row>
+                <label class="ml-actor-choice" data-harvest-character-row>
                   <input type="checkbox" name="characterUuid" value="{{actorUuid}}"
                     data-harvest-character-select {{#if selected}}checked{{/if}}>
-                  <span class="ml-craftworks-harvest-skip-character">
-                    {{#if actorImg}}
-                      <img src="{{actorImg}}" alt="{{actorName}}">
-                    {{/if}}
-                    <span>
-                      <strong>{{actorName}}</strong>
-                      <small>
-                        {{userName}}{{#unless connected}} · Not connected{{/unless}}
-                      </small>
-                    </span>
+                  <img src="{{actorImg}}" alt="{{actorName}}">
+                  <span class="ml-stack" data-gap="1">
+                    <strong>{{actorName}}</strong>
+                    <small>{{#if connected}}{{userName}}{{else}}Offline · Not connected{{/if}}</small>
                   </span>
                 </label>
               {{/each}}

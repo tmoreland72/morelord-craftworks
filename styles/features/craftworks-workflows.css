@@ -1273,8 +1273,7 @@
   margin-bottom: 14px;
 }
 
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creatures,
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-skill-list {
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creatures {
   display: grid;
   gap: 8px;
   padding: 10px;

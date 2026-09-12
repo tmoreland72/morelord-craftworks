@@ -9,7 +9,7 @@ that world.
 
 ## User documentation
 
-See the [GM manual](docs/gm-manual.md) and [player manual](docs/player-manual.md) for current workflows. Potion and scroll drafts support individual removal and additions through the full filtered catalog picker. Availability counts follow category and school selections. Delerium Search awards Monsters of Drakkenheim compendium items through the Recipient selector. Page sections use the bordered, shaded Morelord Core surfaces used by Downtime.
+See the [GM manual](docs/gm-manual.md) and [player manual](docs/player-manual.md) for current workflows. Potion and scroll drafts support individual removal and additions through the full filtered catalog picker. Availability counts follow category and school selections. Delerium Search awards Monsters of Drakkenheim compendium items through the Recipient selector. Page sections use the bordered, shaded Morelord Core surfaces used by Downtime. Gathering, Harvest, and Delerium Search use the same Core Player Characters section format, with round portraits and highlighted selections.
 
 ## Support baseline
 
@@ -37,7 +37,7 @@ Current Standard functionality includes:
 - large Materials and Recipes catalogs use live search and include/exclude filters
 - browsers count the full matching catalog while limiting rendered cards
 - Recipe browser filters include knowledge, Content Pack, Category, Preferred Artisan Tool, and rarity
-- recipe reference details including tools, checks, normal/no-tool DCs, and crafting-hour requirements
+- recipe reference details including tools, recipe DCs, and crafting-hour requirements
 - Craftworks-wide crafting attempts representing 2 hours of work each
 - failed crafting checks consume time but do not consume recipe materials
 - direct navigation between recipe ingredients/outputs and the Materials browser
@@ -49,8 +49,8 @@ Current Standard functionality includes:
 - recipe cards keep tool requirements informational rather than coloring them as pass/fail state
 - recipe cards display total crafting duration with a clock icon (`N hours`) as core recipe information
 - recipe total crafting durations must be positive multiples of 2 hours
-- automatic normal/no-tool DC selection based on confirmed tool possession and proficiency
-- higher no-tool DCs use a compact warning tooltip rather than duplicating status text
+- missing tool possession or proficiency imposes disadvantage at the recipe DC
+- compact tool requirement hints explain missing possession or proficiency
 - recipe readiness is communicated by per-requirement red/green inventory counts rather than redundant Ready/Missing Materials header badges
 - recursive processing planning
 - campaign-specific Content Pack enable/disable controls
@@ -168,6 +168,8 @@ paths without creating duplicate recipes for the same output.
 
 ### Crafting lifecycle
 
+The following lifecycle describes Standard recipes. Monsters of Drakkenheim recipes complete without rolls or tracked hours once their materials and Workshop requirements are met.
+
 When the selected inventory satisfies a recipe and a Crafter Actor is selected,
 the Recipe browser exposes a Craft action.
 
@@ -209,7 +211,7 @@ Craftworks uses a common timing model for recipe execution:
 - failed checks do not consume the recipe's materials
 - once crafting is initiated, recipe UI can display progress such as `✅ 1 of 4 Successes`
 - the check itself does not change when the required tool is missing
-- lacking the required tool increases the recipe DC; the default increase is **+5**
+- lacking the required tool or its proficiency imposes disadvantage without changing the recipe DC
 - owning a tool and being proficient with that tool are separate concepts
 
 Recipes may define their total `hoursRequired`. Craftworks should use source-backed
@@ -419,7 +421,7 @@ https://raw.githubusercontent.com/tmoreland72/morelord-craftworks/main/module.js
 
 ## Release workflow
 
-Morelord Craftworks uses the standard Morelord Foundry module release workflow shared with Morelord Marketplace and Morelord Drakkenheim Harvesting.
+Morelord Craftworks uses the standard Morelord Foundry module release workflow shared with Morelord Marketplace, Morelord Journeys, and Morelord Encounters.
 
 Project-specific release settings are stored in `release.config.json`. Local website publishing credentials belong in `.env`:
 
@@ -441,4 +443,11 @@ Publish the release:
 .\release.ps1 -Version 0.1.0
 ```
 
-Crafting facility requirements are configured per artisan tool in module Settings. Recipe cards show the resulting requirement, with the crafted item’s rarity as the minimum facility tier; higher tiers qualify. Both crafting DCs and all recipe filter counts are visible. The recipe editor begins with Item to Be Crafted and supports mandatory AND groups containing OR material choices. Offline Harvest and Gather characters can be played by the GM. Potion and scroll draft quantities default to one and may be edited before sharing or awarding.
+Crafting facility requirements are configured per artisan tool in module Settings. Recipe cards show the resulting requirement, with the crafted item’s rarity as the minimum facility tier; higher tiers qualify. The recipe DC and all recipe filter counts are visible. The recipe editor begins with Item to Be Crafted and supports mandatory AND groups containing OR material choices. Offline Harvest and Gather characters can be played by the GM. Potion and scroll draft quantities default to one and may be edited before sharing or awarding.
+
+### Shared UI and current crafting rules
+
+Craftworks consumes Core's page and nested-scroll preservation along with its shared surfaces, typography, and controls. Standard recipes use two-hour attempts at the recipe DC; missing tool possession or proficiency imposes disadvantage. Monsters of Drakkenheim recipes instead complete without rolls or tracked hours when their materials and equal-or-higher Workshop requirements are met. The Workshop requirement is independent of artisan-tool facility settings.
+### Release documentation check
+
+Production releases require the `docs` directory in the archive. Before releasing, update the manuals and set `docs/README.md` frontmatter to the target version; the shared release script rejects a missing or mismatched documentation landing page. Review all manuals as part of each code change, including behavior and compatibility requirements.

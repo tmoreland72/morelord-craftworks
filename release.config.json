@@ -13,7 +13,8 @@
     "scripts",
     "styles",
     "templates",
-    "data"
+    "data",
+    "docs"
   ],
   "optionalPaths": [
     "assets",
@@ -21,7 +22,7 @@
     "LICENSE",
     "LICENSE.md",
     "ATTRIBUTION.md",
-    "USER-GUIDE.md",
-    "docs"
-  ]
+    "USER-GUIDE.md"
+  ],
+  "productDocumentationPath": "docs/README.md"
 }

@@ -34,6 +34,22 @@
     </div>
     <footer class="ml-page-footer ml-actions"><button type="button" data-action="finalize"><i class="fa-solid fa-flag-checkered"></i> Finalize Search</button></footer>
   {{else}}
-    <div class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3"><div class="ml-section-heading"><div><h2>{{sceneName}}</h2><p>Configure this opportunity for the current scene.</p></div></div><label>Search Area<select name="zone">{{#each zones}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}} — DC {{dc}}</option>{{/each}}</select></label><p>Each selected character rolls Arcana, Investigation, or Survival. Meeting the DC earns 1 success; beating it by 5+ or rolling a natural 20 earns 2.</p><fieldset class="ml-craftworks-character-picker"><legend>Player Characters</legend><p>Choose which characters participate in this search.</p><div class="ml-craftworks-character-picker-list">{{#each characters}}<label><input type="checkbox" name="characterUuid" value="{{uuid}}" {{#if checked}}checked{{/if}}><img src="{{img}}" alt="{{name}}"><span><strong>{{name}}</strong><small>{{#if connected}}Connected: {{userName}}{{else}}Offline — GM rolls{{/if}}</small></span></label>{{/each}}</div></fieldset><footer class="ml-page-footer ml-actions"><button type="button" data-action="save-defaults" title="Save this area and selected characters for future searches"><i class="fa-solid fa-floppy-disk"></i> Save as Default</button><button type="button" data-action="start"><i class="fa-solid fa-gem"></i> Start Delerium Search</button></footer></div>
+    <div class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3"><div class="ml-section-heading"><div><h2>{{sceneName}}</h2><p>Configure this opportunity for the current scene.</p></div></div><label>Search Area<select name="zone">{{#each zones}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}} — DC {{dc}}</option>{{/each}}</select></label><p>Each selected character rolls Arcana, Investigation, or Survival. Meeting the DC earns 1 success; beating it by 5+ or rolling a natural 20 earns 2.</p><section class="ml-surface ml-section ml-stack" data-gap="3">
+        <div class="ml-section-heading"><div><h2>Player Characters</h2><p>Choose which characters participate in this search.</p></div></div>
+        <div class="ml-actor-choice-grid">
+          {{#each characters}}
+            <label class="ml-actor-choice">
+              <input type="checkbox" name="characterUuid" value="{{uuid}}" {{#if checked}}checked{{/if}}>
+              <img src="{{img}}" alt="{{name}}">
+              <span class="ml-stack" data-gap="1">
+                <strong>{{name}}</strong>
+                <small>{{#if connected}}{{userName}}{{else}}Offline · Not connected{{/if}}</small>
+              </span>
+            </label>
+          {{else}}
+            <p class="ml-text ml-craftworks-warning" data-tone="warning">No player character Actors are defined.</p>
+          {{/each}}
+        </div>
+      </section><footer class="ml-page-footer ml-actions"><button type="button" data-action="save-defaults" title="Save this area and selected characters for future searches"><i class="fa-solid fa-floppy-disk"></i> Save as Default</button><button type="button" data-action="start"><i class="fa-solid fa-gem"></i> Start Delerium Search</button></footer></div>
   {{/if}}
 </section>

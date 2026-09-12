@@ -28,14 +28,6 @@
 .ml-craftworks .ml-craftworks-delerium-rewards > div:last-child { border-bottom: 0; }
 .ml-craftworks .ml-craftworks-delerium-rewards span { opacity: .85; }
 
-.ml-craftworks .ml-craftworks-character-picker { margin: 14px 0 0; padding: 10px; }
-.ml-craftworks .ml-craftworks-character-picker > p { margin: 0 0 8px; opacity: .85; }
-.ml-craftworks .ml-craftworks-character-picker-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 7px; }
-.ml-craftworks .ml-craftworks-character-picker-list > label { display: grid; grid-template-columns: auto 32px 1fr; align-items: center; gap: 8px; padding: 7px; border: 1px solid var(--ml-color-border); border-radius: 4px; }
-.ml-craftworks .ml-craftworks-character-picker-list input { margin: 0; }
-.ml-craftworks .ml-craftworks-character-picker-list img { width: 32px; height: 32px; object-fit: cover; border: 0; }
-.ml-craftworks .ml-craftworks-character-picker-list span { display: grid; gap: 2px; }
-.ml-craftworks .ml-craftworks-character-picker-list small { opacity: .7; }
 
 .ml-craftworks .ml-craftworks-dead-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
 .ml-craftworks .ml-craftworks-dead-list span { display: inline-flex; align-items: center; gap: 6px; padding: 4px 7px; border: 1px solid var(--ml-color-border); border-radius: 4px; }
@@ -2211,12 +2203,6 @@
 
 
 /* dev.98 — Recipes are reference-only; Craft is the execution workspace */
-.ml-craftworks .ml-craftworks-recipe-mark-context {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
 .ml-craftworks .ml-craftworks-recipe-crafter-selector {
   display: flex;
   align-items: center;
