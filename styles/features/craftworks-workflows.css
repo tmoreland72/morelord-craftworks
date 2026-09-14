@@ -1194,78 +1194,7 @@
   transform: none !important;
 }
 
-/* Configurable Gathering terrain DCs */
-.ml-craftworks-gather-dc-settings {
-  margin-top: 14px;
-  border: 1px solid color-mix(in srgb, var(--ml-color-accent) 25%, transparent);
-  border-radius: 8px;
-  overflow: hidden;
-}
 
-.ml-craftworks-gather-dc-heading {
-  padding: 10px 12px;
-  border-bottom: 1px solid color-mix(in srgb, var(--ml-color-accent) 20%, transparent);
-  background: color-mix(in srgb, var(--ml-color-accent) 6%, transparent);
-}
-
-.ml-craftworks-gather-dc-heading strong,
-.ml-craftworks-gather-dc-heading small {
-  display: block;
-}
-
-.ml-craftworks-gather-dc-heading small {
-  margin-top: 3px;
-  opacity: .72;
-}
-
-.ml-craftworks-gather-dc-list {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.ml-craftworks-gather-dc-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  min-width: 0;
-  padding: 9px 11px;
-  border-bottom: 1px solid color-mix(in srgb, var(--ml-color-text) 6%, transparent);
-}
-
-.ml-craftworks-gather-dc-row:nth-child(odd) {
-  border-right: 1px solid color-mix(in srgb, var(--ml-color-text) 6%, transparent);
-}
-
-.ml-craftworks-gather-dc-copy {
-  min-width: 0;
-}
-
-.ml-craftworks-gather-dc-copy strong,
-.ml-craftworks-gather-dc-copy small {
-  display: block;
-}
-
-.ml-craftworks-gather-dc-copy small {
-  margin-top: 2px;
-  opacity: .68;
-}
-
-.ml-craftworks-gather-dc-row input {
-  flex: 0 0 64px;
-  width: 64px;
-  text-align: center;
-}
-
-@media (max-width: 720px) {
-  .ml-craftworks-gather-dc-list {
-    grid-template-columns: 1fr;
-  }
-
-  .ml-craftworks-gather-dc-row:nth-child(odd) {
-    border-right: 0;
-  }
-}
 
 /* Harvest preflight controls and Drakkenheim special item instructions */
 .ml-craftworks-harvest-modern .ml-craftworks-harvest-harvest-preflight,
@@ -1689,33 +1618,7 @@
   opacity: 0.72;
 }
 
-/* Content synchronization */
-.ml-craftworks-content-sync-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin: 12px 0;
-}
 
-.ml-craftworks-content-sync-card > div {
-  min-width: 0;
-}
-
-.ml-craftworks-content-sync-card p {
-  margin: 4px 0;
-}
-
-.ml-craftworks-content-sync-card button {
-  flex: 0 0 auto;
-}
-
-@media (max-width: 700px) {
-  .ml-craftworks-content-sync-card {
-    align-items: stretch;
-    flex-direction: column;
-  }
-}
 
 /* Marketplace-standard long-list filtering */
 .ml-craftworks-marketplace-browser {

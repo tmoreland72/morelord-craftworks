@@ -1,3 +1,4 @@
+import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-participation.js";
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 import { MODULE_TITLE } from "../constants.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -24,8 +25,7 @@ export class DeleriumSearchResultsApp extends ScrollPreservingApplicationMixin(H
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
     const party = await this.craftworks.recipientResolver.getPartyActor();
-    const recipients = game.actors
-      .filter(actor => actor.type === "character" || actor.type === "group")
+    const recipients = [...listCharacterActors(), ...game.actors.filter(actor => actor.type === "group")]
       .map(actor => ({
         uuid: actor.uuid,
         name: actor.type === "group" ? `${actor.name} (Group Inventory)` : actor.name,

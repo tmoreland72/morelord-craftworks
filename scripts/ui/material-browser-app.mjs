@@ -1,3 +1,4 @@
+import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-participation.js";
 import { MODULE_ID, MODULE_TITLE } from "../constants.mjs";
 import { bindMultiselectBehavior } from "./multiselect-behavior.mjs";
 import { buildMaterialTagGroups } from "./material-filter-groups.mjs";
@@ -601,8 +602,7 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
   }
 
   #availableActors() {
-    return game.actors
-      .filter(actor => ["character", "group"].includes(actor.type))
+    return [...listCharacterActors(), ...game.actors.filter(actor => actor.type === "group")]
       .filter(actor =>
         game.user.isGM
         || actor.testUserPermission(game.user, "OWNER")

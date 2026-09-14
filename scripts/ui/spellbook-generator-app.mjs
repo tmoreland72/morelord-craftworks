@@ -1,3 +1,4 @@
+import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-participation.js";
 import { MODULE_TITLE } from "../constants.mjs";
 
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
@@ -75,12 +76,7 @@ export class SpellbookGeneratorApp
         .getPartyRecipientInfo();
 
     const actors =
-      game.actors
-        .filter(
-          actor =>
-            actor.type === "character"
-            || actor.type === "group"
-        )
+      [...listCharacterActors(), ...game.actors.filter(actor => actor.type === "group")]
         .map(actor => ({
           uuid: actor.uuid,
           name: actor.name,

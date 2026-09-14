@@ -1,3 +1,4 @@
+import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-participation.js";
 import { MODULE_TITLE } from "../constants.mjs";
 import { materialTagsSatisfy } from "../materials/material-match-utils.mjs";
 import {
@@ -1920,8 +1921,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
   }
 
   #availableActors() {
-    const all = game.actors
-      .filter(actor => ["character", "group"].includes(actor.type))
+    const all = [...listCharacterActors(), ...game.actors.filter(actor => actor.type === "group")]
       .filter(actor => game.user.isGM || actor.testUserPermission(game.user, "OWNER"))
       .map(actor => ({
         uuid: actor.uuid,

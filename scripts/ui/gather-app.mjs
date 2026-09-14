@@ -1,3 +1,4 @@
+import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-participation.js";
 import { MODULE_ID, MODULE_TITLE } from "../constants.mjs";
 import { SETTINGS } from "../core/settings.mjs";
 import { getMorelordCoreService } from "../core/morelord-core-api.mjs";
@@ -37,7 +38,7 @@ export class GatherApp extends ScrollPreservingApplicationMixin(
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
     const gatherRecords = this.craftworks.gather.getSceneGatherRecords();
-    const characters = game.actors.filter(actor => actor.type === "character");
+    const characters = listCharacterActors();
     if (this.selectedCharacterUuids === null) {
       const stored = String(game.settings.get(MODULE_ID, SETTINGS.GATHER_SELECTED_CHARACTER_UUIDS) ?? "");
       let selectedUuids = null;
@@ -130,8 +131,7 @@ export class GatherApp extends ScrollPreservingApplicationMixin(
         throw new Error("No Craftworks materials are indexed. Run the development material installer first.");
       }
 
-      const selectedCharacters = game.actors.filter(actor =>
-        actor.type === "character"
+      const selectedCharacters = listCharacterActors().filter(actor => actor.type === "character"
         && this.selectedCharacterUuids.has(actor.uuid)
       );
       if (!selectedCharacters.length) throw new Error("Select at least one player character.");

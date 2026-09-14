@@ -1,3 +1,4 @@
+import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-participation.js";
 import { isCharacterMemberOfGroup } from "./group-membership.mjs";
 
 export class CrafterContextService {
@@ -6,8 +7,7 @@ export class CrafterContextService {
   }
 
   availableCharacters() {
-    return game.actors
-      .filter(actor => actor.type === "character")
+    return listCharacterActors()
       .filter(actor =>
         game.user.isGM
         || actor.testUserPermission(game.user, "OWNER")
@@ -68,8 +68,7 @@ export class CrafterContextService {
   }
 
   availableInventoryActors(crafter = null) {
-    return game.actors
-      .filter(actor => ["character", "group"].includes(actor.type))
+    return [...listCharacterActors(), ...game.actors.filter(actor => actor.type === "group")]
       .filter(actor =>
         game.user.isGM
         || actor.uuid === crafter?.uuid

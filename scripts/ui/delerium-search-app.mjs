@@ -1,3 +1,4 @@
+import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-participation.js";
 import { MODULE_ID, MODULE_TITLE } from "../constants.mjs";
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 import { DeleriumSearchResultsApp } from "./delerium-search-results-app.mjs";
@@ -10,7 +11,7 @@ export class DeleriumSearchApp extends ScrollPreservingApplicationMixin(Handleba
   setSession(session) { this.session = session; return this.render(); }
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
-    const characters = game.actors.filter(actor => actor.type === "character");
+    const characters = listCharacterActors();
     if (this.selectedZone === null) {
       let defaults = {};
       try { defaults = JSON.parse(game.settings.get(MODULE_ID, "deleriumSearchDefaults") || "{}"); } catch { /* Use normal defaults if an old setting is invalid. */ }
@@ -69,7 +70,7 @@ export class DeleriumSearchApp extends ScrollPreservingApplicationMixin(Handleba
   }
   async #start() {
     try {
-      const characters = game.actors.filter(actor => actor.type === "character" && this.selectedCharacterUuids.has(actor.uuid));
+      const characters = listCharacterActors().filter(actor => actor.type === "character" && this.selectedCharacterUuids.has(actor.uuid));
       if (!characters.length) throw new Error("No player character Actors were found.");
       const connectedPlayers = [...new Set(characters.map(actor => this.#activeUserForActor(actor)).filter(Boolean))];
       this.session = this.craftworks.deleriumSearch.start(this.selectedZone);

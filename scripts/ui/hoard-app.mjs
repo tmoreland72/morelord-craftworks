@@ -1,3 +1,4 @@
+import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-participation.js";
 import { MODULE_TITLE } from "../constants.mjs";
 import { HOARD_PROFILES } from "../acquisition/hoard-profiles.mjs";
 
@@ -46,11 +47,7 @@ export class HoardApp extends ScrollPreservingApplicationMixin(
     const context = await super._prepareContext(options);
     const partyInfo = await this.craftworks.materialService.getPartyRecipientInfo();
 
-    const actors = game.actors
-      .filter(actor =>
-        actor.type === "character"
-        || actor.type === "group"
-      )
+    const actors = [...listCharacterActors(), ...game.actors.filter(actor => actor.type === "group")]
       .map(actor => ({
         uuid: actor.uuid,
         name: actor.name,

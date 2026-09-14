@@ -1,3 +1,4 @@
+import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-participation.js";
 import { MODULE_ID, MODULE_TITLE } from "../constants.mjs";
 import { getMorelordCoreService } from "../core/morelord-core-api.mjs";
 import { SETTINGS } from "../core/settings.mjs";
@@ -145,13 +146,13 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
       }
       if (Array.isArray(selectedUuids)) {
         const availableUuids = new Set(
-          game.actors.filter(actor => actor.type === "character").map(actor => actor.uuid)
+          listCharacterActors().map(actor => actor.uuid)
         );
         selectedUuids = selectedUuids.filter(uuid => availableUuids.has(uuid));
         if (!selectedUuids.length) selectedUuids = null;
       }
       const defaults = participation?.listCharacterChoices({ selectedUuids })
-        ?? game.actors.filter(actor => actor.type === "character").map(actor => ({
+        ?? listCharacterActors().map(actor => ({
           uuid: actor.uuid, name: actor.name, img: actor.img,
           checked: selectedUuids ? selectedUuids.includes(actor.uuid) : actor.hasPlayerOwner
         }));
@@ -160,7 +161,7 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
 
     const choices = participation?.listCharacterChoices({
       selectedUuids: [...this.selectedCharacterUuids]
-    }) ?? game.actors.filter(actor => actor.type === "character").map(actor => ({
+    }) ?? listCharacterActors().map(actor => ({
       uuid: actor.uuid, name: actor.name, img: actor.img,
       checked: this.selectedCharacterUuids.has(actor.uuid)
     }));
@@ -407,8 +408,7 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
         );
       }
 
-      const selectedCharacters = game.actors.filter(actor =>
-        actor.type === "character" && this.selectedCharacterUuids.has(actor.uuid)
+      const selectedCharacters = listCharacterActors().filter(actor => actor.type === "character" && this.selectedCharacterUuids.has(actor.uuid)
       );
       if (!selectedCharacters.length) throw new Error("Select at least one player character.");
       const harvestActorsByUser = {};

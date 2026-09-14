@@ -1,9 +1,9 @@
-<section class="ml-app ml-app-shell ml-craftworks-settings ml-craftworks app-shell ml-craftworks-settings-shell">
+<section class="ml-app ml-app-shell ml-craftworks-settings ml-craftworks">
   <header class="ml-hero"><i class="fa-solid fa-hammer ml-hero__icon"></i><div class="ml-hero__body"><h1>Morelord Craftworks Settings</h1><p>Configure content, material acquisition, recipe behavior, and crafting for this world.</p></div>
   <div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header>
 
-  <form class="ml-craftworks-settings-form">
-    <section class="ml-surface ml-settings-section ml-stack" data-gap="3">
+  <form class="ml-stack">
+    <section class="ml-surface ml-stack" data-gap="3">
       <div class="ml-section-heading"><div><h2><i class="fa-solid fa-boxes-stacked"></i> Content Packs</h2><p>Choose which Craftworks content packs are active in this world.</p></div></div>
 
       <section class="ml-access-card" data-state="{{#if core.connected}}active{{else}}locked{{/if}}">
@@ -43,8 +43,8 @@
         </div>
       </section>
 
-      <div class="ml-card ml-craftworks-setting-card ml-craftworks-content-sync-card">
-        <div>
+      <div class="ml-card ml-item-row">
+        <div class="ml-stack" data-gap="1">
           <strong>
             <i class="fa-solid fa-database"></i>
             Compendium Synchronization
@@ -71,13 +71,13 @@
         </button>
       </div>
 
-      <div class="ml-craftworks-content-pack-list">
+      <div class="ml-stack">
         {{#each packs}}
-          <article class="ml-card ml-craftworks-setting-card ml-craftworks-content-pack">
-            <div>
-              <div class="ml-craftworks-content-pack-heading">
+          <article class="ml-card ml-item-row">
+            <div class="ml-stack" data-gap="1">
+              <div class="ml-cluster">
                 <h4>{{label}}</h4>
-                <span class="ml-badge ml-craftworks-content-pack-status {{#if premium}}ml-craftworks-content-pack-premium{{else}}ml-craftworks-content-pack-free{{/if}}" data-tone="{{#if premium}}premium{{else}}success{{/if}}">
+                <span class="ml-badge" data-tone="{{#if premium}}premium{{else}}success{{/if}}">
                   {{statusLabel}}
                 </span>
               </div>
@@ -87,7 +87,7 @@
                 <small><strong>Feature:</strong> {{requiredFeature}}</small>
               {{/if}}
               {{#if setupNotice}}
-                <div class="ml-craftworks-pack-requirement" data-state="{{#if requiredModuleStatus.active}}ready{{else}}missing{{/if}}">
+                <div class="ml-callout" data-tone="{{#if requiredModuleStatus.active}}success{{else}}warning{{/if}}">
                   <i class="fa-solid {{#if requiredModuleStatus.active}}fa-circle-check{{else}}fa-triangle-exclamation{{/if}}"></i>
                   <div>
                     <strong>Required Drakkenheim Setup</strong>
@@ -98,7 +98,7 @@
                   </div>
                 </div>
               {{/if}}
-              <div class="ml-craftworks-pack-counts">
+              <div class="ml-cluster">
                 <span>{{counts.materials}} materials source</span>
                 <span>{{counts.recipes}} recipes</span>
                 <span>{{counts.harvest}} harvest profiles</span>
@@ -108,7 +108,7 @@
               </div>
             </div>
 
-            <label class="ml-craftworks-toggle-row">
+            <label class="ml-check">
               <span>{{#if enabled}}Enabled{{else}}Disabled{{/if}}</span>
               <input
                 type="checkbox"
@@ -122,13 +122,13 @@
       </div>
     </section>
 
-    <section class="ml-surface ml-settings-section ml-stack" data-gap="3">
+    <section class="ml-surface ml-stack" data-gap="3">
       <div class="ml-section-heading"><div><h2><i class="fa-solid fa-gem"></i> Materials</h2><p>Configure acquisition, recipients, Harvesting, Gathering, and Encounter Loot. Available materials and acquisition profiles come only from active Content Packs.</p></div></div>
 
-      <div class="ml-craftworks-settings-subsection">
-        <h4>Material Storage</h4>
+      <div class="ml-stack">
+        <div class="ml-section-heading"><div><h2>Material Storage</h2><p>Choose where newly acquired materials are delivered.</p></div></div>
 
-        <label class="ml-craftworks-setting-row">
+        <label class="ml-setting-row">
           <span>
             <strong>Use Party Actor for Acquired Materials</strong>
             <small>Place Harvest, Gathering, and Encounter Loot materials in a shared Group actor.</small>
@@ -136,7 +136,7 @@
           <input type="checkbox" name="usePartyRecipient" {{#if materials.usePartyRecipient}}checked{{/if}}>
         </label>
 
-        <label class="ml-craftworks-setting-row">
+        <label class="ml-setting-row">
           <span>
             <strong>Party Recipient Actor</strong>
             <small>Choose the Group actor that receives shared Craftworks materials.</small>
@@ -150,16 +150,16 @@
         </label>
       </div>
 
-      <div class="ml-craftworks-settings-subsection">
-        <h4>Harvesting</h4>
-        <div class="ml-craftworks-settings-grid">
+      <div class="ml-stack">
+        <div class="ml-section-heading"><div><h2>Harvesting</h2><p>Set Harvest difficulty, choices, and critical-success behavior.</p></div></div>
+        <div class="ml-grid" data-columns="2">
           <label><span>DC Modifier</span><input type="number" name="harvestDcModifier" value="{{materials.harvestDcModifier}}"></label>
           <label><span>Minimum Choices</span><input type="number" name="harvestChoicesMin" value="{{materials.harvestChoicesMin}}" min="1"></label>
           <label><span>Maximum Choices</span><input type="number" name="harvestChoicesMax" value="{{materials.harvestChoicesMax}}" min="1"></label>
           <label><span>Rare Result Bias (%)</span><input type="number" name="harvestRareBias" value="{{materials.harvestRareBias}}"></label>
         </div>
 
-        <label class="ml-craftworks-setting-row">
+        <label class="ml-setting-row">
           <span>
             <strong>Natural 20 Grants Two Claims</strong>
             <small>
@@ -175,9 +175,9 @@
         </label>
       </div>
 
-      <div class="ml-craftworks-settings-subsection">
-        <h4>Gathering</h4>
-        <div class="ml-craftworks-settings-grid">
+      <div class="ml-stack">
+        <div class="ml-section-heading"><div><h2>Gathering</h2><p>Set Gathering difficulty and yields for the available terrains.</p></div></div>
+        <div class="ml-grid" data-columns="2">
           <label>
             <span>Global DC Modifier</span>
             <input type="number" name="gatherDcModifier" value="{{materials.gatherDcModifier}}">
@@ -192,22 +192,22 @@
           </label>
         </div>
 
-        <div class="ml-craftworks-gather-dc-settings">
-          <div class="ml-craftworks-gather-dc-heading">
+        <div class="ml-stack">
+          <div class="ml-section-heading">
             <div>
-              <strong>Terrain Gather DCs</strong>
-              <small>
+              <h2>Terrain Gather DCs</h2>
+              <p>
                 Set the base Gather DC for each terrain supplied by the currently active Content Packs.
                 The Global DC Modifier above is applied after these values.
-              </small>
+              </p>
             </div>
           </div>
 
           {{#if materials.gatherTerrains.length}}
-            <div class="ml-craftworks-gather-dc-list">
+            <div class="ml-stack">
               {{#each materials.gatherTerrains}}
-                <label class="ml-craftworks-gather-dc-row">
-                  <span class="ml-craftworks-gather-dc-copy">
+                <label class="ml-setting-row">
+                  <span class="ml-stack">
                     <strong>{{name}}</strong>
                     <small>{{packLabel}} · Default DC {{defaultDc}}</small>
                   </span>
@@ -224,23 +224,23 @@
               {{/each}}
             </div>
           {{else}}
-            <div class="ml-empty-state ml-craftworks-settings-empty">
+            <div class="ml-empty-state">
               No active Content Pack currently provides Gathering terrains.
             </div>
           {{/if}}
         </div>
       </div>
 
-      <div class="ml-craftworks-settings-subsection">
-        <h4>Encounter Loot</h4>
+      <div class="ml-stack">
+        <div class="ml-section-heading"><div><h2>Encounter Loot</h2><p>Choose available loot types and adjust their chances and quantities.</p></div></div>
 
-        <div class="ml-craftworks-settings-inline-toggles">
+        <div class="ml-cluster">
           <label><input type="checkbox" name="lootEnableMaterials" {{#if materials.lootEnableMaterials}}checked{{/if}}> Materials</label>
           <label><input type="checkbox" name="lootEnableCoin" {{#if materials.lootEnableCoin}}checked{{/if}}> Coin</label>
           <label><input type="checkbox" name="lootEnableSpecial" {{#if materials.lootEnableSpecial}}checked{{/if}}> Special Treasure</label>
         </div>
 
-        <div class="ml-craftworks-settings-grid">
+        <div class="ml-grid" data-columns="2">
           <label><span>Material Chance Modifier (%)</span><input type="number" name="lootMaterialChanceModifier" value="{{materials.lootMaterialChanceModifier}}"></label>
           <label><span>Coin Chance Modifier (%)</span><input type="number" name="lootCoinChanceModifier" value="{{materials.lootCoinChanceModifier}}"></label>
           <label><span>Special Chance Modifier (%)</span><input type="number" name="lootSpecialChanceModifier" value="{{materials.lootSpecialChanceModifier}}"></label>
@@ -250,37 +250,37 @@
       </div>
     </section>
 
-    <section class="ml-surface ml-settings-section ml-stack" data-gap="3">
+    <section class="ml-surface ml-stack" data-gap="3">
       <div class="ml-section-heading">
         <div>
           <h2><i class="fa-solid fa-scroll"></i> Recipes</h2>
           <p>Recipe availability is controlled by the Content Packs section above.</p>
         </div>
-        <span class="ml-craftworks-settings-summary">{{recipeCount}} active recipe(s)</span>
+        <span class="notes">{{recipeCount}} active recipe(s)</span>
       </div>
 
-      <div class="ml-card ml-craftworks-setting-card">
-        <label class="ml-craftworks-setting-row">
+      <div class="ml-card ml-stack">
+        <label class="ml-setting-row">
           <span>
             <strong>Reveal Recipes from Preferred Tool Proficiency</strong>
             <small>Always show a hidden recipe to a player whose crafting character is proficient with that recipe's preferred artisan tool.</small>
           </span>
           <input type="checkbox" name="showRecipesForPreferredToolProficiency" {{#if materials.showRecipesForPreferredToolProficiency}}checked{{/if}}>
         </label>
-        <p class="ml-craftworks-muted">Recipe search and visibility continue to use only enabled and entitled content packs.</p>
+        <p class="notes">Recipe search and visibility continue to use only enabled and entitled content packs.</p>
       </div>
     </section>
 
-    <section class="ml-surface ml-settings-section ml-stack" data-gap="3">
+    <section class="ml-surface ml-stack" data-gap="3">
       <div class="ml-section-heading">
         <div>
           <h2><i class="fa-solid fa-hammer"></i> Crafting</h2>
           <p>Crafting execution belongs to Craftworks Premium.</p>
         </div>
         {{#if premiumCraftingAvailable}}
-          <span class="ml-badge ml-craftworks-content-pack-status ml-craftworks-content-pack-premium" data-tone="premium">Premium Access</span>
+          <span class="ml-badge" data-tone="premium">Premium Access</span>
         {{else}}
-          <span class="ml-badge ml-craftworks-content-pack-status" data-tone="warning">Premium — Access Required</span>
+          <span class="ml-badge" data-tone="warning">Premium — Access Required</span>
         {{/if}}
       </div>
 

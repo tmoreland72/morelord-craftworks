@@ -1,3 +1,4 @@
+import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-participation.js";
 import { MODULE_TITLE } from "../constants.mjs";
 
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
@@ -40,11 +41,7 @@ export class LootApp extends ScrollPreservingApplicationMixin(
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
 
-    const actors = game.actors
-      .filter(actor =>
-        actor.type === "character"
-        || actor.type === "group"
-      )
+    const actors = [...listCharacterActors(), ...game.actors.filter(actor => actor.type === "group")]
       .map(actor => ({
         uuid: actor.uuid,
         name: actor.name,

@@ -451,3 +451,9 @@ Craftworks consumes Core's page and nested-scroll preservation along with its sh
 ### Release documentation check
 
 Production releases require the `docs` directory in the archive. Before releasing, update the manuals and set `docs/README.md` frontmatter to the target version; the shared release script rejects a missing or mismatched documentation landing page. Review all manuals as part of each code change, including behavior and compatibility requirements.
+
+
+Character choices for crafting, gathering, harvesting, delerium search, and item delivery use Core’s shared player-owned-or-party eligibility. Existing ownership checks and Group inventory access still apply.
+
+
+Settings use Morelord Core’s shared headers, sections, content cards, settings rows, and footer. Descriptions remain beside checkboxes at narrow widths.

@@ -28,7 +28,7 @@ function setup() {
   const gm = { id: "gm", name: "GM", isGM: true, active: true };
   const player = { id: "player", name: "Player", isGM: false, active: true };
   const users = [gm, player]; users.get = id => users.find(user => user.id === id);
-  const actors = [{ uuid: "Actor.offline", name: "Offline", type: "character" }, { uuid: "Actor.online", name: "Online", type: "character" }];
+  const actors = [{ uuid: "Actor.offline", name: "Offline", type: "character", hasPlayerOwner: true }, { uuid: "Actor.online", name: "Online", type: "character", hasPlayerOwner: true }];
   globalThis.game = { user: gm, users, actors, settings: { set: async () => {} } };
   globalThis.fromUuid = async uuid => actors.find(actor => actor.uuid === uuid);
   globalThis.MorelordCore = { users: { activePlayerForActor: actor => actor.uuid === "Actor.online" ? player : null } };

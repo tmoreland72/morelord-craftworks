@@ -1,3 +1,4 @@
+import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-participation.js";
 import { generatorQuantity } from "../core/generator-quantity.mjs";
 import { RecipePickerApp } from "./recipe-picker-app.mjs";
 import { MODULE_TITLE } from "../constants.mjs";
@@ -38,8 +39,7 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
     const schools = this.#schoolOptions(allSpells);
     this.selectedSchools ??= new Set(schools.map(school => school.id));
     const partyInfo = await this.craftworks.materialService.getPartyRecipientInfo();
-    const actors = game.actors
-      .filter(actor => actor.type === "character" || actor.type === "group")
+    const actors = [...listCharacterActors(), ...game.actors.filter(actor => actor.type === "group")]
       .map(actor => ({
         uuid: actor.uuid,
         name: actor.name,
