@@ -1,3 +1,4 @@
+import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
 import { DELERIUM_SEARCH_SKILLS_DND5E } from "../constants.mjs";
 import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
 
@@ -80,7 +81,7 @@ export class DeleriumSearchService {
       const source = await this.#resolveSourceItem(reward.name);
       if (!source) throw new Error(`${reward.name} was not found in the enabled Monsters of Drakkenheim Item compendiums.`);
       resolvedRewards.push({ sourceUuid: source.uuid, name: source.name, img: source.img,
-        formula: reward.formula, rarity: source.system?.rarity ?? null });
+        formula: reward.formula, rarity: itemRarity(source.system) ?? null });
     }
     session.rewards = resolvedRewards;
     session.result = null;

@@ -1,3 +1,4 @@
+import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
 const DND5E_ITEM_PACKS = Object.freeze({
   "SRD 5.2": [
     "dnd5e.equipment24"
@@ -52,7 +53,7 @@ export class Dnd5eCompendiumItemResolver {
         let index;
         try {
           index = await pack.getIndex({
-            fields: ["name", "img", "type", "system.rarity"]
+            fields: ["name", "img", "type", "system.rarity", "system.rarities"]
           });
         } catch (error) {
           console.warn(
@@ -74,7 +75,7 @@ export class Dnd5eCompendiumItemResolver {
             name: entry.name,
             img: entry.img ?? "",
             type: entry.type ?? null,
-            rarity: entry.system?.rarity ?? null,
+            rarity: itemRarity(entry.system) ?? null,
             packId: collection,
             sourceBook
           });

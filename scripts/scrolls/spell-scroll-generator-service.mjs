@@ -1,3 +1,4 @@
+import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
 import { generatorQuantity } from "../core/generator-quantity.mjs";
 import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
 export class SpellScrollGeneratorService {
@@ -217,7 +218,7 @@ export class SpellScrollGeneratorService {
           document: created,
           linkUuid: spell.uuid,
           quantity,
-          rarity: created.system?.rarity
+          rarity: itemRarity(created.system)
         }],
         title: "Spell Scroll Received",
         subtitle: spell.name
@@ -309,7 +310,7 @@ export class SpellScrollGeneratorService {
         document: result.item,
         linkUuid: result.spell.uuid,
         quantity: result.quantity,
-        rarity: result.item.system?.rarity
+        rarity: itemRarity(result.item.system)
       })),
       title: "Spell Scrolls Received",
       subtitle: `${awarded.reduce((sum, row) => sum + row.quantity, 0)} scrolls generated`

@@ -1,3 +1,4 @@
+import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
 import { generatorQuantity } from "../core/generator-quantity.mjs";
 import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
 
@@ -55,7 +56,7 @@ export class PotionGeneratorService {
       try {
         index = await pack.getIndex({
           fields: [
-            "name", "img", "type", "system.type.value", "system.rarity",
+            "name", "img", "type", "system.type.value", "system.rarity", "system.rarities",
             "system.source"
           ]
         });
@@ -69,7 +70,7 @@ export class PotionGeneratorService {
         if (foundry.utils.getProperty(row, "system.type.value") !== "potion") continue;
 
         const rarity = this.#normalizeRarity(
-          foundry.utils.getProperty(row, "system.rarity")
+          itemRarity(row.system)
         );
         if (!rarity) continue;
 
@@ -156,7 +157,7 @@ export class PotionGeneratorService {
         document: created,
         linkUuid: potion.uuid,
         quantity,
-        rarity: created.system?.rarity
+        rarity: itemRarity(created.system)
       });
     }
 

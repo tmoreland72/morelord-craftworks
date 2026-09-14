@@ -1,3 +1,4 @@
+import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
 import { MODULE_TITLE } from "../constants.mjs";
 
 /**
@@ -112,7 +113,7 @@ export class AwardChatCardService {
 
     const rarity =
       entry.rarity
-      ?? document?.system?.rarity
+      ?? itemRarity(document?.system)
       ?? null;
 
     return {

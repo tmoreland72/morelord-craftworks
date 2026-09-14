@@ -1,3 +1,4 @@
+import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
 import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
 import { MODULE_ID } from "../constants.mjs";
 import {
@@ -223,7 +224,7 @@ export class CraftingMaterialService {
         document: resolved.source,
         uuid: resolved.source.uuid,
         quantity: resolved.quantity,
-        rarity: resolved.source.system?.rarity
+        rarity: itemRarity(resolved.source.system)
       }],
       title: "Crafted Item Received",
       subtitle: recipe.name
@@ -259,7 +260,7 @@ export class CraftingMaterialService {
           : [],
         rarity: String(
           flags.rarity
-          ?? item.system?.rarity
+          ?? itemRarity(item.system)
           ?? ""
         ).toLowerCase(),
         category: String(flags.category ?? "").toLowerCase(),

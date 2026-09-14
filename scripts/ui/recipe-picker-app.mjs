@@ -1,3 +1,4 @@
+import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
 import { MODULE_TITLE } from "../constants.mjs";
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -87,12 +88,12 @@ export class RecipePickerApp extends ScrollPreservingApplicationMixin(Handlebars
   async #items() {
     const rows = [];
     for (const pack of this.craftworks.sourceFilter.enabledPacks({ documentName: "Item" }).filter(pack => pack.visible !== false)) {
-      let index; try { index = await pack.getIndex({ fields: ["img", "type", "system.rarity", "system.source"] }); } catch { continue; }
+      let index; try { index = await pack.getIndex({ fields: ["img", "type", "system.rarity", "system.rarities", "system.source"] }); } catch { continue; }
       for (const item of index) {
         if (!CRAFTABLE_ITEM_TYPES.includes(item.type)) continue;
         const sourceLabel = await this.craftworks.sourceFilter.sourceLabelForCompendiumItem(item, { pack });
         rows.push({ id: `${pack.collection}.${item._id}`, uuid: item.uuid ?? `Compendium.${pack.collection}.Item.${item._id}`, name: item.name, img: item.img,
-          type: item.type, rarity: String(item.system?.rarity ?? ""), category: "", sourceLabel });
+          type: item.type, rarity: String(itemRarity(item.system) ?? ""), category: "", sourceLabel });
       }
     }
     return rows.sort((a, b) => a.name.localeCompare(b.name));

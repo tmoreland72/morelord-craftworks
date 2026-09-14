@@ -1,3 +1,4 @@
+import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
 import { MODULE_ID } from "../constants.mjs";
 import {
   equipmentTypeMatches,
@@ -55,7 +56,7 @@ export class RecipeEvaluator {
         quantity,
         materialId: flags.materialId ?? null,
         tags: Array.isArray(flags.tags) ? flags.tags.map(String) : [],
-        rarity: String(flags.rarity ?? item.system?.rarity ?? "").toLowerCase(),
+        rarity: String(flags.rarity ?? itemRarity(item.system) ?? "").toLowerCase(),
         category: String(flags.category ?? "").toLowerCase(),
         stage: String(flags.stage ?? "").toLowerCase()
       };

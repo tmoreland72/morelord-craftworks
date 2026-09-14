@@ -472,3 +472,7 @@ Check the selected **Ingredient Inventory**. A requirement can depend on canonic
 ## Support
 
 Report reproducible problems at [Morelord Craftworks Issues](https://github.com/tmoreland72/morelord-craftworks/issues). Include Craftworks, Foundry, and dnd5e versions; the active content packs; relevant console errors; and steps to reproduce the problem.
+
+## D&D 5e rarity compatibility
+
+Potion, treasure, recipe, and material workflows accept legacy rarity fields and v6 rarity collections. Where one rarity is needed, the lowest listed rarity is used, matching the system Item getter. Existing items and recipe identifiers do not need a migration.

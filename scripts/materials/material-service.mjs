@@ -1,3 +1,4 @@
+import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
 import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
 
 export class MaterialService {
@@ -42,7 +43,7 @@ export class MaterialService {
           document: source,
           uuid: source.uuid,
           quantity,
-          rarity: source.system?.rarity
+          rarity: itemRarity(source.system)
         }],
         title: "Material Received"
       });

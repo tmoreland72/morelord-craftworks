@@ -1,3 +1,4 @@
+import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
 import {
   craftingSuccessesRequired,
   isValidCraftingDuration
@@ -80,7 +81,7 @@ export class RecipeRegistry {
 
     for (const raw of await this.customRecipes?.all?.() ?? []) {
       const item = raw.output?.uuid && typeof fromUuid === "function" ? await fromUuid(raw.output.uuid) : null;
-      const recipe = this.#normalizeRecipe({ ...raw, output: { ...raw.output, rarity: item?.system?.rarity ?? raw.output?.rarity ?? raw.rarity } });
+      const recipe = this.#normalizeRecipe({ ...raw, output: { ...raw.output, rarity: itemRarity(item?.system) ?? raw.output?.rarity ?? raw.rarity } });
       recipe.craft.environment = recipeFacilityEnvironment(recipe);
       this._recipes.set(recipe.id, recipe);
     }
@@ -244,7 +245,7 @@ export class RecipeRegistry {
           quantity: parsed.quantity,
           label: item.name,
           img: item.img,
-          rarity: item.rarity ?? item.system?.rarity ?? raw.rarity ?? null,
+          rarity: item.rarity ?? itemRarity(item.system) ?? raw.rarity ?? null,
           sourceBook: candidateSourceBook,
           sourcePackId: item.packId
         }

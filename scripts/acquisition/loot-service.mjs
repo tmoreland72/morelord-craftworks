@@ -1,3 +1,4 @@
+import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
 import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
 import { MODULE_ID } from "../constants.mjs";
 import { SETTINGS, getSetting } from "../core/settings.mjs";
@@ -308,7 +309,7 @@ export class LootService {
         document: source,
         uuid: source.uuid,
         quantity: material.quantity,
-        rarity: source.system?.rarity
+        rarity: itemRarity(source.system)
       });
     }
 
@@ -316,7 +317,7 @@ export class LootService {
       const source = await fromUuid(potion.uuid);
       if (!source) throw new Error(`Potion could not be resolved: ${potion.name}`);
       const created = await this.adapter.addItemToActor(recipient, source, 1);
-      awardedItems.push({ document: created, linkUuid: potion.uuid, quantity: 1, rarity: created.system?.rarity });
+      awardedItems.push({ document: created, linkUuid: potion.uuid, quantity: 1, rarity: itemRarity(created.system) });
     }
 
     for (const spell of result.spellScrolls ?? []) {
@@ -325,14 +326,14 @@ export class LootService {
         level: spell.level
       });
       const created = await this.adapter.addItemToActor(recipient, generated.item, 1);
-      awardedItems.push({ document: created, linkUuid: spell.uuid, quantity: 1, rarity: created.system?.rarity });
+      awardedItems.push({ document: created, linkUuid: spell.uuid, quantity: 1, rarity: itemRarity(created.system) });
     }
 
     for (const added of result.customItems ?? []) {
       const source = await fromUuid(added.uuid);
       if (!source || source.documentName !== "Item") throw new Error(`Added Item could not be resolved: ${added.name}`);
       const created = await this.adapter.addItemToActor(recipient, source, Number(added.quantity ?? 1));
-      awardedItems.push({ document: created, linkUuid: added.uuid, quantity: Number(added.quantity ?? 1), rarity: created.system?.rarity });
+      awardedItems.push({ document: created, linkUuid: added.uuid, quantity: Number(added.quantity ?? 1), rarity: itemRarity(created.system) });
     }
 
     if (result.coinTotalCopper > 0) {
@@ -365,7 +366,7 @@ export class LootService {
         document: specialItem,
         uuid: specialItem.uuid,
         quantity: 1,
-        rarity: specialItem.system?.rarity
+        rarity: itemRarity(specialItem.system)
       });
     }
 

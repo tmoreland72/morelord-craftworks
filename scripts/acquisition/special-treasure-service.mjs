@@ -1,3 +1,4 @@
+import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
 import { weightedPick } from "./random-choice.mjs";
 
 /**
@@ -190,7 +191,7 @@ export class SpecialTreasureService {
             "name",
             "img",
             "type",
-            "system.rarity",
+            "system.rarity", "system.rarities",
             "system.source.book",
             "system.source.custom",
       "flags.morelord-craftworks.materialId"
@@ -200,7 +201,7 @@ export class SpecialTreasureService {
         for (const row of index) {
           if (row.flags?.["morelord-craftworks"]?.materialId) continue;
 
-          const rarity = this.#normalizeRarity(row.system?.rarity);
+          const rarity = this.#normalizeRarity(itemRarity(row.system));
           if (!rarity) continue;
 
           const key = this.#key(row.name, rarity);
@@ -232,7 +233,7 @@ export class SpecialTreasureService {
   #isEligibleItem(item) {
     if (!item || item.documentName !== "Item") return false;
     if (item.getFlag?.("morelord-craftworks", "materialId")) return false;
-    return Boolean(this.#normalizeRarity(item.system?.rarity));
+    return Boolean(this.#normalizeRarity(itemRarity(item.system)));
   }
 
   #normalizeRarity(value) {

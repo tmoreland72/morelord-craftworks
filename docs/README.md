@@ -2,7 +2,7 @@
 title: Morelord Craftworks Documentation
 slug: morelord-craftworks
 product: morelord-craftworks
-version: 0.4.9
+version: 0.4.10
 ---
 
 # Morelord Craftworks Documentation

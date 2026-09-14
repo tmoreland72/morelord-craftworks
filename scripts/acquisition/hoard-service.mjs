@@ -1,3 +1,4 @@
+import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
 import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
 import { SETTINGS, getSetting } from "../core/settings.mjs";
 import { getHoardProfile } from "./hoard-profiles.mjs";
@@ -187,7 +188,7 @@ export class HoardService {
         document: source,
         uuid: source.uuid,
         quantity: material.quantity,
-        rarity: source.system?.rarity
+        rarity: itemRarity(source.system)
       });
     }
 
@@ -195,20 +196,20 @@ export class HoardService {
       const source = await fromUuid(potion.uuid);
       if (!source) throw new Error(`Potion could not be resolved: ${potion.name}`);
       const created = await this.adapter.addItemToActor(recipient, source, 1);
-      awardedItems.push({ document: created, linkUuid: potion.uuid, quantity: 1, rarity: created.system?.rarity });
+      awardedItems.push({ document: created, linkUuid: potion.uuid, quantity: 1, rarity: itemRarity(created.system) });
     }
 
     for (const spell of result.spellScrolls ?? []) {
       const generated = await this.spellScrollGenerator.createScrollItem({ spellUuid: spell.uuid, level: spell.level });
       const created = await this.adapter.addItemToActor(recipient, generated.item, 1);
-      awardedItems.push({ document: created, linkUuid: spell.uuid, quantity: 1, rarity: created.system?.rarity });
+      awardedItems.push({ document: created, linkUuid: spell.uuid, quantity: 1, rarity: itemRarity(created.system) });
     }
 
     for (const added of result.customItems ?? []) {
       const source = await fromUuid(added.uuid);
       if (!source || source.documentName !== "Item") throw new Error(`Added Item could not be resolved: ${added.name}`);
       const created = await this.adapter.addItemToActor(recipient, source, Number(added.quantity ?? 1));
-      awardedItems.push({ document: created, linkUuid: added.uuid, quantity: Number(added.quantity ?? 1), rarity: created.system?.rarity });
+      awardedItems.push({ document: created, linkUuid: added.uuid, quantity: Number(added.quantity ?? 1), rarity: itemRarity(created.system) });
     }
 
     if (result.coinCopper > 0) {
@@ -239,7 +240,7 @@ export class HoardService {
         document: item,
         uuid: item.uuid,
         quantity: 1,
-        rarity: item.system?.rarity
+        rarity: itemRarity(item.system)
       });
     }
 

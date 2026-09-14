@@ -1,3 +1,4 @@
+import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
 import { MODULE_TITLE } from "../constants.mjs";
 
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
@@ -92,7 +93,7 @@ export class CraftCompletionApp
     );
 
     const rarity =
-      source.system?.rarity
+      itemRarity(source.system)
       ?? source.system?.type?.value
       ?? null;
 
