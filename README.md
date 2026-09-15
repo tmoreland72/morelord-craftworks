@@ -457,3 +457,5 @@ Character choices for crafting, gathering, harvesting, delerium search, and item
 
 
 Settings use Morelord Core’s shared headers, sections, content cards, settings rows, and footer. Descriptions remain beside checkboxes at narrow widths.
+
+D&D5e Configure Sources filtering is provided by Core’s shared `Dnd5eSourceFilterService`, including canonical SRD exclusions for copied documents. Craftworks preserves its existing source and priority behavior while Marketplace and Downtime use the same shared rules.
