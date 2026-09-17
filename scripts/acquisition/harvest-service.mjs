@@ -124,10 +124,14 @@ export class HarvestService {
     if (!drakkenheimEnabled) return context;
 
     try {
-      const monsterActor = await DrakkenheimMonsterDataService.findMonsterActor(actor);
-      if (!monsterActor) return context;
-
-      const harvestData = await DrakkenheimMonsterDataService.inspectHarvestData(monsterActor);
+      let monsterActor = actor;
+      let harvestData = await DrakkenheimMonsterDataService.inspectHarvestData(actor);
+      if (!harvestData.harvestDocuments.length) {
+        monsterActor = await DrakkenheimMonsterDataService.findMonsterActor(actor);
+        if (!monsterActor) return context;
+        harvestData = await DrakkenheimMonsterDataService.inspectHarvestData(monsterActor);
+      }
+      if (!harvestData.harvestDocuments.length) return context;
       const matches = await DrakkenheimMaterialMatchService.matchHarvestComponents(monsterActor, harvestData);
 
       context.harvestMode = "drakkenheim";

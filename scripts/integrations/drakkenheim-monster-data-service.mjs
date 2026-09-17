@@ -452,20 +452,25 @@ export class DrakkenheimMonsterDataService {
     }
 
     /**
-     * Find embedded documents containing Harvestable Components.
+     * Find biography text and embedded documents containing Harvestable Components.
      *
      * @param {Actor} monsterActor
+     * @param {object[]|null} embeds Previously resolved biography embeds.
      * @returns {Promise<object[]>}
      */
     static async findHarvestDocuments(
-        monsterActor
+        monsterActor,
+        embeds = null
     ) {
-        const embeds =
-            await this.resolveBiographyEmbeds(
+        embeds ??= await this.resolveBiographyEmbeds(
                 monsterActor
             );
 
-        return embeds.filter(
+        return [{
+            uuid: monsterActor.uuid,
+            document: monsterActor,
+            html: this.getBiographyHtml(monsterActor)
+        }, ...embeds].filter(
             (entry) =>
                 /harvestable\s+components/i
                     .test(entry.html)
@@ -1273,13 +1278,7 @@ export class DrakkenheimMonsterDataService {
                 );
 
         const harvestDocuments =
-            embeds.filter(
-                (entry) =>
-                    /harvestable\s+components/i
-                        .test(
-                            entry.html
-                        )
-            );
+            await this.findHarvestDocuments(monsterActor, embeds);
 
         const parsedCategories =
             [];

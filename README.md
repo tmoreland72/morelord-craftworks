@@ -85,10 +85,13 @@ the official Foundry module or its Actors. To give players the ability to harves
 Drakkenheim monster material components, the GM must:
 
 1. Install and enable the **Monsters of Drakkenheim** module (`drakkenheim-monsters`).
-2. Create or place monsters using Actors from that module's **Monsters** compendium.
-
-Actors from other compendiums do not provide the official Drakkenheim harvesting
-data required for those material components.
+2. Enable the **Monsters of Drakkenheim** Craftworks Content Pack.
+3. Use creatures whose biographies contain a **Harvestable Components** section,
+   either directly or through an embedded journal page. Craftworks reads the
+   creature's biography first and uses its listed Drakkenheim components and rarity.
+   If no section is present, it checks the matching official **Monsters** compendium
+   Actor before falling back to standard harvesting. Imported or renamed creatures
+   with harvesting data in their biographies do not need a compendium match.
 
 Standard content is shown without an extra source badge in reference browsers.
 Premium content uses a compact **Premium** badge to keep recipe/material displays

@@ -4,7 +4,7 @@ description: Install, configure, and operate Morelord Craftworks acquisition, cr
 slug: morelord-craftworks/gm
 product: morelord-craftworks
 audience: game-master
-version: 0.4.11
+version: 0.4.12
 foundry: 14
 ---
 
@@ -415,7 +415,7 @@ Recipe outputs prefer enabled premium PHB or DMG documents when the connected ac
 
 ### Drakkenheim Harvest preflight
 
-For a supported creature, Craftworks inspects its official source data and matches its listed Harvestable Components to canonical Craftworks materials. Review those matches in the GM preflight before starting the session.
+With the Monsters of Drakkenheim content pack enabled and access available, Craftworks first reads the creature's own biography, including embedded journal pages, for a **Harvestable Components** section. It matches the listed components and rarity to canonical Craftworks materials. If the creature has no harvesting section, Craftworks checks its matching official compendium Actor; if neither has a section, standard harvesting applies. Review those matches in the GM preflight before starting the session.
 
 Some creatures also include an **Items:** entry or special handling rule. Craftworks presents it as **Special Harvest Items / Instructions**. This information is intentionally GM-facing and informational: it calls attention to exceptional treasure or procedures outside the ordinary material reservation workflow.
 
