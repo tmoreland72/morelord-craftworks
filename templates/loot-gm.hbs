@@ -5,24 +5,24 @@
     <div class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3">
       <div class="ml-section-heading"><div><h2>Dead Creatures</h2><p>Select the defeated creatures that contribute to encounter loot.</p></div></div>
       {{#if creatures.length}}
-        <div class="ml-craftworks-loot-selection-actions">
+        <div class="ml-actions">
           <button type="button" data-action="select-all-loot-creatures"><i class="fa-solid fa-check-double"></i> Select All</button>
           <button type="button" data-action="clear-all-loot-creatures"><i class="fa-solid fa-xmark"></i> Clear All</button>
         </div>
-        <div class="ml-craftworks-loot-creatures">
+        <div class="ml-stack" data-gap="2">
           {{#each creatures}}
-            <label class="ml-craftworks-creature ml-craftworks-loot-creature-select">
+            <label class="ml-actor-choice">
               <input
                 type="checkbox"
                 data-loot-creature-select
                 data-token-uuid="{{tokenUuid}}"
                 {{checked selectedForLoot}}
               >
-              <img src="{{img}}" alt="{{name}}">
-              <div>
+              <img class="ml-avatar" src="{{img}}" alt="">
+              <span class="ml-stack" data-gap="1">
                 <strong>{{name}}</strong>
-                <div>CR {{cr}}</div>
-              </div>
+                <small>CR {{cr}}</small>
+              </span>
             </label>
           {{/each}}
         </div>

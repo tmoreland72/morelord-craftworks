@@ -9,6 +9,9 @@ test("Drakkenheim completion survives reload without rolls or tracked hours", as
   await jobs.start({ recipeId: "drakkenheim", crafter, inventoryActorUuid: crafter.uuid, hoursRequired: 8, consumedMaterials: [] });
   const completed = await jobs.completeWithoutCheck("drakkenheim", crafter, crafter.uuid, 0);
   assert.equal(completed.complete, true);
+  assert.equal(completed.timeSpentHours, 0);
+  assert.equal(completed.hoursRequired, 0);
+  assert.equal(completed.attempts, 0);
   jobs.cache.clear();
   const restored = jobs.getProgress("drakkenheim", crafter);
   assert.equal(restored.complete, true);

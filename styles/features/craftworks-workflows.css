@@ -2284,31 +2284,6 @@
   height: 34px;
 }
 
-.ml-craftworks-loot-selection-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.ml-craftworks-loot-selection-actions button {
-  flex: 0 0 auto;
-  width: auto;
-}
-
-.ml-craftworks .ml-craftworks-loot-creature-select {
-  justify-content: flex-start;
-  text-align: left;
-  cursor: pointer;
-}
-
-.ml-craftworks .ml-craftworks-loot-creature-select > input {
-  flex: 0 0 18px;
-  width: 18px;
-  height: 18px;
-  margin: 0;
-}
-
 .ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creature-select {
   display: grid;
   place-items: center;

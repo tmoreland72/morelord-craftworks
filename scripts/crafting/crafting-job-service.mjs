@@ -319,7 +319,7 @@ export class CraftingJobService {
       requiredSuccesses: 1,
       successes: 1,
       progressHours: Math.max(0, Number(job.hoursRequired ?? 0)),
-      timeSpentHours: Math.max(0, Number(existing.hoursRequired ?? 0)),
+      timeSpentHours: Math.max(0, Number(job.hoursRequired ?? 0)),
       complete: true
     };
   }

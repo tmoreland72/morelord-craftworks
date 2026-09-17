@@ -11,6 +11,8 @@ that world.
 
 See the [GM manual](docs/gm-manual.md) and [player manual](docs/player-manual.md) for current workflows. Potion and scroll drafts support individual removal and additions through the full filtered catalog picker. Availability counts follow category and school selections. Delerium Search awards Monsters of Drakkenheim compendium items through the Recipient selector. Page sections use the bordered, shaded Morelord Core surfaces used by Downtime. Gathering, Harvest, and Delerium Search use the same Core Player Characters section format, with round portraits and highlighted selections.
 
+Encounter Loot lists defeated creatures in full-width selection rows with a checkbox, portrait, name, and CR, following Harvest's list layout without a Harvest DC.
+
 ## Support baseline
 
 The Recipes browser counts ingredient tags in one pass per recipe using a shared material-catalog snapshot for each refresh. Reference cards use indexed compendium output names and images; full Items are loaded when opened or crafted. World Items and compendium outputs missing display metadata still resolve on refresh. Filter counts rebuild from the current catalog, so material edits do not leave a persistent cache stale.

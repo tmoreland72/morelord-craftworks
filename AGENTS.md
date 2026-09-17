@@ -44,6 +44,11 @@
 - Keep public documentation aligned with actual implemented behavior and compatibility. Documentation review is part of completing the change, not something deferred until release.
 - In the completion summary, identify documentation updated or state why no update was needed.
 
+## Demo videos
+
+- Before planning, scripting, recording, editing, or exporting any Morelord demo video, read and follow Core's `DEMO-RECORDING-GUIDE.md`. Resolve it from the Core repository in the workspace (normally `../morelord-core`; in this installation, `E:/Foundry14Dev-Data/Data/modules/morelord-core` also serves Compendium in the separate DND data tree).
+- Save reusable demo instructions and corrections from the user in that guide; keep video-specific requirements in the video's brief. Check the finished video against those requirements before delivery.
+
 ## Maintaining these guidelines
 
 - Treat `morelord-core/AGENTS.md` as the canonical shared standard.

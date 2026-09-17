@@ -14,7 +14,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Animus from an Elemental; [Bones] Spine from a Monstrosity; [Dust] Elemental Dust from an Entropic Flame; [Fluid] Monster Blood from an Aberration"
@@ -25,7 +25,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -100,7 +100,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Dust] Aberrant Dust; [Fluid] Contaminated Ichor; [Organ] Any Glands"
@@ -111,7 +111,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -186,7 +186,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Plant Animus; [Dust] Plant Dust; [Fluid] Sap; [Hair] Leaves; [Organ] Flower"
@@ -197,7 +197,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -282,7 +282,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Dust] Aberrant Dust; [Fluid] Contaminated Ichor; [Organ] Flower from a Plant (traditionally an Eldritch Lily)"
@@ -293,7 +293,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -368,7 +368,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Dust] Celestial Dust; [Fluid] Monster Blood; [Hide] Skin from a Fiend; [Organ] Eye from a Dragon"
@@ -379,7 +379,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -464,7 +464,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Animus from a creature that deals Lightning damage (such as a Blue Dragon); [Dust] Elemental Dust; [Fluid] Elemental Fluid; [Fluid] Contaminated Ichor; [Hide] Skin; [Hide] Scales"
@@ -475,7 +475,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -570,7 +570,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any; [Bones] Bones; [Fluid] Sap; [Hide] Plates"
@@ -581,7 +581,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -656,7 +656,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Aberrant Animus; [Dust] Undead Dust; [Fluid] Elemental Fluid; [Hair] Hair from a Fiend; [Hide] Scales from a Blue or Bronze Dragon"
@@ -667,7 +667,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -752,7 +752,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Fluid] Acidic Bile; [Fluid] Mucus; [Natural Weapon] Spores; [Natural Weapon] Mandibles"
@@ -763,7 +763,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -848,7 +848,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Bones] Spine or Ribs; [Dust] Fiend Dust; [Fluid] Acidic Bile; [Fluid] Elemental Fluid"
@@ -859,7 +859,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -960,7 +960,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Animus from a Fiend; [Dust] Any Dust; [Hide] Plates from a Construct; [Organ] Glands from a Dragon"
@@ -971,7 +971,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -1046,7 +1046,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Animus from an Elemental; [Bones] Ribs from an Undead; [Fluid] Contaminated Ichor; [Organ] Heart from a White Dragon, Silver Dragon, Winter Troll, or any monster Immune to Cold damage."
@@ -1057,7 +1057,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -1132,7 +1132,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Undead Animus from a Sanguine Witch; [Dust] Undead Dust from any Vampire; [Fluid] Monster Blood from an Undead; [Natural Weapons] Teeth from any Vampire; [Organ] Heart from a Dragon"
@@ -1143,7 +1143,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -1228,7 +1228,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any; [Bones] Skull from a Giant; [Dust] Undead Dust; [Fluid] Monster Blood"
@@ -1239,7 +1239,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -1314,7 +1314,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Animus from an Elemental; [Dust] Elemental Dust; [Organ] Eye from a Construct; [Organ] Glands"
@@ -1325,7 +1325,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -1400,7 +1400,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Animus from a Dragon; [Bone] Ribs from a Monstrosity; [Dust] Elemental Dust; [Hide] Plates"
@@ -1411,7 +1411,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -1486,7 +1486,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any; [Bones] Bones from a Giant; [Dust] Dust from an Elemental or Fey"
@@ -1497,7 +1497,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -1562,7 +1562,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Animus from a Frost Giant; [Dust] Elemental Dust; [Fluid] Contaminated Ichor; [Fluid] Elemental Fluid"
@@ -1573,7 +1573,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -1648,7 +1648,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Undead Animus from a Wraith; [Bones] Skull from a Dryad; [Dust] Undead Dust; [Fluid] Ectoplasm; [Fluid] Monster Blood from an Undead; [Hair] Hair from a Banshee"
@@ -1659,7 +1659,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -1754,7 +1754,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Giant Animus from a Troll; [Bone] Skull from a Troll.; [Bone] Bone from a Giant; [Dust] Elemental Dust from a Troll; [Hide] Skin from a Monstrosity; [Natural Weapons] Teeth from a Giant, Beast, or Monstrosity"
@@ -1765,7 +1765,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -1860,7 +1860,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Animus from a Giant; [Bones] Skulls of any two Trolls; [Fluid] Monster Blood from any Troll; [Fur] Stitches; [Hide] Skin of any Troll"
@@ -1871,7 +1871,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -1956,7 +1956,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Hair] Fur from any Ratling; [Hide] Skin from any Ratling; [Organ] Guts from any Monstrosity"
@@ -1967,7 +1967,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -2042,7 +2042,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Bones] Any Giant; [Dust] Fey Dust; [Fluid] Any Elemental Fluid; [Fluid] Monster Blood from any Dragon; [Hair] Any Celestial; [Organ] Brain from an Aberration; [Organ] Heart from a Fiend"
@@ -2053,7 +2053,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -2168,7 +2168,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Bones] Spine from a Dragon; [Dust] Elemental Dust; [Fluid] Elemental Fluid; [Hide] Plates from a Construct; [Hide] Skin from a Fiend; [Organ] Brain from an Aberration"
@@ -2179,7 +2179,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -2284,7 +2284,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Animus from a Harpy; [Dust] Fey Dust; [Fluid] Monster Blood from a Harpy; [Hair] Feathers from a Harpy; [Hide] Skin"
@@ -2295,7 +2295,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -2380,7 +2380,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Fey Animus; [Hair] Hair from a Fey*; [Natural Weapon] Horns or Teeth of any Fey, Monstrosity, or Dragon; [Organ] Heart from a Dragon"
@@ -2391,7 +2391,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -2466,7 +2466,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Dust] Elemental Dust; [Hide] Plates; [Organ] Heart from a Red Dragon"
@@ -2477,7 +2477,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -2542,7 +2542,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Fluid] Chemical solution from a Construct; [Hide] Skin from a Fey; [Hide] Plates; [Organ] Heart from a Gorgon"
@@ -2553,7 +2553,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -2638,7 +2638,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Fluid] Chemical Solution; [Hair] Hair; [Hide] Plates; [Hide] Skin; [Natural Weapons] Needles from an Injector"
@@ -2649,7 +2649,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -2744,7 +2744,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Hair] Fur from a Monstrosity; [Hide] Skin from a Monstrosity; [Natural Weapons] Horns from a Fiend; [Dust] Fey Dust"
@@ -2755,7 +2755,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -2840,7 +2840,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Dust] Any Dragon Dust; [Fluid] Monster Blood from a Monstrosity; [Hide] Scales; [Hide] Skin from an Aberration"
@@ -2851,7 +2851,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -2936,7 +2936,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Dust] Any Dragon Dust; [Fluid] Monster Blood from a Monstrosity; [Hide] Scales; [Hide] Skin from an Aberration"
@@ -2947,7 +2947,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -3032,7 +3032,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Dust] Any Dragon Dust; [Fluid] Monster Blood from a Monstrosity; [Hide] Scales; [Hide] Skin from an Aberration"
@@ -3043,7 +3043,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -3128,7 +3128,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Animus from a creature that has the Shapechanger trait; [Bones] Skull of a Monstrosity*; [Dust] Aberrant Dust; [Fluid] Acidic Bile; [Fluid] Mucus from a Mimic; [Organ] Flesh from a Doppelganger"
@@ -3139,7 +3139,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -3234,7 +3234,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Fluid] Sap; [Hair] Hair from a Fey; [Hair] Leaves; [Hide] Bark"
@@ -3245,7 +3245,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -3330,7 +3330,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Fluid] Sap; [Hair] Hair from a Fey; [Hair] Leaves; [Hide] Bark"
@@ -3341,7 +3341,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -3426,7 +3426,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Fluid] Sap; [Hair] Hair from a Fey; [Hair] Leaves; [Hide] Bark"
@@ -3437,7 +3437,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -3522,7 +3522,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Undead Animus; [Bones] Ribs; [Bones] Skull; [Bones] Spine; [Fluid] Contaminated Ichor; [Natural Weapon] Teeth"
@@ -3533,7 +3533,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -3628,7 +3628,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Monstrosity Animus; [Fluid] Contaminated Ichor; [Hair] Fur from a Garmyr; [Hide] Skin from a Ratling; [Natural Weapon] Claws from a Harpy"
@@ -3639,7 +3639,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -3724,7 +3724,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Fluid] Venom; [Hide] Bark; [Natural Weapons] Claws from a Ratling"
@@ -3735,7 +3735,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -3810,7 +3810,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] any Animus from an Elemental; [Dust] Elemental Dust; [Fluid] any two Elemental Fluids from different Elementals"
@@ -3821,7 +3821,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -3886,7 +3886,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Fluid] Contaminated Ichor; [Hide] Shell from an Anomollusk; [Hide] Skin from an Aberration"
@@ -3897,7 +3897,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -3972,7 +3972,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Animus from an Aberration; [Fluid] Contaminated Ichor; [Organs] Any two Organs from an Aberration."
@@ -3983,7 +3983,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -4048,7 +4048,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Dust] Fey Dust; [Fluid] Any Elemental Fluid; [Fluid] Monster Blood from a Dragon; [Organ] Heart from a Fiend"
@@ -4059,7 +4059,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -4144,7 +4144,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Fluid] Goopy Ooze; [Hide] Scales from a Dragon; [Hide] Webbed Membrane; [Hair] Feathers from a Harpy; [Organ] Flesh from a Dragon"
@@ -4155,7 +4155,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -4250,7 +4250,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any; [Dust] Fey Dust; [Fluid] Elemental Fluid; [Hide] Any"
@@ -4261,7 +4261,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -4336,7 +4336,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any; [Fluid] Monster Blood from a Fey, Dragon, or Giant; [Hide] Skin from a Monstrosity"
@@ -4347,7 +4347,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -4412,7 +4412,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Bones] Spine; [Hide] Plates; [Hide] Skin from any Beast or Monstrosity; [Natural Weapons] Two Blades from a Reautomata"
@@ -4423,7 +4423,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -4508,7 +4508,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Aberration Animus; [Bones] Skull, Spine, or Ribs from an Aberration.; [Fluid] Contaminated Ichor from a Far Dweller; [Hide] Skin from an Aberration; [Natural Weapon] Tentacles from a Warp Marauder"
@@ -4519,7 +4519,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -4604,7 +4604,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Fluid] Elemental Fluid; [Hair] Stitches; [Hide] Skin; [Natural Weapons] Claws"
@@ -4615,7 +4615,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -4700,7 +4700,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Hair] Stitches; [Hide] Bark; [Hide] Webbed Membrane; [Natural Weapons] Tentacles from an Aberration"
@@ -4711,7 +4711,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -4796,7 +4796,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Animus from The Algorithm*; [Hide] Plates from a Construct; [Natural Weapon] Any Needles; [Organ] Eye from a Construct"
@@ -4807,7 +4807,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -4882,7 +4882,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Undead Animus; [Dust] Undead Dust from any Vampire; [Fluid] Ectoplasm; [Fluid] Monster Blood from a Vampire"
@@ -4893,7 +4893,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -4968,7 +4968,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Fey Animus; [Fluid] Monster Blood from a Troll; [Organ] Eyes from a Troll"
@@ -4979,7 +4979,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -5044,7 +5044,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Fluid] Goopy Ooze; [Hair] Hair from an Undead; [Hide] Bark"
@@ -5055,7 +5055,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -5130,7 +5130,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any; [Bones] Bones from an Undead; [Dust] Fey Dust; [Fluid] Ectoplasm"
@@ -5141,7 +5141,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [
@@ -5216,7 +5216,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
     "source": {
       "title": "Monsters of Drakkenheim",
       "section": "Appendix E: Magic Items",
-      "craftingTime": "1 day",
+      "craftingTime": "None",
       "checks": "None",
       "difficulty": "No crafting check",
       "materialsText": "[Animus] Any Animus; [Bones] Ribs; [Fluid] Elemental Fluid; [Hide] Plates; [Hide] Skin from any Monstrosity; [Natural Weapon] Blade from a Ripper"
@@ -5227,7 +5227,7 @@ export const MONSTERS_OF_DRAKKENHEIM_RECIPES = [
       "skill": null,
       "dc": null,
       "noToolDc": null,
-      "hoursRequired": 8,
+      "hoursRequired": 0,
       "checkRequired": false
     },
     "requirementGroups": [

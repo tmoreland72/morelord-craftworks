@@ -36,6 +36,8 @@ test("canceling a tool roll does not count as failure", async () => {
 
 test("official and custom Drakkenheim recipes never call a roll API, even with legacy DCs", async () => {
   assert.ok(MONSTERS_OF_DRAKKENHEIM_RECIPES.every(recipe => recipe.craft.checkRequired === false));
+  assert.ok(MONSTERS_OF_DRAKKENHEIM_RECIPES.every(recipe => recipe.craft.hoursRequired === 0));
+  assert.ok(MONSTERS_OF_DRAKKENHEIM_RECIPES.every(recipe => recipe.source.craftingTime === "None"));
   for (const source of [{ packId: "monsters-of-drakkenheim" }, { source: { contentPackId: "monsters-of-drakkenheim" } }]) {
     const result = await new CraftingRollService().roll({ recipe: { ...recipe, ...source }, crafter: {} });
     assert.equal(result.rollType, "none");

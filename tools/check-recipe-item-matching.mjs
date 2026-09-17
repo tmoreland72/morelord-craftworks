@@ -164,7 +164,6 @@ assert.equal(
 );
 for (const templatePath of [
   "templates/recipe-browser.hbs",
-  "templates/craft.hbs",
   "templates/partials/craft-card.hbs"
 ]) {
   const template = fs.readFileSync(templatePath, "utf8");

@@ -4,7 +4,7 @@ description: Browse materials and recipes, manage crafting projects, and partici
 slug: morelord-craftworks/player
 product: morelord-craftworks
 audience: player
-version: 0.4.9
+version: 0.4.11
 foundry: 14
 ---
 
@@ -107,7 +107,7 @@ Each ingredient row shows the amount available and required. Green counts satisf
 - alternative ingredients
 - several units that must come from one matching material
 
-Craftworks rolls the listed artisan tool at the recipe DC. Missing the tool in your crafter’s inventory or its proficiency imposes disadvantage, without changing the DC. Drakkenheim recipes require a Workshop matching or exceeding the item’s rarity, regardless of tool settings. Bring the required materials and choose Craft Item; there is no crafting roll or tracked time requirement. The GM can narrate the short construction period.
+Craftworks rolls the listed artisan tool at the recipe DC. Missing the tool in your crafter’s inventory or its proficiency imposes disadvantage, without changing the DC. Drakkenheim recipes require a Workshop matching or exceeding the item’s rarity, regardless of tool settings. Bring the required materials and choose Craft Item; there is no crafting roll or time requirement, including for an older saved crafting project.
 
 ### Make progress
 
