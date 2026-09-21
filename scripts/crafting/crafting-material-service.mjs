@@ -47,6 +47,16 @@ export class CraftingMaterialService {
     return this.#dedupePlans(plans);
   }
 
+  /** Whether an item can satisfy any ingredient, independent of required quantity. */
+  recipeUsesItem(recipe, item) {
+    if (!item) return false;
+    const [entry] = this.#inventory({ items: [item] });
+    return (recipe?.requirementGroups ?? []).some(group =>
+      (group.requirements ?? []).some(requirement =>
+        (requirement.type === "alternatives" ? requirement.alternatives ?? [] : [requirement])
+          .some(choice => this.#matches(entry, choice.match))));
+  }
+
   async consume(actor, plan, { crafter = null, recipe = null } = {}) {
     if (!actor) throw new Error("Crafting material consumption requires an Actor.");
     if (!plan?.consumptions?.length) {

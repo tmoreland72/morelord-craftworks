@@ -959,22 +959,6 @@
   color: var(--ml-color-accent);
 }
 
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-recipe-tag {
-  display: inline-flex;
-  align-items: center;
-  max-width: 190px;
-  padding: 2px 7px;
-  overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--ml-color-accent) 38%, transparent);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--ml-color-accent) 9%, transparent);
-  color: var(--ml-color-accent);
-  font-size: var(--ml-font-size-xs);
-  font-weight: var(--ml-font-weight-bold);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .ml-craftworks-harvest-modern .ml-craftworks-harvest-recipe-help {
   width: auto;
   min-width: 0;
@@ -1202,13 +1186,6 @@
   margin-bottom: 14px;
 }
 
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creatures {
-  display: grid;
-  gap: 8px;
-  padding: 10px;
-}
-
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creature,
 .ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-skill-row {
   display: flex;
   align-items: center;
@@ -1219,7 +1196,6 @@
   background: color-mix(in srgb, var(--ml-color-text) 3%, transparent);
 }
 
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creature > img,
 .ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-character > img {
   width: 42px;
   height: 42px;
@@ -1229,14 +1205,11 @@
   border: 1px solid color-mix(in srgb, var(--ml-color-accent) 25%, transparent);
 }
 
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creature-copy,
 .ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-character {
   min-width: 0;
   flex: 1 1 auto;
 }
 
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creature-copy > strong,
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creature-copy > small,
 .ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-character strong,
 .ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-character small {
   display: block;
@@ -1948,14 +1921,6 @@
   width: auto;
 }
 
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creature {
-  position: relative;
-  justify-content: flex-start;
-  text-align: left;
-}
-
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creature-copy,
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creature-copy > *,
 .ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-skill-row,
 .ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-character,
 .ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-character > *,
@@ -2016,40 +1981,6 @@
 }
 
 /* Potion generator */
-.ml-craftworks-generator-constraints {
-  margin: 0 0 0.75rem;
-  padding: 0.6rem 0.75rem 0.7rem;
-  border: 1px solid var(--ml-color-border, var(--ml-color-muted));
-  border-radius: 4px;
-}
-
-.ml-craftworks-generator-constraints legend {
-  padding: 0 0.3rem;
-  font-weight: var(--ml-font-weight-bold);
-}
-
-.ml-craftworks-generator-constraints legend small {
-  font-weight: var(--ml-font-weight-normal);
-  opacity: 0.75;
-}
-
-.ml-craftworks-generator-option-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
-  gap: 0.35rem 0.75rem;
-}
-
-.ml-craftworks-generator-option-grid label {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.ml-craftworks-generator-option-grid input {
-  flex: 0 0 auto;
-  margin: 0;
-}
-
 .ml-craftworks-potion-generator {
   display: grid;
   gap: 12px;
@@ -2282,26 +2213,6 @@
   flex: 0 0 auto;
   width: 34px;
   height: 34px;
-}
-
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creature-select {
-  display: grid;
-  place-items: center;
-  flex: 0 0 26px;
-  width: 26px;
-  min-width: 26px;
-  max-width: 26px;
-  align-self: stretch;
-  padding: 0 2px 0 0;
-  margin: 0;
-  cursor: pointer;
-}
-
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-creature-select input {
-  width: 18px;
-  height: 18px;
-  margin: 0;
-  cursor: pointer;
 }
 
 .ml-craftworks .ml-craftworks-editable-result > input[type="checkbox"] {

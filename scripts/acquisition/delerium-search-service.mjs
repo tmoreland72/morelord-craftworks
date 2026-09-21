@@ -115,7 +115,7 @@ export class DeleriumSearchService {
         if (session.results.some(result => result.sourceUuid === reward.sourceUuid)) continue;
         if (reward.quantity == null) {
           const roll = await new Roll(reward.formula).evaluate();
-          await roll.toMessage({ flavor: `Delerium Search — ${reward.name}`, speaker: ChatMessage.getSpeaker({ actor: recipient }) });
+          await roll.toMessage({ flavor: `Delerium Search — ${reward.name}`, speaker: ChatMessage.getSpeaker({ actor: recipient }) }, session.messageMode ? { messageMode: session.messageMode } : {});
           reward.quantity = Number(roll.total);
         }
         const source = sources[index];
@@ -127,7 +127,7 @@ export class DeleriumSearchService {
       session.result = { items: [...session.results], recipientName: recipient.name, recipientUuid: recipient.uuid };
       await AwardChatCardService.post({ recipient, items: session.results.map(result => ({
         document: sources.find(source => source.uuid === result.sourceUuid), uuid: result.sourceUuid, quantity: result.quantity
-      })), title: "Delerium Found" });
+      })), title: "Delerium Found", messageMode: session.messageMode });
       return session.result;
     } finally {
       this.awardingSessions.delete(sessionId);

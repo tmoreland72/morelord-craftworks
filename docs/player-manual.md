@@ -4,7 +4,7 @@ description: Browse materials and recipes, manage crafting projects, and partici
 slug: morelord-craftworks/player
 product: morelord-craftworks
 audience: player
-version: 0.4.11
+version: 0.4.13
 foundry: 14
 ---
 
@@ -146,7 +146,7 @@ The GM chooses the characters included in the Harvest and may enable the session
 
 Select one of the highlighted components after a success. If your natural d20 was 20 and the world setting permits it, you can receive a second claim. Claimed creatures remain expanded to keep the window from shifting during a large Harvest; you can still collapse a creature manually.
 
-A claim is a reservation, not an immediate inventory award. All participants see it in the shared **Claimed Components** list, and another player cannot take the same reserved component. Materials connected to one of your marked recipes may display **Needed for Crafting**.
+A claim is a reservation, not an immediate inventory award. All participants see it in the shared **Claimed Components** list, and another player cannot take the same reserved component. Materials connected to one of your marked recipes may display **Needed for Crafting**. Marked recipe names in Harvest show this component’s inventory quantity / required quantity (for example, **2/4**). Long recipe names end with an ellipsis while the quantity remains visible; hover over the pill for the full name. Inventory combines the harvesting character’s personal items with their party Group inventories; other characters’ inventories and unawarded claims are excluded. Repeated required ingredients are added together. For alternative recipe paths, the count uses the lowest quantity along a path that uses this component.
 
 The GM must select **Finalize Harvest** before reserved items enter their resolved inventories. If the GM resets or cancels the session, unfinalized claims are discarded.
 

@@ -8,7 +8,7 @@
   {{#if hasAccess}}
     {{#unless hasResult}}
     <section class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3">
-      <div class="ml-section-heading"><div><h2>Generation Options</h2><p>Choose the available options and quantities to generate.</p></div></div>
+      <div class="ml-section-heading"><div><h2>Generation Options</h2><p>Available categories and generation quantities.</p></div></div>
       <label class="ml-craftworks-spellbook-name">
         <span>Spellbook Name</span>
         <input
@@ -18,11 +18,11 @@
         >
       </label>
 
-      <fieldset class="ml-craftworks-generator-constraints">
+      <fieldset class="ml-field-group ml-stack" data-gap="2">
         <legend>Schools of Magic <small>(all selected by default)</small></legend>
-        <div class="ml-craftworks-generator-option-grid">
+        <div class="ml-cluster">
           {{#each schools}}
-            <label><input type="checkbox" data-spell-school="{{id}}" {{#if selected}}checked{{/if}}> {{label}}</label>
+            <label class="ml-check"><input type="checkbox" data-spell-school="{{id}}" {{#if selected}}checked{{/if}}><span>{{label}}</span></label>
           {{/each}}
         </div>
       </fieldset>
@@ -105,7 +105,7 @@
       </section>
 
       <section class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3">
-        <div class="ml-section-heading"><div><h2>Recipient</h2><p>Choose the character or party inventory that receives these items.</p></div></div>
+        <div class="ml-section-heading"><div><h2>Recipient</h2><p>Destination inventory for the generated items.</p></div></div>
 
         <label>
           Recipient

@@ -180,7 +180,7 @@
                     <div class="ml-craftworks-harvest-needed-recipes">
                       <i class="fa-solid fa-hammer"></i>
                       {{#each visibleRecipes}}
-                        <span class="ml-craftworks-harvest-recipe-tag">{{name}}</span>
+                        <span class="ml-badge ml-craftworks-harvest-recipe-tag" data-tone="premium" data-truncate title="{{name}} — personal and party inventory / required"><span class="ml-badge__label">{{name}}</span> <span class="ml-badge__value">{{available}}/{{required}}</span></span>
                       {{/each}}
                       {{#if hasMoreRecipes}}
                         <button type="button"
@@ -267,7 +267,7 @@
                     <span class="ml-craftworks-harvest-needed-inline">
                       <i class="fa-solid fa-hammer"></i>
                       {{#each visibleRecipes}}
-                        <span class="ml-craftworks-harvest-recipe-tag">{{name}}</span>
+                        <span class="ml-badge ml-craftworks-harvest-recipe-tag" data-tone="premium" data-truncate title="{{name}} — personal and party inventory / required"><span class="ml-badge__label">{{name}}</span> <span class="ml-badge__value">{{available}}/{{required}}</span></span>
                       {{/each}}
                       {{#if hasMoreRecipes}}
                         <button type="button"

@@ -18,6 +18,7 @@ export class HarvestService {
     this.materialService = materialService;
     this.sessions = sessions;
     this.contentPacks = contentPacks;
+    this.diagnosticHarvests = [];
     DrakkenheimMaterialMatchService.configure(materialRegistry);
   }
 
@@ -115,23 +116,33 @@ export class HarvestService {
 
     applyKibblesContext();
 
+    const finish = reason => {
+      this.diagnosticHarvests.push({
+        at: new Date().toISOString(), reason, mode: context.harvestMode,
+        componentCount: context.components.length,
+        matchedCount: context.components.filter(component => component.matched).length
+      });
+      this.diagnosticHarvests = this.diagnosticHarvests.slice(-20);
+      return context;
+    };
+
     // Drakkenheim is an enhancement path, never a dependency. A Drakkenheim
     // actor uses exact book components only when that content pack is both
     // configured and entitled. Otherwise it stays on the standard profile.
     const drakkenheimEnabled =
       this.contentPacks?.isEnabled?.("monsters-of-drakkenheim") ?? false;
 
-    if (!drakkenheimEnabled) return context;
+    if (!drakkenheimEnabled) return finish("drakkenheim-pack-unavailable");
 
     try {
       let monsterActor = actor;
       let harvestData = await DrakkenheimMonsterDataService.inspectHarvestData(actor);
       if (!harvestData.harvestDocuments.length) {
         monsterActor = await DrakkenheimMonsterDataService.findMonsterActor(actor);
-        if (!monsterActor) return context;
+        if (!monsterActor) return finish("drakkenheim-monster-not-matched");
         harvestData = await DrakkenheimMonsterDataService.inspectHarvestData(monsterActor);
       }
-      if (!harvestData.harvestDocuments.length) return context;
+      if (!harvestData.harvestDocuments.length) return finish("drakkenheim-harvest-data-missing");
       const matches = await DrakkenheimMaterialMatchService.matchHarvestComponents(monsterActor, harvestData);
 
       context.harvestMode = "drakkenheim";
@@ -159,9 +170,11 @@ export class HarvestService {
       });
     } catch (error) {
       console.warn(`Morelord Craftworks | Drakkenheim harvest inspection failed for ${actor.name}.`, error);
+      return finish("drakkenheim-inspection-failed");
     }
 
-    return context;
+    return finish(context.components.some(component => !component.matched)
+      ? "drakkenheim-components-unmatched" : "drakkenheim-resolved");
   }
 
   async start({

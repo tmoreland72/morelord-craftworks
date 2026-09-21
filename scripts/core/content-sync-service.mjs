@@ -35,6 +35,7 @@ export class ContentSyncService {
     this.spellScrollInstaller =
       spellScrollInstaller;
     this.running = null;
+    this.diagnosticAttempts = [];
   }
 
   setRuntimeServices({
@@ -212,8 +213,23 @@ export class ContentSyncService {
         reason
       });
 
+    const attempt = { at: new Date().toISOString(), status: "running" };
+    this.diagnosticAttempts.push(attempt);
+    this.diagnosticAttempts = this.diagnosticAttempts.slice(-10);
     try {
-      return await this.running;
+      const result = await this.running;
+      Object.assign(attempt, {
+        status: "completed",
+        materialCreates: result.materialCreates,
+        materialUpdates: result.materialUpdates,
+        materialDeletes: result.materialDeletes,
+        recipeCount: result.recipeCount
+      });
+      return result;
+    } catch (error) {
+      attempt.status = "failed";
+      attempt.reason = "content-sync-failed";
+      throw error;
     } finally {
       this.running = null;
     }

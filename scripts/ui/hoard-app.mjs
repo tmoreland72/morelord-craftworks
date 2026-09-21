@@ -1,6 +1,6 @@
 import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-participation.js";
 import { MODULE_TITLE } from "../constants.mjs";
-import { HOARD_PROFILES } from "../acquisition/hoard-profiles.mjs";
+import { HOARD_PROFILES, getHoardProfile } from "../acquisition/hoard-profiles.mjs";
 
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 import {
@@ -16,11 +16,11 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 export class HoardApp extends ScrollPreservingApplicationMixin(
   HandlebarsApplicationMixin(ApplicationV2)
 ) {
-  constructor(craftworks, options = {}) {
+  constructor(craftworks, { profileId = "0-4", ...options } = {}) {
     super(options);
     this.craftworks = craftworks;
     this.result = null;
-    this.profileId = "0-4";
+    this.profileId = getHoardProfile(profileId).id;
     this.itemSearchQuery = "";
     this.itemSearchResults = [];
     this.itemSearchTimer = null;

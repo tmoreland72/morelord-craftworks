@@ -2,7 +2,7 @@
   <header class="ml-hero"><i class="fa-solid fa-hammer ml-hero__icon"></i><div class="ml-hero__body"><h1>{{#if editing}}Edit{{else}}New{{/if}} {{#if drakkenheim}}Drakkenheim {{/if}}Recipe</h1><p>Choose the item to craft, the required materials, and the crafting checks.</p></div><div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header>
   <form class="ml-stack">
     <section class="ml-surface ml-stack" data-gap="3">
-      <div class="ml-section-heading"><div><h2>Item to Be Crafted</h2><p>Choose the item and quantity produced by this recipe.</p></div></div>
+      <div class="ml-section-heading"><div><h2>Item to Be Crafted</h2><p>The finished item and output quantity.</p></div></div>
       {{#if output}}
         <article class="ml-card ml-item-row" data-document-uuid="{{output.uuid}}" title="Open {{output.name}}">
           <img src="{{output.img}}" alt="{{output.name}}"><span class="ml-stack" data-gap="1"><strong>{{output.name}}</strong><small>Click the item to open its sheet.</small></span>
@@ -14,7 +14,7 @@
       <label><span>Quantity to Craft</span><input type="number" name="outputQuantity" min="1" value="{{form.outputQuantity}}"></label>
     </section>
     <section class="ml-surface ml-stack" data-gap="3">
-      <div class="ml-section-heading"><div><h2>Recipe Details</h2><p>Set the tools, time, and description for this recipe.</p></div></div>
+      <div class="ml-section-heading"><div><h2>Recipe Details</h2><p>Tools and recipe description{{#unless drakkenheim}}, with crafting duration{{/unless}}.</p></div></div>
       <div class="ml-grid" data-columns="2">
         <label><span>Artisan Tool</span><select name="tool"><option value="">No tool</option>{{#each tools}}<option value="{{label}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></label>
         {{#unless drakkenheim}}<label><span>Crafting Hours</span><input type="number" name="hoursRequired" min="2" step="2" value="{{form.hoursRequired}}"></label>{{/unless}}
@@ -22,15 +22,16 @@
       <label><span>Description</span><textarea name="description" rows="3">{{form.description}}</textarea></label>
     </section>
     <section class="ml-surface ml-stack" data-gap="3">
-      <div class="ml-section-heading"><div><h2>Crafting Check</h2><p>{{#if drakkenheim}}Requires a Workshop of the item’s rarity or higher. No roll or tracked crafting time is required.{{else}}Use the artisan tool at this DC; missing tools or proficiency impose disadvantage.{{/if}}</p></div></div>
-      {{#unless drakkenheim}}<label><span>Tool Ability</span><select name="ability">{{#each abilities}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{value}}</option>{{/each}}</select></label>
+      <div class="ml-section-heading"><div><h2>Crafting Check</h2><p>Check requirements for this recipe.</p></div></div>
+      {{#if drakkenheim}}<aside class="ml-callout" data-tone="info"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><div><strong>No crafting check required</strong><p>Drakkenheim recipes require materials and a Workshop of the item’s rarity or higher. No skill check or crafting time is required.</p></div></aside>{{else}}<p>Use the artisan tool at this DC; missing tools or proficiency impose disadvantage.</p><label><span>Tool Ability</span><select name="ability">{{#each abilities}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{value}}</option>{{/each}}</select></label>
       <div class="ml-grid" data-columns="2">
         <label><span>DC</span><input type="number" name="dc" min="1" value="{{form.dc}}"></label>
-      </div>{{/unless}}
+      </div>{{/if}}
     </section>
 
     <section class="ml-surface ml-stack" data-gap="3">
-      <div class="ml-section-heading"><div><h2>Materials</h2><p>Every group is required (AND). Within each group, choose one material (OR).</p></div></div>
+      <div class="ml-section-heading"><div><h2>Materials</h2><p>Required ingredients and alternative choices.</p></div></div>
+      <p>Every group is required (AND). Within each group, choose one material (OR).</p>
       {{#each groups}}
         {{#if variantStart}}<p>OR — alternative complete recipe</p>{{/if}}
         <div class="ml-card ml-stack">

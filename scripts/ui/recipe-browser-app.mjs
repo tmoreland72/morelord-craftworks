@@ -1,3 +1,4 @@
+import { recipeRarity, normalizeRarity, recipeMatchesFilters } from "../recipes/recipe-filters.mjs";
 import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-participation.js";
 import { MODULE_TITLE } from "../constants.mjs";
 import { materialTagsSatisfy } from "../materials/material-match-utils.mjs";
@@ -46,10 +47,11 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     this.selectedTools = [];
     this.excludedTools = [];
     this.actorUuid = null;
-    this.crafterUuid = null;
+    this.crafterUuid = options.crafterActorUuid ?? null;
+    this.recipeIds = options.recipeIds ? new Set(options.recipeIds.map(String)) : null;
     this.searchRenderTimer = null;
     this.restoreSearchFocus = false;
-    this.searchExecuted = false;
+    this.searchExecuted = this.recipeIds !== null;
     this.displayedRecipeIds = [];
     this.searchSelectionStart = null;
     this.searchSelectionEnd = null;
@@ -235,7 +237,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     const prospectiveCount = matchingRecipes.length;
     const prospectiveCountLabel = String(prospectiveCount);
     const hasSearchCriteria = Boolean(
-      this.search.trim()
+      this.recipeIds || this.search.trim()
       || this.selectedPackIds.length
       || this.excludedPackIds.length
       || this.selectedCategories.length
@@ -651,6 +653,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       prospectiveCount,
       prospectiveCountLabel,
       hasSearchCriteria,
+      focusedRecipeCount: this.recipeIds?.size ?? 0,
       searchExecuted:
         autoShowResults,
       autoShowResults,
@@ -1466,64 +1469,9 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     return rows;
   }
 
-  #recipeRarity(recipe) {
-    const direct =
-      recipe?.rarity
-      ?? recipe?.output?.rarity
-      ?? null;
+  #recipeRarity(recipe) { return recipeRarity(recipe); }
 
-    const normalizedDirect =
-      this.#normalizeRarity(
-        direct
-      );
-
-    if (normalizedDirect) {
-      return normalizedDirect;
-    }
-
-    // Recipe tags are public metadata and Drakkenheim recipes already carry
-    // their rarity there. This fallback keeps player filtering independent of
-    // hidden ingredient requirements.
-    for (
-      const tag of
-      recipe?.tags ?? []
-    ) {
-      const normalizedTag =
-        this.#normalizeRarity(
-          tag
-        );
-
-      if (normalizedTag) {
-        return normalizedTag;
-      }
-    }
-
-    return null;
-  }
-
-  #normalizeRarity(value) {
-    const raw =
-      String(value ?? "")
-        .trim()
-        .toLowerCase()
-        .replace(/[_-]+/g, " ")
-        .replace(/\s+/g, " ");
-
-    const aliases = new Map([
-      ["common", "common"],
-      ["uncommon", "uncommon"],
-      ["rare", "rare"],
-      ["very rare", "very rare"],
-      ["veryrare", "very rare"],
-      ["legendary", "legendary"],
-      ["artifact", "artifact"],
-      ["varies", "varies"],
-      ["variable", "varies"]
-    ]);
-
-    return aliases.get(raw)
-      ?? null;
-  }
+  #normalizeRarity(value) { return normalizeRarity(value); }
 
   #recipeRaritiesForFilter(recipe) {
     const rarity =
@@ -1619,6 +1567,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
   }
 
   #clearTriStateFilters() {
+    this.recipeIds = null;
     this.selectedPackIds = [];
     this.excludedPackIds = [];
     this.selectedCategories = [];
@@ -1638,6 +1587,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       this.craftworks.recipes.search(
         this.search
       );
+    if (this.recipeIds) recipes = recipes.filter(recipe => this.recipeIds.has(recipe.id));
 
     if (!game.user.isGM) {
       recipes = recipes.filter(recipe =>
@@ -1694,16 +1644,10 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       );
     }
 
-    if (this.selectedRecipeRarities.length) {
-      const selected = new Set(
-        this.selectedRecipeRarities
-      );
-
-      recipes = recipes.filter(recipe =>
-        this.#recipeRaritiesForFilter(recipe)
-          .some(rarity => selected.has(rarity))
-      );
-    }
+    recipes = recipes.filter(recipe => recipeMatchesFilters(recipe, {
+      rarities: this.selectedRecipeRarities,
+      ingredientTags: this.selectedIngredientTags
+    }, this.craftworks.materials));
 
     if (this.excludedRecipeRarities.length) {
       const excluded = new Set(
@@ -1718,14 +1662,6 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       );
     }
 
-    if (this.selectedIngredientTags.length) {
-      recipes = recipes.filter(recipe =>
-        this.#recipeHasDistinctIngredientTags(
-          recipe,
-          this.selectedIngredientTags
-        )
-      );
-    }
 
     if (this.excludedIngredientTags.length) {
       const excluded = new Set(
@@ -1788,96 +1724,11 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     return recipes;
   }
 
-  #recipeHasDistinctIngredientTags(recipe, selectedTags) {
-    const selected = [...new Set(
-      selectedTags.map(tag => String(tag).toLowerCase())
-    )];
-    const slots = [];
-
-    for (const group of recipe.requirementGroups ?? []) {
-      for (const requirement of group.requirements ?? []) {
-        const matches = requirement.type === "alternatives"
-          ? (requirement.alternatives ?? []).map(alternative => alternative.match)
-          : [requirement.match];
-        const slotTags = new Set();
-
-        for (const match of matches.filter(Boolean)) {
-          for (const material of this.#materialsMatchingIngredient(match)) {
-            for (const tag of material.tags ?? []) {
-              slotTags.add(String(tag).toLowerCase());
-            }
-          }
-        }
-
-        if (slotTags.size) slots.push(slotTags);
-      }
-    }
-
-    const assign = (tagIndex, usedSlots) => {
-      if (tagIndex >= selected.length) return true;
-
-      for (let slotIndex = 0; slotIndex < slots.length; slotIndex += 1) {
-        if (usedSlots.has(slotIndex) || !slots[slotIndex].has(selected[tagIndex])) {
-          continue;
-        }
-
-        usedSlots.add(slotIndex);
-        if (assign(tagIndex + 1, usedSlots)) return true;
-        usedSlots.delete(slotIndex);
-      }
-
-      return false;
-    };
-
-    return assign(0, new Set());
-  }
-
-  #materialsMatchingIngredient(match) {
-    if (!match) return [];
-
-    if (match.materialId) {
-      const material = this.craftworks.materials.get(match.materialId);
-      return material ? [material] : [];
-    }
-
-    const itemName = String(match.itemName ?? "").trim().toLowerCase();
-    const requiredTags = (match.tags ?? [])
-      .map(tag => String(tag).toLowerCase());
-
-    return this.craftworks.materials.all().filter(material => {
-      if (
-        itemName
-        && String(material.name ?? "").trim().toLowerCase() !== itemName
-      ) return false;
-      if (
-        match.rarity
-        && String(material.rarity ?? "").toLowerCase()
-          !== String(match.rarity).toLowerCase()
-      ) return false;
-      if (
-        match.category
-        && String(material.category ?? "").toLowerCase()
-          !== String(match.category).toLowerCase()
-      ) return false;
-      if (
-        match.stage
-        && String(material.stage ?? "").toLowerCase()
-          !== String(match.stage).toLowerCase()
-      ) return false;
-
-      const materialTags = new Set(
-        (material.tags ?? []).map(tag => String(tag).toLowerCase())
-      );
-
-      return materialTagsSatisfy(requiredTags, materialTags);
-    });
-  }
-
   #updateLiveQueryState() {
     const recipes = this.#matchingRecipes();
 
     const hasCriteria = Boolean(
-      this.search.trim()
+      this.recipeIds || this.search.trim()
       || this.selectedPackIds.length
       || this.excludedPackIds.length
       || this.selectedCategories.length

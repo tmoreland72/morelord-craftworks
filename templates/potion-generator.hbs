@@ -5,12 +5,12 @@
   {{#if hasAccess}}
     {{#unless hasResult}}
     <section class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3">
-      <div class="ml-section-heading"><div><h2>Generation Options</h2><p>Choose the available options and quantities to generate.</p></div></div>
-      <fieldset class="ml-craftworks-generator-constraints">
+      <div class="ml-section-heading"><div><h2>Generation Options</h2><p>Available categories and generation quantities.</p></div></div>
+      <fieldset class="ml-field-group ml-stack" data-gap="2">
         <legend>Potion Categories <small>(inferred from potion names; all selected by default)</small></legend>
-        <div class="ml-craftworks-generator-option-grid">
+        <div class="ml-cluster">
           {{#each categories}}
-            <label><input type="checkbox" data-potion-category="{{id}}" {{#if selected}}checked{{/if}}> {{label}}</label>
+            <label class="ml-check"><input type="checkbox" data-potion-category="{{id}}" {{#if selected}}checked{{/if}}><span>{{label}}</span></label>
           {{/each}}
         </div>
       </fieldset>
@@ -40,7 +40,7 @@
 
     {{#if hasResult}}
       <section class="ml-surface ml-section ml-craftworks-panel ml-craftworks-potion-preview ml-stack" data-gap="3">
-        <div class="ml-section-heading"><div><h2><i class="fa-solid fa-flask"></i> {{resultCount}} Generated Potions</h2><p>Review and customize the generated items.</p></div></div>
+        <div class="ml-section-heading"><div><h2><i class="fa-solid fa-flask"></i> {{resultCount}} Generated Potions</h2><p>Generated items and quantities.</p></div></div>
         <div class="ml-actions"><button type="button" data-action="add-result"><i class="fa-solid fa-plus"></i> Add Potion</button></div>
         <div class="ml-craftworks-potion-results-scroll">
           {{#each resultGroups}}
@@ -63,7 +63,7 @@
       </section>
 
       <section class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3">
-        <div class="ml-section-heading"><div><h2>Recipient</h2><p>Choose the character or party inventory that receives these items.</p></div></div>
+        <div class="ml-section-heading"><div><h2>Recipient</h2><p>Destination inventory for the generated items.</p></div></div>
         <label>Recipient
           <select name="recipient">
             <option value="">Choose character or group…</option>

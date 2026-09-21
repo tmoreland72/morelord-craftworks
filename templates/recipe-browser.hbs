@@ -2,6 +2,7 @@
   <header class="ml-hero"><i class="fa-solid fa-hammer ml-hero__icon"></i><div class="ml-hero__body"><h1>Recipes</h1><p>Browse recipes, discover requirements, and mark recipes for Craft.</p></div>
   <div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header>
 
+  {{#if focusedRecipeCount}}<p class="notes">Showing {{focusedRecipeCount}} selected recipe(s). Clear all filters to browse the full catalog.</p>{{/if}}
   <div class="ml-craftworks-marketplace-browser-body">
     <aside class="ml-surface ml-craftworks-filter-rail ml-stack" data-gap="3">
       <div class="ml-section-heading"><div><h2>Filters</h2><p>Narrow the catalog to the entries you want to use.</p></div>

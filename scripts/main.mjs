@@ -1,4 +1,7 @@
+import { getCraftworksDiagnostics } from "./core/diagnostics.mjs";
 import { combinedCraftingInventory } from "./crafting/group-membership.mjs";
+import { researchRecipeMatches } from "./recipes/recipe-filters.mjs";
+import { getHiddenRecipeIds, setHiddenRecipeIds } from "./core/settings.mjs";
 import { MODULE_ID } from "./constants.mjs";
 import { log } from "./core/logger.mjs";
 import {
@@ -304,6 +307,18 @@ Hooks.once("ready", async () => {
     spellScrollGenerator
   });
   let gmHarvestApp = null;
+  const telemetry = globalThis.MorelordCore?.telemetry;
+  telemetry?.windows(MODULE_ID, {
+    "morelord-craftworks": "dashboard.opened", "morelord-craftworks-recipes": "recipes.opened",
+    "morelord-craftworks-craft": "crafting.opened", "morelord-craftworks-harvest": "harvest.opened",
+    "morelord-craftworks-gather": "gather.opened", "morelord-craftworks-loot": "loot.opened",
+    "morelord-craftworks-hoard": "hoard.opened", "morelord-craftworks-delerium-search": "delerium.opened",
+    "morelord-craftworks-potion-generator": "potions.opened", "morelord-craftworks-material-browser": "materials.opened"
+  });
+  telemetry?.observe(MODULE_ID, craftingJobs, { start: "crafting.start", recordAttempt: "crafting.check", completeWithoutCheck: "crafting.complete" });
+  telemetry?.observe(MODULE_ID, harvest, { start: "harvest.start", claim: "harvest.claim" });
+  telemetry?.observe(MODULE_ID, loot, { roll: "loot.roll", award: "loot.award" });
+  telemetry?.observe(MODULE_ID, hoard, { roll: "hoard.roll", award: "hoard.award" });
   const playerHarvestApps = new Map();
   let gmGatherApp = null;
   const playerGatherApps = new Map();
@@ -321,6 +336,7 @@ Hooks.once("ready", async () => {
   let craftApp = null;
 
   const api = {
+    getDiagnostics: () => getCraftworksDiagnostics(api),
     adapter,
     materials,
     materialService,
@@ -365,6 +381,33 @@ Hooks.once("ready", async () => {
       getMaterialId: getCraftworksMaterialId
     },
     downtimeIntegration: Object.freeze({
+      isResearchAvailable: () => contentPacks.isEnabled("monsters-of-drakkenheim"),
+      learnResearchRecipes: async recipeIds => {
+        if (!game.user.isGM) throw new Error("Only a GM can reveal researched recipes.");
+        const hidden = getHiddenRecipeIds();
+        for (const id of recipeIds) hidden.delete(String(id));
+        await setHiddenRecipeIds(hidden);
+        if (recipeBrowserApp?.rendered) await recipeBrowserApp.render({ force: true });
+      },
+      getResearchComponents: async actorUuid => {
+        const actor = await fromUuid(actorUuid);
+        if (actor?.type !== "character") throw new Error("Choose a character to research recipes.");
+        return combinedCraftingInventory(actor).items.filter(item =>
+          Number(item.system?.quantity ?? 1) > 0
+          && item.flags?.[MODULE_ID]?.tags?.includes("monster-component")
+        ).map(item => ({ uuid: item.uuid, name: item.name, img: item.img,
+          inventoryName: item.parent?.name ?? actor.name }));
+      },
+      getResearchRecipes: async (actorUuid, componentUuid) => {
+        const components = await api.downtimeIntegration.getResearchComponents(actorUuid);
+        if (!components.some(item => item.uuid === componentUuid)) {
+          throw new Error("The monster component is no longer in this character's or party's inventory.");
+        }
+        const item = await fromUuid(componentUuid);
+        return recipes.all().filter(recipe =>
+          (recipe.packId === "monsters-of-drakkenheim" || recipe.source?.contentPackId === "monsters-of-drakkenheim")
+          && researchRecipeMatches(recipe, item.flags?.[MODULE_ID], materials));
+      },
       getRecipe: recipeId => recipes.get(recipeId, { includeDisabled: true }),
       listRecipes: () => recipes.all(),
       getFacilityOptions: () => foundry.utils.deepClone(
@@ -461,10 +504,10 @@ Hooks.once("ready", async () => {
       gmLootApp = new LootApp(api);
       return gmLootApp.render({ force: true });
     },
-    openHoard: () => {
+    openHoard: ({ profileId = "0-4" } = {}) => {
       if (!game.user.isGM) throw new Error("Only the GM can generate a treasure hoard.");
       if (gmHoardApp?.rendered) gmHoardApp.close();
-      gmHoardApp = new HoardApp(api);
+      gmHoardApp = new HoardApp(api, { profileId });
       return gmHoardApp.render({ force: true });
     },
     openMaterials: async ({ materialId = null } = {}) => {
@@ -484,9 +527,9 @@ Hooks.once("ready", async () => {
 
       return materialBrowserApp.render({ force: true });
     },
-    openRecipes: async () => {
+    openRecipes: async ({ recipeIds = null, crafterActorUuid = null } = {}) => {
       if (recipeBrowserApp?.rendered) await recipeBrowserApp.close();
-      recipeBrowserApp = new RecipeBrowserApp(api);
+      recipeBrowserApp = new RecipeBrowserApp(api, { recipeIds, crafterActorUuid });
       return recipeBrowserApp.render({ force: true });
     },
     openCustomRecipes: async ({ drakkenheim = false } = {}) => {

@@ -4,7 +4,7 @@ description: Install, configure, and operate Morelord Craftworks acquisition, cr
 slug: morelord-craftworks/gm
 product: morelord-craftworks
 audience: game-master
-version: 0.4.12
+version: 0.4.13
 foundry: 14
 ---
 
@@ -194,7 +194,9 @@ Use **Mark Context Known** or **Mark Context Unknown** to update only the recipe
 
 ### Create and manage custom recipes
 
-Open **Recipe Manager** from the dashboard. Choose **New Recipe**, or **New Drakkenheim Recipe** when that content is available. The first section, **Item to Be Crafted**, selects the item with the full filtered catalog picker. Then set its quantity, artisan tool, crafting hours, tool ability, and DC. **Add Required Group (AND)** adds another mandatory requirement. **Add Material Choice (OR)** offers another material within that group. For example: Animus AND (Spine OR Ribs) AND Dust. Existing alternative complete recipes retain their original logic when edited. Save the recipe to make it available in the catalog.
+The Harvest creature selector uses the same whole-row selection as Encounter Loot: click the creature’s name, portrait, or row to check or uncheck it.
+
+Open **Recipe Manager** from the dashboard. Choose **New Recipe**, or **New Drakkenheim Recipe** when that content is available. The first section, **Item to Be Crafted**, selects the item with the full filtered catalog picker. Then set its quantity, artisan tool, crafting hours, tool ability, and DC. **Add Required Group (AND)** adds another mandatory requirement. **Add Material Choice (OR)** offers another material within that group. For example: Animus AND (Spine OR Ribs) AND Dust. Existing alternative complete recipes retain their original logic when edited. The Drakkenheim editor explains its no-check and no-time rules in a callout beneath Crafting Check; the Workshop requirement still applies. Save the recipe to make it available in the catalog.
 
 The manager supports editing, deleting, exporting individual recipes or all recipes, and importing JSON. Import conflicts can be skipped or replaced. Standard and Drakkenheim recipes keep their material catalogs separate.
 
@@ -413,6 +415,10 @@ Drakkenheim content is not isolated in a separate mode. When enabled, its materi
 
 Recipe outputs prefer enabled premium PHB or DMG documents when the connected account has access, then fall back to SRD 5.2. Healing potions can also use SRD 5.1. Enhanced armor, shield, and weapon recipes use the generic **+1, +2, or +3** source item; the GM configures the completed item as the intended equipment.
 
+### Harvest recipe inventory counts
+
+Marked recipe names in Harvest show this component’s inventory quantity / required quantity (for example, **2/4**). Inventory combines the harvesting character’s personal items with their party Group inventories; other characters’ inventories and unawarded claims are excluded. Repeated required ingredients are added together. For alternative recipe paths, the count uses the lowest quantity along a path that uses this component.
+
 ### Drakkenheim Harvest preflight
 
 With the Monsters of Drakkenheim content pack enabled and access available, Craftworks first reads the creature's own biography, including embedded journal pages, for a **Harvestable Components** section. It matches the listed components and rarity to canonical Craftworks materials. If the creature has no harvesting section, Craftworks checks its matching official compendium Actor; if neither has a section, standard harvesting applies. Review those matches in the GM preflight before starting the session.
@@ -426,6 +432,8 @@ Players still use the normal Harvest experience—roll against each creature, re
 If the official Drakkenheim creature or harvesting data cannot be resolved, Craftworks falls back to standard harvesting where possible rather than making the creature unusable. Missing enhanced results should therefore be diagnosed as a content-pack, entitlement, source-installation, or synchronization issue—not as a requirement for ordinary Craftworks operation.
 
 ## Troubleshooting
+
+When harvesting gives unexpected materials, use Core's **Download Troubleshooting File** before **Sync with Compendiums**, and download a second file afterward. With updated Core and Craftworks, the report includes pack configuration and access, catalog counts, known compendium availability and source filters, sync status, and recent harvest fallback reasons. It contains no creature identities or raw console logs. Recent outcomes reset when that client reloads; reproduce the issue and export from the GM client that performed the harvest.
 
 ### Materials or recipes are missing
 
@@ -476,3 +484,8 @@ Report reproducible problems at [Morelord Craftworks Issues](https://github.com/
 ## D&D 5e rarity compatibility
 
 Potion, treasure, recipe, and material workflows accept legacy rarity fields and v6 rarity collections. Where one rarity is needed, the lowest listed rarity is used, matching the system Item getter. Existing items and recipe identifiers do not need a migration.
+
+
+Generator category and school filters keep each checkbox with its label and wrap complete options as the window narrows.
+
+Encounter Stories can open Hoard with a selected starting profile via `game.modules.get("morelord-craftworks").api.openHoard({ profileId: "5-10" })`. Existing calls without options still start at Challenge 0–4; unknown profile IDs use that default. This only opens the normal interface: the GM must generate, review, and award explicitly.

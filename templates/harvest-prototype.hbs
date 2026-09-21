@@ -216,9 +216,8 @@
     {{else}}
       {{#if deadCreatures.length}}
         <section class="ml-surface ml-section ml-stack" data-gap="3">
-          <div class="ml-section-heading"><div><h2>{{deadCreatures.length}} defeated NPC token(s) found</h2><p>Foundry cannot reliably distinguish a monster from a shopkeeper,
-            trap, or other NPC-based token. Select only the creatures that can
-            actually be harvested.</p></div></div>
+          <div class="ml-section-heading"><div><h2>{{deadCreatures.length}} defeated NPC token(s) found</h2><p>Defeated creatures available for this Harvest.</p></div></div>
+          <p>Foundry cannot reliably distinguish a monster from a shopkeeper, trap, or other NPC-based token. Select only creatures that can be harvested.</p>
 
           <div class="ml-craftworks-harvest-preflight-selection-actions">
             <button type="button" data-action="select-all-harvest-creatures">
@@ -231,19 +230,17 @@
             </button>
           </div>
 
-          <div class="ml-craftworks-harvest-preflight-creatures">
+          <div class="ml-stack" data-gap="2">
             {{#each deadCreatures}}
-              <article class="ml-craftworks-harvest-preflight-creature">
-                <label class="ml-craftworks-harvest-preflight-creature-select" title="Include {{name}} in this Harvest session">
+              <label class="ml-actor-choice" title="Include {{name}} in this Harvest session">
                   <input
                     type="checkbox"
                     data-harvest-creature-select
                     data-token-uuid="{{tokenUuid}}"
                     {{checked selectedForHarvest}}
                   >
-                </label>
-                <img src="{{img}}" alt="{{name}}">
-                <div class="ml-craftworks-harvest-preflight-creature-copy">
+                <img class="ml-avatar" src="{{img}}" alt="">
+                <span class="ml-stack" data-gap="1">
                   <strong>{{name}}</strong>
                   <small>
                     {{creatureType}} · CR {{cr}} · Harvest DC {{dc}}
@@ -263,14 +260,14 @@
                       {{/each}}
                     </div>
                   {{/if}}
-                </div>
-              </article>
+                </span>
+              </label>
             {{/each}}
           </div>
         </section>
 
         <section class="ml-surface ml-section ml-stack" data-gap="3">
-          <div class="ml-section-heading"><div><h2>Player Characters</h2><p>Choose which characters take part in this Harvest.</p></div></div>
+          <div class="ml-section-heading"><div><h2>Player Characters</h2><p>Characters participating in this Harvest.</p></div></div>
 
           <label class="ml-craftworks-harvest-skip-skill-row">
             <span class="ml-craftworks-harvest-skip-character">

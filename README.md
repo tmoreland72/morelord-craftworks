@@ -1,5 +1,9 @@
 # Morelord Craftworks
 
+For missing harvesting components, use Core's **Download Troubleshooting File** before **Sync with Compendiums**, then export again afterward. Updated Core exports include Craftworks content-pack configuration/access, material and recipe counts, known compendium/source availability, synchronization status, and the current client's last 10 sync attempts and 20 harvest inspections. These outcomes use fixed reason codes, contain no actor names or raw errors, and reset on reload. Older Core versions can still obtain the snapshot through `game.modules.get("morelord-craftworks").api.getDiagnostics()`.
+
+Downtime recipe research uses `api.downtimeIntegration.getResearchComponents(actorUuid)` to list personal/party monster components and `getResearchRecipes(actorUuid, componentUuid)` to search enabled Drakkenheim recipes using the Recipes browser's family and recipe-rarity filters. These methods never consume components. `isResearchAvailable()` checks content-pack access; GM-only `learnResearchRecipes(recipeIds)` marks discoveries known to all players. `openRecipes({ recipeIds, crafterActorUuid })` focuses the Recipes browser on the results; Clear all filters returns to the catalog. Crafting still requires exact ingredients.
+
 Morelord Craftworks is a Foundry VTT module for gathering, harvesting, looting,
 materials, recipes, and crafting workflows.
 
@@ -464,3 +468,18 @@ Character choices for crafting, gathering, harvesting, delerium search, and item
 Settings use Morelord Core’s shared headers, sections, content cards, settings rows, and footer. Descriptions remain beside checkboxes at narrow widths.
 
 D&D5e Configure Sources filtering is provided by Core’s shared `Dnd5eSourceFilterService`, including canonical SRD exclusions for copied documents. Craftworks preserves its existing source and priority behavior while Marketplace and Downtime use the same shared rules.
+
+## Optional usage and error reports
+
+When a compatible Morelord Core is active, its explicit reporting choices can share fixed feature events and sanitized error code locations without connecting a Morelord account. Reporting is disabled in Developer Mode. No campaign content or account credentials are sent; a random world ID measures repeat use. See [Core reporting documentation](../morelord-core/TELEMETRY.md) for this module's event coverage and limitations. Existing Core versions continue to work without this optional reporting API. Website ingestion must be deployed before releasing these changes.
+
+Encounter Stories can open Hoard with a selected starting profile via `game.modules.get("morelord-craftworks").api.openHoard({ profileId: "5-10" })`. Existing calls without options still start at Challenge 0–4; unknown profile IDs use that default. This only opens the normal interface: the GM must generate, review, and award explicitly.
+
+
+### Game Master chat integration
+
+Morelord Game Master can reuse the Delerium Search service with chat-card requests instead of player windows. It sets `session.messageMode` to `blind`, which the existing reward service now forwards to quantity rolls and the award card. Sessions without this optional property keep their existing visibility. Search rules, source items, and reward calculations are unchanged.
+
+## Release dependency
+
+This release requires Morelord Core 0.3.10 or newer for the shared UI and service updates. Optional integrations remain optional.

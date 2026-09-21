@@ -15,6 +15,7 @@ export class AwardChatCardService {
     title = "Items Received",
     subtitle = null,
     speakerActor = null,
+    messageMode = null,
     icon = "fa-solid fa-gift"
   } = {}) {
     const normalizedItems = (items ?? [])
@@ -85,7 +86,7 @@ export class AwardChatCardService {
         actor: speakerActor ?? recipient ?? null
       }),
       content
-    });
+    }, messageMode ? { messageMode } : {});
   }
 
   static #normalizeItem(entry) {

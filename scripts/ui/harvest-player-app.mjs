@@ -1,3 +1,4 @@
+import { combinedCraftingInventory } from "../crafting/group-membership.mjs";
 import { MODULE_TITLE } from "../constants.mjs";
 import { materialTagsSatisfy } from "../materials/material-match-utils.mjs";
 import { harvestParticipantKey } from "../acquisition/harvest-participants.mjs";
@@ -143,11 +144,20 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
           .filter(Boolean)
       : [];
 
+    const quantities = new Map();
+    for (const item of combinedCraftingInventory(actor)?.items ?? []) {
+      const materialId = item.flags?.["morelord-craftworks"]?.materialId;
+      if (!materialId) continue;
+      quantities.set(materialId, (quantities.get(materialId) ?? 0) + Math.max(0, Number(item.system?.quantity ?? 1)));
+    }
     this.recipeMatchesByMaterial = new Map();
     const recipeUsageFor = material => {
       const recipes = markedRecipes
-        .filter(recipe => this.#recipeCanUseMaterial(recipe, material))
-        .map(recipe => ({
+        .map(recipe => ({ recipe, required: this.#recipeMaterialRequired(recipe, material) }))
+        .filter(({ required }) => required > 0)
+        .map(({ recipe, required }) => ({
+          available: quantities.get(material.materialId) ?? 0,
+          required,
           id: recipe.id,
           name: recipe.name,
           category: recipe.category ?? null,
@@ -511,7 +521,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
         <div class="ml-craftworks-harvest-recipe-dialog-list">
           ${recipes.map(recipe => `
             <div class="ml-craftworks-harvest-recipe-dialog-row">
-              <strong>${escape(recipe.name)}</strong>
+              <strong>${escape(recipe.name)} <span title="In personal and party inventory / required">${recipe.available}/${recipe.required}</span></strong>
               <span>${escape([recipe.category, recipe.tool].filter(Boolean).join(" · "))}</span>
             </div>
           `).join("")}
@@ -526,20 +536,17 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
     });
   }
 
-  #recipeCanUseMaterial(recipe, material) {
-    if (!recipe || !material) return false;
-
-    return (recipe.requirementGroups ?? []).some(group =>
-      (group.requirements ?? []).some(requirement => {
-        if (requirement.type === "alternatives") {
-          return (requirement.alternatives ?? []).some(alternative =>
-            this.#materialMatches(alternative.match, material)
-          );
-        }
-
-        return this.#materialMatches(requirement.match, material);
-      })
-    );
+  #recipeMaterialRequired(recipe, material) {
+    // Complete groups are OR paths; requirements within a group are AND.
+    // Show the least quantity needed along a path that uses this component.
+    const quantities = (recipe?.requirementGroups ?? []).map(group =>
+      (group.requirements ?? []).reduce((total, requirement) => {
+        const options = requirement.type === "alternatives" ? requirement.alternatives ?? [] : [requirement];
+        const matches = options.filter(option => this.#materialMatches(option.match, material));
+        return total + (matches.length ? Math.min(...matches.map(option => Math.max(1, Number(option.quantity ?? 1)))) : 0);
+      }, 0)
+    ).filter(quantity => quantity > 0);
+    return quantities.length ? Math.min(...quantities) : 0;
   }
 
   #materialMatches(match, material) {
