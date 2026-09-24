@@ -494,7 +494,7 @@ Morelord Game Master can reuse the Delerium Search service with chat-card reques
 
 ## Release dependency
 
-This release requires Morelord Core 0.3.10 or newer for the shared UI and service updates. Optional integrations remain optional.
+This release requires Morelord Core 0.3.14 or newer for the shared UI and service updates. Optional integrations remain optional.
 
 
 ## Grouped chat roll requests

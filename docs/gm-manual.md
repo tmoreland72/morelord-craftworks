@@ -50,7 +50,7 @@ Premium access is managed by Morelord Core. A content pack may also depend on of
 
 - Foundry Virtual Tabletop v14
 - dnd5e 5.3 or later
-- Morelord Core 0.3.7 or later
+- Morelord Core 0.3.14 or later
 - SocketLib 1.1.3 or later
 - Morelord Craftworks 0.4.9 or later
 
