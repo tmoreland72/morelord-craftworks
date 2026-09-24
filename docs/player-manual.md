@@ -188,7 +188,7 @@ Harvest is different while it is in progress: a component appears on the final a
 
 ## Optional Drakkenheim content
 
-Your campaign may enable the exceptional **Monsters of Drakkenheim** Content Pack. It is additional content rather than a requirement for using Craftworks.
+Your campaign may enable the exceptional **Drakkenheim** Content Pack. It is additional content rather than a requirement for using Craftworks.
 
 When available, you may encounter:
 

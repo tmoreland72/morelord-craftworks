@@ -1,5 +1,17 @@
 # Morelord Craftworks
 
+Craftworks' generated world packs appear under **Morelord Gaming → Craftworks** as **Craftworks Materials**, **Craftworks Drakkenheim Materials**, **Craftworks Spell Scrolls**, and **Craftworks Custom Recipes**. Existing pack IDs and item/recipe UUIDs are preserved. Core migrates folder placement once per pack/world and applies the display labels on each client; newly created packs use those labels in their metadata too. The Drakkenheim pack remains subject to its existing content requirements. No personal Graypes Compendium content is moved into this folder.
+
+Craftworks Standard, SRD 5.2, and SRD 5.1 show **Standard** tier badges alongside availability.
+
+The PHB and DMG settings cards retain their **Premium** subscription badges alongside their separate module-availability badges.
+
+In settings, the Player's Handbook and Dungeon Master's Guide badges report **Available** only when their official modules are installed and enabled in this world. The **Drakkenheim** card keeps its **Champion** badge and existing content toggle, with separate availability subheaders for **Dungeons of Drakkenheim** and **Monsters of Drakkenheim**. Availability is distinct from subscription access and the saved content toggle; stored pack IDs remain unchanged.
+
+The Drakkenheim integration requires a **Morelord Gaming Champion subscription** and the official Drakkenheim books installed as Foundry modules; the Morelord content pack does not include them. Monsters of Drakkenheim supplies harvesting and crafting sources; Dungeons of Drakkenheim supplies encounters and Lucky Finds. Connect the world in Core settings, enable the content pack, and use monsters from the official Monsters compendium whenever possible.
+
+**Save Changes** now synchronizes compendiums before closing. Manual **Sync with Compendiums** remains available; a failed sync leaves the settings window open with an error. **Acquire → Lucky Finds** rolls the installed table for the GM, with clickable private dice, real item links, corrected tools/ointment/art-object references, and a direct spell-scroll generator button. It does not automatically award items. See the GM manual for details and the optional Game Master combat trigger.
+
 For missing harvesting components, use Core's **Download Troubleshooting File** before **Sync with Compendiums**, then export again afterward. Updated Core exports include Craftworks content-pack configuration/access, material and recipe counts, known compendium/source availability, synchronization status, and the current client's last 10 sync attempts and 20 harvest inspections. These outcomes use fixed reason codes, contain no actor names or raw errors, and reset on reload. Older Core versions can still obtain the snapshot through `game.modules.get("morelord-craftworks").api.getDiagnostics()`.
 
 Downtime recipe research uses `api.downtimeIntegration.getResearchComponents(actorUuid)` to list personal/party monster components and `getResearchRecipes(actorUuid, componentUuid)` to search enabled Drakkenheim recipes using the Recipes browser's family and recipe-rarity filters. These methods never consume components. `isResearchAvailable()` checks content-pack access; GM-only `learnResearchRecipes(recipeIds)` marks discoveries known to all players. `openRecipes({ recipeIds, crafterActorUuid })` focuses the Recipes browser on the results; Clear all filters returns to the catalog. Crafting still requires exact ingredients.
@@ -84,12 +96,12 @@ unentitled Content Pack contributes no runtime Craftworks content.
 
 ### Monsters of Drakkenheim setup requirement
 
-Access to the **Monsters of Drakkenheim** Craftworks Content Pack does not install
+Access to the **Drakkenheim** Craftworks Content Pack does not install
 the official Foundry module or its Actors. To give players the ability to harvest
 Drakkenheim monster material components, the GM must:
 
 1. Install and enable the **Monsters of Drakkenheim** module (`drakkenheim-monsters`).
-2. Enable the **Monsters of Drakkenheim** Craftworks Content Pack.
+2. Enable the **Drakkenheim** Craftworks Content Pack.
 3. Use creatures whose biographies contain a **Harvestable Components** section,
    either directly or through an embedded journal page. Craftworks reads the
    creature's biography first and uses its listed Drakkenheim components and rarity.
@@ -483,3 +495,18 @@ Morelord Game Master can reuse the Delerium Search service with chat-card reques
 ## Release dependency
 
 This release requires Morelord Core 0.3.10 or newer for the shared UI and service updates. Optional integrations remain optional.
+
+
+## Grouped chat roll requests
+
+Delerium Search now posts one grouped party request card, matching Game Master, with each character’s skill selection, DIS/Roll/ADV controls, and separate Decline search action. Each response completes only that character. Any GM can resolve a pending character, including after a player disconnects. The GM-only search summary and reward workflow remain separate. This requires the matching pending Core update; Game Master remains optional.
+
+### Delerium Search completion
+
+Clicking Roll or Decline immediately replaces that character's controls with centered **Completed** text. Other characters can roll while earlier dice animate. Rejected submissions restore their controls. The GM records each response before acknowledging it, and the outcome summary still waits for all relevant dice animations.
+
+After every selected character rolls or declines, Craftworks posts a new GM-only completion card after the dice messages. It lists each character’s total and pass/fail/decline, aggregate successes and failures, the earned reward formulas (or **No delerium found**), and whether a random encounter is required. **Open Search Results** opens the existing reward/recipient window; when an encounter is required, that window provides the Encounters action. Rewards still require an explicit recipient and award action. **Finalize Search** on the original GM summary safely retries finalization using the saved rolls; it does not reroll characters or duplicate the completion card.
+
+Completed searches saved before this fix are recovered by their coordinating GM on reload: missing completion cards are posted from the saved results, without rerolling or awarding items. Search summaries use Foundry 14’s `gm` message mode; the older `gmroll` value is a legacy roll-mode name and is not a valid message-mode name.
+
+This release requires Morelord Core 0.3.14 or newer for shared roll requests, outcome scheduling, and consistent UI.

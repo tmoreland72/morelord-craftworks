@@ -37,6 +37,7 @@ export const CONTENT_PACKS = [
   },
   {
     id: "phb",
+    requiredModuleId: "dnd-players-handbook",
     label: "Player's Handbook",
     shortLabel: "PHB",
     rulesVersion: "2024",
@@ -50,6 +51,7 @@ export const CONTENT_PACKS = [
   },
   {
     id: "dmg",
+    requiredModuleId: "dnd-dungeon-masters-guide",
     label: "Dungeon Master's Guide",
     shortLabel: "DMG",
     rulesVersion: "2024",
@@ -64,11 +66,16 @@ export const CONTENT_PACKS = [
   {
     id: "monsters-of-drakkenheim",
     label: "Monsters of Drakkenheim",
+    settingsLabel: "Drakkenheim",
     shortLabel: "Drakkenheim",
     rulesVersion: "2024",
-    description: "Premium Monsters of Drakkenheim materials, monster harvesting data, recipes, and acquisition content.",
+    description: "Drakkenheim materials, harvesting, recipes, encounters, and Lucky Finds. Requires a Morelord Gaming Champion subscription and the official source books installed as Foundry modules.",
+    accessLabel: "Champion",
     requiredModuleId: "drakkenheim-monsters",
-    setupNotice: "To give players access to Drakkenheim monster material components, install and enable the Monsters of Drakkenheim module, then create or place monsters using Actors from that module's Monsters compendium.",
+    sourceModules: [
+      { id: "drakkenheim-core", label: "Dungeons of Drakkenheim", description: "Published encounter tables and Lucky Finds." },
+      { id: "drakkenheim-monsters", label: "Monsters of Drakkenheim", description: "Monster harvesting, materials, and recipes. Use Actors from its Monsters compendium whenever possible." }
+    ],
     premium: true,
     requiredEntitlements: [],
     requiredFeatures: ["craftworks.content-mod"],

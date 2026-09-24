@@ -35,7 +35,7 @@ export class DeleriumSearchService {
   getSkillOptions() { return DELERIUM_SEARCH_SKILLS_DND5E; }
 
   start(zoneId) {
-    if (!this.hasAccess) throw new Error("Enable the Monsters of Drakkenheim Content Pack to search for delerium.");
+    if (!this.hasAccess) throw new Error("Enable the Drakkenheim Content Pack to search for delerium.");
     const zone = ZONES[zoneId];
     if (!zone) throw new Error("Choose the Outer City or Inner City.");
     const scene = canvas.scene;

@@ -52,7 +52,7 @@
           <p>
             Craftworks automatically synchronizes when its version, enabled
             Content Packs, D&D5e version, or available Item compendiums change.
-            Use this button to force an immediate rescan.
+            Save Changes also waits for a fresh sync before closing. Use this button to force an immediate rescan.
           </p>
           <small>
             Last sync: {{contentSyncStatus.lastAtLabel}}
@@ -77,27 +77,20 @@
             <div class="ml-stack" data-gap="1">
               <div class="ml-cluster">
                 <h4>{{label}}</h4>
-                <span class="ml-badge" data-tone="{{#if premium}}premium{{else}}success{{/if}}">
+                {{#if tierLabel}}<span class="ml-badge" data-tone="{{tierTone}}">{{tierLabel}}</span>{{/if}}
+                <span class="ml-badge" data-tone="{{statusTone}}">
                   {{statusLabel}}
                 </span>
               </div>
               <p>{{description}}</p>
               <small>{{rulesVersion}}</small>
-              {{#if requiredFeature}}
-                <small><strong>Feature:</strong> {{requiredFeature}}</small>
-              {{/if}}
-              {{#if setupNotice}}
-                <div class="ml-callout" data-tone="{{#if requiredModuleStatus.active}}success{{else}}warning{{/if}}">
-                  <i class="fa-solid {{#if requiredModuleStatus.active}}fa-circle-check{{else}}fa-triangle-exclamation{{/if}}"></i>
-                  <div>
-                    <strong>Required Drakkenheim Setup</strong>
-                    <span>{{setupNotice}}</span>
-                    {{#if requiredModuleStatus}}
-                      <small>{{requiredModuleStatus.label}}</small>
-                    {{/if}}
-                  </div>
-                </div>
-              {{/if}}
+              {{#if accessRequired}}<p>Subscription access required to enable this content pack.</p>{{/if}}
+              {{#each sourceModules}}
+                <section class="ml-stack" data-gap="1">
+                  <div class="ml-cluster"><h5>{{name}}</h5><span class="ml-badge" data-tone="{{tone}}">{{label}}</span></div>
+                  <p>{{description}}</p>
+                </section>
+              {{/each}}
               <div class="ml-cluster">
                 <span>{{counts.materials}} materials source</span>
                 <span>{{counts.recipes}} recipes</span>

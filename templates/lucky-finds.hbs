@@ -1,0 +1,15 @@
+<section class="ml-app ml-app-shell">
+  <header class="ml-hero">
+    <i class="fa-solid fa-clover ml-hero__icon"></i>
+    <div class="ml-hero__body"><h1>Lucky Finds</h1><p>GM only · Table roll: {{total}}</p></div>
+    <div class="ml-hero__actions ml-actions"><button type="button" data-action="open-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div>
+  </header>
+  {{#each results}}
+    <section class="ml-surface ml-stack" data-gap="3">
+      <div>{{{html}}}</div>
+      {{#if artisanTools}}<div class="ml-stack"><h2>Artisan tools</h2><p>Roll the quantity above, then choose from the linked tools.</p><p>{{{toolsHtml}}}</p></div>{{/if}}
+      {{#if scrollRarity}}<p>Generate {{scrollRarity}} spell scrolls using the quantity in this result.</p><div class="ml-actions"><button type="button" class="ml-button" data-action="generate-scroll"><i class="fa-solid fa-scroll"></i> Generate Spell Scroll</button></div>{{/if}}
+      {{#each missing}}<p class="ml-notice" data-tone="warning">Item unavailable in the required compendium: {{this}}</p>{{/each}}
+    </section>
+  {{/each}}
+</section>

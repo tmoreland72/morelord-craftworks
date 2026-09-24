@@ -58,6 +58,13 @@
           </button>
         {{/if}}
 
+        {{#if luckyFindsAvailable}}
+          <button type="button" class="ml-card ml-craftworks-dashboard-card" data-action="lucky-finds">
+            <i class="fa-solid fa-clover"></i>
+            <span class="ml-craftworks-dashboard-card-copy"><strong>Lucky Finds</strong><small>Roll the Dungeons of Drakkenheim treasure table · GM only</small></span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        {{/if}}
         <button type="button" class="ml-card ml-craftworks-dashboard-card" data-action="loot" {{#unless scene}}disabled{{/unless}}>
           <i class="fa-solid fa-sack-dollar"></i>
           <span class="ml-craftworks-dashboard-card-copy">

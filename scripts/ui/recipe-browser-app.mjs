@@ -365,7 +365,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         outputDocumentUuid: outputDocument?.uuid ?? null,
         outputResolutionWarning,
         showPremiumBadge: Boolean(sourcePack?.premium),
-        sourceBadgeLabel: sourcePack?.premium ? "Premium" : null,
+        sourceBadgeLabel: sourcePack?.premium ? sourcePack.accessLabel ?? "Premium" : null,
         sourceLabel: sourcePack?.label ?? recipe.packLabel ?? recipe.packId,
         canMark: Boolean(crafter),
         isMarked: markedRecipeIds.has(recipe.id),

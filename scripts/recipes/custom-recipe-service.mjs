@@ -1,4 +1,5 @@
 import { MODULE_ID } from "../constants.mjs";
+import { organizeCraftworksCompendiums } from "../compendium-organization.mjs";
 
 const PACK_NAME = "morelord-craftworks-custom-recipes";
 const FLAG_PATH = `flags.${MODULE_ID}.customRecipe`;
@@ -138,11 +139,13 @@ export class CustomRecipeService {
   }
 
   async #pack() {
-    return game.packs.get(this.collection)
-      ?? foundry.documents.collections.CompendiumCollection.createCompendium({
-        name: PACK_NAME, label: "Morelord Craftworks — Custom Recipes",
+    const pack = game.packs.get(this.collection)
+      ?? await foundry.documents.collections.CompendiumCollection.createCompendium({
+        name: PACK_NAME, label: "Craftworks Custom Recipes",
         type: "JournalEntry", package: "world"
       });
+    await organizeCraftworksCompendiums();
+    return pack;
   }
 
   async #documents(pack) {

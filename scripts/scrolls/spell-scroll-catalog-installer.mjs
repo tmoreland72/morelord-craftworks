@@ -1,4 +1,5 @@
 import { MODULE_ID, SCHEMA_VERSION } from "../constants.mjs";
+import { organizeCraftworksCompendiums } from "../compendium-organization.mjs";
 
 const PACK_NAME = "morelord-craftworks-spell-scrolls";
 
@@ -62,14 +63,16 @@ export class SpellScrollCatalogInstaller {
 
   async #getOrCreatePack() {
     const collection = `world.${PACK_NAME}`;
-    return game.packs.get(collection)
-      ?? foundry.documents.collections.CompendiumCollection.createCompendium({
+    const pack = game.packs.get(collection)
+      ?? await foundry.documents.collections.CompendiumCollection.createCompendium({
         name: PACK_NAME,
-        label: "Morelord Craftworks — Spell Scrolls",
+        label: "Craftworks Spell Scrolls",
         type: "Item",
         package: "world",
         system: game.system.id
       });
+    await organizeCraftworksCompendiums();
+    return pack;
   }
 }
 

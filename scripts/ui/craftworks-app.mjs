@@ -112,6 +112,7 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
       deadCreatureCount: deadCreatures.length,
       gatherRecordCount: Object.keys(gatherRecords).length,
       deleriumSearchAvailable: Boolean(this.craftworks.deleriumSearch?.hasAccess),
+      luckyFindsAvailable: Boolean(this.craftworks.luckyFinds?.hasAccess),
       spellScrollGeneratorPremium:
         Boolean(this.craftworks.spellScrollGenerator?.hasAccess),
       spellbookGeneratorPremium:
@@ -149,6 +150,13 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
 
     this.element.querySelector("[data-action='loot']")
       ?.addEventListener("click", () => this.#gmAction(() => this.craftworks.openLoot()));
+    this.element.querySelector("[data-action='lucky-finds']")
+      ?.addEventListener("click", async event => {
+        event.currentTarget.disabled = true;
+        try { await this.#gmAction(() => this.craftworks.openLuckyFinds()); }
+        catch (error) { ui.notifications.error(error.message); }
+        finally { if (event.target.isConnected) event.target.closest("button").disabled = false; }
+      });
 
     this.element.querySelector("[data-action='hoard']")
       ?.addEventListener("click", () => this.#gmAction(() => this.craftworks.openHoard()));

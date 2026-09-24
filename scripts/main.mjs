@@ -1,4 +1,5 @@
 import { getCraftworksDiagnostics } from "./core/diagnostics.mjs";
+import { initializeDeleriumChatRequests } from "./acquisition/delerium-chat-requests.mjs";
 import { combinedCraftingInventory } from "./crafting/group-membership.mjs";
 import { researchRecipeMatches } from "./recipes/recipe-filters.mjs";
 import { getHiddenRecipeIds, setHiddenRecipeIds } from "./core/settings.mjs";
@@ -34,6 +35,8 @@ import { RecipeRegistry } from "./recipes/recipe-registry.mjs";
 import { CustomRecipeService } from "./recipes/custom-recipe-service.mjs";
 import { Dnd5eCompendiumItemResolver } from "./recipes/dnd5e-compendium-item-resolver.mjs";
 import { SpellScrollGeneratorService } from "./scrolls/spell-scroll-generator-service.mjs";
+import { LuckyFindsService } from "./acquisition/lucky-finds-service.mjs";
+import { LuckyFindsApp } from "./ui/lucky-finds-app.mjs";
 import { SpellScrollCatalogInstaller } from "./scrolls/spell-scroll-catalog-installer.mjs";
 import { SpellScrollGeneratorApp } from "./ui/spell-scroll-generator-app.mjs";
 import { SpellbookGeneratorService } from "./spellbooks/spellbook-generator-service.mjs";
@@ -130,6 +133,8 @@ Hooks.on("getSceneControlButtons", controls => {
 });
 
 Hooks.once("ready", async () => {
+  const { organizeCraftworksCompendiums } = await import("./compendium-organization.mjs");
+  await organizeCraftworksCompendiums();
   exposePartyActorSetting();
   const sourceFilter = new Dnd5eSourceFilterService();
   const adapter = createSystemAdapter({ sourceFilter });
@@ -345,6 +350,12 @@ Hooks.once("ready", async () => {
     harvest,
     gather,
     deleriumSearch,
+    luckyFinds: new LuckyFindsService({ contentPacks, itemResolver: dnd5eItemResolver }),
+    openLuckyFinds: async (options = {}) => {
+      const result = await api.luckyFinds.roll(options);
+      await new LuckyFindsApp(api, result).render({ force: true });
+      return result;
+    },
     loot,
     hoard,
     specialTreasure,
@@ -493,7 +504,7 @@ Hooks.once("ready", async () => {
     },
     openDeleriumSearch: async () => {
       if (!game.user.isGM) throw new Error("Only the GM can initiate a delerium search.");
-      if (!deleriumSearch.hasAccess) throw new Error("Enable the Monsters of Drakkenheim Content Pack to search for delerium.");
+      if (!deleriumSearch.hasAccess) throw new Error("Enable the Drakkenheim Content Pack to search for delerium.");
       if (gmDeleriumSearchApp?.rendered) await gmDeleriumSearchApp.close();
       gmDeleriumSearchApp = new DeleriumSearchApp(api);
       return gmDeleriumSearchApp.render({ force: true });
@@ -936,6 +947,7 @@ Hooks.once("ready", async () => {
 
   const module = game.modules.get(MODULE_ID);
   if (module) module.api = api;
+  api.requestDeleriumSearch = initializeDeleriumChatRequests(api);
   globalThis.MorelordCraftworks = api;
 
   log("Ready. API available as game.modules.get('morelord-craftworks').api and MorelordCraftworks.");

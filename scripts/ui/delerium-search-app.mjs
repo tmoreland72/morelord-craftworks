@@ -72,27 +72,8 @@ export class DeleriumSearchApp extends ScrollPreservingApplicationMixin(Handleba
     try {
       const characters = listCharacterActors().filter(actor => actor.type === "character" && this.selectedCharacterUuids.has(actor.uuid));
       if (!characters.length) throw new Error("No player character Actors were found.");
-      const connectedPlayers = [...new Set(characters.map(actor => this.#activeUserForActor(actor)).filter(Boolean))];
-      this.session = this.craftworks.deleriumSearch.start(this.selectedZone);
-      this.session.selectedCharacterUuids = characters.map(actor => actor.uuid);
-      const deliveries = await Promise.all(connectedPlayers.map(async user => ({
-        user,
-        response: await this.craftworks.socket.emit(
-          "delerium-search.open",
-          { session: this.session },
-          { targetUserId: user.id }
-        )
-      })));
-      const failed = deliveries.filter(delivery => delivery.response?.opened !== true);
-      if (failed.length) {
-        this.craftworks.sessions.delete(this.session.id);
-        this.session = null;
-        throw new Error(
-          `The Delerium Search window did not open for: ${failed.map(delivery => delivery.user.name).join(", ")}. `
-          + "Have those players reload Foundry and try again."
-        );
-      }
-      await this.render();
+      await this.craftworks.requestDeleriumSearch(this.selectedZone,characters.map(actor => actor.uuid));
+      await this.close();
     } catch (error) { ui.notifications.error(error.message); }
   }
   async #gmRoll(event) {

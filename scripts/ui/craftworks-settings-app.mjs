@@ -17,6 +17,7 @@ import {
 } from "../acquisition/gather-profiles.mjs";
 
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
+import { contentPackPresentation } from "./content-pack-presentation.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -78,9 +79,6 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
     const packs = [...CONTENT_PACKS]
       .sort((a,b) => Number(a.sort ?? 0) - Number(b.sort ?? 0))
       .map(pack => {
-        const requiredModule = pack.requiredModuleId
-          ? game.modules.get(pack.requiredModuleId)
-          : null;
         const state = craftworks?.contentPacks?.describe(pack.id);
         const requiredFeatures = Array.isArray(pack.requiredFeatures) ? pack.requiredFeatures : [];
         const hasAccess = state?.hasAccess ?? (
@@ -98,9 +96,11 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
 
         return {
           ...pack,
+          ...contentPackPresentation(pack, game.modules),
           active: state?.active ?? (enabled && hasAccess),
           enabled,
           canEnable: hasAccess,
+          accessRequired: !hasAccess,
           counts: {
             materials: manifest?.materials?.entries?.length ?? (
               manifest?.materials?.seedPath ? "seed" : 0
@@ -111,24 +111,6 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
             loot: manifest?.lootTiers?.length ?? 0,
             encounter: manifest?.encounterLootProfiles?.length ?? 0
           },
-          requiredFeature:
-            Array.isArray(pack.requiredFeatures)
-              ? pack.requiredFeatures[0] ?? null
-              : null,
-          setupNotice: hasAccess ? pack.setupNotice ?? null : null,
-          requiredModuleStatus: hasAccess && pack.requiredModuleId
-            ? {
-                active: Boolean(requiredModule?.active),
-                label: requiredModule?.active
-                  ? "Required module detected and enabled."
-                  : requiredModule
-                    ? "Required module is installed but not enabled."
-                    : "Required module is not installed."
-              }
-            : null,
-          statusLabel: hasAccess
-            ? (pack.premium ? "Premium" : "Available")
-            : "Access Required"
         };
       });
 
@@ -330,86 +312,104 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
 
   async #save(event) {
     event.preventDefault();
+    if (this.saving) return;
 
     const form = this.element.querySelector("form");
     if (!form) return;
+    this.saving = true;
+    const button = event.currentTarget;
+    button.disabled = true;
+    let saved = false;
+    try {
 
-    const data = new FormData(form);
-    const bool = name => data.has(name);
-    const number = name => Number(data.get(name) ?? 0);
-    const string = name => String(data.get(name) ?? "");
+      const data = new FormData(form);
+      const bool = name => data.has(name);
+      const number = name => Number(data.get(name) ?? 0);
+      const string = name => String(data.get(name) ?? "");
 
-    const updates = [
-      [SETTINGS.USE_PARTY_RECIPIENT, bool("usePartyRecipient")],
-      [SETTINGS.PARTY_ACTOR_UUID, string("partyActorUuid")],
-      [
-        SETTINGS.SHOW_RECIPES_FOR_PREFERRED_TOOL_PROFICIENCY,
-        bool("showRecipesForPreferredToolProficiency")
-      ],
+      const updates = [
+        [SETTINGS.USE_PARTY_RECIPIENT, bool("usePartyRecipient")],
+        [SETTINGS.PARTY_ACTOR_UUID, string("partyActorUuid")],
+        [
+          SETTINGS.SHOW_RECIPES_FOR_PREFERRED_TOOL_PROFICIENCY,
+          bool("showRecipesForPreferredToolProficiency")
+        ],
 
-      [SETTINGS.HARVEST_DC_MODIFIER, number("harvestDcModifier")],
-      [SETTINGS.HARVEST_CHOICES_MIN, number("harvestChoicesMin")],
-      [SETTINGS.HARVEST_CHOICES_MAX, number("harvestChoicesMax")],
-      [SETTINGS.HARVEST_RARE_BIAS, number("harvestRareBias")],
-      [
-        SETTINGS.HARVEST_NAT20_DOUBLE_CLAIM,
-        bool("harvestNat20DoubleClaim")
-      ],
+        [SETTINGS.HARVEST_DC_MODIFIER, number("harvestDcModifier")],
+        [SETTINGS.HARVEST_CHOICES_MIN, number("harvestChoicesMin")],
+        [SETTINGS.HARVEST_CHOICES_MAX, number("harvestChoicesMax")],
+        [SETTINGS.HARVEST_RARE_BIAS, number("harvestRareBias")],
+        [
+          SETTINGS.HARVEST_NAT20_DOUBLE_CLAIM,
+          bool("harvestNat20DoubleClaim")
+        ],
 
-      [SETTINGS.GATHER_DC_MODIFIER, number("gatherDcModifier")],
-      [SETTINGS.GATHER_QUANTITY_MULTIPLIER, number("gatherQuantityMultiplier")],
-      [SETTINGS.GATHER_RARE_BIAS, number("gatherRareBias")],
+        [SETTINGS.GATHER_DC_MODIFIER, number("gatherDcModifier")],
+        [SETTINGS.GATHER_QUANTITY_MULTIPLIER, number("gatherQuantityMultiplier")],
+        [SETTINGS.GATHER_RARE_BIAS, number("gatherRareBias")],
 
-      [SETTINGS.LOOT_ENABLE_MATERIALS, bool("lootEnableMaterials")],
-      [SETTINGS.LOOT_ENABLE_COIN, bool("lootEnableCoin")],
-      [SETTINGS.LOOT_ENABLE_SPECIAL, bool("lootEnableSpecial")],
-      [SETTINGS.LOOT_MATERIAL_CHANCE_MODIFIER, number("lootMaterialChanceModifier")],
-      [SETTINGS.LOOT_COIN_CHANCE_MODIFIER, number("lootCoinChanceModifier")],
-      [SETTINGS.LOOT_SPECIAL_CHANCE_MODIFIER, number("lootSpecialChanceModifier")],
-      [SETTINGS.LOOT_MATERIAL_QUANTITY_MULTIPLIER, number("lootMaterialQuantityMultiplier")],
-      [SETTINGS.LOOT_COIN_MULTIPLIER, number("lootCoinMultiplier")]
-    ];
+        [SETTINGS.LOOT_ENABLE_MATERIALS, bool("lootEnableMaterials")],
+        [SETTINGS.LOOT_ENABLE_COIN, bool("lootEnableCoin")],
+        [SETTINGS.LOOT_ENABLE_SPECIAL, bool("lootEnableSpecial")],
+        [SETTINGS.LOOT_MATERIAL_CHANCE_MODIFIER, number("lootMaterialChanceModifier")],
+        [SETTINGS.LOOT_COIN_CHANCE_MODIFIER, number("lootCoinChanceModifier")],
+        [SETTINGS.LOOT_SPECIAL_CHANCE_MODIFIER, number("lootSpecialChanceModifier")],
+        [SETTINGS.LOOT_MATERIAL_QUANTITY_MULTIPLIER, number("lootMaterialQuantityMultiplier")],
+        [SETTINGS.LOOT_COIN_MULTIPLIER, number("lootCoinMultiplier")]
+      ];
 
-    for (const [key, value] of updates) {
-      await game.settings.set(MODULE_ID, key, value);
+      for (const [key, value] of updates) {
+        await game.settings.set(MODULE_ID, key, value);
+      }
+
+      const gatherDcOverrides = {};
+
+      for (const [name, value] of data.entries()) {
+        if (!String(name).startsWith("gatherDc:")) continue;
+
+        const profileId = String(name).slice("gatherDc:".length);
+        const numeric = Number(value);
+
+        if (!profileId || !Number.isFinite(numeric)) continue;
+
+        gatherDcOverrides[profileId] = Math.max(
+          1,
+          Math.round(numeric)
+        );
+      }
+
+      await setGatherDcOverrides(gatherDcOverrides);
+      const facilityRules = Object.fromEntries([...data.entries()].filter(([name]) => name.startsWith("facility:")).map(([name, value]) => [name.slice(9), String(value)]));
+      await game.settings.set(MODULE_ID, SETTINGS.CRAFTING_FACILITY_RULES, JSON.stringify(facilityRules));
+
+      for (const pack of CONTENT_PACKS) {
+        const key = getContentPackSettingKey(pack.id);
+        const requiredFeatures = Array.isArray(pack.requiredFeatures)
+          ? pack.requiredFeatures
+          : [];
+        const hasAccess = requiredFeatures.length
+          ? requiredFeatures.every(feature => EntitlementService.hasFeature(feature))
+          : !pack.premium;
+
+        const requested = bool(`pack:${pack.id}`);
+        const enabled = pack.premium && !hasAccess ? false : requested;
+
+        await game.settings.set(MODULE_ID, key, enabled);
+      }
+
+      saved = true;
+      await this.constructor.craftworks.contentSync?.running;
+      await this.constructor.craftworks.syncContent({ reason: "settings-save" });
+      ui.notifications.info("Morelord Craftworks settings saved and compendiums synchronized.");
+      await this.close();
+    } catch (error) {
+      console.error("Morelord Craftworks | Settings save/sync failed.", error);
+      ui.notifications.error(saved
+        ? `Settings saved, but compendium sync failed: ${error.message}. Retry Sync with Compendiums.`
+        : `Could not save all Craftworks settings: ${error.message}`);
+    } finally {
+      this.saving = false;
+      if (button.isConnected) button.disabled = false;
     }
-
-    const gatherDcOverrides = {};
-
-    for (const [name, value] of data.entries()) {
-      if (!String(name).startsWith("gatherDc:")) continue;
-
-      const profileId = String(name).slice("gatherDc:".length);
-      const numeric = Number(value);
-
-      if (!profileId || !Number.isFinite(numeric)) continue;
-
-      gatherDcOverrides[profileId] = Math.max(
-        1,
-        Math.round(numeric)
-      );
-    }
-
-    await setGatherDcOverrides(gatherDcOverrides);
-    const facilityRules = Object.fromEntries([...data.entries()].filter(([name]) => name.startsWith("facility:")).map(([name, value]) => [name.slice(9), String(value)]));
-    await game.settings.set(MODULE_ID, SETTINGS.CRAFTING_FACILITY_RULES, JSON.stringify(facilityRules));
-
-    for (const pack of CONTENT_PACKS) {
-      const key = getContentPackSettingKey(pack.id);
-      const requiredFeatures = Array.isArray(pack.requiredFeatures)
-        ? pack.requiredFeatures
-        : [];
-      const hasAccess = requiredFeatures.length
-        ? requiredFeatures.every(feature => EntitlementService.hasFeature(feature))
-        : !pack.premium;
-
-      const requested = bool(`pack:${pack.id}`);
-      const enabled = pack.premium && !hasAccess ? false : requested;
-
-      await game.settings.set(MODULE_ID, key, enabled);
-    }
-
-    ui.notifications.info("Morelord Craftworks settings saved.");
-    await this.close();
   }
 }

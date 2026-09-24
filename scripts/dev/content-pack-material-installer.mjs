@@ -1,4 +1,5 @@
 import { MODULE_ID, SCHEMA_VERSION } from "../constants.mjs";
+import { organizeCraftworksCompendiums } from "../compendium-organization.mjs";
 
 export class ContentPackMaterialInstaller {
   constructor({ registry, contentPacks }) {
@@ -34,8 +35,8 @@ export class ContentPackMaterialInstaller {
       : `morelord-craftworks-materials-${manifest.id}`;
 
     const packLabel = legacyStandard
-      ? "Morelord Craftworks — Standard Materials (Dev)"
-      : `Morelord Craftworks — ${manifest.id} Materials`;
+      ? "Craftworks Materials"
+      : manifest.id === "monsters-of-drakkenheim" ? "Craftworks Drakkenheim Materials" : `Craftworks ${manifest.id} Materials`;
 
     const collection = `world.${packName}`;
     let pack = game.packs.get(collection);
@@ -53,6 +54,7 @@ export class ContentPackMaterialInstaller {
       });
     }
 
+    await organizeCraftworksCompendiums();
     const existingIndex = await pack.getIndex({
       fields: [`flags.${MODULE_ID}.materialId`]
     });

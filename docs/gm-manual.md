@@ -104,18 +104,17 @@ Enable only the packs that should contribute to the campaign. Depending on insta
 - SRD 5.1
 - Player's Handbook
 - Dungeon Master's Guide
-- Monster Manual
-- Monsters of Drakkenheim
+- Drakkenheim
 
 An active pack can contribute materials, recipes, Harvest and Gather profiles, encounter-loot rules, economy profiles, and crafting definitions. Disabled or unavailable packs contribute no runtime content.
 
-![The Monsters of Drakkenheim content pack is enabled separately from standard Craftworks content.](assets/content-pack-drakkenheim.png)
+The Drakkenheim card keeps one enable/disable control and a Champion badge, with separate availability statuses for Dungeons of Drakkenheim and Monsters of Drakkenheim.
 
 ### Synchronize compendiums
 
 Craftworks automatically synchronizes when the first active GM enters the world and a relevant content signature has changed. The signature includes Craftworks and dnd5e versions, enabled content packs, available Item compendiums, and versions of active modules that supply Item compendiums.
 
-Select **Sync with Compendiums** after installing or updating source content, changing dnd5e's configured sources, or troubleshooting a missing material or recipe. Synchronization updates Craftworks material compendiums, refreshes external Item discovery, and rebuilds the recipe index.
+**Save Changes** saves the settings and waits for a fresh compendium sync before closing. If synchronization fails, saved settings remain and the window stays open with an error so you can retry. Select **Sync with Compendiums** after installing or updating source content, changing dnd5e's configured sources, or troubleshooting a missing material or recipe. Synchronization updates Craftworks material compendiums, refreshes external Item discovery, and rebuilds the recipe index.
 
 Generated compendium-backed rewards respect the dnd5e **Configure Sources** selection. A disabled source is excluded when results are generated and checked again before an award is committed.
 
@@ -315,13 +314,29 @@ Every generated hoard includes potion and spell-scroll rewards in addition to it
 
 ## Delerium Search
 
-Enable the Monsters of Drakkenheim Content Pack and its installed source module, then open **Delerium Search** under **Acquire**. Choose an area and participating characters. Connected players roll Arcana, Investigation, or Survival; the GM can roll for offline characters. The search takes one hour per quarter-mile hex. Outer City checks are DC 15; Inner City checks are DC 20. A success earns one success, or two when beating the DC by 5 or rolling a natural 20. Two failed character checks trigger a random encounter.
+Enable the Drakkenheim Content Pack and its installed source module, then open **Delerium Search** under **Acquire**. Choose an area and participating characters. Connected players roll Arcana, Investigation, or Survival; the GM can roll for offline characters. The search takes one hour per quarter-mile hex. Outer City checks are DC 15; Inner City checks are DC 20. A success earns one success, or two when beating the DC by 5 or rolling a natural 20. Two failed character checks trigger a random encounter.
 
 Use **Save as Default** to remember the search area and selected characters for future searches.
 
 **What the Party Finds** lists cumulative rewards: 0–2 successes find nothing; 3 successes find 3d6 chips; 4 successes find 3d6 chips **and** 1d6 fragments; 5 or more find both of those rewards **and** one shard. Click the dice buttons for reference rolls in chat. These reference rolls do not award items or set the final quantity.
 
 Select **Finalize Search**, choose a character or party Group under **Recipient**, and use **Roll & Award All Delerium**. This rolls each quantity and awards all earned original Delerium Chip, Fragment, and Shard items from the **Monsters of Drakkenheim** Item compendium. Open a reward to inspect its source document. A result can only be awarded once; if a delivery fails partway through, retry with the same recipient to finish the remaining rewards. When an encounter is required, the results window can open Morelord Encounters if it is active.
+
+## Content-pack availability
+
+Craftworks Standard, SRD 5.2, and SRD 5.1 display **Standard** tier badges alongside availability. This distinguishes Standard, Premium, and Champion access without changing any pack toggle or subscription rules.
+
+The Player's Handbook and Dungeon Master's Guide retain their **Premium** subscription badges beside the independent availability indicators.
+
+The **Player's Handbook** and **Dungeon Master's Guide** settings cards show **Available** when the corresponding official module is installed and enabled in this world, **Disabled** when installed but inactive, and **Not Installed** when absent. The **Drakkenheim** card shows **Champion** and keeps its enable/disable control. Its **Dungeons of Drakkenheim** and **Monsters of Drakkenheim** subheaders report each module's availability separately. This replaces the former setup callout. Subscription access still controls whether a paid content pack can be enabled; module availability does not grant a subscription.
+
+## Lucky Finds
+
+With Champion access and the Drakkenheim content pack enabled, install the official **Dungeons of Drakkenheim** module and choose **Acquire → Lucky Finds**. It rolls that module's table without changing its source data and opens a GM-only result window. Click dice formulas once for GM-only quantity rolls and click item links to inspect source documents; this does not automatically award inventory or currency.
+
+Result 8 offers **1d4 artisan tools** with available linked tools to choose from. Result 12 links the DMG **Art Object (25 GP)**. Results 15–16 link **Keoghtom's Ointment**. Delerium always links to **Monsters of Drakkenheim → Magic Items**. Missing required items are called out rather than replaced with invented documents. Spell-scroll results, including 20, include **Generate Spell Scroll**, opening the existing generator directly; select the stated rarity's spell levels and quantity there.
+
+To roll at combat completion, import **Lucky Finds** into the world and configure **Morelord Game Master → Triggers → + New Trigger → Combat ends: roll Lucky Finds**. This optional integration coordinates one GM and skips the roll if the world table is absent. It does not make Craftworks a required Game Master dependency.
 
 ## Use the item generators
 
@@ -391,8 +406,8 @@ The standard Craftworks experience does not depend on Drakkenheim. **Monsters of
 
 The enhanced experience requires:
 
-- the **Monsters of Drakkenheim** Craftworks Content Pack enabled
-- the corresponding Morelord account entitlement
+- the **Drakkenheim** Craftworks Content Pack enabled
+- a **Morelord Gaming Champion subscription**, connected to this world through Morelord Core
 - the supported official Monsters of Drakkenheim Foundry content installed and available
 
 Enabling the Craftworks pack does not provide or unlock the official source product. After installing or changing the source content, run **Sync with Compendiums**.
@@ -421,7 +436,7 @@ Marked recipe names in Harvest show this component’s inventory quantity / requ
 
 ### Drakkenheim Harvest preflight
 
-With the Monsters of Drakkenheim content pack enabled and access available, Craftworks first reads the creature's own biography, including embedded journal pages, for a **Harvestable Components** section. It matches the listed components and rarity to canonical Craftworks materials. If the creature has no harvesting section, Craftworks checks its matching official compendium Actor; if neither has a section, standard harvesting applies. Review those matches in the GM preflight before starting the session.
+With the Drakkenheim content pack enabled and access available, Craftworks first reads the creature's own biography, including embedded journal pages, for a **Harvestable Components** section. It matches the listed components and rarity to canonical Craftworks materials. If the creature has no harvesting section, Craftworks checks its matching official compendium Actor; if neither has a section, standard harvesting applies. Review those matches in the GM preflight before starting the session.
 
 Some creatures also include an **Items:** entry or special handling rule. Craftworks presents it as **Special Harvest Items / Instructions**. This information is intentionally GM-facing and informational: it calls attention to exceptional treasure or procedures outside the ordinary material reservation workflow.
 
@@ -467,7 +482,7 @@ Confirm its compendium remains enabled in dnd5e **Configure Sources**. Craftwork
 
 ### Drakkenheim components are not appearing
 
-- Confirm the **Monsters of Drakkenheim** Content Pack is enabled.
+- Confirm the **Drakkenheim** Content Pack is enabled.
 - Confirm the connected account has the corresponding entitlement.
 - Confirm the supported official source module is installed and active.
 - Run **Sync with Compendiums** after changing content or access.
