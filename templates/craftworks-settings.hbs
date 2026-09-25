@@ -1,10 +1,10 @@
 <section class="ml-app ml-app-shell ml-craftworks-settings ml-craftworks">
-  <header class="ml-hero"><i class="fa-solid fa-hammer ml-hero__icon"></i><div class="ml-hero__body"><h1>Morelord Craftworks Settings</h1><p>Configure content, material acquisition, recipe behavior, and crafting for this world.</p></div>
+  <header class="ml-hero"><i class="fa-solid fa-hammer ml-hero__icon"></i><div class="ml-hero__body"><h1>Morelord Craftworks Settings</h1><p class="notes">Configure content, material acquisition, recipe behavior, and crafting for this world.</p></div>
   <div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header>
 
   <form class="ml-stack">
     <section class="ml-surface ml-stack" data-gap="3">
-      <div class="ml-section-heading"><div><h2><i class="fa-solid fa-boxes-stacked"></i> Content Packs</h2><p>Choose which Craftworks content packs are active in this world.</p></div></div>
+      <div class="ml-section-heading"><div><h2><i class="fa-solid fa-boxes-stacked"></i> Content Packs</h2><p class="notes">Choose which Craftworks content packs are active in this world.</p></div></div>
 
       <section class="ml-access-card" data-state="{{#if core.connected}}active{{else}}locked{{/if}}">
         <div class="ml-access-card__icon">
@@ -49,7 +49,7 @@
             <i class="fa-solid fa-database"></i>
             Compendium Synchronization
           </strong>
-          <p>
+          <p class="notes">
             Craftworks automatically synchronizes when its version, enabled
             Content Packs, D&D5e version, or available Item compendiums change.
             Save Changes also waits for a fresh sync before closing. Use this button to force an immediate rescan.
@@ -82,13 +82,13 @@
                   {{statusLabel}}
                 </span>
               </div>
-              <p>{{description}}</p>
+              <p class="notes">{{description}}</p>
               <small>{{rulesVersion}}</small>
-              {{#if accessRequired}}<p>Subscription access required to enable this content pack.</p>{{/if}}
+              {{#if accessRequired}}<p class="notes">Subscription access required to enable this content pack.</p>{{/if}}
               {{#each sourceModules}}
                 <section class="ml-stack" data-gap="1">
                   <div class="ml-cluster"><h5>{{name}}</h5><span class="ml-badge" data-tone="{{tone}}">{{label}}</span></div>
-                  <p>{{description}}</p>
+                  <p class="notes">{{description}}</p>
                 </section>
               {{/each}}
               <div class="ml-cluster">
@@ -116,10 +116,10 @@
     </section>
 
     <section class="ml-surface ml-stack" data-gap="3">
-      <div class="ml-section-heading"><div><h2><i class="fa-solid fa-gem"></i> Materials</h2><p>Configure acquisition, recipients, Harvesting, Gathering, and Encounter Loot. Available materials and acquisition profiles come only from active Content Packs.</p></div></div>
+      <div class="ml-section-heading"><div><h2><i class="fa-solid fa-gem"></i> Materials</h2><p class="notes">Configure acquisition, recipients, Harvesting, Gathering, and Encounter Loot. Available materials and acquisition profiles come only from active Content Packs.</p></div></div>
 
       <div class="ml-stack">
-        <div class="ml-section-heading"><div><h2>Material Storage</h2><p>Choose where newly acquired materials are delivered.</p></div></div>
+        <div class="ml-section-heading"><div><h2>Material Storage</h2><p class="notes">Choose where newly acquired materials are delivered.</p></div></div>
 
         <label class="ml-setting-row">
           <span>
@@ -144,7 +144,7 @@
       </div>
 
       <div class="ml-stack">
-        <div class="ml-section-heading"><div><h2>Harvesting</h2><p>Set Harvest difficulty, choices, and critical-success behavior.</p></div></div>
+        <div class="ml-section-heading"><div><h2>Harvesting</h2><p class="notes">Set Harvest difficulty, choices, and critical-success behavior.</p></div></div>
         <div class="ml-grid" data-columns="2">
           <label><span>DC Modifier</span><input type="number" name="harvestDcModifier" value="{{materials.harvestDcModifier}}"></label>
           <label><span>Minimum Choices</span><input type="number" name="harvestChoicesMin" value="{{materials.harvestChoicesMin}}" min="1"></label>
@@ -169,7 +169,7 @@
       </div>
 
       <div class="ml-stack">
-        <div class="ml-section-heading"><div><h2>Gathering</h2><p>Set Gathering difficulty and yields for the available terrains.</p></div></div>
+        <div class="ml-section-heading"><div><h2>Gathering</h2><p class="notes">Set Gathering difficulty and yields for the available terrains.</p></div></div>
         <div class="ml-grid" data-columns="2">
           <label>
             <span>Global DC Modifier</span>
@@ -189,7 +189,7 @@
           <div class="ml-section-heading">
             <div>
               <h2>Terrain Gather DCs</h2>
-              <p>
+              <p class="notes">
                 Set the base Gather DC for each terrain supplied by the currently active Content Packs.
                 The Global DC Modifier above is applied after these values.
               </p>
@@ -225,7 +225,7 @@
       </div>
 
       <div class="ml-stack">
-        <div class="ml-section-heading"><div><h2>Encounter Loot</h2><p>Choose available loot types and adjust their chances and quantities.</p></div></div>
+        <div class="ml-section-heading"><div><h2>Encounter Loot</h2><p class="notes">Choose available loot types and adjust their chances and quantities.</p></div></div>
 
         <div class="ml-cluster">
           <label><input type="checkbox" name="lootEnableMaterials" {{#if materials.lootEnableMaterials}}checked{{/if}}> Materials</label>
@@ -247,7 +247,7 @@
       <div class="ml-section-heading">
         <div>
           <h2><i class="fa-solid fa-scroll"></i> Recipes</h2>
-          <p>Recipe availability is controlled by the Content Packs section above.</p>
+          <p class="notes">Recipe availability is controlled by the Content Packs section above.</p>
         </div>
         <span class="notes">{{recipeCount}} active recipe(s)</span>
       </div>
@@ -268,7 +268,7 @@
       <div class="ml-section-heading">
         <div>
           <h2><i class="fa-solid fa-hammer"></i> Crafting</h2>
-          <p>Crafting execution belongs to Craftworks Premium.</p>
+          <p class="notes">Crafting execution belongs to Craftworks Premium.</p>
         </div>
         {{#if premiumCraftingAvailable}}
           <span class="ml-badge" data-tone="premium">Premium Access</span>
@@ -277,7 +277,7 @@
         {{/if}}
       </div>
 
-      <p>Choose the location activity required for each artisan tool, or allow crafting anywhere. Required facilities must match or exceed the rarity of the item to be crafted.</p>
+      <p class="notes">Choose the location activity required for each artisan tool, or allow crafting anywhere. Required facilities must match or exceed the rarity of the item to be crafted.</p>
       <div class="ml-stack" data-gap="3">
         {{#each facilityRules}}
           <label><span>{{tool}}</span><select name="facility:{{tool}}">{{selectOptions @root.facilityOptions selected=selected}}</select></label>

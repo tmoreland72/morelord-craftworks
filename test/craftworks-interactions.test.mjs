@@ -114,6 +114,7 @@ for (const [App, kind, action] of [[GatherPlayerApp, "gather", "roll"], [Harvest
     const session = { id: "session", terrain: { name: "Forest", dc: 15 }, creatures: [{ tokenUuid: "Token.monster", name: "Monster", dc: 15 }], [kind + "ActorsByUser"]: { disconnected: ["Actor.offline"] } };
     const api = { adapter: { rollSkill: async actor => { assert.equal(actor.uuid, "Actor.offline"); return { total: 20, naturalD20: 15 }; } }, socket: { executeAsGm: async (...args) => calls.push(args) } };
     const app = new App(api, session, "Actor.offline");
+    api.harvest = { hasHarvested: async () => false };
     app.selectedHarvestSkill = "sur";
     await bind(app, `[data-action='${action}']`, { dataset: { skill: "sur" } })();
     assert.equal(calls[0][1].userId, "disconnected");
@@ -207,4 +208,29 @@ test("recipe browsing snapshots materials once and uses indexed outputs without 
   const changedTags = second.ingredientTagGroups.flatMap(group => group.options);
   assert.deepEqual(changedTags.map(tag => [tag.id, tag.count]), [["changed", 30]]);
   assert.equal(second.recipeGroups[0].recipes.find(recipe => recipe.id === "r0").output.label, "Live name");
+});
+
+ test("harvest rolls once for a whole session and retries delivery without rolling again", async () => {
+  setup();
+  let rolls = 0, sends = 0;
+  const errors = [];
+  const originalError = ui.notifications.error;
+  ui.notifications.error = message => errors.push(message);
+  try {
+    const session = { id: "single-roll", creatures: [1, 2, 3].map(n => ({ tokenUuid: "Token." + n, dc: 10 + n })), harvestActorsByUser: { gm: ["Actor.offline"] } };
+    const app = new HarvestPlayerApp({
+      harvest: { hasHarvested: async () => false },
+      adapter: { rollSkill: async () => { rolls++; return { total: 18, naturalD20: 16 }; } },
+      socket: { executeAsGm: async (type, data) => { sends++; assert.equal(type, "harvest.batch-attempt"); assert.equal(data.total, 18); if (sends === 1) throw Error("Disconnected"); } }
+    }, session, "Actor.offline");
+    app.selectedHarvestSkill = "sur";
+    const click = bind(app, "[data-action='roll-harvest-checks']", {});
+    await Promise.all([click(), click()]);
+    assert.equal(rolls, 1);
+    assert.equal(sends, 1);
+    await click();
+    assert.equal(rolls, 1);
+    assert.equal(sends, 2);
+    assert.deepEqual(errors, ["Disconnected"]);
+  } finally { ui.notifications.error = originalError; }
 });

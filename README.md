@@ -25,7 +25,7 @@ that world.
 
 ## User documentation
 
-See the [GM manual](docs/gm-manual.md) and [player manual](docs/player-manual.md) for current workflows. Potion and scroll drafts support individual removal and additions through the full filtered catalog picker. Availability counts follow category and school selections. Delerium Search awards Monsters of Drakkenheim compendium items through the Recipient selector. Page sections use the bordered, shaded Morelord Core surfaces used by Downtime. Gathering, Harvest, and Delerium Search use the same Core Player Characters section format, with round portraits and highlighted selections.
+See the [GM manual](docs/gm-manual.md) and [player manual](docs/player-manual.md) for current workflows. Potion and scroll drafts support individual removal and additions through the full filtered catalog picker. Availability counts follow category and school selections. Scroll quantities can be entered by spell level or rarity. The Magic Item Generator draws an item by category and rarity, with Add Item and Remove controls. Harvesting uses one roll per character per session, with no Skip Skill Checks option; the optional natural-20 bonus is unchanged. Delerium Search awards Monsters of Drakkenheim compendium items through the Recipient selector. Page sections use the bordered, shaded Morelord Core surfaces used by Downtime. Gathering, Harvest, and Delerium Search use the same Core Player Characters section format, with round portraits and highlighted selections.
 
 Encounter Loot lists defeated creatures in full-width selection rows with a checkbox, portrait, name, and CR, following Harvest's list layout without a Harvest DC.
 
@@ -299,10 +299,36 @@ Recipe and material catalog facets cycle through neutral, include, and exclude s
 ### Spell Scroll Generator
 
 Spell Scroll Generator is a premium GM utility. It builds the available spell
-pool from spell Items in compendiums currently available to the world, filters
-by scroll level, and can generate a random spell result. The utility is exposed
-through the Craftworks API/dashboard foundation for future scroll creation and
-loot integration.
+pool from spell Items in enabled compendiums. Choose quantities by spell level
+or by rarity, then filter schools of magic. Rarity mode draws from matching
+levels: Common 0–1, Uncommon 2–3, Rare 4–5, Very Rare 6–8, Legendary 9.
+Review, reroll, share, or create and award the generated scrolls.
+
+### Magic Item Generator
+
+A premium GM tool under **Tools** that draws one random item by category and rarity. Use **Add Item** to choose more items from the catalog, remove entries, reroll, share results, or **Go Back** to change filters. No quantity or vendor controls are needed.
+Core supplies source priority, source labels, rarity reading, and shared UI.
+
+GM scripts can open the tool with `MorelordCraftworks.openMagicItemGenerator()`.
+For a draft without opening a window, use
+`MorelordCraftworks.magicItemGenerator.generate({ uncommon: 3 }, { categories: ["weapon", "armor"] })`.
+Scroll scripts retain level-count generation by default; for rarity counts use
+`MorelordCraftworks.spellScrollGenerator.generate({ uncommon: 3 }, { byRarity: true })`.
+
+### Generator and Harvest regression checks
+
+Run `npm test` for the isolated checks. In Dev1, run
+`node tools/verify-generators-and-harvest.mjs` for the shared Core runner plus
+scroll quantity modes, editable magic item lists, and one-roll Harvest regressions. The
+browser script verifies the world ID before login and before testing, creates
+and removes its own Harvest fixtures, and removes its test chat messages.
+`--generators-only` runs just the generator regressions.
+`--visual-only` checks the final generator controls at narrow widths with light
+and dark window theme classes at 100% and 200% zoom. Both commands accept
+`MORELORD_PLAYWRIGHT` (path to Playwright's `index.mjs`), `FOUNDRY_TEST_URL`,
+`FOUNDRY_TEST_GM`, and `FOUNDRY_TEST_PASSWORD`; the default URL is port 31400.
+They block telemetry and remote entitlement refresh in the test browser, using
+Core's existing access snapshot. Reports and captures go in `test/in-game-reports`.
 
 
 ### D&D5e source filtering
@@ -311,7 +337,7 @@ Randomized compendium-backed features respect the D&D5e system's
 `Configure Sources` selection. Craftworks treats a compendium as available
 unless D&D5e's `packSourceConfiguration` setting explicitly disables it.
 
-This source filter applies to Spell Scroll Generator, Encounter Loot special
+This source filter applies to Magic Item Generator, Spell Scroll Generator, Encounter Loot special
 treasure, and Hoard special treasure. Recipe catalogs intentionally use
 Craftworks Content Pack settings instead and do not follow D&D5e's source filter.
 
@@ -494,7 +520,7 @@ Morelord Game Master can reuse the Delerium Search service with chat-card reques
 
 ## Release dependency
 
-This release requires Morelord Core 0.3.14 or newer for the shared UI and service updates. Optional integrations remain optional.
+This release requires Morelord Core 0.3.15 or newer for the shared UI and service updates. Optional integrations remain optional.
 
 
 ## Grouped chat roll requests
@@ -509,4 +535,4 @@ After every selected character rolls or declines, Craftworks posts a new GM-only
 
 Completed searches saved before this fix are recovered by their coordinating GM on reload: missing completion cards are posted from the saved results, without rerolling or awarding items. Search summaries use Foundry 14’s `gm` message mode; the older `gmroll` value is a legacy roll-mode name and is not a valid message-mode name.
 
-This release requires Morelord Core 0.3.14 or newer for shared roll requests, outcome scheduling, and consistent UI.
+This release requires Morelord Core 0.3.15 or newer for shared roll requests, outcome scheduling, and consistent UI.

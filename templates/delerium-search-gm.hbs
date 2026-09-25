@@ -34,7 +34,7 @@
     </div>
     <footer class="ml-page-footer ml-actions"><button type="button" data-action="finalize"><i class="fa-solid fa-flag-checkered"></i> Finalize Search</button></footer>
   {{else}}
-    <div class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3"><div class="ml-section-heading"><div><h2>{{sceneName}}</h2><p>Configure this opportunity for the current scene.</p></div></div><label>Search Area<select name="zone">{{#each zones}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}} — DC {{dc}}</option>{{/each}}</select></label><p>Each selected character rolls Arcana, Investigation, or Survival. Meeting the DC earns 1 success; beating it by 5+ or rolling a natural 20 earns 2.</p><section class="ml-surface ml-section ml-stack" data-gap="3">
+    <div class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3"><div class="ml-section-heading"><div><h2>{{sceneName}}</h2><p>Configure this opportunity for the current scene.</p></div></div><label>Search Area<select name="zone">{{#each zones}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}} — DC {{dc}}</option>{{/each}}</select></label><p class="notes">Each selected character rolls Arcana, Investigation, or Survival. Meeting the DC earns 1 success; beating it by 5+ or rolling a natural 20 earns 2.</p><section class="ml-surface ml-section ml-stack" data-gap="3">
         <div class="ml-section-heading"><div><h2>Player Characters</h2><p>Choose which characters participate in this search.</p></div></div>
         <div class="ml-actor-choice-grid">
           {{#each characters}}

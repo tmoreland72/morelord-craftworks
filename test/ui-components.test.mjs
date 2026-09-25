@@ -9,7 +9,7 @@ test('every Craftworks section uses the Core title/subtitle header structure', (
     const source = readFileSync(new URL(`templates/${file.replaceAll('\\', '/')}`, root), 'utf8');
     for (const match of source.matchAll(/<([\w-]+)\b[^>]*class="[^"]*\bml-section-heading\b[^"]*"[^>]*>/g)) {
       assert.equal(match[1], 'div', `${file}: a heading class belongs on its container`);
-      assert.match(source.slice(match.index + match[0].length), /^\s*<div>\s*<h2>[\s\S]*?<\/h2>\s*<p>[\s\S]*?<\/p>\s*<\/div>/, `${file}: title and description must precede the divider`);
+      assert.match(source.slice(match.index + match[0].length), /^\s*<div>\s*<h2>[\s\S]*?<\/h2>\s*<p\b[^>]*>[\s\S]*?<\/p>\s*<\/div>/, `${file}: title and description must precede the divider`);
     }
     for (const match of source.matchAll(/class="([^"]*\bml-surface\b[^"]*)"([^>]*)>/g)) {
       assert.match(match[1], /\bml-stack\b/, `${file}: surfaces use Core spacing`);

@@ -43,7 +43,7 @@
         </section>
         <section class="ml-section ml-craftworks-craft-session-summary">
           <div class="ml-section-heading"><div><h2>This Session</h2><p>Review crafting activity recorded during this session.</p></div></div>
-          {{#if hasSessionLog}}<div class="ml-craftworks-craft-session-log">{{#each sessionLog}}<div class="ml-craftworks-craft-log-entry ml-craftworks-craft-log-{{kind}}"><span class="ml-craftworks-craft-log-time">{{time}}</span><strong>{{recipeName}}</strong><span>{{text}}</span></div>{{/each}}</div>{{else}}<p class="ml-craftworks-muted">Crafting activity will appear here.</p>{{/if}}
+          {{#if hasSessionLog}}<div class="ml-craftworks-craft-session-log">{{#each sessionLog}}<div class="ml-craftworks-craft-log-entry ml-craftworks-craft-log-{{kind}}"><span class="ml-craftworks-craft-log-time">{{time}}</span><strong>{{recipeName}}</strong><span>{{text}}</span></div>{{/each}}</div>{{else}}<p class="notes ml-craftworks-muted">Crafting activity will appear here.</p>{{/if}}
         </section>
       {{/if}}
     </aside>
@@ -103,7 +103,7 @@
                   {{#if isCompletePending}}
                     <span class="ml-craftworks-crafting-complete"><i class="fa-solid fa-trophy"></i> Crafting Complete</span><button type="button" data-action="choose-destination" data-recipe-id="{{id}}"><i class="fa-solid fa-box-open"></i> Choose Destination</button>
                   {{else if isActive}}
-                    <span class="ml-craftworks-muted">Materials consumed from {{inventoryActorName}}.</span>{{#if environment.passed}}<button type="button" data-action="craft" data-recipe-id="{{id}}">{{#if craftMeta.checkRequired}}<i class="fa-solid fa-dice-d20"></i> Roll Crafting Check{{else}}<i class="fa-solid fa-hammer"></i> Craft Item{{/if}}</button>{{else}}<span class="ml-craftworks-craft-missing-label"><i class="fa-solid fa-pause"></i> Paused here</span>{{/if}}<button type="button" class="ml-craftworks-button-subtle" data-action="cancel-crafting" data-recipe-id="{{id}}"><i class="fa-solid fa-ban"></i> Cancel</button>
+                    <span class="notes ml-craftworks-muted">Materials consumed from {{inventoryActorName}}.</span>{{#if environment.passed}}<button type="button" data-action="craft" data-recipe-id="{{id}}">{{#if craftMeta.checkRequired}}<i class="fa-solid fa-dice-d20"></i> Roll Crafting Check{{else}}<i class="fa-solid fa-hammer"></i> Craft Item{{/if}}</button>{{else}}<span class="ml-craftworks-craft-missing-label"><i class="fa-solid fa-pause"></i> Paused here</span>{{/if}}<button type="button" class="ml-craftworks-button-subtle" data-action="cancel-crafting" data-recipe-id="{{id}}"><i class="fa-solid fa-ban"></i> Cancel</button>
                   {{else if requirementsKnown}}
                     {{#if readiness.ready}}<span class="ml-craftworks-craft-ready-label"><i class="fa-solid fa-circle-check"></i> Ready to Craft</span><button type="button" data-action="craft" data-recipe-id="{{id}}"><i class="fa-solid fa-hammer"></i> {{#if craftMeta.checkRequired}}Start Crafting{{else}}Craft Item{{/if}}</button>{{else}}<span class="ml-craftworks-craft-missing-label"><i class="fa-solid fa-circle-xmark"></i> Missing Requirements</span>{{/if}}
                   {{else}}<span class="ml-craftworks-craft-missing-label"><i class="fa-solid fa-circle-question"></i> Ingredients Unknown</span>{{/if}}

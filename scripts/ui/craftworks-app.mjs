@@ -119,6 +119,7 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
         Boolean(this.craftworks.spellbookGenerator?.hasAccess),
       potionGeneratorPremium:
         Boolean(this.craftworks.potionGenerator?.hasAccess),
+      magicItemGeneratorPremium: Boolean(this.craftworks.magicItemGenerator?.hasAccess),
       partyInfo,
       canOpenDocumentation: game.user.isGM && Boolean(
         getMorelordCoreService("ui")?.documentation?.open
@@ -189,6 +190,8 @@ export class CraftworksApp extends ScrollPreservingApplicationMixin(
       ?.addEventListener("click", () => this.#gmAction(
         () => this.craftworks.openCustomRecipes()
       ));
+    this.element.querySelector("[data-action='magic-item-generator']")
+      ?.addEventListener("click", () => this.#gmAction(() => this.craftworks.openMagicItemGenerator()));
 
     this.element.querySelector("[data-action='refresh']")
       ?.addEventListener("click", event => this.#refreshContent(event));

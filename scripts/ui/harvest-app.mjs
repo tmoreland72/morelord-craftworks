@@ -22,7 +22,6 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
     this.preflightCreatures = null;
     this.selectedPreflightCreatureUuids = new Set();
     this.selectedCharacterUuids = null;
-    this.skipSkillChecks = false;
   }
 
   static DEFAULT_OPTIONS = {
@@ -270,7 +269,6 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
       claimedItems,
       deadCreatures,
       playerCharacters,
-      skipSkillChecks: this.skipSkillChecks,
       hasSpecialHarvestItems:
         deadCreatures.some(
           creature =>
@@ -340,10 +338,6 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
         else this.selectedCharacterUuids.delete(uuid);
       }));
 
-    this.element.querySelector("[data-skip-skill-check]")
-      ?.addEventListener("change", event => {
-        this.skipSkillChecks = event.currentTarget.checked;
-      });
 
     this.element.querySelector("[data-action='select-all-harvest-creatures']")
       ?.addEventListener("click", event => {
@@ -417,10 +411,6 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
         (harvestActorsByUser[user?.id ?? game.user.id] ??= []).push(actor.uuid);
       }
       const players = Object.keys(harvestActorsByUser).map(id => game.users.get(id)).filter(Boolean);
-      const skipSkillChecks = Object.entries(harvestActorsByUser)
-        .flatMap(([userId, actorUuids]) => actorUuids
-          .filter(() => this.skipSkillChecks)
-          .map(actorUuid => ({ userId, actorUuid })));
 
       const selectedCreatureUuids =
         new Set(
@@ -453,7 +443,6 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
       this.session =
         await this.craftworks.harvest.start({
           creatureContexts,
-          skipSkillChecks,
           harvestActorsByUser
         });
 
@@ -597,7 +586,6 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
     this.preflightCreatures = null;
     this.selectedPreflightCreatureUuids.clear();
     this.collapsedCreatures.clear();
-    this.skipSkillChecks = false;
 
     ui.notifications.info("Harvesting completed.");
     await this.close();

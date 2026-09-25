@@ -1,11 +1,11 @@
 <section class="ml-app ml-app-shell ml-craftworks app-shell ml-craftworks-spell-scroll-generator">
-  <header class="ml-hero"><i class="fa-solid fa-hammer ml-hero__icon"></i><div class="ml-hero__body"><h1>Spell Scroll Generator</h1><p>Choose how many scrolls of each spell level to generate from enabled D&amp;D5e compendium sources. Each draw is random and duplicates are allowed.</p></div>
+  <header class="ml-hero"><i class="fa-solid fa-hammer ml-hero__icon"></i><div class="ml-hero__body"><h1>Spell Scroll Generator</h1><p>Choose scroll quantities by spell level or rarity from enabled D&amp;D5e compendium sources. Each draw is random and duplicates are allowed.</p></div>
   <div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header>
 
   {{#if hasAccess}}
     {{#unless hasResult}}
     <section class="ml-surface ml-section ml-craftworks-panel ml-stack" data-gap="3">
-      <div class="ml-section-heading"><div><h2>Generation Options</h2><p>Available schools and generation quantities.</p></div></div>
+      <div class="ml-section-heading"><div><h2>Generation Options</h2><p>Scroll rarities, schools, and generation quantities.</p></div></div>
       <fieldset class="ml-field-group ml-stack" data-gap="2">
         <legend>Schools of Magic <small>(all selected by default)</small></legend>
         <div class="ml-cluster">
@@ -14,18 +14,23 @@
           {{/each}}
         </div>
       </fieldset>
-      <div class="ml-craftworks-generator-count-grid">
-        {{#each levels}}
-          <label class="ml-craftworks-generator-count-row">
-            <span><strong>{{label}}</strong><small>{{available}} available</small></span>
-            <span class="ml-craftworks-generator-stepper" data-count-stepper>
-              <input type="number" min="0" step="1" value="{{count}}" data-scroll-level="{{level}}">
-              <span class="ml-craftworks-generator-stepper-controls">
-                <button type="button" data-count-adjust="1" aria-label="Add one {{label}} scroll"><i class="fa-solid fa-chevron-up"></i></button>
-                <button type="button" data-count-adjust="-1" aria-label="Remove one {{label}} scroll"><i class="fa-solid fa-chevron-down"></i></button>
-              </span>
-            </span>
-          </label>
+      <label>Generate By
+        <select name="scrollCountMode">
+          <option value="level" {{#unless byRarity}}selected{{/unless}}>Spell Level</option>
+          <option value="rarity" {{#if byRarity}}selected{{/if}}>Rarity</option>
+        </select>
+      </label>
+      {{#if byRarity}}<p class="notes">Each scroll is drawn from the spell levels in its rarity. Common: cantrip–1; Uncommon: 2–3; Rare: 4–5; Very Rare: 6–8; Legendary: 9.</p>{{/if}}
+      <div class="ml-grid" data-columns="auto">
+        {{#each countOptions}}
+          <div class="ml-card ml-stack" data-gap="2">
+            <span class="ml-stack" data-gap="1"><strong>{{label}}</strong><small>{{detail}} · {{available}} available</small></span>
+            <div class="ml-stepper" data-count-stepper>
+              <button type="button" data-count-adjust="-1" aria-label="Decrease {{label}}"><i class="fa-solid fa-minus"></i></button>
+              <input type="number" aria-label="{{label}} count" min="0" step="1" value="{{count}}" data-scroll-count="{{key}}" {{#unless ../byRarity}}data-scroll-level="{{level}}"{{/unless}}>
+              <button type="button" data-count-adjust="1" aria-label="Increase {{label}}"><i class="fa-solid fa-plus"></i></button>
+            </div>
+          </div>
         {{/each}}
       </div>
       <footer class="ml-page-footer ml-actions">
@@ -66,8 +71,9 @@
             {{#each actors}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
           </select>
         </label>
-        {{#if partyInfo.valid}}<p class="ml-craftworks-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
+        {{#if partyInfo.valid}}<p class="notes ml-craftworks-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
         <footer class="ml-page-footer ml-actions">
+          <button type="button" data-action="edit-scroll-options"><i class="fa-solid fa-sliders"></i> Go Back</button>
           <button type="button" data-action="reroll-scrolls"><i class="fa-solid fa-arrows-rotate"></i> Reroll</button>
           <button type="button" data-action="share-scrolls"><i class="fa-solid fa-message"></i> Display Results in Chat</button>
           <button type="button" data-action="award-scrolls"><i class="fa-solid fa-scroll"></i> Award Generated Spell Scrolls</button>

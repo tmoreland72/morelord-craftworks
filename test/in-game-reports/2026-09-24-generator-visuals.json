@@ -1,0 +1,55 @@
+{
+  "ok": true,
+  "world": "dev1",
+  "foundry": "14.368",
+  "results": [
+    {
+      "name": "scroll",
+      "theme": "dark",
+      "zoom": 1,
+      "status": "pass"
+    },
+    {
+      "name": "scroll",
+      "theme": "dark",
+      "zoom": 2,
+      "status": "pass"
+    },
+    {
+      "name": "scroll",
+      "theme": "light",
+      "zoom": 1,
+      "status": "pass"
+    },
+    {
+      "name": "scroll",
+      "theme": "light",
+      "zoom": 2,
+      "status": "pass"
+    },
+    {
+      "name": "magic-items",
+      "theme": "dark",
+      "zoom": 1,
+      "status": "pass"
+    },
+    {
+      "name": "magic-items",
+      "theme": "dark",
+      "zoom": 2,
+      "status": "pass"
+    },
+    {
+      "name": "magic-items",
+      "theme": "light",
+      "zoom": 1,
+      "status": "pass"
+    },
+    {
+      "name": "magic-items",
+      "theme": "light",
+      "zoom": 2,
+      "status": "pass"
+    }
+  ]
+}

@@ -29,13 +29,12 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
     this.states = {};
     this.focusedCreatureTokenUuid = null;
     this.collapsedCreatures = new Set();
-    this.selectedHarvestSkill = "";
+    this.selectedHarvestSkill = session.harvestRolls?.[actorUuid]?.skillId ?? "";
     this.recipeMatchesByMaterial = new Map();
 
-    // A Harvest session may already contain authoritative participant state
-    // before the player window opens (for example when the GM selected
-    // "Skip Skill Checks"). Hydrate that state immediately so the initial
-    // render goes straight to component claiming instead of showing a roll.
+    // Hydrate authoritative results when reopening an existing session.
+    this.harvestRoll = session.harvestRolls?.[actorUuid] ?? null;
+    this.rolling = false;
     for (const creature of session?.creatures ?? []) {
       const state =
         session.participants?.[
@@ -76,6 +75,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
 
   async setSession(session, { preserveFocus = false } = {}) {
     this.session = session;
+    this.harvestRoll ??= session.harvestRolls?.[this.actorUuid] ?? null;
 
     // Keep local per-creature state synchronized with the authoritative
     // session sent by the GM.
@@ -304,26 +304,19 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
 
     const selectedSkill = skillOptions.find(skill => skill.selected) ?? null;
 
-    const skillChecksBypassed = Boolean(
-      actor
-      && (this.session.skipSkillChecks ?? []).some(entry =>
-        entry?.userId === this.participantUserId
-        && entry?.actorUuid === actor.uuid
-      )
-    );
 
     return foundry.utils.mergeObject(context, {
       session: this.session,
       actor: actor ? { name: actor.name, img: actor.img, uuid: actor.uuid } : null,
       skills: skillOptions,
       selectedHarvestSkill: this.selectedHarvestSkill,
+      hasHarvestRoll: Boolean(this.harvestRoll),
       selectedHarvestSkillLabel: selectedSkill ? `${selectedSkill.label} ${selectedSkill.modifierLabel}` : "",
-      skillChecksBypassed,
       availableSkillCheckCount,
       canRollHarvestChecks: Boolean(
         actor
         && this.selectedHarvestSkill
-        && availableSkillCheckCount > 0
+        && availableSkillCheckCount > 0 && !this.rolling
       ),
       creatures,
       claimedItems: (this.session.results ?? [])
@@ -412,12 +405,12 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
 
             rollButton.disabled =
               !this.selectedHarvestSkill
-              || available <= 0;
+              || available <= 0 || this.rolling;
             const label = rollButton.querySelector("[data-roll-skill-label]");
             const option = event.currentTarget.selectedOptions?.[0];
-            if (label) label.textContent = option?.dataset.skillLabel
-              ? `Roll ${option.dataset.skillLabel} Checks`
-              : "Roll Harvest Checks";
+            if (label) label.textContent = this.harvestRoll ? "Resolve Recorded Roll" : option?.dataset.skillLabel
+              ? `Roll ${option.dataset.skillLabel} Check`
+              : "Roll Harvest Check";
           }
         }
       );
@@ -614,151 +607,45 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
   }
 
   async #rollHarvestChecks(event) {
-    const button =
-      event.currentTarget;
-
-    const skillId =
-      this.selectedHarvestSkill;
-
-    if (!skillId) {
-      ui.notifications.warn(
-        "Choose a Harvest skill before rolling."
-      );
-      return;
-    }
-
+    if (this.rolling) return;
+    const button = event.currentTarget;
+    const skillId = this.selectedHarvestSkill;
+    if (!skillId) return ui.notifications.warn("Choose a Harvest skill before rolling.");
     const actor = await this.#getHarvestActor();
-
-    if (!actor) {
-      ui.notifications.error(
-        "Select a token you own or configure a user character first."
-      );
-      return;
-    }
-
-    const availableCreatures = [];
-
-    for (
-      const creature of
-      this.session.creatures ?? []
-    ) {
-      const state =
-        this.states[
-          creature.tokenUuid
-        ]
-        ?? null;
-
-      if (state?.status) {
-        continue;
-      }
-
-      availableCreatures.push(
-        creature
-      );
-    }
-
-    if (!availableCreatures.length) {
-      ui.notifications.info(
-        "There are no unresolved Harvest checks for this character."
-      );
-      return;
-    }
-
+    if (!actor) return ui.notifications.error("No harvesting character is available.");
+    if (this.rolling) return;
+    this.rolling = true;
     button.disabled = true;
-
-    const originalLabel =
-      button.innerHTML;
-
     try {
-      const attempts = [];
-
-      for (
-        let index = 0;
-        index < availableCreatures.length;
-        index += 1
-      ) {
-        const creature =
-          availableCreatures[index];
-
-        button.innerHTML =
-          `<i class="fa-solid fa-dice-d20 fa-spin"></i> `
-          + `Rolling ${index + 1} of ${availableCreatures.length}`;
-
-        const roll =
-          await this.craftworks.adapter
-            .rollSkill(
-              actor,
-              skillId,
-              {
-                dc: creature.dc,
-                flavor:
-                  `Harvest ${creature.name} — DC ${creature.dc}`,
-                configure: true
-              }
-            );
-
-        if (roll?.cancelled) {
-          continue;
-        }
-
-        attempts.push({
-          sessionId:
-            this.session.id,
-          creatureTokenUuid:
-            creature.tokenUuid,
-          userId:
-            this.participantUserId,
-          actorUuid:
-            actor.uuid,
-          skillId,
-          total:
-            roll.total,
-          naturalD20:
-            roll.naturalD20
+      const creatures = [];
+      for (const creature of this.session.creatures ?? []) {
+        if (this.states[creature.tokenUuid]?.status) continue;
+        if (await this.craftworks.harvest.hasHarvested(creature.tokenUuid, actor.uuid)) continue;
+        creatures.push(creature);
+      }
+      if (!creatures.length) return ui.notifications.info("All Harvest checks for this character are already resolved.");
+      this.harvestRoll ??= this.session.harvestRolls?.[actor.uuid]
+        ?? Object.values(this.states).find(state => state.total != null && Number.isFinite(Number(state.total)))
+        ?? null;
+      if (!this.harvestRoll) {
+        button.innerHTML = '<i class="fa-solid fa-dice-d20 fa-spin"></i> Rolling Harvest Check';
+        const roll = await this.craftworks.adapter.rollSkill(actor, skillId, {
+          flavor: "Harvest — one roll for all selected creatures", configure: true
         });
-
-        this.states[
-          creature.tokenUuid
-        ] = {
-          status: "pending",
-          total: roll.total,
-          skillId,
-          naturalD20:
-            roll.naturalD20
-        };
-
-        // Every creature being resolved remains expanded so successful checks
-        // immediately expose their available claim choices.
-        this.collapsedCreatures.delete(
-          creature.tokenUuid
-        );
+        if (!roll || roll.cancelled) return;
+        this.harvestRoll = { skillId, total: roll.total, naturalD20: roll.naturalD20 };
       }
-
-      if (!attempts.length) {
-        ui.notifications.warn(
-          "No Harvest checks were rolled."
-        );
-        return;
-      }
-
-      await this.#sendToGm(
-        "harvest.batch-attempt",
-        {
-          sessionId:
-            this.session.id,
-          userId:
-            this.participantUserId,
-          attempts
-        }
-      );
-    } catch (err) {
-      ui.notifications.error(
-        err.message
-      );
-
-      button.disabled = false;
-      button.innerHTML =
-        originalLabel;
+      button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Resolving Harvest';
+      await this.#sendToGm("harvest.batch-attempt", {
+        sessionId: this.session.id, userId: this.participantUserId,
+        actorUuid: actor.uuid, ...this.harvestRoll
+      });
+      for (const creature of creatures) this.collapsedCreatures.delete(creature.tokenUuid);
+    } catch (error) {
+      ui.notifications.error(error.message);
+    } finally {
+      this.rolling = false;
+      await this.render({ force: true });
     }
   }
 

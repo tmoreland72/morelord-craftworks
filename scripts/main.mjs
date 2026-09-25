@@ -43,6 +43,8 @@ import { SpellbookGeneratorService } from "./spellbooks/spellbook-generator-serv
 import { SpellbookGeneratorApp } from "./ui/spellbook-generator-app.mjs";
 import { PotionGeneratorService } from "./potions/potion-generator-service.mjs";
 import { PotionGeneratorApp } from "./ui/potion-generator-app.mjs";
+import { MagicItemGeneratorService } from "./items/magic-item-generator-service.mjs";
+import { MagicItemGeneratorApp } from "./ui/magic-item-generator-app.mjs";
 import { RecipeEvaluator } from "./recipes/recipe-evaluator.mjs";
 import { RecipePlanner } from "./recipes/recipe-planner.mjs";
 import { ToolInspector } from "./recipes/tool-inspector.mjs";
@@ -211,6 +213,7 @@ Hooks.once("ready", async () => {
   });
 
   const customRecipes = new CustomRecipeService({ materialRegistry: materials });
+  const magicItemGenerator = new MagicItemGeneratorService({ coreAccess, sourceFilter });
   const recipes = new RecipeRegistry({
     materialRegistry: materials,
     coreAccess,
@@ -337,6 +340,7 @@ Hooks.once("ready", async () => {
   let spellScrollGeneratorApp = null;
   let spellbookGeneratorApp = null;
   let potionGeneratorApp = null;
+  let magicItemGeneratorApp = null;
   let craftworksApp = null;
   let craftApp = null;
 
@@ -366,6 +370,7 @@ Hooks.once("ready", async () => {
     spellScrollGenerator,
     spellbookGenerator,
     potionGenerator,
+    magicItemGenerator,
     coreAccess,
     contentPacks,
     contentSync,
@@ -607,6 +612,15 @@ Hooks.once("ready", async () => {
         force: true
       });
     },
+    openMagicItemGenerator: async () => {
+      if (!game.user.isGM) throw new Error("Only the GM can use the Magic Item Generator.");
+      if (magicItemGeneratorApp?.rendered) {
+        magicItemGeneratorApp.bringToFront();
+        return magicItemGeneratorApp;
+      }
+      magicItemGeneratorApp = new MagicItemGeneratorApp(api);
+      return magicItemGeneratorApp.render({ force: true });
+    },
     openPotionGenerator: async () => {
       if (!game.user.isGM) {
         throw new Error(
@@ -647,7 +661,7 @@ Hooks.once("ready", async () => {
     const playerHarvestApp = new HarvestPlayerApp(api, imported, actorUuid);
     playerHarvestApps.set(actorUuid, playerHarvestApp);
 
-    // Constructor hydration loads any pre-seeded automatic-success state.
+    // Constructor hydration loads any existing authoritative results.
     // The first client render must still be forced so ApplicationV2 actually
     // opens a newly-created Harvest window.
     await playerHarvestApp.render({
@@ -679,6 +693,10 @@ Hooks.once("ready", async () => {
     async ({
       sessionId,
       userId,
+      actorUuid,
+      skillId,
+      total,
+      naturalD20,
       attempts = []
     }) => {
       if (!game.user.isGM) return;
@@ -692,13 +710,10 @@ Hooks.once("ready", async () => {
         );
       }
 
-      for (const attempt of attempts) {
-        await harvest.recordAttempt({
-          ...attempt,
-          sessionId,
-          userId
-        });
-      }
+      // Accept older clients' batch shape, but use only their first roll.
+      const roll = actorUuid ? { actorUuid, skillId, total, naturalD20 } : attempts[0];
+      if (!roll?.actorUuid) throw new Error("A harvesting character is required.");
+      await harvest.recordBatchAttempt({ ...roll, sessionId, userId });
 
       const authoritative =
         sessions.get(sessionId);

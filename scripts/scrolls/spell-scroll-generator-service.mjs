@@ -1,6 +1,7 @@
 import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
 import { generatorQuantity } from "../core/generator-quantity.mjs";
 import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
+import { SCROLL_RARITIES } from "./scroll-rarity.mjs";
 export class SpellScrollGeneratorService {
   constructor({
     coreAccess = null,
@@ -137,30 +138,30 @@ export class SpellScrollGeneratorService {
     ];
   }
 
-  async generate(counts = {}, { schools = null } = {}) {
+  async generate(counts = {}, { schools = null, byRarity = false } = {}) {
     if (!this.hasAccess) {
       throw new Error(
         "Spell Scroll Generator requires premium access."
       );
     }
 
-    const allSpells = await this.availableSpells({ schools });
+    const allSpells = schools && !schools.length ? [] : await this.availableSpells({ schools });
     const generated = [];
-
-    for (let level = 0; level <= 9; level += 1) {
-      const requested = Math.max(
-        0,
-        Math.floor(Number(counts[level] ?? 0))
-      );
+    const groups = byRarity ? SCROLL_RARITIES : Array.from({ length: 10 }, (_, level) => ({
+      id: level, label: level === 0 ? "Cantrip" : `Level ${level}`, levels: [level]
+    }));
+    for (const group of groups) {
+      const count = Number(counts[group.id] ?? 0);
+      const requested = count === 0 ? 0 : generatorQuantity(count);
       if (!requested) continue;
 
       const pool = allSpells.filter(spell =>
-        Number(spell.level ?? 0) === level
+        group.levels.includes(Number(spell.level ?? 0))
       );
 
       if (!pool.length) {
         throw new Error(
-          `No ${level === 0 ? "cantrips" : `level ${level} spells`} match the selected schools in enabled D&D5e compendium sources.`
+          `No ${group.label.toLowerCase()} ${byRarity ? "scrolls" : "spells"} match the selected schools in enabled D&D5e compendium sources.`
         );
       }
 

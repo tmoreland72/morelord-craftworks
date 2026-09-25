@@ -109,7 +109,7 @@
               {{#if itemSearchReady}}
                 <p class="ml-craftworks-item-lookup-empty">No matching Items found in enabled sources.</p>
               {{else}}
-                <p class="ml-craftworks-item-lookup-hint">Enter at least 2 characters to search.</p>
+                <p class="notes ml-craftworks-item-lookup-hint">Enter at least 2 characters to search.</p>
               {{/if}}
             {{/if}}
           </div>
@@ -199,7 +199,7 @@
             {{#each actors}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
           </select>
         </label>
-        {{#if partyInfo.valid}}<p class="ml-craftworks-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
+        {{#if partyInfo.valid}}<p class="notes ml-craftworks-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
 
         <footer class="ml-page-footer ml-actions">
           <button type="button" data-action="reroll-loot"><i class="fa-solid fa-dice"></i> Reroll</button>

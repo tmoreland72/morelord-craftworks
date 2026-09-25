@@ -133,12 +133,12 @@ Harvest begins when the GM selects defeated creatures and starts a synchronized 
 
 1. Wait for the Harvest window to open.
 2. Choose an available Harvest skill.
-3. Select **Roll Harvest Checks**.
-4. Craftworks rolls that skill separately against every unresolved creature available to your character.
+3. Select **Roll Harvest Check**.
+4. Roll that skill once for the entire Harvest session. Craftworks applies the same total to every unresolved creature.
 
-Each creature uses its own Harvest DC. A success reveals claimable components; a failure consumes your character's attempt for that creature. Previously attempted or resolved creatures are not rolled again.
+Each creature uses its own Harvest DC. A success reveals claimable components; a failure consumes your character's attempt for that creature. Previously attempted or resolved creatures are not rolled again. Reopening the window or retrying delivery reuses the recorded roll. There is no Skip Skill Checks option. The optional natural-20 bonus still allows two component claims on a successful harvest.
 
-The GM chooses the characters included in the Harvest and may enable the session-wide **Skip Skill Checks** option. When enabled, every included character proceeds directly to the available choices. If you control multiple included characters, Craftworks opens an independently titled Harvest window for each one; their checks and claims remain separate.
+The GM chooses the characters included in the Harvest. Every character must make the single session check; the GM can roll on behalf of offline players. If you control multiple included characters, Craftworks opens an independently titled Harvest window for each one; their checks and claims remain separate.
 
 ![The player Harvest window presents the available skill choices and each unresolved creature.](assets/harvest-player-ready.png)
 

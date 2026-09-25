@@ -142,8 +142,6 @@
  */
 
 
-
-
 /*
  * CREATURE
  */
@@ -1179,58 +1177,11 @@
 }
 
 
-
 /* Harvest preflight controls and Drakkenheim special item instructions */
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-harvest-preflight,
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-skill-section {
+.ml-craftworks-harvest-modern .ml-craftworks-harvest-harvest-preflight {
   margin-bottom: 14px;
 }
 
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-skill-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 10px;
-  border: 1px solid color-mix(in srgb, var(--ml-color-accent) 20%, transparent);
-  border-radius: 7px;
-  background: color-mix(in srgb, var(--ml-color-text) 3%, transparent);
-}
-
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-character > img {
-  width: 42px;
-  height: 42px;
-  flex: 0 0 42px;
-  object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid color-mix(in srgb, var(--ml-color-accent) 25%, transparent);
-}
-
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-character {
-  min-width: 0;
-  flex: 1 1 auto;
-}
-
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-character strong,
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-character small {
-  display: block;
-}
-
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-character {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-skill-row {
-  justify-content: space-between;
-}
-
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
-}
 
 .ml-craftworks-harvest-modern .ml-craftworks-harvest-preflight-help {
   margin: 8px 10px 0;
@@ -1484,79 +1435,6 @@
   flex: 0 0 auto;
 }
 
-/* Harvest preflight Skip Skill Checks alignment */
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-character {
-  flex: 1 1 auto;
-}
-
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-toggle {
-  margin-left: auto;
-  flex: 0 0 auto;
-  justify-content: flex-end;
-  text-align: right;
-}
-
-/* Player Harvest batch skill check */
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-
-  margin-top: 10px;
-  padding: 10px 12px;
-
-  border: 1px solid var(--ml-craftworks-harvest-soft-border);
-  border-radius: 6px;
-
-  background: color-mix(in srgb, var(--ml-color-text) 4%, transparent);
-}
-
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check-copy {
-  min-width: 0;
-}
-
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check-copy strong,
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check-copy small {
-  display: block;
-}
-
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check-copy small {
-  margin-top: 2px;
-  opacity: 0.72;
-}
-
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 0 0 auto;
-}
-
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check-controls select {
-  min-width: 160px;
-}
-
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check-controls button {
-  min-width: 175px;
-}
-
-@media (max-width: 680px) {
-  .ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check-controls {
-    width: 100%;
-  }
-
-  .ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check-controls select,
-  .ml-craftworks-harvest-modern .ml-craftworks-harvest-batch-check-controls button {
-    flex: 1 1 0;
-    min-width: 0;
-  }
-}
 
 .ml-craftworks-material-icon-display {
   cursor: default;
@@ -1590,7 +1468,6 @@
   margin-top: 2px;
   opacity: 0.72;
 }
-
 
 
 /* Marketplace-standard long-list filtering */
@@ -1921,34 +1798,12 @@
   width: auto;
 }
 
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-skill-row,
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-character,
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-skip-character > *,
 .ml-craftworks-harvest-modern .ml-craftworks-harvest-creature-info,
 .ml-craftworks-harvest-modern .ml-craftworks-harvest-component-body,
 .ml-craftworks-harvest-modern .ml-craftworks-harvest-claimed-body {
   text-align: left;
 }
 
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-skill-check-bypassed {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 12px;
-  border-color: color-mix(in srgb, var(--ml-color-accent) 58%, transparent);
-  background: color-mix(in srgb, var(--ml-color-accent) 12%, transparent);
-  text-align: left;
-}
-
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-skill-check-bypassed > i {
-  color: var(--ml-color-accent);
-  font-size: var(--ml-font-size-title);
-}
-
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-skill-check-bypassed strong,
-.ml-craftworks-harvest-modern .ml-craftworks-harvest-skill-check-bypassed small {
-  display: block;
-}
 
 .ml-craftworks-harvest-modern .ml-craftworks-harvest-player-progress-list {
   display: grid;
@@ -1994,10 +1849,6 @@
 }
 
 .ml-craftworks-potion-rarity-grid,
-.ml-craftworks-generator-count-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
 .ml-craftworks-potion-rarity-row {
   display: flex;
   align-items: center;
@@ -2101,40 +1952,19 @@
   padding-right: 0;
 }
 
-.ml-craftworks-generator-count-grid,
 .ml-craftworks-generator-result-list {
   display: grid;
   gap: 8px;
 }
 
-.ml-craftworks-generator-count-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 9px 10px;
-  border: 1px solid color-mix(in srgb, var(--ml-color-accent) 22%, transparent);
-  border-radius: 7px;
-  text-align: left;
-}
-
-.ml-craftworks-generator-count-row span,
 .ml-craftworks-generator-result-row span {
   min-width: 0;
   flex: 1 1 auto;
 }
 
-.ml-craftworks-generator-count-row strong,
-.ml-craftworks-generator-count-row small,
 .ml-craftworks-generator-result-row strong,
 .ml-craftworks-generator-result-row small {
   display: block;
-}
-
-.ml-craftworks-generator-count-row input {
-  width: 54px;
-  min-width: 0;
-  text-align: center;
 }
 
 .ml-craftworks-generator-stepper {
@@ -2171,16 +2001,14 @@
 
 @media (max-width: 760px) {
   .ml-craftworks-spellbook-level-grid,
-  .ml-craftworks-potion-rarity-grid,
-  .ml-craftworks-generator-count-grid {
+  .ml-craftworks-potion-rarity-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 520px) {
   .ml-craftworks-spellbook-level-grid,
-  .ml-craftworks-potion-rarity-grid,
-  .ml-craftworks-generator-count-grid {
+  .ml-craftworks-potion-rarity-grid {
     grid-template-columns: 1fr;
   }
 }

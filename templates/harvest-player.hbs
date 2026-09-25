@@ -1,5 +1,5 @@
 <div class="ml-app ml-app-shell ml-craftworks-harvest-shell ml-craftworks-harvest-modern">
-  <header class="ml-hero"><i class="fa-solid fa-scalpel ml-hero__icon"></i><div class="ml-hero__body"><h1>Harvesting</h1><p>Resolve your harvest checks and choose components from {{session.sceneName}}.</p></div><div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header><div class="ml-stack">
+  <header class="ml-hero"><i class="fa-solid fa-scalpel ml-hero__icon"></i><div class="ml-hero__body"><h1>Harvesting</h1><p>Resolve your harvest check and choose components from {{session.sceneName}}.</p></div><div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header><div class="ml-stack">
 
     {{#if actor}}
       <div class="ml-craftworks-harvest-user">
@@ -7,7 +7,7 @@
         <div><strong>{{actor.name}}</strong><span>{{game.user.name}}</span></div>
       </div>
       <div class="ml-craftworks-harvest-instructions">
-        Choose one Harvest skill and roll all unresolved creature checks at once.
+        Choose one Harvest skill and roll once for the entire session. The same total is compared against each creature’s DC.
         Successful creatures will immediately show their claimable components.
       </div>
     {{else}}
@@ -21,31 +21,19 @@
     </div>
 
     {{#if actor}}
-      {{#if skillChecksBypassed}}
-        <section class="ml-craftworks-harvest-batch-check ml-craftworks-harvest-skill-check-bypassed">
-          <i class="fa-solid fa-forward"></i>
-          <div>
-            <strong>Skill Checks Bypassed</strong>
-            <small>
-              The GM granted {{actor.name}} automatic success. No Harvest
-              rolls are required; choose from the highlighted components below.
-            </small>
-          </div>
-        </section>
-      {{else}}
-        <section class="ml-craftworks-harvest-batch-check">
-        <div class="ml-craftworks-harvest-batch-check-copy">
+        <section class="ml-card ml-stack" data-gap="2">
+        <div class="ml-stack" data-gap="1">
           <strong>Harvest Skill Check</strong>
           {{#if availableSkillCheckCount}}
             <small>
-              {{availableSkillCheckCount}} unresolved creature check(s) will be rolled.
+              One roll resolves {{availableSkillCheckCount}} unresolved creature(s).
             </small>
           {{else}}
-            <small>All creature checks are already resolved or skipped.</small>
+            <small>All creature checks are already resolved.</small>
           {{/if}}
         </div>
 
-        <div class="ml-craftworks-harvest-batch-check-controls">
+        <div class="ml-grid" data-columns="2">
           <select
             data-action="select-harvest-skill"
             aria-label="Harvest skill"
@@ -70,11 +58,10 @@
             {{#unless canRollHarvestChecks}}disabled{{/unless}}
           >
             <i class="fa-solid fa-dice-d20"></i>
-            <span data-roll-skill-label>{{#if selectedHarvestSkillLabel}}Roll {{selectedHarvestSkillLabel}} Checks{{else}}Roll Harvest Checks{{/if}}</span>
+            <span data-roll-skill-label>{{#if hasHarvestRoll}}Resolve Recorded Roll{{else if selectedHarvestSkillLabel}}Roll {{selectedHarvestSkillLabel}} Check{{else}}Roll Harvest Check{{/if}}</span>
           </button>
         </div>
         </section>
-      {{/if}}
     {{/if}}
   </div>
 
@@ -128,9 +115,7 @@
             {{#if (eq state.status "awaiting-claim")}}
               <div class="ml-craftworks-harvest-harvest-message ml-craftworks-harvest-mine">
                 <i class="fa-solid fa-check"></i>
-                {{#if state.automaticSuccess}}
-                  Skill check skipped by the GM. Choose one highlighted component.
-                {{else if state.claimsMade}}
+                {{#if state.claimsMade}}
                   Natural 20 harvest: choose {{state.claimsRemaining}} more highlighted component.
                 {{else if (eq state.claimsAllowed 2)}}
                   Natural 20! Harvest succeeded with {{state.total}}. Choose two highlighted components.

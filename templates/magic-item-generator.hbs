@@ -1,0 +1,53 @@
+<section class="ml-app ml-app-shell ml-craftworks-magic-item-generator">
+  <header class="ml-hero">
+    <i class="fa-solid fa-wand-magic-sparkles ml-hero__icon"></i>
+    <div class="ml-hero__body"><h1>Magic Item Generator</h1><p>Quickly select random magic items from enabled compendium sources.</p></div>
+    <div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div>
+  </header>
+  {{#if hasAccess}}
+    {{#unless hasDraft}}
+      <section class="ml-surface ml-stack" data-gap="3">
+        <div class="ml-section-heading"><div><h2>Generation Options</h2><p>Choose categories and a rarity.</p></div></div>
+        <fieldset class="ml-field-group ml-stack" data-gap="2">
+          <legend>Categories</legend>
+          <div class="ml-cluster">
+            {{#each categories}}
+              <label class="ml-check"><input type="checkbox" data-magic-category="{{id}}" {{#if selected}}checked{{/if}}><span>{{label}}</span></label>
+            {{/each}}
+          </div>
+        </fieldset>
+        <label>Rarity
+          <select name="magicRarity">
+            {{#each rarities}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{label}} ({{available}} available)</option>{{/each}}
+          </select>
+        </label>
+        <p class="notes">Generate a random item, then add or remove items from the results.</p>
+      </section>
+      <footer class="ml-page-footer ml-actions"><button type="button" data-action="generate-stock"><i class="fa-solid fa-dice"></i> Generate</button></footer>
+    {{else}}
+      <section class="ml-surface ml-stack" data-gap="3">
+        <div class="ml-section-heading"><div><h2>Generated Magic Items</h2><p>Review, add, or remove items.</p></div></div>
+        <div class="ml-actions"><button type="button" data-action="add-item"><i class="fa-solid fa-plus"></i> Add Item</button></div>
+        {{#each results}}
+          <div class="ml-card ml-item-row">
+            <img src="{{img}}" alt="">
+            <div class="ml-stack" data-gap="1">
+              <a class="content-link ml-item-link" data-uuid="{{uuid}}" data-type="Item" data-link draggable="true"><i class="fa-solid fa-suitcase"></i> {{name}}</a>
+              <small>{{rarityLabel}} · {{categoryLabel}} · {{sourceLabel}}</small>
+            </div>
+            <button type="button" class="ml-icon-button" data-remove-stock="{{index}}" aria-label="Remove {{name}}"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        {{else}}
+          <p class="ml-empty-message">No items remain in this draft. Go back or reroll to generate another selection.</p>
+        {{/each}}
+      </section>
+      <footer class="ml-page-footer ml-actions">
+        <button type="button" data-action="edit-options"><i class="fa-solid fa-sliders"></i> Go Back</button>
+        <button type="button" data-action="reroll-stock"><i class="fa-solid fa-arrows-rotate"></i> Reroll</button>
+        <button type="button" data-action="share-stock" {{#unless hasItems}}disabled{{/unless}}><i class="fa-solid fa-message"></i> Display Results in Chat</button>
+      </footer>
+    {{/unless}}
+  {{else}}
+    <div class="ml-empty-state"><p class="ml-text" data-tone="premium">Magic Item Generator is a premium Craftworks feature.</p></div>
+  {{/if}}
+</section>

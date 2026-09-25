@@ -179,7 +179,6 @@ export class HarvestService {
 
   async start({
     creatureContexts = null,
-    skipSkillChecks = [],
     harvestActorsByUser = {}
   } = {}) {
     let creatures =
@@ -243,32 +242,8 @@ export class HarvestService {
       participants: {},
       results: [],
       harvestActorsByUser: foundry.utils.deepClone(harvestActorsByUser ?? {}),
-      skipSkillChecks:
-        foundry.utils.deepClone(
-          skipSkillChecks ?? []
-        )
+      harvestRolls: {}
     });
-
-    for (const entry of skipSkillChecks ?? []) {
-      if (!entry?.actorUuid || !entry?.userId) {
-        continue;
-      }
-
-      for (const creature of creatures) {
-        const key = harvestParticipantKey(entry.actorUuid, creature.tokenUuid);
-
-        session.participants[key] =
-          this.#buildSuccessfulState({
-            creature,
-            userId: entry.userId,
-            actorUuid: entry.actorUuid,
-            skillId: null,
-            total: null,
-            naturalD20: null,
-            automaticSuccess: true
-          });
-      }
-    }
 
     return session;
   }
@@ -463,8 +438,7 @@ export class HarvestService {
     actorUuid,
     skillId,
     total,
-    naturalD20 = null,
-    automaticSuccess = false
+    naturalD20 = null
   }) {
     const choices =
       this.#buildChoices(creature, total);
@@ -478,14 +452,12 @@ export class HarvestService {
         skillId,
         status: "no-results",
         total,
-        naturalD20,
-        automaticSuccess
+        naturalD20
       };
     }
 
     const doubleClaimEnabled =
-      !automaticSuccess
-      && Boolean(
+      Boolean(
         getSetting(
           SETTINGS.HARVEST_NAT20_DOUBLE_CLAIM
         )
@@ -510,7 +482,6 @@ export class HarvestService {
       total,
       naturalD20:
         Number(naturalD20) || null,
-      automaticSuccess,
       claimsAllowed,
       claimsMade: 0,
       claimsRemaining: claimsAllowed,
@@ -565,7 +536,18 @@ export class HarvestService {
     const key = harvestParticipantKey(actorUuid, creature.tokenUuid);
     if (session.participants[key]?.status) throw new Error("This player has already attempted to harvest this creature.");
 
-    const numericTotal = Number(total);
+    session.harvestRolls ??= {};
+    const priorRoll = session.harvestRolls[actorUuid]
+      ?? Object.values(session.participants).find(state => state.actorUuid === actorUuid && state.total != null && Number.isFinite(Number(state.total)));
+    const numericTotal = Number(priorRoll?.total ?? total);
+    if (!Number.isFinite(numericTotal) || (!priorRoll && total == null)) throw new Error("A valid Harvest roll is required.");
+    if (priorRoll) {
+      skillId = priorRoll.skillId;
+      naturalD20 = priorRoll.naturalD20;
+    }
+    // Reserve the first roll before any asynchronous work. Every creature and
+    // retried socket submission uses this character's single session roll.
+    session.harvestRolls[actorUuid] ??= { skillId, total: numericTotal, naturalD20 };
     const success = Number.isFinite(numericTotal) && numericTotal >= creature.dc;
     if (!success) {
       session.participants[key] = {
@@ -594,8 +576,7 @@ export class HarvestService {
         actorUuid,
         skillId,
         total: numericTotal,
-        naturalD20,
-        automaticSuccess: false
+        naturalD20
       });
 
     session.participants[key] =
@@ -617,6 +598,19 @@ export class HarvestService {
     }
 
     return session.participants[key];
+  }
+
+  async recordBatchAttempt({ sessionId, userId, actorUuid, ...roll }) {
+    const session = this.sessions.get(sessionId);
+    if (!session || session.status !== "open") throw new Error("This harvest session is no longer open.");
+    for (const creature of session.creatures) {
+      if (this.getParticipant(sessionId, actorUuid, creature.tokenUuid)?.status) continue;
+      if (await this.hasHarvested(creature.tokenUuid, actorUuid)) continue;
+      // Recheck after the asynchronous token lookup to prevent duplicate resolution.
+      if (this.getParticipant(sessionId, actorUuid, creature.tokenUuid)?.status) continue;
+      await this.recordAttempt({ ...roll, sessionId, userId, actorUuid, creatureTokenUuid: creature.tokenUuid });
+    }
+    return session;
   }
 
   async claim({

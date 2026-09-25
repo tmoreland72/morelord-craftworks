@@ -70,7 +70,7 @@
             {{#each actors}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
           </select>
         </label>
-        {{#if partyInfo.valid}}<p class="ml-craftworks-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
+        {{#if partyInfo.valid}}<p class="notes ml-craftworks-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
         <footer class="ml-page-footer ml-actions">
           <button type="button" data-action="reroll-potions"><i class="fa-solid fa-arrows-rotate"></i> Reroll</button>
           <button type="button" data-action="share-potions"><i class="fa-solid fa-message"></i> Display Results in Chat</button>

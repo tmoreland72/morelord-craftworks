@@ -75,7 +75,7 @@ Open **Token Controls** on the left side of a scene and select the **Morelord Cr
 | --- | --- |
 | **Acquire** | Harvest, Gather, Loot, Hoard |
 | **Craft** | Materials, Recipes, Craft |
-| **Tools** | Potion Generator, Spell Scroll Generator, Spellbook Generator |
+| **Tools** | Magic Item Generator, Potion Generator, Spell Scroll Generator, Spellbook Generator |
 
 Acquisition and generator tools are GM-operated. Players can use the reference and crafting tools available to them and receive interactive Harvest or Gather windows when the GM starts a session.
 
@@ -226,16 +226,15 @@ Harvest is a synchronized session in which players test their characters against
 5. Use **Select All** or **Clear All** when useful.
 6. Review creature type, CR, Harvest DC, rarity, components, and special instructions.
 7. Select the participating player characters. Defaults follow the primary populated party, then player-owned characters, and the last successful selection is remembered.
-8. Optionally enable the single **Skip Skill Checks** option for every included character.
-9. Select **Start Harvest**.
+8. Select **Start Harvest**.
 
-![The GM Harvest preflight identifies defeated creatures and lets the GM include participants and bypass checks selectively.](assets/harvest-gm-preflight.png)
+![The GM Harvest preflight identifies defeated creatures and lets the GM include participants and select participating characters.](assets/harvest-gm-preflight.png)
 
 At least one defeated NPC and one player character must be selected. Each selected character controlled by a connected player receives an independent Harvest window. One user controlling two selected characters receives two character-titled windows with separate checks and claims. Offline characters receive a character-specific window on the GM’s client. Use **Roll as GM** to open it again and make checks or choose components on their behalf.
 
 ### Monitor checks and claims
 
-A player chooses one Harvest skill and uses **Roll Harvest Checks**. Craftworks rolls that skill separately against every unresolved creature available to the character. Success exposes component choices; failure consumes that character's attempt for that creature.
+A player chooses one Harvest skill and uses **Roll Harvest Check** once for the entire session. The same total is compared against each unresolved creature’s DC. Success exposes component choices; failure consumes that character’s attempt for that creature. Reopening or resending the request reuses the recorded roll. Checks cannot be skipped; the optional natural-20 double-component bonus still applies.
 
 A claim reserves a component but does not add it to inventory. All open Harvest windows synchronize reservations, claimants, source creatures, and roll results. Other players cannot reserve the same component.
 
@@ -342,6 +341,14 @@ To roll at combat completion, import **Lucky Finds** into the world and configur
 
 Each potion or scroll result defaults to **Quantity 1**. Change the result’s Quantity to award multiple copies of that item, such as three Potions of Healing. Sharing in chat and awarding both use the edited quantities. Quantities must be positive whole numbers; rerolling replaces the draft.
 
+### Magic Item Generator
+
+Open **Tools → Magic Item Generator**, select categories and a rarity, then select **Generate** to draw one random magic item from enabled D&D5e Item compendiums. This premium GM utility has no quantity controls, vendor name, or duplicate checkbox.
+
+Items without a recognized magic-item rarity and nonphysical documents are excluded. Legacy rarity fields and D&D5e v6 rarity sets are supported; multi-rarity items use their lowest rarity, matching the shared Core item reader. Duplicate names within the same category/rarity prefer the configured source priority. Add Item omits items already in the draft.
+
+Open linked source Items, use **Add Item** to choose another item from the searchable catalog, remove entries, **Reroll**, or **Go Back** to change filters. **Display Results in Chat** shares the linked list. The draft lasts while the window remains open; generating and sharing do not change inventories.
+
 ### Potion Generator
 
 Category changes immediately update the available counts for every rarity, including zero when all categories are disabled.
@@ -356,10 +363,10 @@ Open **Potion Generator**, choose quantities with the numeric fields or visible 
 
 ### Spell Scroll Generator
 
-School selections immediately update the available counts at every level. No schools selected means zero available spells.
+Below Schools of Magic, choose **Generate By → Spell Level** or **Rarity**. The modes keep separate quantities. Rarity mode draws each requested scroll from its matching levels: Common = cantrip–1, Uncommon = 2–3, Rare = 4–5, Very Rare = 6–8, Legendary = 9. School selections update availability in either mode; no schools selected means zero available spells.
 
 1. Open **Spell Scroll Generator**.
-2. Enter the number of scrolls to generate at each level, from cantrip through level 9, using the numeric fields or up/down controls.
+2. Choose Spell Level or Rarity, then enter quantities with the numeric fields or +/− buttons.
 3. Select **Generate** and review the random spells from enabled compendiums.
 4. Open a source document when you need to inspect a result, or use **Reroll** to replace the draft.
 5. Optionally select **Display Results in Chat** to share the draft without creating Items.
@@ -440,7 +447,7 @@ With the Drakkenheim content pack enabled and access available, Craftworks first
 
 Some creatures also include an **Items:** entry or special handling rule. Craftworks presents it as **Special Harvest Items / Instructions**. This information is intentionally GM-facing and informational: it calls attention to exceptional treasure or procedures outside the ordinary material reservation workflow.
 
-Players still use the normal Harvest experience—roll against each creature, reserve an available component, and wait for the GM to finalize the awards. The content is richer, but the workflow remains consistent.
+Players still use the normal Harvest experience—roll once for the session against each creature’s DC, reserve an available component, and wait for the GM to finalize the awards. The content is richer, but the workflow remains consistent.
 
 ### Graceful fallback
 

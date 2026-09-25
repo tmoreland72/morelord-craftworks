@@ -13,7 +13,7 @@
         </select>
       </label>
 
-      <p class="ml-craftworks-muted">Higher tiers generate substantially more coin, more Craftworks material rolls, and a greater chance of special treasure.</p>
+      <p class="notes ml-craftworks-muted">Higher tiers generate substantially more coin, more Craftworks material rolls, and a greater chance of special treasure.</p>
 
       <footer class="ml-page-footer ml-actions"><button type="button" data-action="roll">
         <i class="fa-solid fa-dice-d20"></i> Generate Hoard
@@ -49,7 +49,7 @@
               {{#if itemSearchReady}}
                 <p class="ml-craftworks-item-lookup-empty">No matching Items found in enabled sources.</p>
               {{else}}
-                <p class="ml-craftworks-item-lookup-hint">Enter at least 2 characters to search.</p>
+                <p class="notes ml-craftworks-item-lookup-hint">Enter at least 2 characters to search.</p>
               {{/if}}
             {{/if}}
           </div>
@@ -145,7 +145,7 @@
             {{/each}}
           </select>
         </label>
-        {{#if partyInfo.valid}}<p class="ml-craftworks-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
+        {{#if partyInfo.valid}}<p class="notes ml-craftworks-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
 
         <footer class="ml-page-footer ml-actions">
           <button type="button" data-action="send-chat">

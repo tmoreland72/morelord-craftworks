@@ -1,10 +1,11 @@
+import { bindGeneratorCountControls } from "./generator-count-controls.mjs";
 import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-participation.js";
 import { generatorQuantity } from "../core/generator-quantity.mjs";
 import { RecipePickerApp } from "./recipe-picker-app.mjs";
 import { MODULE_TITLE } from "../constants.mjs";
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
-import { bindGeneratorCountControls } from "./generator-count-controls.mjs";
 import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
+import { SCROLL_RARITIES, scrollRarity } from "../scrolls/scroll-rarity.mjs";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -19,6 +20,8 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
     this.hasDraft = false;
     this.selectedRecipientUuid = null;
     this.selectedSchools = null;
+    this.countMode = "level";
+    this.rarityCounts = Object.fromEntries(SCROLL_RARITIES.map(rarity => [rarity.id, 0]));
   }
 
   static DEFAULT_OPTIONS = {
@@ -49,6 +52,7 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
     const levels = Array.from({ length: 10 }, (_, level) => ({
       level,
       label: level === 0 ? "Cantrips" : `Level ${level}`,
+      rarityLabel: scrollRarity(level).label,
       count: Number(this.counts[level] ?? 0),
       available: allSpells.filter(spell => Number(spell.level ?? 0) === level && this.selectedSchools.has(spell.school)).length
     }));
@@ -60,6 +64,13 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
     return foundry.utils.mergeObject(context, {
       hasAccess: Boolean(service?.hasAccess),
       levels,
+      byRarity: this.countMode === "rarity",
+      countOptions: this.countMode === "rarity" ? SCROLL_RARITIES.map(rarity => ({
+        key: rarity.id, label: rarity.label,
+        detail: rarity.levels.map(level => level === 0 ? "Cantrip" : level).join(", "),
+        count: this.rarityCounts[rarity.id],
+        available: allSpells.filter(spell => rarity.levels.includes(Number(spell.level)) && this.selectedSchools.has(spell.school)).length
+      })) : levels.map(entry => ({ ...entry, key: entry.level, detail: entry.rarityLabel })),
       schools: schools.map(school => ({ ...school, selected: this.selectedSchools.has(school.id) })),
       resultGroups,
       resultCount: this.result.length,
@@ -71,6 +82,7 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
 
   async _onRender(context, options) {
     await super._onRender(context, options);
+    bindGeneratorCountControls(this.element, { inputSelector: "[data-scroll-count]" });
     this.element.querySelectorAll("[data-result-quantity]").forEach(input => input.addEventListener("input", () => {
       this.result[Number(input.dataset.resultQuantity)].quantity = input.value;
     }));
@@ -80,9 +92,13 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
       await this.render({ force: true });
     }));
     this.element.querySelector("[data-action='add-result']")?.addEventListener("click", () => this.#addResult());
-    this.element.querySelectorAll("[data-scroll-level]").forEach(input =>
-      input.addEventListener("change", event => {
-        this.counts[Number(event.currentTarget.dataset.scrollLevel)] = Math.max(0, Math.floor(Number(event.currentTarget.value ?? 0)));
+    this.element.querySelector("[data-action='edit-scroll-options']")?.addEventListener("click", async () => {
+      this.hasDraft = false;
+      await this.render({ force: true });
+    });
+    this.element.querySelectorAll("[data-scroll-count]").forEach(input =>
+      input.addEventListener("change", () => {
+        this.#readCounts();
         this.result = [];
       })
     );
@@ -93,8 +109,11 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
         this.render({ force: true });
       })
     );
-    bindGeneratorCountControls(this.element, {
-      inputSelector: "[data-scroll-level]"
+    this.element.querySelector("[name='scrollCountMode']")?.addEventListener("change", async event => {
+      this.#readCounts();
+      this.countMode = event.currentTarget.value;
+      this.result = [];
+      await this.render({ force: true });
     });
     this.element.querySelector("[data-action='generate-scrolls']")
       ?.addEventListener("click", event => this.#generate(event));
@@ -129,8 +148,9 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
   }
 
   #readCounts() {
-    this.element.querySelectorAll("[data-scroll-level]").forEach(input => {
-      this.counts[Number(input.dataset.scrollLevel)] = Math.max(0, Math.floor(Number(input.value ?? 0)));
+    const counts = this.countMode === "rarity" ? this.rarityCounts : this.counts;
+    this.element.querySelectorAll("[data-scroll-count]").forEach(input => {
+      counts[input.dataset.scrollCount] = Number(input.value ?? 0);
     });
   }
 
@@ -162,13 +182,14 @@ export class SpellScrollGeneratorApp extends ScrollPreservingApplicationMixin(
       ui.notifications.warn("Choose at least one school of magic.");
       return;
     }
-    if (!Object.values(this.counts).some(value => value > 0)) {
+    const counts = this.countMode === "rarity" ? this.rarityCounts : this.counts;
+    if (!Object.values(counts).some(value => value > 0)) {
       ui.notifications.warn("Choose at least one spell scroll before generating results.");
       return;
     }
     try {
-      this.result = await this.craftworks.spellScrollGenerator.generate(this.counts, {
-        schools: [...this.selectedSchools]
+      this.result = await this.craftworks.spellScrollGenerator.generate(counts, {
+        schools: [...this.selectedSchools], byRarity: this.countMode === "rarity"
       });
       this.hasDraft = true;
       await this.render({ force: true });
