@@ -2,7 +2,7 @@
 title: Morelord Craftworks Documentation
 slug: morelord-craftworks
 product: morelord-craftworks
-version: 0.4.14
+version: 0.4.15
 ---
 
 # Morelord Craftworks Documentation
@@ -43,3 +43,5 @@ Craftworks can also support exceptional add-on content packs that go beyond the 
 These manuals describe Morelord Craftworks 0.4.9 for Foundry Virtual Tabletop v14 and dnd5e 5.3 or later. The in-Foundry **Documentation** button on the Craftworks dashboard opens the current product guide through Morelord Core.
 
 Page sections use Morelord Core bordered, shaded surfaces with shared padding, section headings, and spacing, matching Downtime. Older screenshots illustrate the workflows but may show the previous panel styling or omit the new add/remove controls. Refer to the manual text for current controls.
+
+Version 0.4.15 adds the Premium Magic Item Generator and spell-scroll quantities by rarity. Harvesting uses one character roll across the session. Requires Morelord Core 0.3.15 or later.
