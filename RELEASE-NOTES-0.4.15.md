@@ -1,15 +1,17 @@
 # Morelord Craftworks 0.4.15
 
-## Added
+## What Changed
+
+### Added
 
 - [Premium] GM Magic Item Generator with category and rarity filters, random draws, catalog selection, removal, and chat sharing.
 
-## Improvements
+### Improvements
 
 - Spell Scroll Generator supports quantities by spell level or rarity, with working plus/minus controls and existing school/source filters.
 - Workflow guidance uses Core's shared subtitle and notes styles.
 
-## Fixed
+### Fixed
 
 - Harvesting uses one character roll for the whole session, applying the total to each creature's DC and preserving it across retries and reopened windows. GM fallback and the optional natural-20 bonus remain available.
 
