@@ -179,8 +179,11 @@ export class HarvestService {
 
   async start({
     creatureContexts = null,
-    harvestActorsByUser = {}
+    harvestActorsByUser = {},
+    skipSkillChecks = false,
+    rollMode = "creature"
   } = {}) {
+    if (skipSkillChecks === true && !game.user.isGM) throw new Error("Only the GM can skip Harvest skill checks.");
     let creatures =
       Array.isArray(creatureContexts)
         ? foundry.utils.deepClone(creatureContexts)
@@ -242,9 +245,29 @@ export class HarvestService {
       participants: {},
       results: [],
       harvestActorsByUser: foundry.utils.deepClone(harvestActorsByUser ?? {}),
-      harvestRolls: {}
+      harvestRolls: {},
+      skipSkillChecks: skipSkillChecks === true,
+      rollMode,
+      participantProgress: {}
     });
 
+    if (session.skipSkillChecks || rollMode === "creature") {
+      for (const [userId, actors] of Object.entries(session.harvestActorsByUser)) {
+        for (const actorUuid of Array.isArray(actors) ? actors : [actors]) {
+          for (const creature of session.creatures) {
+            if (rollMode === "creature" && await this.hasHarvested(creature.tokenUuid, actorUuid)) {
+              session.participants[harvestParticipantKey(actorUuid, creature.tokenUuid)] = {
+                userId, actorUuid, creatureTokenUuid: creature.tokenUuid, status: "previously-harvested"
+              };
+              continue;
+            }
+            if (!session.skipSkillChecks && creature.harvestMode !== "drakkenheim") continue;
+            if (await this.hasHarvested(creature.tokenUuid, actorUuid)) continue;
+            await this.recordAttempt({ sessionId: session.id, userId, actorUuid, creatureTokenUuid: creature.tokenUuid });
+          }
+        }
+      }
+    }
     return session;
   }
 
@@ -525,6 +548,7 @@ export class HarvestService {
     const session = this.sessions.get(sessionId);
     if (!session) throw new Error("Harvest session not found.");
     if (session.status !== "open") throw new Error("This harvest session is no longer open.");
+    if ((session.completedParticipantIds ?? []).includes(actorUuid)) throw new Error("This character has finished harvesting.");
     const permittedActors = session.harvestActorsByUser?.[userId] ?? [];
     if (!(Array.isArray(permittedActors) ? permittedActors : [permittedActors]).includes(actorUuid)) {
       throw new Error("This character is not part of the Harvest session.");
@@ -536,18 +560,28 @@ export class HarvestService {
     const key = harvestParticipantKey(actorUuid, creature.tokenUuid);
     if (session.participants[key]?.status) throw new Error("This player has already attempted to harvest this creature.");
 
+    if (session.skipSkillChecks === true || (session.rollMode === "creature" && creature.harvestMode === "drakkenheim")) {
+      const state = this.#buildSuccessfulState({ creature, userId, actorUuid, skillId: null, total: null });
+      session.participants[key] = state;
+      if (state.status === "no-results") {
+        await this.#writeHarvestRecord(creatureTokenUuid, actorUuid, { status: state.status, skillId: null, total: null });
+      }
+      return state;
+    }
+
     session.harvestRolls ??= {};
-    const priorRoll = session.harvestRolls[actorUuid]
-      ?? Object.values(session.participants).find(state => state.actorUuid === actorUuid && state.total != null && Number.isFinite(Number(state.total)));
+    const rollKey = session.rollMode === "creature" ? key : actorUuid;
+    const priorRoll = session.harvestRolls[rollKey]
+      ?? (session.rollMode === "creature" ? null :
+        Object.values(session.participants).find(state => state.actorUuid === actorUuid && state.total != null && Number.isFinite(Number(state.total))));
     const numericTotal = Number(priorRoll?.total ?? total);
     if (!Number.isFinite(numericTotal) || (!priorRoll && total == null)) throw new Error("A valid Harvest roll is required.");
     if (priorRoll) {
       skillId = priorRoll.skillId;
       naturalD20 = priorRoll.naturalD20;
     }
-    // Reserve the first roll before any asynchronous work. Every creature and
-    // retried socket submission uses this character's single session roll.
-    session.harvestRolls[actorUuid] ??= { skillId, total: numericTotal, naturalD20 };
+    // Reserve the roll before asynchronous work so retries cannot reroll it.
+    session.harvestRolls[rollKey] ??= { skillId, total: numericTotal, naturalD20 };
     const success = Number.isFinite(numericTotal) && numericTotal >= creature.dc;
     if (!success) {
       session.participants[key] = {
@@ -613,6 +647,44 @@ export class HarvestService {
     return session;
   }
 
+  advance({ sessionId, userId, actorUuid, creatureTokenUuid, action }) {
+    const session = this.sessions.get(sessionId);
+    if (!session || session.status !== "open") throw new Error("This harvest session is no longer open.");
+    const actors = session.harvestActorsByUser?.[userId] ?? [];
+    if (!(Array.isArray(actors) ? actors : [actors]).includes(actorUuid)) throw new Error("This character is not part of the Harvest session.");
+    if (!["next", "skip", "done"].includes(action)) throw new Error("Invalid Harvest action.");
+    if ((session.completedParticipantIds ?? []).includes(actorUuid)) return session;
+    session.participantProgress ??= {};
+    const index = session.participantProgress[actorUuid] ?? 0;
+    if (session.creatures[index]?.tokenUuid !== creatureTokenUuid) throw new Error("This Harvest page has already changed. Reopen the window.");
+    if (action === "next") {
+      const state = this.getParticipant(sessionId, actorUuid, creatureTokenUuid);
+      if (state?.status === "awaiting-claim" && (state.claimsMade > 0 || !(state.choices ?? []).some(choice => {
+        const componentId = choice.componentId ?? `${creatureTokenUuid}::${choice.materialId}`;
+        return !(state.claimedComponentIds ?? []).includes(componentId)
+          && (session.creatures[index].harvestMode !== "drakkenheim" || !session.results.some(result => result.creatureTokenUuid === creatureTokenUuid && result.componentId === componentId));
+      }))) {
+        state.status = state.claimsMade ? "claimed" : "no-results";
+        state.claimsRemaining = 0;
+      }
+      if (!state || ["pending", "awaiting-claim"].includes(state.status)) throw new Error("Resolve the current creature and claim its components before continuing.");
+      if (index >= session.creatures.length - 1) throw new Error("Use Done on the last creature.");
+      session.participantProgress[actorUuid] = index + 1;
+    } else {
+      if (action === "done" && index !== session.creatures.length - 1) throw new Error("Use Skip Remaining to finish early.");
+      for (const creature of session.creatures) {
+        const key = harvestParticipantKey(actorUuid, creature.tokenUuid);
+        const state = session.participants[key];
+        if (!state || state.status === "awaiting-claim") {
+          session.participants[key] = { ...state, userId, actorUuid, creatureTokenUuid: creature.tokenUuid,
+            status: state?.claimsMade ? "claimed" : "skipped", claimsRemaining: 0 };
+        }
+      }
+      session.completedParticipantIds = [...(session.completedParticipantIds ?? []), actorUuid];
+    }
+    return session;
+  }
+
   async claim({
     sessionId,
     creatureTokenUuid,
@@ -623,6 +695,8 @@ export class HarvestService {
   }) {
     const session = this.sessions.get(sessionId);
     if (!session) throw new Error("Harvest session not found.");
+
+    if (session.status !== "open" || (session.completedParticipantIds ?? []).includes(actorUuid)) throw new Error("This character cannot claim from this Harvest session.");
 
     const key = harvestParticipantKey(actorUuid, creatureTokenUuid);
     const state = session.participants?.[key];
@@ -707,6 +781,13 @@ export class HarvestService {
 
     const user = game.users.get(userId);
 
+    // Lookups above may yield to another claim or the character's Done action.
+    if (state.status !== "awaiting-claim" || (session.completedParticipantIds ?? []).includes(actorUuid)
+      || (state.claimedComponentIds ?? []).includes(resolvedComponentId)
+      || (isExclusiveComponent && session.results.some(result => result.creatureTokenUuid === creatureTokenUuid && result.componentId === resolvedComponentId))) {
+      throw new Error("That component is no longer available to this character.");
+    }
+
     state.claimedComponentIds = [
       ...(state.claimedComponentIds ?? []),
       resolvedComponentId
@@ -769,25 +850,7 @@ export class HarvestService {
     state.recipientUuid = recipient.uuid;
     state.recipientName = recipient.name;
 
-    await this.#writeHarvestRecord(creatureTokenUuid, actor.uuid, {
-      status: state.status,
-      skillId: state.skillId,
-      total: state.total,
-      naturalD20: state.naturalD20 ?? null,
-      claimsAllowed: targetClaims,
-      claimsMade: state.claimsMade,
-      claimedMaterialIds: state.claimedMaterialIds,
-      claimedComponentIds: state.claimedComponentIds,
-      claimedNames: state.claimedNames,
-      materialId: choice.materialId,
-      componentId: resolvedComponentId,
-      claimedName: state.claimedName,
-      recipientUuid: recipient.uuid,
-      recipientName: recipient.name,
-      itemUuid: null,
-      sourceItemUuid: material.uuid,
-      awarded: false
-    });
+
 
     const result = {
       id:
@@ -830,7 +893,28 @@ export class HarvestService {
       awardedAt: null
     };
 
+    // Reserve the finite component before writing flags, which can yield to another player.
     session.results.push(result);
+
+    await this.#writeHarvestRecord(creatureTokenUuid, actor.uuid, {
+      status: state.status,
+      skillId: state.skillId,
+      total: state.total,
+      naturalD20: state.naturalD20 ?? null,
+      claimsAllowed: targetClaims,
+      claimsMade: state.claimsMade,
+      claimedMaterialIds: state.claimedMaterialIds,
+      claimedComponentIds: state.claimedComponentIds,
+      claimedNames: state.claimedNames,
+      materialId: choice.materialId,
+      componentId: resolvedComponentId,
+      claimedName: state.claimedName,
+      recipientUuid: recipient.uuid,
+      recipientName: recipient.name,
+      itemUuid: null,
+      sourceItemUuid: material.uuid,
+      awarded: false
+    });
 
     return {
       state,
@@ -879,6 +963,7 @@ export class HarvestService {
   async updatePlayerCompletions(sessionId) {
     const session = this.sessions.get(sessionId);
     if (!session) throw new Error("Harvest session not found.");
+    if (session.rollMode === "creature") return []; // Completion is explicitly acknowledged with Done or Skip Remaining.
 
     const participants = new Map(
       Object.values(session.participants ?? {})

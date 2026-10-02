@@ -129,30 +129,29 @@ Actual crafting execution requires the appropriate premium access. Standard user
 
 Harvest begins when the GM selects defeated creatures and starts a synchronized session.
 
-### Roll against the creatures
+### Work through the creatures
 
 1. Wait for the Harvest window to open.
-2. Choose an available Harvest skill.
-3. Select **Roll Harvest Check**.
-4. Roll that skill once for the entire Harvest session. Craftworks applies the same total to every unresolved creature.
+2. Review the current creature in the larger right panel; your character’s claimed components appear on the left.
+3. For a non-Drakkenheim creature, choose a skill and select **Roll Harvest Check** once for that creature. Drakkenheim creatures open directly to claims.
+4. Claim your components, then select **Next** to replace this creature with the next one.
 
-Each creature uses its own Harvest DC. A success reveals claimable components; a failure consumes your character's attempt for that creature. Previously attempted or resolved creatures are not rolled again. Reopening the window or retrying delivery reuses the recorded roll. There is no Skip Skill Checks option. The optional natural-20 bonus still allows two component claims on a successful harvest.
+Each creature uses its own Harvest DC. A success reveals claimable components; a failure consumes your character's attempt for that creature. Previously attempted or resolved creatures are not rolled again. Reopening the window or retrying delivery reuses the recorded roll. If the GM enables **Skip Skill Checks** before starting, your window opens directly to component choices without a roll. Skipped checks do not grant a natural-20 bonus. The optional natural-20 bonus still allows two component claims on a successful harvest.
 
-The GM chooses the characters included in the Harvest. Every character must make the single session check; the GM can roll on behalf of offline players. If you control multiple included characters, Craftworks opens an independently titled Harvest window for each one; their checks and claims remain separate.
+The GM chooses the characters included in the Harvest. Each character makes their own checks for non-Drakkenheim creatures; the GM can roll on behalf of offline players. If you control multiple included characters, Craftworks opens an independently titled Harvest window for each one; their checks and claims remain separate.
 
-![The player Harvest window presents the available skill choices and each unresolved creature.](assets/harvest-player-ready.png)
+![The player Harvest window presents a personal claim ledger beside the current creature and its skill check.](assets/harvest-player-ready.png)
 
 ### Claim a component
 
-Select one of the highlighted components after a success. If your natural d20 was 20 and the world setting permits it, you can receive a second claim. Claimed creatures remain expanded to keep the window from shifting during a large Harvest; you can still collapse a creature manually.
+Select one of the highlighted components after a success. If your natural d20 was 20 and the world setting permits it, you can receive a second claim or select **Next** to forgo it. The creature remains visible after claiming until you select **Next**. Select **Skip Remaining** to finish early, or **Done** on the last creature. Both notify the GM that your character completed harvesting and close the window without discarding your claims.
 
-A claim is a reservation, not an immediate inventory award. All participants see it in the shared **Claimed Components** list, and another player cannot take the same reserved component. Materials connected to one of your marked recipes may display **Needed for Crafting**. Marked recipe names in Harvest show this component’s inventory quantity / required quantity (for example, **2/4**). Long recipe names end with an ellipsis while the quantity remains visible; hover over the pill for the full name. Inventory combines the harvesting character’s personal items with their party Group inventories; other characters’ inventories and unawarded claims are excluded. Repeated required ingredients are added together. For alternative recipe paths, the count uses the lowest quantity along a path that uses this component.
+A claim is a reservation, not an immediate inventory award. Your character’s reservations appear in the left **Claimed Components** panel. Drakkenheim parts cannot be reserved by another character; standard components may be harvested independently. Materials connected to one of your marked recipes may display **Needed for Crafting**. Marked recipe names in Harvest show this component’s inventory quantity / required quantity (for example, **2/4**). Recipe badges show the name and quantity; hover for the full name. Inventory combines the harvesting character’s personal items with their party Group inventories; other characters’ inventories and unawarded claims are excluded. Repeated required ingredients are added together. For alternative recipe paths, the count uses the lowest quantity along a path that uses this component.
 
 The GM must select **Finalize Harvest** before reserved items enter their resolved inventories. If the GM resets or cancels the session, unfinalized claims are discarded.
 
-![Successful Harvest checks reveal component choices and their source creatures.](assets/harvest-player-results.png)
+![Drakkenheim opens directly to component choices; narrow windows stack the claim ledger above the current creature.](assets/harvest-player-results.png)
 
-![A claimed component is visibly reserved while the session awaits GM finalization.](assets/harvest-player-claimed.png)
 
 ![Finalization posts the delivered Harvest materials as linked chat results.](assets/harvest-award-chat-card.png)
 

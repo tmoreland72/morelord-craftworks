@@ -19,10 +19,10 @@ export const CRAFTWORKS_DOCUMENTATION = Object.freeze({
     ] },
     { id: "harvest", title: "Harvest", icon: "fa-solid fa-skull", introduction: "Harvest creates a synchronized component-claim session from defeated creatures on the current scene.", steps: [
       { title: "Prepare", body: "Select defeated creatures and participating characters. Defaults follow the primary party, then player-owned characters; the last successful selection is remembered." },
-      { title: "Choose checks", body: "The session-wide Skip Skill Checks option sends every included character directly to component choices." },
-      { title: "Resolve", body: "Each character receives independent roll state and claims. Connected players use their own windows; offline characters open on the GM’s client and can be reopened with Roll as GM." },
+      { title: "Choose checks", body: "The GM can enable session-wide Skip Skill Checks in the Skill Checks section before starting to send every included character directly to component choices, including Drakkenheim harvesting. Otherwise, each non-Drakkenheim creature requires a separate check. Drakkenheim always opens directly to claims. Skipping does not grant a natural-20 bonus or reset previous attempts." },
+      { title: "Resolve", body: "Each character sees a personal claim ledger beside one current creature. Next advances after resolving its check and claims. Skip Remaining or Done on the last creature tells the GM the character completed harvesting and preserves claims. Reopening restores progress. Connected players use their own windows; offline characters open on the GM’s client and can be reopened with Roll as GM." },
       { title: "Finalize", body: "Claims reserve components. Finalizing awards them to resolved recipients and posts the outcome." }
-    ], callouts: [{ tone: "info", icon: "fa-solid fa-window-restore", title: "Stable working view", body: "Claimed creatures remain expanded unless manually collapsed, preventing list jumps during large harvests." }] },
+    ], callouts: [{ tone: "info", icon: "fa-solid fa-window-restore", title: "Stable working view", body: "Only the current creature appears. Claiming and socket updates keep it visible until Next is selected." }] },
     { id: "acquisition", title: "Gather, Loot, and Hoards", icon: "fa-solid fa-seedling", bullets: [
       "Gather uses the same party-priority picker as Harvest and gives each selected character an independent scene-tracked terrain opportunity. The GM can roll for offline characters.",
       "Loot generates encounter materials, currency, and special treasure using configured acquisition rules.",

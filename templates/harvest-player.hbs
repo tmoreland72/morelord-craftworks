@@ -1,299 +1,67 @@
-<div class="ml-app ml-app-shell ml-craftworks-harvest-shell ml-craftworks-harvest-modern">
-  <header class="ml-hero"><i class="fa-solid fa-scalpel ml-hero__icon"></i><div class="ml-hero__body"><h1>Harvesting</h1><p>Resolve your harvest check and choose components from {{session.sceneName}}.</p></div><div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header><div class="ml-stack">
-
-    {{#if actor}}
-      <div class="ml-craftworks-harvest-user">
-        {{#if actor.img}}<img src="{{actor.img}}" alt="{{actor.name}}">{{/if}}
-        <div><strong>{{actor.name}}</strong><span>{{game.user.name}}</span></div>
-      </div>
-      <div class="ml-craftworks-harvest-instructions">
-        Choose one Harvest skill and roll once for the entire session. The same total is compared against each creature’s DC.
-        Successful creatures will immediately show their claimable components.
-      </div>
-    {{else}}
-    <div class="ml-text ml-craftworks-harvest-instructions ml-craftworks-warning" data-tone="warning">No character is available. Select a token you own or configure a user character.</div>
-    {{/if}}
-
-    <div class="ml-craftworks-harvest-summary">
-      <span><i class="fa-solid fa-skull"></i> {{summary.creatures}} Creatures</span>
-      <span><i class="fa-solid fa-check"></i> {{summary.completed}} Resolved</span>
-      {{#if summary.drakkenheim}}<span><i class="fa-solid fa-radiation"></i> {{summary.drakkenheim}} Drakkenheim</span>{{/if}}
-    </div>
-
-    {{#if actor}}
-        <section class="ml-card ml-stack" data-gap="2">
-        <div class="ml-stack" data-gap="1">
-          <strong>Harvest Skill Check</strong>
-          {{#if availableSkillCheckCount}}
-            <small>
-              One roll resolves {{availableSkillCheckCount}} unresolved creature(s).
-            </small>
-          {{else}}
-            <small>All creature checks are already resolved.</small>
-          {{/if}}
-        </div>
-
-        <div class="ml-grid" data-columns="2">
-          <select
-            data-action="select-harvest-skill"
-            aria-label="Harvest skill"
-            {{#unless availableSkillCheckCount}}disabled{{/unless}}
-          >
-            <option value="">Choose skill...</option>
-            {{#each skills}}
-              <option
-                value="{{id}}"
-                data-skill-label="{{label}} {{modifierLabel}}"
-                {{#if selected}}selected{{/if}}
-              >
-                {{label}} ({{modifierLabel}})
-              </option>
-            {{/each}}
-          </select>
-
-          <button
-            type="button"
-            data-action="roll-harvest-checks"
-            data-available-count="{{availableSkillCheckCount}}"
-            {{#unless canRollHarvestChecks}}disabled{{/unless}}
-          >
-            <i class="fa-solid fa-dice-d20"></i>
-            <span data-roll-skill-label>{{#if hasHarvestRoll}}Resolve Recorded Roll{{else if selectedHarvestSkillLabel}}Roll {{selectedHarvestSkillLabel}} Check{{else}}Roll Harvest Check{{/if}}</span>
-          </button>
-        </div>
-        </section>
-    {{/if}}
-  </div>
-
-  <main class="ml-craftworks-harvest-creatures ml-stack" data-gap="3">
-    {{#each creatures}}
-      <section class="ml-card ml-craftworks-harvest-creature {{#if isCollapsed}}ml-craftworks-harvest-creature-collapsed{{/if}}" data-creature-token="{{tokenUuid}}">
-        <header class="ml-craftworks-harvest-creature-header">
-          {{#if img}}<img class="ml-craftworks-harvest-creature-image" src="{{img}}" alt="{{name}}">{{/if}}
-          <div class="ml-craftworks-harvest-creature-info">
-            <h2>{{name}}</h2>
-            <div class="ml-craftworks-harvest-creature-meta">
-              <span>{{creatureType}} · CR {{cr}}</span>
-              <span>Harvest DC {{dc}}</span>
-              {{#if rarity}}<span class="ml-craftworks-harvest-rarity">{{rarity}}</span>{{/if}}
-              {{#if (eq harvestMode "drakkenheim")}}<span class="ml-craftworks-harvest-has-claim"><i class="fa-solid fa-radiation"></i> Drakkenheim</span>{{/if}}
-            </div>
-          </div>
-          <button type="button" class="ml-craftworks-harvest-creature-toggle" data-action="toggle-creature" data-creature="{{tokenUuid}}" title="{{#if isCollapsed}}Expand{{else}}Collapse{{/if}}">
-            <i class="fa-solid {{#if isCollapsed}}fa-chevron-down{{else}}fa-chevron-up{{/if}}"></i>
-          </button>
-        </header>
-
-        {{#unless isCollapsed}}
-          {{#if alreadyHarvested}}
-            <div class="ml-craftworks-harvest-harvest-message ml-craftworks-harvest-locked">
-              <i class="fa-solid fa-lock"></i>
-              This character has already attempted to harvest this creature.
-            </div>
-          {{else if state}}
-            {{#if (eq state.status "pending")}}
-              <div class="ml-craftworks-harvest-harvest-message">
-                <i class="fa-solid fa-spinner fa-spin"></i>
-                Resolving harvest check...
-              </div>
-            {{/if}}
-
-            {{#if (eq state.status "failed")}}
-      <div class="ml-text ml-craftworks-harvest-harvest-message ml-craftworks-failure" data-tone="danger">
-                <i class="fa-solid fa-xmark"></i>
-                Failed with {{state.total}}. No component recovered.
-              </div>
-            {{/if}}
-
-            {{#if (eq state.status "no-results")}}
-      <div class="ml-text ml-craftworks-harvest-harvest-message ml-craftworks-warning" data-tone="warning">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-                The check succeeded, but no compatible component is available.
-              </div>
-            {{/if}}
-
-            {{#if (eq state.status "awaiting-claim")}}
-              <div class="ml-craftworks-harvest-harvest-message ml-craftworks-harvest-mine">
-                <i class="fa-solid fa-check"></i>
-                {{#if state.claimsMade}}
-                  Natural 20 harvest: choose {{state.claimsRemaining}} more highlighted component.
-                {{else if (eq state.claimsAllowed 2)}}
-                  Natural 20! Harvest succeeded with {{state.total}}. Choose two highlighted components.
-                {{else}}
-                  Harvest succeeded with {{state.total}}. Choose one highlighted component.
-                {{/if}}
-              </div>
-            {{/if}}
-
-            {{#if (eq state.status "claimed")}}
-              <div class="ml-craftworks-harvest-harvest-message ml-craftworks-harvest-mine">
-                <i class="fa-solid fa-check-double"></i>
-                {{#if (eq state.claimsMade 2)}}
-                  Natural 20 harvest complete. Claimed two components.
-                {{else}}
-                  Claimed {{state.claimedName}}.
-                {{/if}}
-              </div>
-            {{/if}}
-          {{/if}}
-
-          <div class="ml-craftworks-harvest-components">
-            {{#each displayComponents}}
-              <article class="ml-craftworks-harvest-component {{#if claimable}}ml-craftworks-harvest-component-available{{else}}ml-craftworks-harvest-component-unavailable{{/if}} {{#if neededForCrafting}}ml-craftworks-harvest-component-needed{{/if}}" data-document-uuid="{{itemUuid}}">
-                <div class="ml-craftworks-harvest-component-image">
-                  {{#if img}}
-                    <img src="{{img}}" alt="{{name}}">
-                  {{else}}
-                    <i class="fa-solid fa-flask"></i>
-                  {{/if}}
-                </div>
-
-                <div class="ml-craftworks-harvest-component-body">
-                  <div class="ml-craftworks-harvest-component-name">
-                    {{componentName}}{{#if quantity}} ×{{quantity}}{{/if}}
-                  </div>
-                  <div class="ml-craftworks-harvest-component-category">
-                    {{category}}{{#if rarity}} · {{rarity}}{{/if}}{{#if harvestDc}} · DC {{harvestDc}}{{/if}}{{#if sourceRoll}} · d100 {{sourceRoll}}{{/if}}
-                  </div>
-                  {{#if name}}
-                    <div class="ml-craftworks-harvest-ingredient-name">
-                      <i class="fa-solid fa-arrow-right"></i>{{name}}
-                    </div>
-                  {{/if}}
-
-                  {{#if neededForCrafting}}
-                    <div class="ml-craftworks-harvest-needed-recipes">
-                      <i class="fa-solid fa-hammer"></i>
-                      {{#each visibleRecipes}}
-                        <span class="ml-badge ml-craftworks-harvest-recipe-tag" data-tone="premium" data-truncate title="{{name}} — personal and party inventory / required"><span class="ml-badge__label">{{name}}</span> <span class="ml-badge__value">{{available}}/{{required}}</span></span>
-                      {{/each}}
-                      {{#if hasMoreRecipes}}
-                        <button type="button"
-                                class="ml-craftworks-harvest-recipe-help"
-                                data-action="show-matching-recipes"
-                                data-material="{{materialId}}"
-                                title="Show all {{recipeCount}} matching recipes">
-                          More...
-                        </button>
-                      {{/if}}
-                    </div>
-                  {{/if}}
-                </div>
-
-                <div class="ml-craftworks-harvest-component-action">
-                  {{#if claimed}}
-                    <div class="ml-craftworks-harvest-claim-status {{#if claimedByCurrentUser}}ml-craftworks-harvest-mine{{else}}ml-craftworks-harvest-taken{{/if}}">
-                      <i class="fa-solid {{#if claimedByCurrentUser}}fa-check{{else}}fa-lock{{/if}}"></i>
-                      <span>
-                        {{#if claimedByCurrentUser}}
-                          Claimed by you
-                        {{else}}
-                          Claimed by <strong>{{claimantNames}}</strong>{{#if multipleClaims}} (multiple claims){{/if}}
-                        {{/if}}
-                        {{#if claimRoll}}
-                          · Roll {{claimRoll}}
-                        {{/if}}
-                      </span>
-                    </div>
-                  {{else}}
-                    {{#if hasVisibleClaims}}<div class="ml-craftworks-harvest-claim-status ml-craftworks-harvest-taken"><i class="fa-solid fa-users"></i><span>Also claimed by <strong>{{claimantNames}}</strong></span></div>{{/if}}
-                    <button
-                      type="button"
-                      class="ml-craftworks-harvest-claim"
-                      data-action="claim"
-                      data-creature="{{../tokenUuid}}"
-                      data-material="{{materialId}}"
-                      data-component="{{id}}"
-                      {{#unless claimable}}disabled{{/unless}}
-                    >
-                      <i class="fa-solid fa-hand"></i> Claim
-                    </button>
-                  {{/if}}
-                </div>
-              </article>
-            {{/each}}
-
-            {{#unless displayComponents.length}}
-      <div class="ml-text ml-craftworks-harvest-harvest-message ml-craftworks-warning" data-tone="warning">
-                No compatible Craftworks components are available for this creature.
-              </div>
-            {{/unless}}
-          </div>
-        {{/unless}}
-      </section>
-    {{/each}}
-
+<div class="ml-app ml-app-shell ml-craftworks-harvest-shell" data-ml-responsive>
+  <header class="ml-hero"><i class="fa-solid fa-scalpel ml-hero__icon"></i><div class="ml-hero__body"><h1>Harvesting</h1><p>Choose components from {{session.sceneName}}, one creature at a time.</p></div><div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header>
+  {{#if actor}}<div class="ml-actor-identity"><img class="ml-avatar" src="{{actor.img}}" alt=""><span>{{actor.name}}</span></div>{{else}}<p class="ml-text" data-tone="warning">No harvesting character is available.</p>{{/if}}
+  <main class="ml-grid ml-craftworks-harvest-walkthrough" data-columns="2">
+    <aside class="ml-surface ml-section ml-stack" data-gap="3">
+      <div class="ml-section-heading"><div><h2>Claimed Components</h2><p>{{summary.claimed}} claimed by your character. The GM finalizes awards.</p></div></div>
+      {{#each claimedItems}}
+        <article class="ml-card ml-item-row" data-document-uuid="{{linkUuid}}">
+          <img src="{{displayImg}}" alt="">
+          <div class="ml-stack" data-gap="1"><strong>{{displayName}} ×{{quantity}}</strong><small>{{creatureName}} · {{displayRarity}}</small></div>
+          {{#if linkUuid}}<button type="button" class="ml-icon-button" data-action="open-claimed-item" data-uuid="{{linkUuid}}" aria-label="Open {{displayName}}"><i class="fa-solid fa-arrow-up-right-from-square"></i></button>{{/if}}
+        </article>
+      {{else}}<p class="ml-empty-message">No components claimed yet.</p>{{/each}}
+    </aside>
     <section class="ml-surface ml-section ml-stack" data-gap="3">
-      <div class="ml-section-heading"><div><h2>Claimed Components</h2><p>Review the {{summary.claimed}} components claimed during this harvest.</p></div></div>
-
-      {{#if claimedItems.length}}
-        <div class="ml-craftworks-harvest-claimed-list">
-          {{#each claimedItems}}
-            <article class="ml-card ml-craftworks-harvest-claimed-item {{#if neededForCrafting}}ml-craftworks-harvest-claimed-needed{{/if}}" data-document-uuid="{{linkUuid}}">
-              <button
-                type="button"
-                class="ml-craftworks-harvest-claimed-image-link"
-                data-action="open-claimed-item"
-                data-uuid="{{linkUuid}}"
-                {{#unless linkUuid}}disabled{{/unless}}
-                title="{{#if linkUuid}}Open {{displayName}}{{else}}{{displayName}}{{/if}}"
-              >
-                {{#if displayImg}}
-                  <img src="{{displayImg}}" alt="{{displayName}}">
-                {{else}}
-                  <i class="fa-solid fa-flask"></i>
-                {{/if}}
-              </button>
-
-              <div class="ml-craftworks-harvest-claimed-body">
-                <div class="ml-craftworks-harvest-claimed-name">
-                  {{displayName}}{{#if quantity}} ×{{quantity}}{{/if}}
-                  {{#if neededForCrafting}}
-                    <span class="ml-craftworks-harvest-needed-inline">
-                      <i class="fa-solid fa-hammer"></i>
-                      {{#each visibleRecipes}}
-                        <span class="ml-badge ml-craftworks-harvest-recipe-tag" data-tone="premium" data-truncate title="{{name}} — personal and party inventory / required"><span class="ml-badge__label">{{name}}</span> <span class="ml-badge__value">{{available}}/{{required}}</span></span>
-                      {{/each}}
-                      {{#if hasMoreRecipes}}
-                        <button type="button"
-                                class="ml-craftworks-harvest-recipe-help"
-                                data-action="show-matching-recipes"
-                                data-material="{{materialId}}"
-                                title="Show all {{recipeCount}} matching recipes">
-                          More...
-                        </button>
-                      {{/if}}
-                    </span>
-                  {{/if}}
-                </div>
-                <div class="ml-craftworks-harvest-claimed-meta">
-                  <span class="ml-craftworks-harvest-claimed-rarity">{{displayRarity}}</span>
-                  <span>{{creatureName}}</span>
-                  <span>Claimed by {{displayClaimant}}</span>
-                </div>
-              </div>
-
-              <div class="ml-craftworks-harvest-claimed-roll">
-                <span>Harvest Roll</span>
-                <strong>{{displayRoll}}</strong>
-              </div>
-            </article>
-          {{/each}}
-        </div>
+      {{#if completed}}
+        <div class="ml-empty-state"><i class="fa-solid fa-circle-check"></i><h2>Harvesting Completed</h2><p>The GM has been notified. Your claimed components remain reserved.</p></div>
       {{else}}
-        <div class="ml-craftworks-harvest-claimed-empty">
-          No components have been claimed yet.
-        </div>
+        {{#with currentCreature}}
+          <div class="ml-section-heading"><div><h2>Creature {{@root.creatureNumber}} of {{@root.summary.creatures}}</h2><p>Resolve this creature, claim components, then continue.</p></div></div>
+          <header class="ml-card ml-item-row" data-creature-token="{{tokenUuid}}">
+            {{#if img}}<img src="{{img}}" alt="">{{/if}}
+            <div class="ml-stack" data-gap="1"><h3>{{name}}</h3><small>{{creatureType}} · CR {{cr}}{{#if rarity}} · {{rarity}}{{/if}}{{#unless (eq harvestMode "drakkenheim")}} · Harvest DC {{dc}}{{/unless}}</small></div>
+            {{#if (eq harvestMode "drakkenheim")}}<span class="ml-badge" data-tone="info">Drakkenheim</span>{{/if}}
+          </header>
+          {{#if requiresSkillCheck}}
+            <section class="ml-card ml-stack" data-gap="2">
+              <strong>Harvest Skill Check</strong><p class="notes">Roll once for this creature. A successful check reveals claimable components.</p>
+              <div class="ml-grid" data-columns="2">
+                <select data-action="select-harvest-skill" aria-label="Harvest skill"><option value="">Choose skill...</option>{{#each @root.skills}}<option value="{{id}}" data-skill-label="{{label}} {{modifierLabel}}" {{#if selected}}selected{{/if}}>{{label}} ({{modifierLabel}})</option>{{/each}}</select>
+                <button type="button" data-action="roll-harvest-checks" data-available-count="1" {{#unless @root.canRollHarvestChecks}}disabled{{/unless}}><i class="fa-solid fa-dice-d20"></i> <span data-roll-skill-label>Roll Harvest Check</span></button>
+              </div>
+            </section>
+          {{/if}}
+          {{#if (eq state.status "previously-harvested")}}<p class="ml-text" data-tone="warning">This character has already attempted to harvest this creature.</p>{{/if}}
+          {{#if (eq state.status "failed")}}<p class="ml-text" data-tone="danger">Failed with {{state.total}}. No component recovered.</p>{{/if}}
+          {{#if (eq state.status "no-results")}}<p class="ml-text" data-tone="warning">No compatible component is available.</p>{{/if}}
+          {{#if (eq state.status "awaiting-claim")}}
+            <p class="ml-text" data-tone="success">{{#if (eq state.claimsAllowed 2)}}Natural 20! Choose {{state.claimsRemaining}} more component(s).{{else}}{{#if state.total includeZero=true}}Harvest succeeded with {{state.total}}.{{else}}Skill check skipped.{{/if}} Choose one component.{{/if}}</p>
+          {{/if}}
+          {{#if (eq state.status "claimed")}}<p class="ml-text" data-tone="success">Claimed {{state.claimedName}}.{{#if (eq state.claimsMade 2)}} Two components claimed.{{/if}}</p>{{/if}}
+          <div class="ml-stack" data-gap="2">
+            {{#each displayComponents}}
+              <article class="ml-card ml-item-row" data-document-uuid="{{itemUuid}}">
+                {{#if img}}<img src="{{img}}" alt="">{{/if}}
+                <div class="ml-stack" data-gap="1">
+                  <strong>{{componentName}}{{#if quantity}} ×{{quantity}}{{/if}}</strong><small>{{category}}{{#if rarity}} · {{rarity}}{{/if}}{{#if harvestDc}} · DC {{harvestDc}}{{/if}}{{#if sourceRoll}} · d100 {{sourceRoll}}{{/if}}</small>
+                  {{#if neededForCrafting}}<div class="ml-cluster">{{#each visibleRecipes}}<span class="ml-badge" data-tone="premium" title="{{name}} — personal and party inventory / required">{{name}} {{available}}/{{required}}</span>{{/each}}{{#if hasMoreRecipes}}<button type="button" data-action="show-matching-recipes" data-material="{{materialId}}">More recipes...</button>{{/if}}</div>{{/if}}
+                  {{#if hasVisibleClaims}}<small>{{#if claimedByCurrentUser}}Claimed by you{{else}}Claimed by {{claimantNames}}{{/if}}</small>{{/if}}
+                </div>
+                {{#unless claimed}}<button type="button" data-action="claim" data-creature="{{../tokenUuid}}" data-material="{{materialId}}" data-component="{{id}}" {{#unless claimable}}disabled{{/unless}}><i class="fa-solid fa-hand"></i> Claim</button>{{/unless}}
+              </article>
+            {{else}}<p class="ml-empty-message">No compatible Craftworks components are available.</p>{{/each}}
+          </div>
+        {{/with}}
       {{/if}}
     </section>
   </main>
-
   <footer class="ml-page-footer ml-actions">
-    <div class="ml-craftworks-harvest-footer-status"><span>{{summary.completed}} of {{summary.creatures}} creature attempts resolved</span></div>
+    <span>{{#if completed}}Harvesting Completed{{else}}Creature {{creatureNumber}} of {{summary.creatures}}{{/if}}</span>
     <div class="ml-actions">
-      <button type="button" data-action="cancel-claims"><i class="fa-solid fa-ban"></i> Cancel</button>
-      <button type="button" data-action="reset-claims"><i class="fa-solid fa-rotate-left"></i> Reset</button>
-      <button type="button" data-action="done-claims"><i class="fa-solid fa-check"></i> Done</button>
+      {{#if completed}}<button type="button" data-action="close">Close</button>
+      {{else if isLastCreature}}<button type="button" data-action="done-creature"><i class="fa-solid fa-check"></i> Done</button>
+      {{else}}<button type="button" data-action="skip-creature">Skip Remaining</button><button type="button" data-action="next-creature" {{#unless canAdvance}}disabled{{/unless}}>Next <i class="fa-solid fa-arrow-right"></i></button>{{/if}}
     </div>
   </footer>
 </div>

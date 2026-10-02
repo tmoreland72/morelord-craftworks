@@ -811,6 +811,20 @@ Hooks.once("ready", async () => {
     }
   });
 
+  socket.on("harvest.advance", async (data, payload) => {
+    if (!game.user.isGM) return;
+    const sender = game.users.get(payload.senderUserId);
+    const actor = await fromUuid(data.actorUuid);
+    if (!sender || (!sender.isGM && (sender.id !== data.userId || !actor?.testUserPermission(sender, "OWNER")))) {
+      throw new Error("You cannot complete another character's Harvest.");
+    }
+    const session = harvest.advance(data);
+    await socket.emit("harvest.session", { session });
+    for (const app of playerHarvestApps.values()) if (app.session?.id === session.id) await app.setSession(session, { preserveFocus: true });
+    await gmHarvestApp?.setSession(session);
+    return { completed: (session.completedParticipantIds ?? []).includes(data.actorUuid) };
+  });
+
   socket.on("harvest.release-claims", async ({ sessionId, userId, actorUuid }) => {
     if (!game.user.isGM) return;
     const session = await harvest.releaseClaims(sessionId, userId, actorUuid);

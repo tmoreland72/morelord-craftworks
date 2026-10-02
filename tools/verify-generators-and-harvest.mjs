@@ -4,6 +4,8 @@ const playwright = process.env.MORELORD_PLAYWRIGHT || "C:/Users/troy/.cache/code
 const { chromium } = await import(pathToFileURL(playwright).href);
 const browser = await chromium.launch({ headless: true });
 const folder = "test/in-game-reports";
+const harvestOnly = process.argv.includes("--harvest-only");
+const stamp = harvestOnly ? new Date().toISOString().slice(0, 10) : "2026-09-24";
 await fs.mkdir(folder, { recursive: true });
 try {
   const page = await browser.newPage({ viewport: { width: 1500, height: 1100 } });
@@ -33,12 +35,12 @@ try {
     }
     if ((await page.evaluate(() => game.world.id)).toLowerCase() !== "dev1") throw new Error("World identity changed; tests skipped.");
     await page.exposeFunction("captureCraftworks", async (name, id) => {
-      await page.locator(`[id="${id}"]`).screenshot({ path: `${folder}/2026-09-24-${name}.png` });
+      await page.locator(`[id="${id}"]`).screenshot({ path: `${folder}/${stamp}-${name}.png` });
     });
     const visualOnly = process.argv.includes("--visual-only");
     const generatorsOnly = process.argv.includes("--generators-only");
     if (visualOnly) await page.setViewportSize({ width: 1600, height: 1900 });
-    const report = await page.evaluate(async ({ visualOnly, generatorsOnly }) => {
+    const report = await page.evaluate(async ({ visualOnly, generatorsOnly, harvestOnly }) => {
       if (visualOnly) {
         const { SpellScrollGeneratorApp } = await import("./modules/morelord-craftworks/scripts/ui/spell-scroll-generator-app.mjs");
         const { MagicItemGeneratorApp } = await import("./modules/morelord-craftworks/scripts/ui/magic-item-generator-app.mjs");
@@ -79,6 +81,12 @@ try {
           await new Promise(resolve => setTimeout(resolve, 150));
           const content = app.element.querySelector('.window-content');
           if (content.scrollWidth > content.clientWidth + 1) throw new Error(`${name} overflows at ${width}px.`);
+          const walkthrough = app.element.querySelector('.ml-craftworks-harvest-walkthrough');
+          if (walkthrough) {
+            const [ledger, creature] = [...walkthrough.children].map(element => element.getBoundingClientRect());
+            if (width === 460 && Math.abs(ledger.left - creature.left) > 1) throw new Error("Narrow Harvest panels must stack.");
+            if (width === 820 && creature.width <= ledger.width) throw new Error("The current-creature panel must be wider than the claim ledger.");
+          }
           await window.captureCraftworks(`${name}-${width}`, app.id);
           const lastInput = [...app.element.querySelectorAll('input,select')].at(-1);
           if (lastInput && width === 460) {
@@ -87,9 +95,9 @@ try {
             await window.captureCraftworks(`${name}-${width}-controls`, app.id);
           }
         }
-      } }).filter(check => !generatorsOnly || !check.id.includes("harvest")) });
-    }, { visualOnly, generatorsOnly });
-    await fs.writeFile(`${folder}/2026-09-24-${visualOnly ? "generator-visuals" : generatorsOnly ? "generator-controls" : "generators-and-harvest"}.json`, JSON.stringify(report, null, 2));
+      } }).filter(check => (!generatorsOnly || !check.id.includes("harvest")) && (!harvestOnly || check.id.includes("harvest"))) });
+    }, { visualOnly, generatorsOnly, harvestOnly });
+    await fs.writeFile(`${folder}/${stamp}-${visualOnly ? "generator-visuals" : generatorsOnly ? "generator-controls" : harvestOnly ? "harvest-skip" : "generators-and-harvest"}.json`, JSON.stringify(report, null, 2));
     console.log(JSON.stringify(report));
     if (!report.ok) process.exitCode = 1;
   }

@@ -95,59 +95,98 @@ export function generatorAndHarvestChecks({ capture = async () => {} } = {}) {
       }
     }
   }, {
-    id: "craftworks.one-harvest-roll-per-session",
+    id: "craftworks.harvest-creature-walkthrough",
     async run() {
       assert(game.user.isGM, "GM required for disposable Harvest fixtures.");
       const material = api.materials.all()[0];
       assert(material, "An indexed material is required.");
-      let actor, scene, app, session;
+      let actor, other, scene, app, gmApp, session;
       const messages = new Set(game.messages.map(message => message.id));
       const originalRoll = api.adapter.rollSkill;
       let rolls = 0;
       try {
-        actor = await Actor.create({ name: "Craftworks single-roll regression", type: "character" });
-        scene = await Scene.create({ name: "Craftworks single-roll regression", active: false });
+        actor = await Actor.create({ name: "Harvest walkthrough regression", type: "character" });
+        other = await Actor.create({ name: "Harvest skip regression", type: "character" });
+        scene = await Scene.create({ name: "Harvest walkthrough regression", active: false });
         const tokens = await scene.createEmbeddedDocuments("Token", [
-          { name: "Harvest Success", x: 0, y: 0 }, { name: "Harvest Failure", x: 100, y: 0 }
+          { name: "Harvest Success", x: 0, y: 0 }, { name: "Harvest Failure", x: 100, y: 0 }, { name: "Drakkenheim Parts", x: 200, y: 0 }
         ]);
         const creatures = tokens.map((token, index) => ({ tokenUuid: token.uuid, name: token.name,
-          dc: index ? 1000 : -1000, harvestMode: "drakkenheim", cr: 1,
-          components: [{ id: `${token.id}-material`, materialId: material.materialId, name: material.name, componentName: material.name, matched: true }] }));
-        session = await api.harvest.start({ creatureContexts: creatures, harvestActorsByUser: { [game.user.id]: [actor.uuid] },
-          skipSkillChecks: [{ userId: game.user.id, actorUuid: actor.uuid }] });
-        assert(!Object.keys(session.participants).length, "Legacy skip input must not grant automatic success.");
+          dc: index ? 1000 : -1000, harvestMode: index === 2 ? "drakkenheim" : "kibbles", cr: 1,
+          components: [{ id: token.id + "-material", materialId: material.materialId, name: material.name,
+            componentName: material.name, quantity: 2, matched: true }] }));
+        session = await api.harvest.start({ creatureContexts: creatures, harvestActorsByUser: { [game.user.id]: [actor.uuid, other.uuid] } });
+        assert(session.rollMode === "creature", "New sessions must use per-creature rolls.");
+        gmApp = await api.openHarvest();
+        await gmApp.setSession(session);
         api.adapter.rollSkill = async (who, skill, options) => {
           rolls++;
           return originalRoll.call(api.adapter, who, skill, { ...options, configure: false });
         };
-        await api.socket.emit("harvest.open", { session, actorUuid: actor.uuid }, { targetUserId: game.user.id });
-        app = foundry.applications.instances.get(`morelord-craftworks-harvest-player-${actor.id}`);
-        assert(app instanceof HarvestPlayerApp, "Real Harvest window must open through its socket route.");
-        const select = app.element.querySelector('[data-action="select-harvest-skill"]');
-        select.value = "nat"; select.dispatchEvent(new Event("change"));
-        await capture(app, "harvest-before");
-        app.element.querySelector('[data-action="roll-harvest-checks"]').click();
-        await until(() => !app.rolling && Object.keys(session.participants).length === 2, "Harvest did not resolve both creatures.");
-        assert(rolls === 1, "The player must roll exactly once for the entire session.");
-        const states = Object.values(session.participants);
-        assert(states[0].total === states[1].total, "Every creature must use the same roll total.");
-        assert(states[0].status === "awaiting-claim" && states[1].status === "failed", "The shared total must be compared against each creature DC.");
-        const snapshot = JSON.stringify(session.participants);
-        await api.socket.executeAsGm("harvest.batch-attempt", { sessionId: session.id, userId: game.user.id, actorUuid: actor.uuid, skillId: "nat", total: 9999, naturalD20: 20 }, { gmUserId: game.user.id });
-        assert(JSON.stringify(session.participants) === snapshot, "Repeated submissions must not replace resolved outcomes.");
-        await capture(app, "harvest-after");
-        await app.close();
-        await api.socket.emit("harvest.open", { session, actorUuid: actor.uuid }, { targetUserId: game.user.id });
-        app = foundry.applications.instances.get(`morelord-craftworks-harvest-player-${actor.id}`);
-        assert(app.element.querySelector('[data-action="roll-harvest-checks"]').disabled, "Reopening must not allow another roll.");
-        assert(session.participants[harvestParticipantKey(actor.uuid, tokens[0].uuid)].total === session.harvestRolls[actor.uuid].total, "Authoritative roll must remain available on reopen.");
+        const open = async who => {
+          await api.socket.emit("harvest.open", { session, actorUuid: who.uuid }, { targetUserId: game.user.id });
+          app = foundry.applications.instances.get("morelord-craftworks-harvest-player-" + who.id);
+          assert(app instanceof HarvestPlayerApp, "Character window must open through its real socket route.");
+        };
+        const roll = async who => {
+          const index = session.participantProgress[who.uuid] ?? 0;
+          const select = app.element.querySelector('[data-action="select-harvest-skill"]');
+          select.value = "nat"; select.dispatchEvent(new Event("change"));
+          app.element.querySelector('[data-action="roll-harvest-checks"]').click();
+          await until(() => !app.rolling && api.harvest.getParticipant(session.id, who.uuid, tokens[index].uuid), "Creature roll did not resolve.");
+        };
+        const claim = async who => {
+          app.element.querySelector('[data-action="claim"]:not(:disabled)').click();
+          await until(() => session.results.some(result => result.actorUuid === who.uuid), "Claim did not reach the GM.");
+          await until(() => app.element.querySelector('[data-action="next-creature"]:not(:disabled)') || app.element.querySelector('[data-action="done-creature"]'), "Claim controls did not update.");
+        };
+        const next = async index => {
+          app.element.querySelector('[data-action="next-creature"]').click();
+          await until(() => !app.navigating && session.participantProgress[actor.uuid] === index, "Next did not persist the page position.");
+        };
+        await open(actor);
+        assert(app.element.querySelectorAll('[data-creature-token]').length === 1, "Only one creature must be displayed.");
+        assert(app.element.querySelector('[data-action="next-creature"]').disabled, "Next must wait for this creature's check and claims.");
+        assert(!app.element.querySelector('[data-action="done-creature"]'), "Done belongs on the final creature.");
+        await capture(app, "harvest-walkthrough-before");
+        await roll(actor); await claim(actor);
+        assert(rolls === 1 && session.results[0].quantity === 2, "The first page must roll once and preserve component quantity.");
+        assert(!(session.completedParticipantIds ?? []).includes(actor.uuid), "Claims alone must not mark the player completed.");
+        await next(1); await app.close(); await open(actor);
+        assert(app.element.querySelector('[data-creature-token]').dataset.creatureToken === tokens[1].uuid, "Reopening must restore the current creature.");
+        assert(app.element.querySelector('aside').textContent.includes(material.name), "The left panel must retain this character's claims.");
+        await roll(actor);
+        assert(rolls === 2 && api.harvest.getParticipant(session.id, actor.uuid, tokens[1].uuid).status === "failed", "The second non-Drakkenheim creature must get its own roll.");
+        await next(2);
+        assert(!app.element.querySelector('[data-action="roll-harvest-checks"]'), "Drakkenheim must open directly to claims.");
+        assert(!app.element.querySelector('[data-action="next-creature"], [data-action="skip-creature"]'), "The final page must have only Done navigation.");
+        assert(app.element.querySelector('[data-action="claim"]:not(:disabled)'), "Drakkenheim components must be immediately claimable.");
+        await capture(app, "harvest-walkthrough-final");
+        app.element.querySelector('[data-action="done-creature"]').click();
+        await until(() => !app.rendered && session.completedParticipantIds?.includes(actor.uuid), "Done did not tell the GM this player is completed.");
+        assert(gmApp.element.querySelector('.ml-craftworks-harvest-player-progress-row').textContent.includes("Harvesting Completed"), "The GM progress row must show completion.");
+        assert(session.results.length === 1 && !actor.items.size, "Done must retain reservations without awarding inventory.");
+        await open(actor);
+        assert(app.element.textContent.includes("Harvesting Completed") && !app.element.querySelector('[data-action="claim"]'), "Completed players cannot claim again after reopening.");
+        await app.close(); await open(other);
+        assert(!app.element.querySelector('aside').textContent.includes(material.name), "One user's character windows must keep their ledgers separate.");
+        await roll(other); await claim(other);
+        app.element.querySelector('[data-action="skip-creature"]').click();
+        await until(() => !app.rendered && session.completedParticipantIds?.includes(other.uuid), "Skip Remaining did not tell the GM this player is completed.");
+        assert(session.results.length === 2, "Skip Remaining must preserve existing claims.");
+        const count = session.completedParticipantIds.length;
+        await api.socket.executeAsGm("harvest.advance", { sessionId: session.id, userId: game.user.id, actorUuid: other.uuid,
+          creatureTokenUuid: tokens[0].uuid, action: "skip" }, { gmUserId: game.user.id });
+        assert(session.completedParticipantIds.length === count, "Repeated completion must be idempotent.");
+        await open(other);
+        assert(!app.element.querySelector('[data-action="roll-harvest-checks"]'), "Skipped characters must stay completed after reopening.");
+        await capture(app, "harvest-walkthrough-completed");
       } finally {
         api.adapter.rollSkill = originalRoll;
-        await app?.close();
+        await app?.close(); await gmApp?.close();
         if (session) api.sessions.delete(session.id);
-        for (const message of game.messages.filter(message => !messages.has(message.id) && message.speaker?.actor === actor?.id)) await message.delete();
-        await scene?.delete();
-        await actor?.delete();
+        for (const message of game.messages.filter(message => !messages.has(message.id) && [actor?.id, other?.id].includes(message.speaker?.actor))) await message.delete();
+        await scene?.delete(); await other?.delete(); await actor?.delete();
       }
     }
   }];

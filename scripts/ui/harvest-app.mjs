@@ -22,6 +22,7 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
     this.preflightCreatures = null;
     this.selectedPreflightCreatureUuids = new Set();
     this.selectedCharacterUuids = null;
+    this.skipSkillChecks = false;
   }
 
   static DEFAULT_OPTIONS = {
@@ -269,6 +270,7 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
       claimedItems,
       deadCreatures,
       playerCharacters,
+      skipSkillChecks: this.skipSkillChecks,
       hasSpecialHarvestItems:
         deadCreatures.some(
           creature =>
@@ -283,6 +285,9 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
 
     this.element.querySelector("[data-action='start']")
       ?.addEventListener("click", () => this.#startHarvest());
+
+    this.element.querySelector("[name='skipSkillChecks']")
+      ?.addEventListener("change", event => { this.skipSkillChecks = event.currentTarget.checked; });
 
     this.element.querySelector("[data-action='finalize']")
       ?.addEventListener("click", () => this.#finalizeHarvest());
@@ -443,7 +448,8 @@ export class HarvestPrototypeApp extends ScrollPreservingApplicationMixin(
       this.session =
         await this.craftworks.harvest.start({
           creatureContexts,
-          harvestActorsByUser
+          harvestActorsByUser,
+          skipSkillChecks: this.skipSkillChecks
         });
 
       await game.settings.set(

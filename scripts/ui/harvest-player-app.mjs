@@ -35,6 +35,8 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
     // Hydrate authoritative results when reopening an existing session.
     this.harvestRoll = session.harvestRolls?.[actorUuid] ?? null;
     this.rolling = false;
+    this.pendingCreatureRolls = {};
+    this.navigating = false;
     for (const creature of session?.creatures ?? []) {
       const state =
         session.participants?.[
@@ -205,7 +207,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
         (this.session.results ?? [])
           .filter(result =>
             result.creatureTokenUuid === creature.tokenUuid
-            && result.userId === this.participantUserId
+            && result.actorUuid === this.actorUuid
           )
           .map(result => [result.componentId, result])
       );
@@ -253,7 +255,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
             claimed:
               Boolean(globalClaim),
             claimedByCurrentUser:
-              globalClaim?.userId === this.participantUserId,
+              globalClaim?.actorUuid === this.actorUuid,
             claimantName:
               globalClaim?.actorName
               ?? globalClaim?.userName
@@ -283,11 +285,10 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
       });
     }
 
-    const availableSkillCheckCount =
-      creatures.filter(
-        creature =>
-          creature.requiresSkillCheck
-      ).length;
+    const currentIndex = this.session.participantProgress?.[this.actorUuid] ?? 0;
+    const currentCreature = creatures[currentIndex] ?? null;
+    const completed = (this.session.completedParticipantIds ?? []).includes(this.actorUuid);
+    const availableSkillCheckCount = !completed && currentCreature?.requiresSkillCheck ? 1 : 0;
 
     const skillOptions =
       this.craftworks.harvest
@@ -319,7 +320,15 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
         && availableSkillCheckCount > 0 && !this.rolling
       ),
       creatures,
+      currentCreature,
+      creatureNumber: currentIndex + 1,
+      isLastCreature: currentIndex >= creatures.length - 1,
+      completed,
+      canAdvance: !this.rolling && !this.navigating && Boolean(currentCreature?.state?.status)
+        && currentCreature?.state?.status !== "pending"
+        && (currentCreature?.state?.status !== "awaiting-claim" || currentCreature.state.claimsMade > 0 || !currentCreature.displayComponents.some(component => component.claimable)),
       claimedItems: (this.session.results ?? [])
+        .filter(result => result.actorUuid === this.actorUuid)
         .map(result => {
           const material =
             this.craftworks.materials.get(result.materialId)
@@ -369,7 +378,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
         creatures: creatures.length,
         completed: creatures.filter(c => c.alreadyHarvested || c.state?.status === "claimed" || c.state?.status === "failed").length,
         drakkenheim: creatures.filter(c => c.harvestMode === "drakkenheim").length,
-        claimed: (this.session.results ?? []).length
+        claimed: (this.session.results ?? []).filter(result => result.actorUuid === this.actorUuid).length
       }
     }, { inplace: false });
   }
@@ -477,8 +486,25 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
       }));
     this.element.querySelector("[data-action='cancel-claims']")?.addEventListener("click", () => this.#releaseClaims({ close: true }));
     this.element.querySelector("[data-action='reset-claims']")?.addEventListener("click", () => this.#releaseClaims({ reset: true }));
-    this.element.querySelector("[data-action='done-claims']")?.addEventListener("click", () => this.close());
+    for (const action of ["next", "skip", "done"]) {
+      this.element.querySelector(`[data-action='${action}-creature']`)
+        ?.addEventListener("click", () => this.#advance(action));
+    }
 
+  }
+
+  async #advance(action) {
+    if (this.navigating || this.rolling) return;
+    this.navigating = true;
+    try {
+      const index = this.session.participantProgress?.[this.actorUuid] ?? 0;
+      const result = await this.#sendToGm("harvest.advance", {
+        sessionId: this.session.id, userId: this.participantUserId, actorUuid: this.actorUuid,
+        creatureTokenUuid: this.session.creatures[index]?.tokenUuid, action
+      });
+      if (action !== "next" && result?.completed) await this.close();
+    } catch (error) { ui.notifications.error(error.message); }
+    finally { this.navigating = false; if (this.rendered) await this.render(); }
   }
 
   async #releaseClaims({ close = false, reset = false } = {}) {
@@ -617,6 +643,22 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
     this.rolling = true;
     button.disabled = true;
     try {
+      if (this.session.rollMode === "creature") {
+        const index = this.session.participantProgress?.[actor.uuid] ?? 0;
+        const creature = this.session.creatures[index];
+        if (!creature || this.states[creature.tokenUuid]?.status) return;
+        let roll = this.pendingCreatureRolls[creature.tokenUuid];
+        if (!roll) {
+          roll = await this.craftworks.adapter.rollSkill(actor, skillId, { flavor: `Harvest — ${creature.name}`, configure: true });
+          if (!roll || roll.cancelled) return;
+          this.pendingCreatureRolls[creature.tokenUuid] = { skillId, total: roll.total, naturalD20: roll.naturalD20 };
+        }
+        await this.#sendToGm("harvest.attempt", {
+          sessionId: this.session.id, userId: this.participantUserId, actorUuid: actor.uuid,
+          creatureTokenUuid: creature.tokenUuid, ...this.pendingCreatureRolls[creature.tokenUuid]
+        });
+        return;
+      }
       const creatures = [];
       for (const creature of this.session.creatures ?? []) {
         if (this.states[creature.tokenUuid]?.status) continue;
@@ -661,13 +703,14 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
     const button = event.currentTarget;
     button.disabled = true;
 
-    await this.#sendToGm("harvest.claim", {
+    try { await this.#sendToGm("harvest.claim", {
       sessionId: this.session.id,
       creatureTokenUuid: button.dataset.creature,
       userId: this.participantUserId,
       actorUuid: this.actorUuid,
       materialId: button.dataset.material,
       componentId: button.dataset.component || null
-    });
+    }); } catch (error) { ui.notifications.error(error.message); }
+    finally { if (this.rendered) await this.render(); }
   }
 }

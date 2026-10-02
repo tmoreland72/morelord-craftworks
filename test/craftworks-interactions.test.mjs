@@ -234,3 +234,30 @@ test("recipe browsing snapshots materials once and uses indexed outputs without 
     assert.deepEqual(errors, ["Disconnected"]);
   } finally { ui.notifications.error = originalError; }
 });
+
+
+test("walkthrough retries only the current creature without rerolling and sends explicit completion to the GM", async () => {
+  setup();
+  let rolls = 0, sends = 0;
+  const errors = [], originalError = ui.notifications.error;
+  ui.notifications.error = message => errors.push(message);
+  try {
+    const session = { id: "walkthrough", rollMode: "creature", creatures: [1, 2].map(n => ({ tokenUuid: "Token." + n, name: "Creature " + n })), harvestActorsByUser: { gm: ["Actor.offline"] }, participantProgress: {} };
+    let closed = 0;
+    const app = new HarvestPlayerApp({ adapter: { rollSkill: async () => { rolls++; return { total: 18, naturalD20: 16 }; } },
+      socket: { executeAsGm: async (type, data) => {
+        if (type === "harvest.attempt") { sends++; assert.equal(data.creatureTokenUuid, "Token.1"); if (sends === 1) throw Error("Disconnected"); }
+        else { assert.equal(type, "harvest.advance"); assert.equal(data.action, "skip"); assert.equal(data.userId, "gm"); return { completed: true }; }
+      } }
+    }, session, "Actor.offline");
+    app.selectedHarvestSkill = "sur";
+    const click = bind(app, "[data-action='roll-harvest-checks']", {});
+    await Promise.all([click(), click()]);
+    await click();
+    assert.equal(rolls, 1); assert.equal(sends, 2); assert.deepEqual(errors, ["Disconnected"]);
+    const skip = bind(app, "[data-action='skip-creature']", {});
+    app.close = async () => { closed++; };
+    await Promise.all([skip(), skip()]);
+    assert.equal(closed, 1);
+  } finally { ui.notifications.error = originalError; }
+});

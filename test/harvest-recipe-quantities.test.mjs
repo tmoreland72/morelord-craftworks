@@ -18,7 +18,7 @@ test('harvest recipe quantities combine personal and member-party stock, refresh
     { id: 'scroll', requirementGroups: [{ requirements: [{ quantity: 1, match: { itemType: 'spellScroll' } }] }] }
   ];
   const api = { markedRecipes: { list: () => recipes.map(r => r.id) }, recipes: { get: id => recipes.find(r => r.id === id) }, materials: { get: () => ({materialId:'bone'}) }, harvest: {getSkillOptions:()=>[]} };
-  const session = { creatures: [{ tokenUuid:'fixture', components:[{id:'bone',matched:true,materialId:'bone'}] }], results:[{materialId:'bone'}] };
+  const session = { creatures: [{ tokenUuid:'fixture', components:[{id:'bone',matched:true,materialId:'bone'}] }], results:[{materialId:'bone', actorUuid: actor.uuid}] };
   const app = new HarvestPlayerApp(api, session, actor.uuid);
   const context = await app._prepareContext({});
   const rows = context.creatures[0].displayComponents[0].matchingRecipes;

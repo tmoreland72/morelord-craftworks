@@ -234,11 +234,11 @@ At least one defeated NPC and one player character must be selected. Each select
 
 ### Monitor checks and claims
 
-A player chooses one Harvest skill and uses **Roll Harvest Check** once for the entire session. The same total is compared against each unresolved creature’s DC. Success exposes component choices; failure consumes that character’s attempt for that creature. Reopening or resending the request reuses the recorded roll. Checks cannot be skipped; the optional natural-20 double-component bonus still applies.
+Each character sees one creature at a time in the larger right panel and their own reserved components in the left panel. Non-Drakkenheim creatures require one **Roll Harvest Check** each. Success exposes component choices; failure consumes that character’s attempt for that creature. Drakkenheim creatures open directly to component choices without a skill check. Reopening restores the current creature and its recorded outcomes; retrying delivery does not reroll. Before starting, the GM can enable **Skip Skill Checks** in the Skill Checks section to send all included characters directly to component choices, including Drakkenheim harvesting. Skipping does not grant a natural-20 bonus or reset previous attempts. When checks are enabled, the optional natural-20 double-component bonus still applies.
 
-A claim reserves a component but does not add it to inventory. All open Harvest windows synchronize reservations, claimants, source creatures, and roll results. Other players cannot reserve the same component.
+A claim reserves a component but does not add it to inventory. Open Harvest windows synchronize reservations and claimants. Drakkenheim parts are exclusive; standard components can be harvested independently by each character.
 
-Claiming does not automatically collapse the creature. The stable expanded list reduces disruptive window movement during large harvests; players can still collapse entries manually.
+**Next** replaces the current creature after its check and available claims are resolved. **Skip Remaining** ends the character’s remaining opportunities; on the last creature, **Done** is the only navigation button and can also finish without taking a remaining claim. Both finish actions mark that character **Harvesting Completed** in the GM’s progress view and close their window. Existing claims remain reserved for **Finalize Harvest**. Reopening a completed character shows their claim ledger without further checks or claims.
 
 ![The GM view tracks every participant's checks, outcomes, and component claims in real time.](assets/harvest-gm-results.png)
 
@@ -447,7 +447,7 @@ With the Drakkenheim content pack enabled and access available, Craftworks first
 
 Some creatures also include an **Items:** entry or special handling rule. Craftworks presents it as **Special Harvest Items / Instructions**. This information is intentionally GM-facing and informational: it calls attention to exceptional treasure or procedures outside the ordinary material reservation workflow.
 
-Players still use the normal Harvest experience—roll once for the session against each creature’s DC, reserve an available component, and wait for the GM to finalize the awards. The content is richer, but the workflow remains consistent.
+Players work through one creature at a time, reserve available components, and select Next, Skip Remaining, or Done. Drakkenheim creatures require no Harvest skill check. Claimed components stay reserved until the GM finalizes awards.
 
 ### Graceful fallback
 

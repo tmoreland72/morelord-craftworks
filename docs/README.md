@@ -2,7 +2,7 @@
 title: Morelord Craftworks Documentation
 slug: morelord-craftworks
 product: morelord-craftworks
-version: 0.4.15
+version: 0.4.16
 ---
 
 # Morelord Craftworks Documentation
@@ -44,4 +44,4 @@ These manuals describe Morelord Craftworks 0.4.9 for Foundry Virtual Tabletop v1
 
 Page sections use Morelord Core bordered, shaded surfaces with shared padding, section headings, and spacing, matching Downtime. Older screenshots illustrate the workflows but may show the previous panel styling or omit the new add/remove controls. Refer to the manual text for current controls.
 
-Version 0.4.15 adds the Premium Magic Item Generator and spell-scroll quantities by rarity. Harvesting uses one character roll across the session. Requires Morelord Core 0.3.15 or later.
+Version 0.4.16 adds a Harvest walkthrough showing one creature at a time beside a personal claim ledger. Non-Drakkenheim creatures use individual checks, while Drakkenheim and GM-skipped checks open directly to claims. Next advances; Skip Remaining and Done notify the GM of character completion. Requires Morelord Core 0.4.0 or later.
