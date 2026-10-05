@@ -476,7 +476,7 @@ Project-specific release settings are stored in `release.config.json`. Local web
 RELEASE_PUBLISH_TOKEN=your-token-here
 ```
 
-Release notes use the standard filename format `RELEASE-NOTES-0.1.0.md`.
+Release notes use the standard filename format `release-notes/RELEASE-NOTES-0.1.0.md`.
 
 Validate a release without modifying GitHub or the website:
 
@@ -536,3 +536,5 @@ After every selected character rolls or declines, Craftworks posts a new GM-only
 Completed searches saved before this fix are recovered by their coordinating GM on reload: missing completion cards are posted from the saved results, without rerolling or awarding items. Search summaries use Foundry 14’s `gm` message mode; the older `gmroll` value is a legacy roll-mode name and is not a valid message-mode name.
 
 This release requires Morelord Core 0.4.0 or newer for shared roll requests, outcome scheduling, and consistent UI.
+
+Release history lives in `release-notes/`; Foundry links to the GitHub Releases page through the manifest `changelog` URL. Use the module-local `/tmp/` directory for working files; it is ignored by Git and excluded from release packages.
