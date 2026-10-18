@@ -1,3 +1,4 @@
+import { registerDrakkenheimSourceCacheHooks, clearDrakkenheimSourceCache, getDrakkenheimHarvestableMaterialIds } from "./materials/drakkenheim-source-index.mjs";
 import { getCraftworksDiagnostics } from "./core/diagnostics.mjs";
 import { initializeDeleriumChatRequests } from "./acquisition/delerium-chat-requests.mjs";
 import { combinedCraftingInventory } from "./crafting/group-membership.mjs";
@@ -639,6 +640,17 @@ Hooks.once("ready", async () => {
   };
 
   CraftworksSettingsApp.craftworks = api;
+
+  registerDrakkenheimSourceCacheHooks(() => {
+    materialBrowserApp?.refreshSourceAvailability();
+    if (game.user.isGM) void socket.emit("materials.sources-invalidated");
+  });
+  socket.on("materials.harvest-availability", () => getDrakkenheimHarvestableMaterialIds(api));
+  socket.on("materials.sources-invalidated", (_data, payload) => {
+    if (!game.users.get(payload?.senderUserId)?.isGM) return;
+    clearDrakkenheimSourceCache();
+    materialBrowserApp?.refreshSourceAvailability();
+  });
 
   socket.on("debug.ping", async ({ message }) => {
     log(`Socket ping received: ${message}`);

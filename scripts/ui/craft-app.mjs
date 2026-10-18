@@ -1,4 +1,5 @@
 import { combinedCraftingInventory } from "../crafting/group-membership.mjs";
+import { materialsMatchingIngredient } from "../recipes/recipe-filters.mjs";
 import { MODULE_TITLE } from "../constants.mjs";
 import { CraftCompletionApp } from "./craft-completion-app.mjs";
 import {
@@ -470,16 +471,17 @@ export class CraftApp
       });
 
     this.element
-      .querySelectorAll("[data-output-document-uuid]")
+      .querySelectorAll("[data-open-recipe-id]")
       .forEach(element => {
         element.addEventListener(
           "click",
           async event => {
-            const document = await fromUuid(
-              event.currentTarget
-                .dataset.outputDocumentUuid
-            );
-            document?.sheet?.render(true);
+            event.preventDefault();
+            event.stopPropagation();
+            await this.craftworks.openRecipes({
+              recipeIds: [event.currentTarget.dataset.openRecipeId],
+              crafterActorUuid: this.crafterActorUuid
+            });
           }
         );
       });
@@ -544,74 +546,7 @@ export class CraftApp
       };
     }
 
-    const requiredTags =
-      (match.tags ?? [])
-        .map(tag =>
-          String(tag).toLowerCase()
-        );
-
-    const matches =
-      this.craftworks.materials
-        .all()
-        .filter(material => {
-          if (
-            match.rarity
-            && String(
-              material.rarity ?? ""
-            ).toLowerCase()
-              !== String(
-                match.rarity
-              ).toLowerCase()
-          ) {
-            return false;
-          }
-
-          if (
-            match.category
-            && String(
-              material.category ?? ""
-            ).toLowerCase()
-              !== String(
-                match.category
-              ).toLowerCase()
-          ) {
-            return false;
-          }
-
-          if (
-            match.stage
-            && String(
-              material.stage ?? ""
-            ).toLowerCase()
-              !== String(
-                match.stage
-              ).toLowerCase()
-          ) {
-            return false;
-          }
-
-          if (requiredTags.length) {
-            const materialTags =
-              new Set(
-                (material.tags ?? [])
-                  .map(tag =>
-                    String(tag)
-                      .toLowerCase()
-                  )
-              );
-
-            if (
-              !requiredTags.every(
-                tag =>
-                  materialTags.has(tag)
-              )
-            ) {
-              return false;
-            }
-          }
-
-          return true;
-        });
+    const matches = materialsMatchingIngredient(match, this.craftworks.materials);
 
     if (!matches.length) {
       return {

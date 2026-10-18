@@ -1,4 +1,5 @@
 import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
+import { materialMatchesIngredient } from "./recipe-filters.mjs";
 import {
   craftingSuccessesRequired,
   isValidCraftingDuration
@@ -175,6 +176,10 @@ export class RecipeRegistry {
     );
   }
 
+  recipesUsingMaterial(materialId) {
+    return this.all().filter(recipe => this.#recipeUsesMaterial(recipe, materialId));
+  }
+
   recipesProducingMaterial(materialId, { includeDisabled = false } = {}) {
     const target = String(materialId ?? "").trim();
     if (!target) return [];
@@ -277,12 +282,14 @@ export class RecipeRegistry {
   }
 
   #recipeUsesMaterial(recipe, materialId) {
+    const material = this.materialRegistry?.get(materialId);
     return (recipe.requirementGroups ?? []).some(group =>
       (group.requirements ?? []).some(requirement => {
         if (requirement.match?.materialId === materialId) return true;
+        if (materialMatchesIngredient(requirement.match, material)) return true;
 
         return (requirement.alternatives ?? []).some(alternative =>
-          alternative.match?.materialId === materialId
+          alternative.match?.materialId === materialId || materialMatchesIngredient(alternative.match, material)
         );
       })
     );

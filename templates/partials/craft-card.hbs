@@ -1,20 +1,7 @@
 <article class="ml-card ml-craftworks-craft-card">
   <header class="ml-craftworks-craft-card-header">
     <div class="ml-craftworks-craft-card-title">
-      {{#if output.img}}
-        {{#if outputDocumentUuid}}
-          <button type="button"
-                  class="ml-craftworks-craft-card-image"
-                  data-output-document-uuid="{{outputDocumentUuid}}"
-                  title="Open source Item">
-            <img src="{{output.img}}" alt="{{name}}">
-          </button>
-        {{else}}
-          <img class="ml-craftworks-craft-card-image-static"
-               src="{{output.img}}"
-               alt="{{name}}">
-        {{/if}}
-      {{/if}}
+      {{#if output.img}}<button type="button" class="ml-image-link" data-size="large" data-open-recipe-id="{{id}}" title="Open {{name}} recipe" aria-label="Open {{name}} recipe"><img src="{{output.img}}" alt="" data-ml-image-fallback="icons/svg/item-bag.svg"></button>{{/if}}
 
       <div>
         <h3>{{name}}</h3>
@@ -87,7 +74,7 @@
                         {{#if materialId}}
                           <button type="button"
                                   data-material-id="{{materialId}}"
-                                  class="ml-craftworks-material-icon-link">
+                                  class="ml-image-link" title="Open {{displayLabel}} material" aria-label="Open {{displayLabel}} material">
                             <img src="{{materialImg}}" alt="">
                           </button>
                         {{else}}
@@ -114,7 +101,7 @@
                     {{#if materialId}}
                       <button type="button"
                               data-material-id="{{materialId}}"
-                              class="ml-craftworks-material-icon-link">
+                              class="ml-image-link" title="Open {{displayLabel}} material" aria-label="Open {{displayLabel}} material">
                         <img src="{{materialImg}}" alt="">
                       </button>
                     {{else}}
@@ -154,7 +141,7 @@
       <h4>Produces</h4>
       <div class="ml-craftworks-craft-output">
         {{#if output.img}}
-          <img src="{{output.img}}" alt="{{output.label}}">
+          <button type="button" class="ml-image-link" data-open-recipe-id="{{id}}" title="Open {{name}} recipe" aria-label="Open {{name}} recipe"><img src="{{output.img}}" alt=""></button>
         {{/if}}
         <div>
           <strong>{{output.label}}</strong>

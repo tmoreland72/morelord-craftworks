@@ -8,6 +8,8 @@
     "check": "node --check scripts/main.mjs",
     "test": "node --test",
     "check:kibbles": "node tools/check-kibbles-harvest.mjs",
+    "check:acquisition": "node tools/check-material-acquisition.mjs",
+    "check:images": "node tools/check-material-images.mjs",
     "check:recipes": "node tools/check-recipe-item-matching.mjs",
     "check:scroll-catalog": "node tools/check-spell-scroll-catalog.mjs",
     "build": "node tools/build.mjs"

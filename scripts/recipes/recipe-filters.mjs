@@ -1,4 +1,4 @@
-import { materialTagsSatisfy } from "../materials/material-match-utils.mjs";
+import { materialTagsSatisfy, materialRarityMatches } from "../materials/material-match-utils.mjs";
 
 export function recipeMatchesFilters(recipe, { rarities = [], ingredientTags = [] } = {}, materials) {
   return (!rarities.length || rarities.includes(recipeRarity(recipe)))
@@ -124,19 +124,22 @@ export function materialsMatchingIngredient(match, materials) {
       return material ? [material] : [];
     }
 
-    const itemName = String(match.itemName ?? "").trim().toLowerCase();
-    const requiredTags = (match.tags ?? [])
-      .map(tag => String(tag).toLowerCase());
+    return materials.all().filter(material => materialMatchesIngredient(match, material));
+  }
 
-    return materials.all().filter(material => {
+export function materialMatchesIngredient(match, material) {
+    if (!match || !material) return false;
+    if (match.materialId && match.materialId !== material.materialId) return false;
+    if (match.equipmentType || match.weaponType || match.lootTypes?.length || match.itemType) return false;
+    const itemName = String(match.itemName ?? "").trim().toLowerCase();
+    const requiredTags = (match.tags ?? []).map(tag => String(tag).toLowerCase());
       if (
         itemName
         && String(material.name ?? "").trim().toLowerCase() !== itemName
       ) return false;
       if (
         match.rarity
-        && String(material.rarity ?? "").toLowerCase()
-          !== String(match.rarity).toLowerCase()
+        && !materialRarityMatches(match.rarity, material.rarity)
       ) return false;
       if (
         match.category
@@ -154,5 +157,4 @@ export function materialsMatchingIngredient(match, materials) {
       );
 
       return materialTagsSatisfy(requiredTags, materialTags);
-    });
   }

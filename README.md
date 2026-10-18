@@ -35,7 +35,7 @@ The Recipes browser counts ingredient tags in one pass per recipe using a shared
 
 - Foundry Virtual Tabletop v14
 - D&D5e 5.3+
-- Morelord Core for Morelord Gaming account access and premium entitlements
+- Morelord Core 0.5.1 or later for shared UI components, Morelord Gaming account access, and premium entitlements
 - `socketlib` for multiplayer acquisition sessions
 
 Foundry v13 compatibility is intentionally out of scope.

@@ -9,6 +9,11 @@ const DRAKKENHEIM_FAMILIES = new Set([
   "organs"
 ]);
 
+export function materialRarityMatches(required, available) {
+  const key = value => String(value ?? "").trim().toLowerCase().replace(/[\s_-]+/g, "");
+  return !required || key(required) === key(available);
+}
+
 export function materialTagsSatisfy(requiredTags = [], availableTags = []) {
   const available = new Set(
     Array.from(availableTags ?? [], tag => String(tag).toLowerCase())

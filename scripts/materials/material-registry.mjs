@@ -1,5 +1,6 @@
 import { MODULE_ID } from "../constants.mjs";
 import { log, warn } from "../core/logger.mjs";
+import { materialImage, repairCatalogImages } from "./material-images.mjs";
 
 export class MaterialRegistry {
   #byId = new Map();
@@ -47,6 +48,9 @@ export class MaterialRegistry {
         "system.price"
       ]});
 
+      try { await repairCatalogImages(pack, index); }
+      catch (error) { warn(`Could not repair stored catalog artwork in ${pack.collection}.`, error); }
+
       for (const row of index) {
         const flags = foundry.utils.getProperty(row, `flags.${MODULE_ID}`);
         if (!flags?.materialId) continue;
@@ -81,7 +85,7 @@ export class MaterialRegistry {
           packId,
           packPriority: priority,
           name: row.name,
-          img: row.img,
+          img: materialImage(row.img),
           uuid: `Compendium.${pack.collection}.Item.${row._id}`,
           pack: pack.collection,
           tags: Array.isArray(flags.tags) ? flags.tags : [],

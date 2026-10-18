@@ -28,6 +28,12 @@ export function getLootTier(id, { activePackIds = null } = {}) {
     .find(tier => tier.id === id) ?? null;
 }
 
+export function getLootMaterialIds(options = {}) {
+  return new Set(getLootTiers(options).flatMap(tier =>
+    (tier.results ?? []).filter(result => Number(result.weight ?? 0) > 0).map(result => result.materialId)
+  ));
+}
+
 export function getNothingChance(tier) {
   return Math.max(
     0,

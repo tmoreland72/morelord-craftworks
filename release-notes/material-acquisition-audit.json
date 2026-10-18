@@ -1,0 +1,1455 @@
+{
+  "scope": "Standard catalog only; final flags include expanded loot tables",
+  "materials": 172,
+  "changed": 111,
+  "perFlag": {
+    "gatherable": 29,
+    "harvestable": 14,
+    "lootable": 73
+  },
+  "changes": [
+    {
+      "id": "boiled-leather",
+      "before": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "common-branch",
+      "before": {
+        "gatherable": true,
+        "harvestable": false,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": true,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "common-primal-essence",
+      "before": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": true,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "esoteric-parts",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "fancy-parts",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "leather-scraps",
+      "before": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "legendary-curative-reagent",
+      "before": {
+        "gatherable": true,
+        "harvestable": true,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "legendary-poisonous-reagent",
+      "before": {
+        "gatherable": true,
+        "harvestable": true,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "legendary-reactive-reagent",
+      "before": {
+        "gatherable": true,
+        "harvestable": true,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "long-haft",
+      "before": {
+        "gatherable": true,
+        "harvestable": false,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "metal-scraps",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": true,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "parts",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "quality-branch",
+      "before": {
+        "gatherable": true,
+        "harvestable": false,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": true,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "rare-branch",
+      "before": {
+        "gatherable": true,
+        "harvestable": false,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "rare-curative-reagent",
+      "before": {
+        "gatherable": true,
+        "harvestable": true,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "rare-poisonous-reagent",
+      "before": {
+        "gatherable": true,
+        "harvestable": true,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "rare-primal-essence",
+      "before": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": true,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "rare-reactive-reagent",
+      "before": {
+        "gatherable": true,
+        "harvestable": true,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "short-haft",
+      "before": {
+        "gatherable": true,
+        "harvestable": false,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "tanned-leather",
+      "before": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "tough-leather",
+      "before": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "uncommon-branch",
+      "before": {
+        "gatherable": true,
+        "harvestable": false,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "uncommon-curative-reagent",
+      "before": {
+        "gatherable": true,
+        "harvestable": true,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "uncommon-poisonous-reagent",
+      "before": {
+        "gatherable": true,
+        "harvestable": true,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "uncommon-primal-essence",
+      "before": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": true,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "uncommon-reactive-reagent",
+      "before": {
+        "gatherable": true,
+        "harvestable": true,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "uncommon-supplies",
+      "before": {
+        "gatherable": true,
+        "harvestable": false,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "very-rare-branch",
+      "before": {
+        "gatherable": true,
+        "harvestable": false,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "very-rare-curative-reagent",
+      "before": {
+        "gatherable": true,
+        "harvestable": true,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "very-rare-poisonous-reagent",
+      "before": {
+        "gatherable": true,
+        "harvestable": true,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "very-rare-reactive-reagent",
+      "before": {
+        "gatherable": true,
+        "harvestable": true,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "wooden-stock",
+      "before": {
+        "gatherable": true,
+        "harvestable": false,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "common-meat",
+      "before": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "uncommon-meat",
+      "before": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "rare-meat",
+      "before": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "very-rare-meat",
+      "before": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "legendary-meat",
+      "before": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "common-fresh-ingredient",
+      "before": {
+        "gatherable": true,
+        "harvestable": true,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "tough-hide",
+      "before": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "resistant-hide",
+      "before": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "dragon-scales",
+      "before": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-boots-50",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-circlet-50",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-quiver-25",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-gauntlets-50",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-helm-25",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-pipes-25",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-silver-coffer-500",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-picture-of-a-horse-75",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-picture-of-mastiffs-25",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-belt-200",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-set-of-bracers-200",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-bowl-200",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-cape-200",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-cloak-50",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-figurine-of-a-fly-20",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-figurines-of-a-goat-20",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-figurine-of-a-dog-20",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-figurine-of-a-panther-unpriced",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-horn-100",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-brass-horn-50",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-helm-50",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-mantle-100",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-robe-100",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-stone-200",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-fancy-carpet-1000",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-figurine-of-a-horse-50",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-3-inch-cube-500",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-bronze-horn-100",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-robe-200",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-iron-flask-200",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-white-gray-or-black-robe-500",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-fine-black-cloth-100",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-sword-hilt-200",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-sword-200",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-javelin-100",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-weapon-1000",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-sword-100",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-sword-500",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-scimitar-500",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-weapon-10000",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-maul-1000",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-lance-1000",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-fine-longcoat-100",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-shield-1000",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-plate-armor-1500",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-shield-200",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-set-of-plate-armor-4000",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-ring-10",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-ring-400",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-ring-200",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-medallion-25",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-necklace-50",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-necklace-10",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-scarab-shaped-medallion-unpriced",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-talisman-1000",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-rod-100",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-rod-500",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-rod-3000",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-rod-5000",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-rod-10000",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-blank-book-500",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-blank-book-250",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-hat-5",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "valued-component-rare-materials-50",
+      "before": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": false
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "common-supplies",
+      "before": {
+        "gatherable": true,
+        "harvestable": false,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "lumber",
+      "before": {
+        "gatherable": true,
+        "harvestable": false,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "rare-supplies",
+      "before": {
+        "gatherable": true,
+        "harvestable": false,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "supplies",
+      "before": {
+        "gatherable": true,
+        "harvestable": false,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "sand",
+      "before": {
+        "gatherable": true,
+        "harvestable": false,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    },
+    {
+      "id": "tentacle",
+      "before": {
+        "gatherable": false,
+        "harvestable": true,
+        "lootable": true
+      },
+      "after": {
+        "gatherable": false,
+        "harvestable": false,
+        "lootable": true
+      }
+    }
+  ]
+}

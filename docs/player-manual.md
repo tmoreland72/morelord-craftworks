@@ -4,7 +4,7 @@ description: Browse materials and recipes, manage crafting projects, and partici
 slug: morelord-craftworks/player
 product: morelord-craftworks
 audience: player
-version: 0.4.15
+version: 0.4.18
 foundry: 14
 ---
 
@@ -47,6 +47,12 @@ Harvest and Gather windows open automatically when the GM starts a session in wh
 
 Open **Materials** to search the complete active material catalog. A material card can show its name, image, rarity, category, processing stage, value, acquisition methods, tags, and recipes that use it.
 
+**Used in** lists enabled recipes whose ingredient requirements accept the material, including tag-based Drakkenheim components, required rarity, and alternatives. A recipe that only produces the material is listed under **Produced by** instead.
+
+**Craftable** means an enabled recipe produces this material; **Produced by** lists its recipes. It does not indicate that your current inventory or character meets the crafting requirements. Standard **Gather**, **Harvest**, and **Loot** tags reflect active acquisition rules. GMs can click their orange source pills for details; players see passive reference tags.
+
+Drakkenheim **Harvest** tags are verified by a connected GM using the same source check as the GM's browser. During **Checking monster harvest sources…**, or if verification fails, unverified Harvest tags stay hidden. Players receive only material availability; monster source details remain GM-only. Source changes refresh verified availability, and reopening Materials retries a failed check.
+
 ### Search and filters
 
 Enter part of a name in Search or use facets such as Content Pack, rarity, category, stage, and material tag. Each facet cycles through three states:
@@ -85,6 +91,8 @@ Changing the search text or a facet updates the matching catalog and result coun
 ### Mark a goal
 
 Use a recipe's crafting marker to add or remove it from your Craft list. You may mark an Unknown recipe as a future goal even though you cannot see its ingredients or start a new job yet.
+
+In **Craft**, click the crafted item's image to open that recipe in **Recipes**, preserving the selected crafter. Click a specific ingredient's image to open its entry in **Materials**. The image buttons also support keyboard focus and activation. Generic requirements without one identifiable material retain a reference image.
 
 ## Plan and complete crafting
 

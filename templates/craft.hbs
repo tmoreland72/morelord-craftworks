@@ -61,7 +61,7 @@
               <article class="ml-card ml-craftworks-craft-card ml-craftworks-craft-list-card is-{{statusKey}}" data-document-uuid="{{outputDocumentUuid}}">
                 <header class="ml-craftworks-craft-card-header">
                   <div class="ml-craftworks-craft-card-title">
-                    {{#if output.img}}{{#if outputDocumentUuid}}<button type="button" class="ml-craftworks-craft-card-image" data-output-document-uuid="{{outputDocumentUuid}}" title="Open source Item"><img src="{{output.img}}" alt="{{name}}"></button>{{else}}<img class="ml-craftworks-craft-card-image-static" src="{{output.img}}" alt="{{name}}">{{/if}}{{/if}}
+                    {{#if output.img}}<button type="button" class="ml-image-link" data-size="large" data-open-recipe-id="{{id}}" title="Open {{name}} recipe" aria-label="Open {{name}} recipe"><img src="{{output.img}}" alt="" data-ml-image-fallback="icons/svg/item-bag.svg"></button>{{/if}}
                     <div><h3>{{name}}</h3><div class="ml-craftworks-recipe-meta"><span>{{sourceLabel}}</span><span>{{category}}</span>{{#each tags}}<span>{{this}}</span>{{/each}}</div></div>
                   </div>
 <span class="ml-badge ml-craftworks-craft-status-badge is-{{statusKey}}"><i class="fa-solid {{#if isActive}}fa-gears{{else if readiness.ready}}fa-circle-check{{else}}fa-circle-xmark{{/if}}"></i>{{statusLabel}}</span>
@@ -86,12 +86,12 @@
                             <fieldset class="ml-craftworks-craft-alternative-group">
                               <legend><i class="fa-solid fa-code-branch"></i> Choose one</legend>
                               {{#each alternativeRows}}
-                                <div class="ml-craftworks-craft-requirement-row {{#if inventory.ready}}ml-craftworks-ready{{else}}ml-craftworks-missing{{/if}}" data-document-uuid="{{materialUuid}}">{{#if materialImg}}<img src="{{materialImg}}" alt="">{{else}}<i class="fa-solid fa-cube"></i>{{/if}}<span>{{displayLabel}}</span>{{#if inventory}}<strong>{{inventory.available}} / {{inventory.required}}</strong>{{/if}}</div>
+                                <div class="ml-craftworks-craft-requirement-row {{#if inventory.ready}}ml-craftworks-ready{{else}}ml-craftworks-missing{{/if}}" data-document-uuid="{{materialUuid}}">{{#if materialImg}}{{#if materialId}}<button type="button" class="ml-image-link" data-material-id="{{materialId}}" title="Open {{displayLabel}} material" aria-label="Open {{displayLabel}} material"><img src="{{materialImg}}" alt="" data-ml-image-fallback="icons/svg/item-bag.svg"></button>{{else}}<img src="{{materialImg}}" alt="">{{/if}}{{else}}<i class="fa-solid fa-cube"></i>{{/if}}<span>{{displayLabel}}</span>{{#if inventory}}<strong>{{inventory.available}} / {{inventory.required}}</strong>{{/if}}</div>
                                 {{#unless @last}}<div class="ml-craftworks-craft-alternative-or"><span>OR</span></div>{{/unless}}
                               {{/each}}
                             </fieldset>
                           {{else}}
-                            <div class="ml-craftworks-craft-requirement-row {{#if inventory.ready}}ml-craftworks-ready{{else}}ml-craftworks-missing{{/if}}" data-document-uuid="{{materialUuid}}">{{#if materialImg}}<img src="{{materialImg}}" alt="">{{else}}<i class="fa-solid fa-cube"></i>{{/if}}<span>{{displayLabel}}</span>{{#if inventory}}<strong>{{inventory.available}} / {{inventory.required}}</strong>{{/if}}</div>
+                            <div class="ml-craftworks-craft-requirement-row {{#if inventory.ready}}ml-craftworks-ready{{else}}ml-craftworks-missing{{/if}}" data-document-uuid="{{materialUuid}}">{{#if materialImg}}{{#if materialId}}<button type="button" class="ml-image-link" data-material-id="{{materialId}}" title="Open {{displayLabel}} material" aria-label="Open {{displayLabel}} material"><img src="{{materialImg}}" alt="" data-ml-image-fallback="icons/svg/item-bag.svg"></button>{{else}}<img src="{{materialImg}}" alt="">{{/if}}{{else}}<i class="fa-solid fa-cube"></i>{{/if}}<span>{{displayLabel}}</span>{{#if inventory}}<strong>{{inventory.available}} / {{inventory.required}}</strong>{{/if}}</div>
                           {{/if}}
                         {{/each}}</div>{{#unless @last}}<div class="ml-craftworks-requirement-group-or">OR</div>{{/unless}}
                       {{/each}}

@@ -487,7 +487,7 @@ export class CraftingMaterialService {
 
     if (
       match.rarity
-      && entry.rarity !== String(match.rarity).toLowerCase()
+      && !materialRarityMatches(match.rarity, entry.rarity)
     ) {
       return false;
     }
@@ -579,4 +579,4 @@ export class CraftingMaterialService {
     return unique;
   }
 }
-import { materialTagsSatisfy } from "../materials/material-match-utils.mjs";
+import { materialTagsSatisfy, materialRarityMatches } from "../materials/material-match-utils.mjs";

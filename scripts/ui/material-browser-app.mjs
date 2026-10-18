@@ -2,6 +2,9 @@ import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-par
 import { MODULE_ID, MODULE_TITLE } from "../constants.mjs";
 import { bindMultiselectBehavior } from "./multiselect-behavior.mjs";
 import { buildMaterialTagGroups } from "./material-filter-groups.mjs";
+import { MaterialSourcesApp } from "./material-sources-app.mjs";
+import { activeMaterialAcquisition, materialAcquisition } from "../materials/material-sources.mjs";
+import { getDrakkenheimSourceIndex, peekDrakkenheimSourceIndex, drakkenheimSourcesForMaterial } from "../materials/drakkenheim-source-index.mjs";
 
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 
@@ -30,6 +33,12 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
     this.searchSelectionEnd = null;
     this.openFilterKey = null;
     this.ownedOnly = false;
+    this._monsterLookupPending = false;
+    this._monsterLookupFailed = false;
+    this._sourceLookupCancelled = false;
+    this._playerHarvestableIds = null;
+    this._playerAvailabilityMaterials = null;
+    this._sourceAvailabilityGeneration = 0;
   }
 
   static DEFAULT_OPTIONS = {
@@ -85,6 +94,17 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
 
     const inventory = this.#materialInventory(actor);
     const allMaterials = this.craftworks.materials.all();
+    if (this._playerAvailabilityMaterials && (allMaterials.length !== this._playerAvailabilityMaterials.length
+      || allMaterials.some((material, i) => material !== this._playerAvailabilityMaterials[i]))) {
+      this._playerHarvestableIds = null;
+      this._playerAvailabilityMaterials = null;
+      this._monsterLookupFailed = false;
+      this._sourceAvailabilityGeneration++;
+    }
+    const availableAcquisition = activeMaterialAcquisition(this.craftworks);
+    const checkMonsterSources = availableAcquisition.drakkenheimHarvest;
+    const monsterIndex = game.user.isGM && checkMonsterSources ? peekDrakkenheimSourceIndex(this.craftworks) : null;
+    const availabilityReady = game.user.isGM ? Boolean(monsterIndex) : this._playerHarvestableIds !== null;
 
     const materialCountsByPack = allMaterials.reduce((counts, material) => {
       counts.set(
@@ -183,6 +203,13 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
 
             return {
               ...material,
+              acquisition: {
+                ...materialAcquisition(material, availableAcquisition),
+                ...(checkMonsterSources && material.packId === "monsters-of-drakkenheim"
+                  ? { harvestable: game.user.isGM
+                    ? Boolean(monsterIndex && drakkenheimSourcesForMaterial(material, monsterIndex).length)
+                    : Boolean(this._playerHarvestableIds?.has(material.materialId)) } : {})
+              },
               packLabel: pack?.label ?? material.packId ?? "Unknown Pack",
               focused: material.materialId === this.focusMaterialId,
               ownedQuantity: quantity,
@@ -191,28 +218,18 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
                 ? `${material.price.value} ${material.price?.denomination ?? "gp"}`
                 : "No value",
               usedIn: this.craftworks.recipes
-                .getByMaterial(material.materialId)
-                .filter(recipe =>
-                  (recipe.requirementGroups ?? []).some(group =>
-                    (group.requirements ?? []).some(requirement =>
-                      requirement.match?.materialId === material.materialId
-                      || (requirement.alternatives ?? []).some(alternative =>
-                        alternative.match?.materialId === material.materialId
-                      )
-                    )
-                  )
-                )
+                .recipesUsingMaterial(material.materialId)
                 .map(recipe => recipe.name),
               producedBy: this.craftworks.recipes
-                .getByMaterial(material.materialId)
-                .filter(recipe =>
-                  recipe.output?.materialId === material.materialId
-                )
+                .recipesProducingMaterial(material.materialId)
                 .map(recipe => recipe.name)
             };
           });
 
     return foundry.utils.mergeObject(context, {
+      isGM: game.user.isGM,
+      checkingMonsterSources: checkMonsterSources && !availabilityReady && !this._monsterLookupFailed,
+      monsterLookupFailed: this._monsterLookupFailed,
       search: this.search,
       selectedPackIds: this.selectedPackIds,
       actorUuid: this.actorUuid,
@@ -293,9 +310,46 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
   }
 
   async _onRender(context, options) {
+    this._sourceLookupCancelled = false;
     await super._onRender(context, options);
 
     bindMultiselectBehavior(this);
+
+    if (context.checkingMonsterSources && !this._monsterLookupPending) {
+      this._monsterLookupPending = true;
+      const generation = this._sourceAvailabilityGeneration;
+      const materials = this.craftworks.materials.all();
+      const lookup = game.user.isGM ? getDrakkenheimSourceIndex(this.craftworks, { onProgress: text => {
+        const status = this.element?.querySelector("[data-monster-source-status]");
+        if (status) status.textContent = text;
+      } }) : this.craftworks.socket.executeAsGm("materials.harvest-availability");
+      void lookup.then(result => {
+        if (generation !== this._sourceAvailabilityGeneration) return;
+        if (game.user.isGM) this._monsterLookupFailed = result.notices.length > 0;
+        else {
+          if (!Array.isArray(result) || result.some(id => typeof id !== "string")) throw new Error("Invalid harvest availability response.");
+          this._playerHarvestableIds = new Set(result.filter(id => this.craftworks.materials.get(id)?.packId === "monsters-of-drakkenheim"));
+          this._playerAvailabilityMaterials = materials;
+        }
+      }).catch(error => {
+        if (generation !== this._sourceAvailabilityGeneration) return;
+        this._monsterLookupFailed = true;
+        console.warn("Morelord Craftworks | Monster source availability lookup failed", error);
+      }).finally(() => {
+        this._monsterLookupPending = false;
+        if (this.rendered && !this._sourceLookupCancelled) this.render();
+      });
+    }
+
+    this.element.querySelectorAll("[data-material-source]").forEach(button => {
+      button.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!game.user.isGM) return;
+        const material = this.craftworks.materials.get(button.dataset.materialId);
+        if (material) void new MaterialSourcesApp(this.craftworks, material, button.dataset.materialSource).load();
+      });
+    });
 
     const searchInput = this.element.querySelector("[name='search']");
 
@@ -382,6 +436,20 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
       );
 
 
+  }
+
+  async close(options) {
+    this._sourceLookupCancelled = true;
+    this.refreshSourceAvailability(false);
+    return super.close(options);
+  }
+
+  refreshSourceAvailability(render = true) {
+    this._sourceAvailabilityGeneration++;
+    this._playerHarvestableIds = null;
+    this._playerAvailabilityMaterials = null;
+    this._monsterLookupFailed = false;
+    if (render && this.rendered) this.render();
   }
 
   #cycleTriState(group, value) {

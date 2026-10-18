@@ -1,4 +1,6 @@
-export const STANDARD_LOOT_TIERS = [
+import { STANDARD_MATERIAL_LOOT_POOLS } from "./loot-material-pools.mjs";
+
+const BASE_LOOT_TIERS = [
   {
     packId: "standard-core",
     id: "0-4",
@@ -53,3 +55,11 @@ export const STANDARD_LOOT_TIERS = [
     ]
   }
 ];
+
+// Keep existing outcomes and quantities; additions have lower individual weight.
+export const STANDARD_LOOT_TIERS = BASE_LOOT_TIERS.map(tier => ({
+  ...tier,
+  results: [...tier.results, ...STANDARD_MATERIAL_LOOT_POOLS[tier.id]
+    .filter(materialId => !tier.results.some(result => result.materialId === materialId))
+    .map(materialId => ({ materialId, weight: 2, min: 1, max: 1 }))]
+}));

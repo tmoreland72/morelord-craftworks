@@ -1,6 +1,8 @@
 <section class="ml-app ml-app-shell ml-craftworks app-shell ml-craftworks-browser-shell ml-craftworks-marketplace-browser">
   <header class="ml-hero"><i class="fa-solid fa-hammer ml-hero__icon"></i><div class="ml-hero__body"><h1>Materials</h1><p>Reference Craftworks materials, acquisition methods, values, recipes, and inventory quantities.</p></div>
   <div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header>
+  {{#if checkingMonsterSources}}<div class="ml-card" role="status"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> <span data-monster-source-status>Checking monster harvest sources…</span></div>{{/if}}
+  {{#if monsterLookupFailed}}<p role="status">Monster harvest sources could not be fully checked. Reopen Materials to retry.</p>{{/if}}
 
   <div class="ml-craftworks-marketplace-browser-body">
     <aside class="ml-surface ml-craftworks-filter-rail ml-stack" data-gap="3">
@@ -106,7 +108,7 @@
         <div class="ml-craftworks-reference-list ml-craftworks-browser-results">
           {{#each materials}}
       <article class="ml-card ml-craftworks-reference-card ml-craftworks-material-card {{#if owned}}ml-craftworks-material-owned{{/if}} {{#if focused}}ml-craftworks-material-focused{{/if}}" data-document-uuid="{{uuid}}">
-        <img src="{{img}}" alt="{{name}}">
+        <img src="{{img}}" alt="{{name}}" data-ml-image-fallback="icons/svg/item-bag.svg">
 
         <div class="ml-craftworks-reference-main">
           <div class="ml-craftworks-reference-title">
@@ -114,18 +116,19 @@
             <span>{{rarity}} • {{category}} • {{packLabel}}</span>
           </div>
 
-          <div class="ml-craftworks-pills">
+          <div class="ml-cluster">
             {{#if ../actorName}}
-              <span class="ml-craftworks-owned-pill">
+              <span class="ml-badge">
                 Owned: {{ownedQuantity}}
               </span>
             {{/if}}
 
-            {{#if acquisition.gatherable}}<span>Gather</span>{{/if}}
-            {{#if acquisition.harvestable}}<span>Harvest</span>{{/if}}
-            {{#if acquisition.lootable}}<span>Loot</span>{{/if}}
-            {{#if purchasable}}<span>Purchasable</span>{{/if}}
-            <span>{{priceLabel}}</span>
+            {{#if acquisition.gatherable}}{{#if ../isGM}}<button type="button" class="ml-badge" data-tone="action" data-material-source="gather" data-material-id="{{materialId}}" aria-label="Gather sources for {{name}}">Gather</button>{{else}}<span class="ml-badge">Gather</span>{{/if}}{{/if}}
+            {{#if acquisition.harvestable}}{{#if ../isGM}}<button type="button" class="ml-badge" data-tone="action" data-material-source="harvest" data-material-id="{{materialId}}" aria-label="Harvest sources for {{name}}">Harvest</button>{{else}}<span class="ml-badge">Harvest</span>{{/if}}{{/if}}
+            {{#if acquisition.lootable}}{{#if ../isGM}}<button type="button" class="ml-badge" data-tone="action" data-material-source="loot" data-material-id="{{materialId}}" aria-label="Loot sources for {{name}}">Loot</button>{{else}}<span class="ml-badge">Loot</span>{{/if}}{{/if}}
+            {{#if purchasable}}<span class="ml-badge">Purchasable</span>{{/if}}
+            {{#if producedBy.length}}<span class="ml-badge">Craftable</span>{{/if}}
+            <span class="ml-badge">{{priceLabel}}</span>
           </div>
 
           {{#if tags.length}}

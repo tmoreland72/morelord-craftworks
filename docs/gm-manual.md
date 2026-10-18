@@ -4,7 +4,7 @@ description: Install, configure, and operate Morelord Craftworks acquisition, cr
 slug: morelord-craftworks/gm
 product: morelord-craftworks
 audience: game-master
-version: 0.4.15
+version: 0.4.18
 foundry: 14
 ---
 
@@ -50,7 +50,7 @@ Premium access is managed by Morelord Core. A content pack may also depend on of
 
 - Foundry Virtual Tabletop v14
 - dnd5e 5.3 or later
-- Morelord Core 0.3.14 or later
+- Morelord Core 0.5.1 or later. Update Core first, then refresh every connected GM and player client after updating Craftworks so each client registers the current source-availability socket handler
 - SocketLib 1.1.3 or later
 - Morelord Craftworks 0.4.9 or later
 
@@ -161,6 +161,8 @@ Potion and spell-scroll rewards use enabled dnd5e Item sources. Material compone
 
 ### Browse large catalogs
 
+In **Craft**, clicking a crafted item's image opens that recipe in **Recipes** with the selected crafter retained. Clicking a specific material ingredient's image opens that entry in **Materials**. The actions are labeled **Open [recipe name] recipe** and **Open [material name] material** and support keyboard activation. Generic requirements without a single identifiable material keep a passive image. **Used in** on material cards includes enabled recipes accepting that material by ID, name, tags, category, stage, rarity, or alternatives; output-only recipes remain under **Produced by**.
+
 Materials and Recipes use a search field and persistent filter rail. Facets cycle through three states:
 
 | Symbol | State | Meaning |
@@ -172,6 +174,20 @@ Materials and Recipes use a search field and persistent filter rail. Facets cycl
 Search and filter totals always reflect the complete catalog. The browser initially renders up to 300 matching cards to keep very large catalogs responsive.
 
 Materials can be filtered by source pack, rarity, category, processing stage, and material tags. Recipes add filters for recipe/output rarity and knowledge state.
+
+GMs can click the orange, white-text **Gather**, **Harvest**, or **Loot** pills on a material card to open **Material Sources**. Players see passive tags. Standard acquisition pills reflect the active rules, rather than stored catalog flags: processed leather does not show Harvest, and materials without a gathering terrain do not show Gather. **Gather** lists matching terrains. **Harvest** lists creature types, sizes, CR ranges, and required traits; each description shows the harvest category. Repeated results are merged. Fallback entries are labeled **Fallback only** and apply when trait-based harvesting yields no components. The passive **Craftable** pill means an enabled recipe produces the material; **Produced by** lists those recipes. It does not mean the selected actor currently meets their crafting requirements.
+
+For Drakkenheim materials, **Harvest** searches the installed Monsters of Drakkenheim compendium. Family references include specific components of the same family, creature type, and rarity: **Bones - Aberration (Legendary)** includes The World Ender's bones and The Duchess's skull. A specific Skull reference never includes a Spine-only source. This reference grouping does not change the component actually awarded by harvesting. Named results use the shared Encounters monster card: portrait, name, CR, source, and an **Open [name] Actor sheet** icon action, without Regenerate. Results show relevant component/form rarity and component names; unrelated special-item and delerium instructions remain in harvesting and are omitted here. This requires the enabled Drakkenheim content pack and its installed monster compendium. Ordinary materials do not search or mention Drakkenheim. **Searching…** and the monster count indicate an unfinished lookup; unavailable or unreadable content is reported separately.
+
+The first Drakkenheim search builds an in-memory source index shared by subsequent material searches on that client. Concurrent searches share the same build. Material-catalog synchronization or changes to Drakkenheim Actor and Journal documents invalidate it. World restarts and browser reloads clear it automatically; it is not stored in world settings. Failed or incomplete builds are retried on the next search rather than cached as an empty result.
+
+Both GM and player Materials browsers use GM-verified Drakkenheim availability for Harvest tags. **Checking monster harvest sources…** appears during the initial check; Harvest is shown only once a matching source is confirmed. Players request only the verified material IDs through Craftworks' socket service; monster identities and source text remain GM-only. Players need a connected GM for a fresh check. Unverified catalog flags are never used as a fallback, including while loading or when verification fails. Relevant source changes invalidate player availability and refresh open browsers. Catalog-only variants without a source do not offer a Harvest tag. For example, the installed dragons list claws and teeth rather than horns, and the installed ratling harvest rarities range from Common to Rare. Source matching includes creature subtype and the source journal's name, so a Ratlings page can identify a ratling whose Actor name omits that word.
+
+During GM catalog indexing, Craftworks repairs its five known invalid built-in artwork paths on its own world-compendium Items. This fixes both Materials cards and the native Item sheets, preserves compendium locking, and leaves custom artwork and other packages' Items unchanged.
+
+The **Loot** pill appears only for materials with a positive-weight result in the active material loot tables; a stored catalog Loot flag alone does not display it. Disabling a content pack removes its unsupported Loot pills. **Loot** lists **Any creature** with the matching CR bands and source pack. Actual drops also require material rewards enabled in Loot settings. **Documentation** opens the module documentation on the Morelord Gaming website; **Close** dismisses the source window. These lookups do not roll, award items, or alter creatures.
+
+Standard material loot now includes all 172 Standard catalog materials. Newly added Trivial/Common materials appear in CR 0–4, Uncommon in CR 5–10, Rare in CR 11–16, and Very Rare/Legendary in CR 17+. The pools contain 116, 25, 18, and 25 distinct results respectively, including retained original results. Original quantities and weights remain; additions yield one unit with weight 2. The material-drop chance is unchanged, but the broader pools change each material's selection odds. Creature type does not restrict material loot; gathered and processed goods can be found among possessions.
 
 ![The Materials browser combines catalog totals, search, tri-state filters, and rich material cards.](assets/materials-browser-overview.png)
 
