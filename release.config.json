@@ -10,6 +10,7 @@
   "requiredPaths": [
     "module.json",
     "README.md",
+    "CHANGELOG.md",
     "scripts",
     "styles",
     "templates",

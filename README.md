@@ -476,7 +476,7 @@ Project-specific release settings are stored in `release.config.json`. Local web
 RELEASE_PUBLISH_TOKEN=your-token-here
 ```
 
-Release notes use the standard filename format `release-notes/RELEASE-NOTES-0.1.0.md`.
+Release notes use the standard filename format `release-notes/RELEASE-NOTES-0.1.0.md`. Those per-version notes stay out of the release archive. `release.ps1` rebuilds the root `CHANGELOG.md` from them, newest version first, and packages that file at the root of `morelord-craftworks.zip` for GitHub and in-Foundry changelog viewers.
 
 Validate a release without modifying GitHub or the website:
 
@@ -537,4 +537,4 @@ Completed searches saved before this fix are recovered by their coordinating GM 
 
 This release requires Morelord Core 0.4.0 or newer for shared roll requests, outcome scheduling, and consistent UI.
 
-Release history lives in `release-notes/`; Foundry links to the GitHub Releases page through the manifest `changelog` URL. Use the module-local `/tmp/` directory for working files; it is ignored by Git and excluded from release packages.
+Per-version release history lives in `release-notes/` and is excluded from release packages. The packaged `CHANGELOG.md` is the cumulative user-facing history. Foundry links to the GitHub Releases page through the manifest `changelog` URL. Use the module-local `/tmp/` directory for working files; it is ignored by Git and excluded from release packages.
