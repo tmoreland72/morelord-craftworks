@@ -49,6 +49,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     this.actorUuid = null;
     this.crafterUuid = options.crafterActorUuid ?? null;
     this.recipeIds = options.recipeIds ? new Set(options.recipeIds.map(String)) : null;
+    this.recipeFocusNote = options.recipeFocusNote ?? null;
     this.searchRenderTimer = null;
     this.restoreSearchFocus = false;
     this.searchExecuted = this.recipeIds !== null;
@@ -654,6 +655,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       prospectiveCountLabel,
       hasSearchCriteria,
       focusedRecipeCount: this.recipeIds?.size ?? 0,
+      recipeFocusNote: this.recipeFocusNote,
       searchExecuted:
         autoShowResults,
       autoShowResults,
@@ -1568,6 +1570,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
 
   #clearTriStateFilters() {
     this.recipeIds = null;
+    this.recipeFocusNote = null;
     this.selectedPackIds = [];
     this.excludedPackIds = [];
     this.selectedCategories = [];

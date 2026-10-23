@@ -161,7 +161,7 @@ Potion and spell-scroll rewards use enabled dnd5e Item sources. Material compone
 
 ### Browse large catalogs
 
-In **Craft**, clicking a crafted item's image opens that recipe in **Recipes** with the selected crafter retained. Clicking a specific material ingredient's image opens that entry in **Materials**. The actions are labeled **Open [recipe name] recipe** and **Open [material name] material** and support keyboard activation. Generic requirements without a single identifiable material keep a passive image. **Used in** on material cards includes enabled recipes accepting that material by ID, name, tags, category, stage, rarity, or alternatives; output-only recipes remain under **Produced by**.
+In **Craft**, clicking a crafted item's image opens that recipe in **Recipes** with the selected crafter retained. Clicking a specific material ingredient's image opens that entry in **Materials**. The actions are labeled **Open [recipe name] recipe** and **Open [material name] material** and support keyboard activation. Generic requirements without a single identifiable material keep a passive image. **Recipes (N)** on a material card opens **Recipes** filtered to enabled recipes that accept that material by ID, name, tags, category, stage, rarity, or alternatives, including Drakkenheim component family, part, creature type, and rarity. The count is the number of those recipes. Players see only recipes they know. The button is omitted when that list is empty. Unresolved catalog outputs from disabled packs are not included. **Clear all filters** returns to the full catalog. Output-only recipes remain under **Produced by**.
 
 Materials and Recipes use a search field and persistent filter rail. Facets cycle through three states:
 
