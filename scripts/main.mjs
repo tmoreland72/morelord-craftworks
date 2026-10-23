@@ -544,9 +544,9 @@ Hooks.once("ready", async () => {
 
       return materialBrowserApp.render({ force: true });
     },
-    openRecipes: async ({ recipeIds = null, crafterActorUuid = null } = {}) => {
+    openRecipes: async ({ recipeIds = null, crafterActorUuid = null, recipeFocusNote = null } = {}) => {
       if (recipeBrowserApp?.rendered) await recipeBrowserApp.close();
-      recipeBrowserApp = new RecipeBrowserApp(api, { recipeIds, crafterActorUuid });
+      recipeBrowserApp = new RecipeBrowserApp(api, { recipeIds, crafterActorUuid, recipeFocusNote });
       return recipeBrowserApp.render({ force: true });
     },
     openCustomRecipes: async ({ drakkenheim = false } = {}) => {

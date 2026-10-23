@@ -55,6 +55,10 @@ Inactive packs contribute no runtime content.
 
 The PHB pack uses `data/kibbles-recipes.seed.mjs` as the authoritative
 recipe source. Every Kibbles catalog-item recipe is treated as a candidate.
+Ingredient `materialId` values must exist in the Craftworks Standard catalog.
+Recipes that require a material ID missing from that catalog are omitted from
+the seed.
+
 At runtime, Craftworks indexes only the exact Foundry collection
 `dnd-players-handbook.equipment` and includes a PHB recipe only when the
 finished output can be resolved there by name.
