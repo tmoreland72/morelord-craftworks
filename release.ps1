@@ -20,6 +20,9 @@ param(
     [switch]$DryRun,
 
     [Parameter(Mandatory = $false)]
+    [switch]$ValidateOnly,
+
+    [Parameter(Mandatory = $false)]
     [switch]$SkipWebsitePublish,
 
     [Parameter(Mandatory = $false)]
@@ -45,12 +48,19 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$ChangelogScript = Join-Path $ProjectRoot 'scripts/release.ps1'
+if (-not (Test-Path -LiteralPath $ChangelogScript -PathType Leaf)) {
+    throw "Changelog helper was not found: $ChangelogScript"
+}
+. $ChangelogScript
 $ConfigPath = Join-Path $ProjectRoot 'release.config.json'
 $ManifestPath = Join-Path $ProjectRoot 'module.json'
 $Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 
 $OriginalManifestText = $null
 $ManifestWasModified = $false
+$OriginalChangelogText = $null
+$ChangelogWasModified = $false
 $CommitWasCreated = $false
 $TagWasCreated = $false
 $PushCompleted = $false
@@ -276,6 +286,11 @@ function Copy-ReleaseContent {
             Copy-Item -Path $Source -Destination $Destination -Recurse -Force
         }
     }
+    # scripts/ is packaged, and the changelog helper lives at scripts/release.ps1.
+    # release.ps1 is a development tool and must not ship in the module zip.
+    Get-ChildItem -LiteralPath $Destination -Recurse -File -Force |
+        Where-Object { $_.Name -eq 'release.ps1' } |
+        Remove-Item -Force
 }
 
 function Build-Archive {
@@ -506,6 +521,7 @@ function Show-Usage {
     Write-Host ''
     Write-Host '  .\release.ps1 -Version <x.y.z> [-DryRun] [-Prerelease] [-Draft]' -ForegroundColor Yellow
     Write-Host '  .\release.ps1 -Version <x.y.z> -WebsiteOnly' -ForegroundColor Yellow
+    Write-Host '  .\release.ps1 -ValidateOnly' -ForegroundColor Yellow
     Write-Host ''
     Write-Host 'Normal releases publish GitHub + Foundry + morelordgaming.com/releases.'
     Write-Host 'Set RELEASE_PUBLISH_TOKEN in the project .env file or pass -WebsiteToken.'
@@ -531,7 +547,15 @@ $RequiredPaths = @($Config.requiredPaths | ForEach-Object { [string]$_ })
 $OptionalPaths = @($Config.optionalPaths | ForEach-Object { [string]$_ })
 if ($RequiredPaths.Count -eq 0) { throw 'release.config.json requiredPaths must contain at least one path.' }
 
-if ([string]::IsNullOrWhiteSpace($Version)) { Show-Usage -Title $ModuleTitle; exit 0 }
+if ([string]::IsNullOrWhiteSpace($Version)) {
+    if ($ValidateOnly) {
+        $ChangelogUpdated = Update-Changelog -Root $ProjectRoot
+        if ($ChangelogUpdated) { Write-Host 'Updated CHANGELOG.md.' } else { Write-Host 'CHANGELOG.md is already up to date.' }
+        exit 0
+    }
+    Show-Usage -Title $ModuleTitle
+    exit 0
+}
 
 $Tag = "v$Version"
 if ([string]::IsNullOrWhiteSpace($CommitMessage)) { $CommitMessage = "Release $Tag" }
@@ -554,6 +578,21 @@ $ManifestUrl = "https://raw.githubusercontent.com/$Repository/$ReleaseBranch/mod
 $VersionManifestUrl = "https://raw.githubusercontent.com/$Repository/$Tag/module.json"
 $DownloadUrl = "https://github.com/$Repository/releases/download/$Tag/$ArchiveName"
 $GitHubReleaseUrl = "https://github.com/$Repository/releases/tag/$Tag"
+
+if ($ValidateOnly) {
+    $GeneratedChangelog = New-ChangelogMarkdown -Root $ProjectRoot
+    $ChangelogUpdated = Update-Changelog -Root $ProjectRoot -Text $GeneratedChangelog
+    if ($ChangelogUpdated) { Write-Host 'Updated CHANGELOG.md.' } else { Write-Host 'CHANGELOG.md is already up to date.' }
+    if (-not (Test-Path -LiteralPath $ReleaseNotesPath -PathType Leaf)) { throw "Release notes were not found: $ReleaseNotesPath" }
+    $ChangelogText = [System.IO.File]::ReadAllText((Join-Path $ProjectRoot 'CHANGELOG.md'))
+    if ($ChangelogText -notmatch ('(?m)^## ' + [regex]::Escape($Version) + '\s*$')) {
+        throw "CHANGELOG.md does not contain a heading for version $Version."
+    }
+    Write-Host "Validation completed for $ModuleTitle $Tag." -ForegroundColor Green
+    Write-Host 'Git, GitHub, and the website were not modified.'
+    exit 0
+}
+
 $ArchivePath = Join-Path (Join-Path $ProjectRoot 'tmp') $ArchiveName
 $WorkingPath = Join-Path $ProjectRoot 'tmp'
 New-Item -ItemType Directory -Path $WorkingPath -Force | Out-Null
@@ -664,7 +703,21 @@ try {
     Write-Host "  Archive         : $ArchiveName"
 
     Write-Step 'Building and validating release archive...'
+    $GeneratedChangelog = New-ChangelogMarkdown -Root $ProjectRoot
+    if ($DryRun) {
+        $ChangelogUpdated = Update-Changelog -Root $ProjectRoot -Preview -Text $GeneratedChangelog
+        if ($ChangelogUpdated) { Write-Host '  CHANGELOG.md    : would update (dry run leaves the file unchanged)' } else { Write-Host '  CHANGELOG.md    : already up to date' }
+    }
+    else {
+        $ChangelogPath = Join-Path $ProjectRoot 'CHANGELOG.md'
+        if (Test-Path -LiteralPath $ChangelogPath -PathType Leaf) {
+            $OriginalChangelogText = [System.IO.File]::ReadAllText($ChangelogPath)
+        }
+        $ChangelogWasModified = [bool](Update-Changelog -Root $ProjectRoot -Text $GeneratedChangelog)
+        if ($ChangelogWasModified) { Write-Host '  CHANGELOG.md    : updated' } else { Write-Host '  CHANGELOG.md    : already up to date' }
+    }
     Copy-ReleaseContent -Destination $StagingPath -RequiredPaths $RequiredPaths -OptionalPaths $OptionalPaths
+    Write-Utf8NoBom -Path (Join-Path $StagingPath 'CHANGELOG.md') -Text $GeneratedChangelog
     $StagedManifest = Join-Path $StagingPath 'module.json'
     Update-ManifestFile -Path $StagedManifest -ReleaseVersion $Version -DownloadUrl $DownloadUrl -RepositoryUrl $RepositoryUrl -ManifestUrl $ManifestUrl -ExpectedModuleId $ModuleId
     if (-not $DryRun) {
@@ -696,7 +749,7 @@ try {
     }
 
     Write-Step 'Creating release commit and tag...'
-    git add -- module.json
+    git add -- module.json CHANGELOG.md
     git diff --cached --quiet
     if ($LASTEXITCODE -eq 0) { throw 'No staged manifest change was detected. The requested version may already be committed.' }
     Invoke-NativeCommand -Command { git diff --cached --check } -FailureMessage 'Staged changes contain whitespace errors.'
@@ -756,6 +809,16 @@ catch {
     if ($ManifestWasModified -and -not $CommitWasCreated -and $null -ne $OriginalManifestText) {
         Write-Host 'Restoring the original module.json...' -ForegroundColor Yellow
         Write-Utf8NoBom -Path $ManifestPath -Text $OriginalManifestText
+    }
+    if ($ChangelogWasModified -and -not $CommitWasCreated) {
+        Write-Host 'Restoring the original CHANGELOG.md...' -ForegroundColor Yellow
+        $ChangelogPath = Join-Path $ProjectRoot 'CHANGELOG.md'
+        if ($null -ne $OriginalChangelogText) {
+            Write-Utf8NoBom -Path $ChangelogPath -Text $OriginalChangelogText
+        }
+        elseif (Test-Path -LiteralPath $ChangelogPath) {
+            Remove-Item -LiteralPath $ChangelogPath -Force
+        }
     }
     if ($CommitWasCreated) {
         Write-Host 'A release commit was created before the failure. Git history was not rewritten automatically.' -ForegroundColor Yellow
