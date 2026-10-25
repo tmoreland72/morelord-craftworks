@@ -11,6 +11,29 @@ import {
 } from "../core/settings.mjs";
 import { normalizeCraftEnvironment, recipeFacilityEnvironment } from "../crafting/crafting-environment-service.mjs";
 
+// One rank per source pack. Higher wins when the same recipe is in more
+// than one enabled book. Setting and third-party packs outrank the core
+// D&D books; SRD 5.1 is the lowest SRD.
+const SOURCE_PRIORITY = Object.freeze({
+  "srd-5.1": 0,
+  "srd-5.2": 1,
+  "phb": 2,
+  "dmg": 3,
+  "standard-core": -1
+});
+
+function sourcePriority(packId) {
+  return SOURCE_PRIORITY[packId] ?? 4;
+}
+
+function recipeItemKey(name, id) {
+  const key = String(name ?? "")
+    .normalize("NFKD")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+  return key || `id:${id}`;
+}
+
 export class RecipeRegistry {
   constructor({
     materialRegistry,
@@ -28,17 +51,22 @@ export class RecipeRegistry {
   }
 
   async loadStandardSeed() {
-    const sources = CONTENT_PACK_MANIFESTS.map(manifest => [
-      manifest.id,
-      manifest.recipes ?? []
-    ]);
-
     this._recipes.clear();
+    const itemWinners = new Map();
 
-    for (const [packId, entries] of sources) {
+    for (const manifest of CONTENT_PACK_MANIFESTS) {
+      const packId = manifest.id;
+      const entries = manifest.recipes ?? [];
       if (!Array.isArray(entries)) {
         throw new Error(`Packaged recipe source '${packId}' is not an array.`);
       }
+
+      // A disabled pack contributes nothing, so the next enabled source can
+      // supply the same recipe.
+      if (!this.isPackEnabled(packId)) continue;
+
+      const rank = sourcePriority(packId);
+      const tie = Number(manifest.priority ?? 0);
 
       for (const raw of entries) {
         let preparedRaw = {
@@ -70,14 +98,23 @@ export class RecipeRegistry {
           }
         }
 
+        const key = recipeItemKey(raw.name, raw.id);
+        const current = itemWinners.get(key);
+        if (current && current.packId !== packId) {
+          const currentWins = current.rank > rank
+            || (current.rank === rank && current.tie >= tie);
+          if (currentWins) continue;
+          this._recipes.delete(current.id);
+        }
+
         const recipe = this.#normalizeRecipe(preparedRaw);
         recipe.craft.environment = recipeFacilityEnvironment(recipe);
-
-        // Manifest order is priority order. Higher-priority content packs
-        // intentionally replace lower-priority recipes with the same id.
         this._recipes.set(recipe.id, recipe);
-      }
 
+        if (!current || current.packId !== packId) {
+          itemWinners.set(key, { rank, tie, id: recipe.id, packId });
+        }
+      }
     }
 
     for (const raw of await this.customRecipes?.all?.() ?? []) {

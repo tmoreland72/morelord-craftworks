@@ -26,7 +26,6 @@ Lower-priority packs are loaded first. Higher-priority packs load later.
 
 When two active packs define the same identity:
 
-- recipe `id`
 - Harvest profile `id`
 - Gathering profile `id`
 - Loot tier `id`
@@ -34,6 +33,20 @@ When two active packs define the same identity:
 - material `materialId`
 
 the higher-priority pack wins.
+
+Recipes are different. The same recipe name is loaded once, from the
+highest-priority enabled source whose finished item resolves:
+
+1. Any other source pack, such as Monsters of Drakkenheim and future setting
+   or third-party packs
+2. Dungeon Master's Guide
+3. Player's Handbook
+4. SRD 5.2, then SRD 5.1
+
+A disabled pack is skipped, so the next enabled source supplies that recipe.
+The dashboard Recipes total is the number of unique recipes loaded this way,
+including a custom world recipe. Content pack cards in Craftworks Settings do
+not list recipe or profile counts.
 
 This allows campaign packs such as Monsters of Drakkenheim to intentionally
 override a generic Standard definition while both packs remain enabled.
@@ -63,11 +76,9 @@ The PHB module supplies the finished Foundry Item. Kibbles supplies the
 crafting tool, ability, DC, time, value, and material requirements.
 Craftworks Standard supplies the shared Kibbles-defined materials.
 
-Craftworks Settings shows each pack's loaded recipe count after that
-resolution: the recipes from `recipes.all()` whose `packId` is that pack.
-With no custom recipes, those counts add up to the dashboard Recipes total.
-A custom world recipe is included in the dashboard total and is not shown
-on a book card.
+A recipe whose finished item also resolves in a higher-priority enabled
+book is supplied by that book instead. Disabling the higher-priority book
+lets this pack supply it.
 
 Do not duplicate PHB Item definitions inside Craftworks and do not hard-code
 PHB compendium document IDs.

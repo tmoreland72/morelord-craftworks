@@ -108,7 +108,9 @@ Enable only the packs that should contribute to the campaign. Depending on insta
 
 An active pack can contribute materials, recipes, Harvest and Gather profiles, encounter-loot rules, economy profiles, and crafting definitions. Disabled or unavailable packs contribute no runtime content.
 
-The **recipes** count on each pack card is the number of that pack's recipes currently loaded: the pack is enabled and the finished item resolved in that book's compendium. It is not the length of the raw candidate list. Those pack counts add up to the dashboard **Recipes** total when every loaded recipe belongs to a content pack. A custom recipe created in the world is included in the dashboard total and is not shown on a book card.
+Each content pack card shows the pack name, its access badge, availability, a short description, the rules version, and an **Enabled** or **Disabled** control. Cards for packs that depend on installed modules, such as Drakkenheim, also list those modules and each module's availability. The cards do not list material, recipe, harvest, gathering, loot, or encounter counts.
+
+When the same recipe is in more than one enabled book, Craftworks loads that recipe once, from the highest-priority source that has its finished item. Setting and third-party packs such as Drakkenheim win, then the Dungeon Master's Guide, then the Player's Handbook, then SRD 5.2, then SRD 5.1. Disabling a pack lets the next enabled source supply the recipe. The dashboard **Recipes** total counts those unique loaded recipes. A custom recipe created in the world is included in that total.
 
 The Drakkenheim card keeps one enable/disable control and a Champion badge, with separate availability statuses for Dungeons of Drakkenheim and Monsters of Drakkenheim.
 
