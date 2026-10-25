@@ -1,4 +1,88 @@
 import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
+
+// Explicit Kibbles labels whose official compendium title was confirmed in
+// the dnd5e SRD packs (equipment24, items, or tradegoods). Keys are the
+// punctuation-insensitive form used by normalizeName.
+const EXPLICIT_ITEM_ALIASES = new Map([
+  ["blacksmithstools", ["Smith's Tools"]],
+  ["robeofthearchmage", ["Robe of the Archmagi"]],
+  ["dimensionshackles", ["Dimensional Shackles"]],
+  ["luckstone", ["Stone of Good Luck (Luckstone)"]],
+  ["flametongueweapon", ["Flame Tongue"]],
+  ["flametongue", ["Flame Tongue"]],
+  ["glassvial", ["Vial"]],
+  ["splint", ["Splint Armor"]],
+  ["piton", ["Spikes, Iron"]],
+  ["pitons", ["Piton", "Spikes, Iron"]]
+]);
+
+const PARENTHETICAL_NOTE = /^(?:empty|with all patches|\d+\s*ft\.?|\d+\s*feet|per\s+\d+\s*ft\.?|large|huge|gargantuan|medium|small)$/i;
+const BONUS_ITEM = /^(weapon|armor|shield|ammunition)$/i;
+
+function ordinalSpellLevel(level) {
+  const value = Number(level);
+  const teen = value % 100;
+  const suffix = teen >= 11 && teen <= 13
+    ? "th"
+    : { 1: "st", 2: "nd", 3: "rd" }[value % 10] ?? "th";
+  return `${value}${suffix}`;
+}
+
+function addNearMissCandidates(form, add) {
+  if (form.includes("/")) {
+    for (const part of form.split("/")) add(part);
+  }
+
+  if (/\sof\s+(?!the\b)/i.test(form)) {
+    add(form.replace(/\sof\s+/i, " of the "));
+  }
+
+  const words = form.split(/\s+/).filter(Boolean);
+  const last = words.at(-1) ?? "";
+  if (/[^s]s$/i.test(last) && last.length > 3) {
+    add([...words.slice(0, -1), last.slice(0, -1)].join(" "));
+  } else if (last && !/s$/i.test(last)) {
+    add([...words.slice(0, -1), `${last}s`].join(" "));
+  }
+
+  if (/tools$/i.test(form)) add(form.replace(/tools$/i, "Supplies"));
+  if (/supplies$/i.test(form)) add(form.replace(/supplies$/i, "Tools"));
+
+  const comma = form.match(/^([^,]+),\s*(.+)$/);
+  if (comma) add(`${comma[2]} ${comma[1]}`);
+
+  const parenthetical = form.match(/^(.*?)\s*\(([^)]+)\)\s*$/);
+  if (parenthetical) {
+    const stem = parenthetical[1].trim();
+    const inner = parenthetical[2].trim();
+    add(`${inner} ${stem}`);
+    add(`${stem} of ${inner}`);
+    if (PARENTHETICAL_NOTE.test(inner)) add(stem);
+  }
+
+  if (/archmage/i.test(form)) add(form.replace(/archmage/ig, "Archmagi"));
+  if (/oynx/i.test(form)) add(form.replace(/oynx/ig, "Onyx"));
+  if (/amplying/i.test(form)) add(form.replace(/amplying/ig, "Amplifying"));
+
+  const leadingBonus = form.match(/^\+(\d+)\s+(.+)$/);
+  const trailingBonus = form.match(/^(.+?)\s+\+(\d+)$/);
+  const bonus = leadingBonus
+    ? { kind: leadingBonus[2], value: leadingBonus[1] }
+    : trailingBonus
+      ? { kind: trailingBonus[1], value: trailingBonus[2] }
+      : null;
+  if (bonus && BONUS_ITEM.test(bonus.kind)) {
+    add(`${bonus.kind}, +1, +2, or +3`);
+    add(`${bonus.kind} +${bonus.value}`);
+  }
+
+  const aliasKey = form
+    .normalize("NFKD")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+  add(...(EXPLICIT_ITEM_ALIASES.get(aliasKey) ?? []));
+}
+
 const DND5E_ITEM_PACKS = Object.freeze({
   "SRD 5.2": [
     "dnd5e.equipment24"
@@ -167,6 +251,12 @@ export class Dnd5eCompendiumItemResolver {
   candidateNames(value) {
     const name = String(value ?? "").trim();
     const candidates = [name];
+    const add = (...values) => {
+      for (const value of values) {
+        const text = String(value ?? "").trim();
+        if (text) candidates.push(text);
+      }
+    };
 
     if (/^playing card set$/i.test(name)) {
       candidates.push("Playing Cards");
@@ -209,6 +299,13 @@ export class Dnd5eCompendiumItemResolver {
 
       candidates.push(`Spell Scroll, ${levelLabel}`);
       candidates.push(`Spell Scroll (${levelLabel})`);
+
+      // SRD compendiums name leveled scrolls "Spell Scroll, 2nd Level".
+      if (kibblesScrollTier[2]) {
+        const ordinalLabel = `${ordinalSpellLevel(kibblesScrollTier[2])} Level`;
+        candidates.push(`Spell Scroll, ${ordinalLabel}`);
+        candidates.push(`Spell Scroll ${ordinalLabel}`);
+      }
     }
 
     const spellScroll = name.match(
@@ -253,6 +350,13 @@ export class Dnd5eCompendiumItemResolver {
 
     if (parentheticalGiant) {
       candidates.push(`Potion of ${parentheticalGiant[1]} Giant Strength`);
+    }
+
+    const stripped = name.replace(/^\s*\d+\s*[x×]\s*/i, "").trim();
+    if (stripped && stripped !== name) add(stripped);
+
+    for (const form of [...new Set([name, stripped].filter(Boolean))]) {
+      addNearMissCandidates(form, add);
     }
 
     return [...new Set(candidates)];

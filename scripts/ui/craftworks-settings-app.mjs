@@ -76,6 +76,9 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
       }))
       .sort((a,b) => a.name.localeCompare(b.name));
 
+    // Same population as the dashboard Recipes tile. Each card counts the
+    // loaded recipes whose finished item resolved from that pack's book.
+    const loadedRecipes = craftworks?.recipes?.all?.() ?? [];
     const packs = [...CONTENT_PACKS]
       .sort((a,b) => Number(a.sort ?? 0) - Number(b.sort ?? 0))
       .map(pack => {
@@ -92,7 +95,8 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
           game.settings.get(MODULE_ID, getContentPackSettingKey(pack.id))
         );
 
-        const manifest = craftworks?.contentPacks?.manifest(pack.id) ?? getContentPackManifest(pack.id);
+        const manifest = craftworks?.contentPacks?.manifest?.(pack.id) ?? getContentPackManifest(pack.id);
+        const loadedForPack = loadedRecipes.filter(recipe => recipe.packId === pack.id).length;
 
         return {
           ...pack,
@@ -105,7 +109,7 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
             materials: manifest?.materials?.entries?.length ?? (
               manifest?.materials?.seedPath ? "seed" : 0
             ),
-            recipes: manifest?.recipes?.length ?? 0,
+            recipes: craftworks?.recipes?.all ? loadedForPack : 0,
             harvest: manifest?.harvestProfiles?.length ?? 0,
             gathering: manifest?.gatheringProfiles?.length ?? 0,
             loot: manifest?.lootTiers?.length ?? 0,

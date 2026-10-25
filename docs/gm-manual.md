@@ -108,6 +108,8 @@ Enable only the packs that should contribute to the campaign. Depending on insta
 
 An active pack can contribute materials, recipes, Harvest and Gather profiles, encounter-loot rules, economy profiles, and crafting definitions. Disabled or unavailable packs contribute no runtime content.
 
+The **recipes** count on each pack card is the number of that pack's recipes currently loaded: the pack is enabled and the finished item resolved in that book's compendium. It is not the length of the raw candidate list. Those pack counts add up to the dashboard **Recipes** total when every loaded recipe belongs to a content pack. A custom recipe created in the world is included in the dashboard total and is not shown on a book card.
+
 The Drakkenheim card keeps one enable/disable control and a Champion badge, with separate availability statuses for Dungeons of Drakkenheim and Monsters of Drakkenheim.
 
 ### Synchronize compendiums

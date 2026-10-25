@@ -63,6 +63,12 @@ The PHB module supplies the finished Foundry Item. Kibbles supplies the
 crafting tool, ability, DC, time, value, and material requirements.
 Craftworks Standard supplies the shared Kibbles-defined materials.
 
+Craftworks Settings shows each pack's loaded recipe count after that
+resolution: the recipes from `recipes.all()` whose `packId` is that pack.
+With no custom recipes, those counts add up to the dashboard Recipes total.
+A custom world recipe is included in the dashboard total and is not shown
+on a book card.
+
 Do not duplicate PHB Item definitions inside Craftworks and do not hard-code
 PHB compendium document IDs.
 
