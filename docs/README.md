@@ -29,8 +29,22 @@ Craftworks can also support exceptional add-on content packs that go beyond the 
 
 <div class="docs-video">
 	<iframe
-		src="https://www.youtube-nocookie.com/embed/XFebMhTQEA8"
+		src="https://www.youtube-nocookie.com/embed/qmcmKaunt40"
 		title="Morelord Craftworks demo"
+		loading="lazy"
+		allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+		allowfullscreen
+	></iframe>
+</div>
+
+<p class="docs-video-intro">
+	Additional Game Master demo.
+</p>
+
+<div class="docs-video">
+	<iframe
+		src="https://www.youtube-nocookie.com/embed/XFebMhTQEA8"
+		title="Morelord Craftworks additional demo"
 		loading="lazy"
 		allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
 		allowfullscreen
