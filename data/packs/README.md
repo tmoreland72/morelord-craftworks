@@ -97,8 +97,10 @@ This pack has its own material catalog and crafting rules.
 - Recipe requirements come from Appendix E: Magic Items in Monsters of
   Drakkenheim.
 - Finished items are not copied into Craftworks. At runtime, the recipe resolver
-  indexes Item compendiums belonging to the installed `drakkenheim-monsters`
-  package and resolves the recipe output by exact normalized item name.
+  indexes these installed Item compendiums and resolves the recipe output by
+  normalized item name, including the same near-miss titles used for the SRD:
+  `drakkenheim-monsters.items`, `drakkenheim-core.items`, and
+  `drakkenheim-scgd.items`.
 - Monsters of Drakkenheim crafting takes one day at the required Workshop and
   does not require a crafting check. Craftworks therefore uses a no-check
   completion path for these recipes rather than Kibbles' repeated checks.

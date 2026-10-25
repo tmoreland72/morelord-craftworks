@@ -1,8 +1,7 @@
 import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
 
-// Explicit Kibbles labels whose official compendium title was confirmed in
-// the dnd5e SRD packs (equipment24, items, or tradegoods). Keys are the
-// punctuation-insensitive form used by normalizeName.
+// Explicit Kibbles labels whose compendium title was confirmed in an indexed
+// pack. Keys are the punctuation-insensitive form used by normalizeName.
 const EXPLICIT_ITEM_ALIASES = new Map([
   ["blacksmithstools", ["Smith's Tools"]],
   ["robeofthearchmage", ["Robe of the Archmagi"]],
@@ -13,10 +12,11 @@ const EXPLICIT_ITEM_ALIASES = new Map([
   ["glassvial", ["Vial"]],
   ["splint", ["Splint Armor"]],
   ["piton", ["Spikes, Iron"]],
-  ["pitons", ["Piton", "Spikes, Iron"]]
+  ["pitons", ["Piton", "Spikes, Iron"]],
+  // DMG equipment has one Rod of the Pact Keeper document for every bonus.
+  ["rodofthepactkeeper3", ["Rod of the Pact Keeper"]]
 ]);
 
-const PARENTHETICAL_NOTE = /^(?:empty|with all patches|\d+\s*ft\.?|\d+\s*feet|per\s+\d+\s*ft\.?|large|huge|gargantuan|medium|small)$/i;
 const BONUS_ITEM = /^(weapon|armor|shield|ammunition)$/i;
 
 function ordinalSpellLevel(level) {
@@ -48,6 +48,11 @@ function addNearMissCandidates(form, add) {
   if (/tools$/i.test(form)) add(form.replace(/tools$/i, "Supplies"));
   if (/supplies$/i.test(form)) add(form.replace(/supplies$/i, "Tools"));
 
+  const possessive = form.match(/^(\S+)\s+(.+)$/);
+  if (possessive && !/'s$/i.test(possessive[1])) {
+    add(`${possessive[1]}'s ${possessive[2]}`);
+  }
+
   const comma = form.match(/^([^,]+),\s*(.+)$/);
   if (comma) add(`${comma[2]} ${comma[1]}`);
 
@@ -57,7 +62,10 @@ function addNearMissCandidates(form, add) {
     const inner = parenthetical[2].trim();
     add(`${inner} ${stem}`);
     add(`${stem} of ${inner}`);
-    if (PARENTHETICAL_NOTE.test(inner)) add(stem);
+    // Length, size, and variant notes ("Chain (5 ft)", "Ballista (Large)",
+    // "Figurine of Wondrous Power (Ivory Goats)") keep the specific reorderings
+    // above, then try the stem when that exact title exists.
+    add(stem);
   }
 
   if (/archmage/i.test(form)) add(form.replace(/archmage/ig, "Archmagi"));
@@ -97,9 +105,11 @@ const DND5E_ITEM_PACKS = Object.freeze({
   "Dungeon Master's Guide": [
     "dnd-dungeon-masters-guide.equipment"
   ],
-  "Monsters of Drakkenheim": {
-    packageId: "drakkenheim-monsters"
-  }
+  "Monsters of Drakkenheim": [
+    "drakkenheim-monsters.items",
+    "drakkenheim-core.items",
+    "drakkenheim-scgd.items"
+  ]
 });
 
 export class Dnd5eCompendiumItemResolver {

@@ -40,7 +40,7 @@ function index(resolver, sourceBook, names) {
 
 test("pack cards count loaded recipes from each book and add up to the dashboard total", async () => {
   const resolver = new Dnd5eCompendiumItemResolver();
-  index(resolver, "Player's Handbook", ["Hat", "Dart", "Robe"]);
+  index(resolver, "Player's Handbook", ["Splint Armor", "Dart", "Robe"]);
   index(resolver, "Dungeon Master's Guide", ["Dart"]);
   index(resolver, "SRD 5.2", ["Robe", "Splint Armor", "Spell Scroll, 2nd Level", "Arrows"]);
   index(resolver, "SRD 5.1", ["Robes", "Piton", "Arrow"]);
@@ -57,10 +57,10 @@ test("pack cards count loaded recipes from each book and add up to the dashboard
   const loaded = recipes.all();
   const phb = loaded.filter(recipe => recipe.packId === "phb");
   const dmg = loaded.filter(recipe => recipe.packId === "dmg");
-  assert.ok(phb.some(recipe => recipe.name === "Hat/Cap"));
+  assert.ok(phb.some(recipe => recipe.name === "Splint"));
   assert.ok(phb.some(recipe => recipe.name === "10 x Dart"));
   assert.ok(dmg.some(recipe => recipe.name === "10 x Dart"));
-  assert.equal(dmg.some(recipe => recipe.name === "Hat/Cap"), false);
+  assert.equal(dmg.some(recipe => recipe.name === "Splint"), false);
   assert.ok(phb.length > dmg.length);
 
   CraftworksSettingsApp.craftworks = {

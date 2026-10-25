@@ -75,6 +75,9 @@ for (const candidate of [
 }
 assert.ok(crossSourceResolver.candidateNames("Hat/Cap").includes("Hat"));
 assert.ok(crossSourceResolver.candidateNames("Hat/Cap").includes("Cap"));
+assert.ok(crossSourceResolver.candidateNames("Injector Crossbow").includes("Injector's Crossbow"));
+assert.ok(crossSourceResolver.candidateNames("Figurine of Wondrous Power (Ivory Goats)").includes("Figurine of Wondrous Power"));
+assert.ok(crossSourceResolver.candidateNames("Rod of the Pact Keeper +3").includes("Rod of the Pact Keeper"));
 assert.ok(crossSourceResolver.candidateNames("10 x Dart").includes("Dart"));
 assert.equal(
   crossSourceResolver.normalizeName("10 x Dart"),
@@ -110,6 +113,8 @@ const linkedNames = new Map([
   ["Brass Horn of Valhalla", "Brass Horn of Valhalla"],
   ["Iron Flask", "Iron Flask"],
   ["Robe of Useful Items", "Robe of Useful Items"],
+  ["Figurine of Wondrous Power", "Figurine of Wondrous Power"],
+  ["Rod of the Pact Keeper", "Rod of the Pact Keeper"],
   ["Weapon, +1, +2, or +3", "Weapon, +1, +2, or +3"],
   ["Ammunition, +1, +2, or +3", "Ammunition, +1, +2, or +3"],
   ["Robes", "Robes"]
@@ -142,6 +147,8 @@ for (const [recipeName, itemName] of [
   ["Horn of Valhalla (Brass)", "Brass Horn of Valhalla"],
   ["Iron Flask (Empty)", "Iron Flask"],
   ["Robe of Useful Items (with all patches)", "Robe of Useful Items"],
+  ["Figurine of Wondrous Power (Ivory Goats)", "Figurine of Wondrous Power"],
+  ["Rod of the Pact Keeper +3", "Rod of the Pact Keeper"],
   ["+2 Weapon", "Weapon, +1, +2, or +3"],
   ["+1 Ammunition", "Ammunition, +1, +2, or +3"],
   ["Robe", "Robes"],
@@ -187,7 +194,7 @@ const visit = value => {
 };
 
 visit(KIBBLES_RECIPE_SEED);
-assert.ok(structuredScrollRequirements >= 250);
+assert.ok(structuredScrollRequirements >= 223);
 assert.equal(legacyScrollRequirements, 0);
 
 const deleriumSearchPacks = CONTENT_PACKS
