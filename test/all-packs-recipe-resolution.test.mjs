@@ -170,7 +170,7 @@ const srdRoot = "/tmp/dnd5e/packs/_source";
 const paidPath = "/home/ubuntu/.cursor/projects/workspace/uploads/item-names_3185.json";
 const indexesReady = fs.existsSync(path.join(srdRoot, "equipment24")) && fs.existsSync(paidPath);
 
-test("installed compendiums load 288 unique recipes, or 265 without the SRD books", { skip: indexesReady ? false : "local item indexes are not in this checkout" }, async () => {
+test("installed compendiums load 279 unique recipes, or 275 without the SRD books", { skip: indexesReady ? false : "local item indexes are not in this checkout" }, async () => {
   const paid = JSON.parse(fs.readFileSync(paidPath, "utf8"));
   const paidNames = key => (paid[key]?.names ?? []).filter(name => !String(name).startsWith("Activate "));
   const rowsFor = names => names.map((name, index) => ({
@@ -202,15 +202,29 @@ test("installed compendiums load 288 unique recipes, or 265 without the SRD book
   const linkedDespiteSources = registry({ sourceFilter: { isPackEnabled: () => false } });
   await linkedDespiteSources.loadStandardSeed();
   assert.deepEqual(counts(linkedDespiteSources), {
-    total: 288,
+    total: 279,
     byPack: {
-      "srd-5.2": 16,
-      "srd-5.1": 7,
+      "srd-5.1": 4,
       phb: 55,
-      dmg: 134,
+      dmg: 144,
       "monsters-of-drakkenheim": 76
     }
   });
+  const loadedNames = linkedDespiteSources.all().map(recipe => recipe.name);
+  for (const level of ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th"]) {
+    assert.equal(loadedNames.includes(`${level}-Level Spell`), false);
+  }
+  for (const name of ["Saddle, Exotic", "Saddle, Pack", "Saddlebag", "Merchant\u2019s Scale"]) {
+    assert.equal(
+      linkedDespiteSources.all().find(recipe => recipe.name === name)?.packId,
+      "srd-5.1",
+      name
+    );
+  }
+  assert.equal(
+    linkedDespiteSources.all().find(recipe => recipe.name === "Instant Fortress")?.output.label,
+    "Daern's Instant Fortress"
+  );
 
   use(new Set([
     "dnd-players-handbook.equipment",
@@ -222,11 +236,19 @@ test("installed compendiums load 288 unique recipes, or 265 without the SRD book
   const withoutSrdBooks = registry({});
   await withoutSrdBooks.loadStandardSeed();
   assert.deepEqual(counts(withoutSrdBooks), {
-    total: 265,
+    total: 275,
     byPack: {
       phb: 55,
-      dmg: 134,
+      dmg: 144,
       "monsters-of-drakkenheim": 76
     }
   });
+  assert.equal(
+    withoutSrdBooks.all().some(recipe => recipe.name === "Saddle, Exotic"),
+    false
+  );
+  assert.equal(
+    withoutSrdBooks.all().find(recipe => recipe.name === "Crawler Mucus")?.packId,
+    "dmg"
+  );
 });

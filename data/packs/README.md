@@ -48,14 +48,25 @@ The dashboard Recipes total is the number of unique recipes loaded this way,
 including a custom world recipe. Content pack cards in Craftworks Settings do
 not list recipe or profile counts.
 
-With every pack enabled and its item compendium installed, that total is 288:
-SRD 5.2 supplies 16, SRD 5.1 supplies 7, Player's Handbook 55, Dungeon
-Master's Guide 134, and Monsters of Drakkenheim 76. Linking still reads a
-compendium when dnd5e Configure Sources excludes it. Missing SRD item
-compendiums, or SRD packs saved as disabled, leave those 23 recipes out,
-and the total is 265. Ingredient
-materials are not taken from the winning book. Kibbles materials come from
-Craftworks Standard.
+SRD titles that drop a creator prefix match a Player's Handbook or Dungeon
+Master's Guide item when that book has exactly one `<Name>'s` plus the SRD
+title. Explicit pairs cover the renames that pattern misses: Crawler Mucus /
+Carrion Crawler Mucus, Efficient Quiver / Quiver of Ehlonna, Restorative
+Ointment / Keoghtom's Ointment, and the stone and storm belts of giant
+strength. Recipes named `1st-Level Spell` through `9th-Level Spell` are not
+loaded. Each spell already has a scroll item, and those nine generic outputs
+are not handbook items. Cantrip and the Drakkenheim spell-scroll tier recipes
+stay.
+
+With every pack enabled and its item compendium installed, that total is 279:
+SRD 5.1 supplies 4 (Saddle, Exotic; Saddle, Pack; Saddlebag; Merchant's Scale),
+Player's Handbook 55, Dungeon Master's Guide 144, and Monsters of Drakkenheim
+76. SRD 5.2 adds nothing further while the Dungeon Master's Guide is enabled.
+Linking still reads a compendium when dnd5e Configure Sources excludes it.
+Missing SRD item compendiums, or SRD packs saved as disabled, leave those four
+recipes out, and the total is 275. The renamed items still load from the
+Dungeon Master's Guide. Ingredient materials are not taken from the winning
+book. Kibbles materials come from Craftworks Standard.
 
 This allows campaign packs such as Monsters of Drakkenheim to intentionally
 override a generic Standard definition while both packs remain enabled.

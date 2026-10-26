@@ -1,5 +1,32 @@
 import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
 
+// Kibbles titles that are the same item as a differently named compendium
+// document. The first name is the recipe title; the rest share its identity.
+// Confirmed against the PHB and DMG equipment indexes. The possessive-prefix
+// scan covers Quaal's, Heward's, and Daern's titles, so those are not listed
+// here. Generic "Nth-Level Spell" scrolls are not aliases: those recipes are
+// omitted at load because each spell already has its own scroll item.
+const CATALOG_NAME_ALIASES = Object.freeze([
+  ["Crawler Mucus", "Carrion Crawler Mucus"],
+  ["Efficient Quiver", "Quiver of Ehlonna"],
+  ["Restorative Ointment", "Keoghtom's Ointment"],
+  ["Belt of Stone Giant Strength", "Belt of Giant Strength (stone)"],
+  ["Belt of Storm Giant Strength", "Belt of Giant Strength (storm)"]
+]);
+
+const POSSESSIVE_PREFIX = /^(\S+?)['\u2019\u2018`]s\s+(.+)$/iu;
+const HANDBOOK_SOURCE_BOOKS = Object.freeze([
+  "Player's Handbook",
+  "Dungeon Master's Guide"
+]);
+
+function looseKey(value) {
+  return String(value ?? "")
+    .normalize("NFKD")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+}
+
 // Explicit Kibbles labels whose compendium title was confirmed in an indexed
 // pack. Keys are the punctuation-insensitive form used by normalizeName.
 const EXPLICIT_ITEM_ALIASES = new Map([
@@ -16,6 +43,19 @@ const EXPLICIT_ITEM_ALIASES = new Map([
   // DMG equipment has one Rod of the Pact Keeper document for every bonus.
   ["rodofthepactkeeper3", ["Rod of the Pact Keeper"]]
 ]);
+
+for (const [recipeName, ...itemNames] of CATALOG_NAME_ALIASES) {
+  EXPLICIT_ITEM_ALIASES.set(looseKey(recipeName), itemNames);
+}
+
+export function catalogAliasKey(name) {
+  const key = looseKey(name);
+  if (!key) return null;
+  for (const names of CATALOG_NAME_ALIASES) {
+    if (names.some(entry => looseKey(entry) === key)) return looseKey(names[0]);
+  }
+  return null;
+}
 
 const BONUS_ITEM = /^(weapon|armor|shield|ammunition)$/i;
 
@@ -207,17 +247,59 @@ export class Dnd5eCompendiumItemResolver {
       if (!key) continue;
 
       const match = sourceIndex.get(key);
-      if (
-        match
-        && (
-          includeDisabledSources
-          || !this.sourceFilter
-          || this.sourceFilter.isPackEnabled(match.packId)
-        )
-      ) return match;
+      if (this.#sourceAllows(match, includeDisabledSources)) return match;
     }
 
+    const possessive = this.#possessivePrefixMatches(sourceIndex, name, includeDisabledSources);
+    if (possessive.length === 1) return possessive[0];
+
     return null;
+  }
+
+  // SRD drops a creator prefix ("Quaal's", "Heward's", "Daern's"). When this
+  // book has exactly one item named "<Name>'s " plus the recipe title, that
+  // item is the recipe output. Zero or several matches do not merge.
+  #possessivePrefixMatches(sourceIndex, name, includeDisabledSources) {
+    const needle = this.normalizeName(name);
+    if (!needle || !sourceIndex) return [];
+
+    const matches = [];
+    for (const item of sourceIndex.values()) {
+      const prefixed = String(item?.name ?? "").trim().match(POSSESSIVE_PREFIX);
+      if (!prefixed) continue;
+      if (this.normalizeName(prefixed[2]) !== needle) continue;
+      if (this.#sourceAllows(item, includeDisabledSources)) matches.push(item);
+    }
+    return matches;
+  }
+
+  #sourceAllows(match, includeDisabledSources) {
+    return Boolean(
+      match
+      && (
+        includeDisabledSources
+        || !this.sourceFilter
+        || this.sourceFilter.isPackEnabled(match.packId)
+      )
+    );
+  }
+
+  // Long form "Quaal's Feather Token (Bird)" shares the short recipe key
+  // only when the handbooks contain exactly one such prefixed item.
+  possessiveCanonicalName(name) {
+    const prefixed = String(name ?? "").trim().match(POSSESSIVE_PREFIX);
+    if (!prefixed) return null;
+    const tail = prefixed[2].trim();
+    const hits = [];
+    for (const sourceBook of HANDBOOK_SOURCE_BOOKS) {
+      hits.push(...this.#possessivePrefixMatches(
+        this._bySourceBook.get(sourceBook),
+        tail,
+        true
+      ));
+    }
+    const distinct = new Set(hits.map(item => this.normalizeName(item.name)));
+    return distinct.size === 1 ? tail : null;
   }
 
   async resolveAny(name, { preferredSourceBook = null, includeDisabledSources = false } = {}) {

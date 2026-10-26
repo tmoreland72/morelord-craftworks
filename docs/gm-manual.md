@@ -114,9 +114,13 @@ Each content pack card shows the pack name, its access badge, availability, a sh
 
 When the same recipe is in more than one enabled book, Craftworks loads that recipe once, from the highest-priority source that has its finished item. Setting and third-party packs such as Drakkenheim win, then the Dungeon Master's Guide, then the Player's Handbook, then SRD 5.2, then SRD 5.1. Disabling a pack lets the next enabled source supply the recipe. The dashboard **Recipes** total counts those unique loaded recipes. A custom recipe created in the world is included in that total.
 
+Some SRD recipe titles omit the creator name the handbooks use. When a book's item index has exactly one document named `<Name>'s` plus the recipe title, that document is the finished item. That rule links **Feather Token (Bird)**, **Feather Token (Swan Boat)**, and **Feather Token (Whip)** to Quaal's feather tokens, **Handy Haversack** to Heward's Handy Haversack, and **Instant Fortress** to Daern's Instant Fortress. A title with two prefixed documents in the handbooks stays unmatched. These explicit pairs also share one recipe: **Crawler Mucus** and Carrion Crawler Mucus, **Efficient Quiver** and Quiver of Ehlonna, **Restorative Ointment** and Keoghtom's Ointment, **Belt of Stone Giant Strength** and Belt of Giant Strength (stone), and **Belt of Storm Giant Strength** and Belt of Giant Strength (storm). Efficient Quiver does not link to the mundane Quiver. With the Dungeon Master's Guide enabled, that book supplies these recipes. Turning it off leaves the SRD copy.
+
+The recipe catalog does not include **1st-Level Spell** through **9th-Level Spell**. Those nine generic scroll outputs overlap the per-spell scroll items, and the handbooks do not have a separate item for each of those levels. **Cantrip** remains, as does each Drakkenheim **Spell Scroll** tier recipe.
+
 Ingredients stay with the recipe. A book pack does not have its own material list; Kibbles materials still come from Craftworks Standard, and Drakkenheim materials still come from the Drakkenheim pack, whichever book won the finished item.
 
-With Craftworks Standard, SRD 5.1, SRD 5.2, Player's Handbook, Dungeon Master's Guide, and Drakkenheim all enabled, and with those item compendiums installed, the dashboard total is **288**: SRD 5.2 supplies 16, SRD 5.1 supplies 7, the Player's Handbook supplies 55, the Dungeon Master's Guide supplies 134, and Drakkenheim supplies 76. Recipe linking reads a book's item compendium even when dnd5e **Configure Sources** excludes it. Generated rewards still honor **Configure Sources**. If the SRD item compendiums are not installed, or SRD 5.2 and SRD 5.1 are saved as disabled, those 23 SRD-only recipes are absent and the total is 265.
+With Craftworks Standard, SRD 5.1, SRD 5.2, Player's Handbook, Dungeon Master's Guide, and Drakkenheim all enabled, and with those item compendiums installed, the dashboard total is **279**: SRD 5.1 supplies 4, the Player's Handbook supplies 55, the Dungeon Master's Guide supplies 144, and Drakkenheim supplies 76. SRD 5.2 adds no further recipe while the Dungeon Master's Guide is enabled. The four SRD 5.1 recipes are **Saddle, Exotic**, **Saddle, Pack**, **Saddlebag**, and **Merchant's Scale**, which have no matching handbook item. Recipe linking reads a book's item compendium even when dnd5e **Configure Sources** excludes it. Generated rewards still honor **Configure Sources**. If the SRD item compendiums are not installed, or SRD 5.2 and SRD 5.1 are saved as disabled, those four recipes are absent and the total is 275. The renamed items above still load from the Dungeon Master's Guide.
 
 The Drakkenheim card keeps one enable/disable control and a Champion badge, with separate availability statuses for Dungeons of Drakkenheim and Monsters of Drakkenheim.
 
@@ -399,7 +403,7 @@ Below Schools of Magic, choose **Generate By → Spell Level** or **Rarity**. Th
 6. Choose the recipient.
 7. Select **Award Generated Spell Scrolls**.
 
-Generated scrolls use dnd5e's native scroll conversion, preserve the selected spell's usable mechanics, support levels above 1, and keep a link to the source spell.
+Generated scrolls use dnd5e's native scroll conversion, preserve the selected spell's usable mechanics, support levels above 1, and keep a link to the source spell. Craftworks also installs one scroll Item per spell into the Craftworks Spell Scrolls compendium. The recipe catalog does not add a separate generic recipe for spell levels 1 through 9.
 
 ![Spell Scroll Generator accepts independent quantities for cantrips and spell levels 1 through 9.](assets/spell-scroll-generator-setup.png)
 
