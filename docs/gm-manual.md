@@ -112,6 +112,10 @@ Each content pack card shows the pack name, its access badge, availability, a sh
 
 When the same recipe is in more than one enabled book, Craftworks loads that recipe once, from the highest-priority source that has its finished item. Setting and third-party packs such as Drakkenheim win, then the Dungeon Master's Guide, then the Player's Handbook, then SRD 5.2, then SRD 5.1. Disabling a pack lets the next enabled source supply the recipe. The dashboard **Recipes** total counts those unique loaded recipes. A custom recipe created in the world is included in that total.
 
+Ingredients stay with the recipe. A book pack does not have its own material list; Kibbles materials still come from Craftworks Standard, and Drakkenheim materials still come from the Drakkenheim pack, whichever book won the finished item.
+
+With Craftworks Standard, SRD 5.1, SRD 5.2, Player's Handbook, Dungeon Master's Guide, and Drakkenheim all enabled, and with those item compendiums installed, the dashboard total is **290**: SRD 5.2 supplies 16, SRD 5.1 supplies 7, the Player's Handbook supplies 57, the Dungeon Master's Guide supplies 134, and Drakkenheim supplies 76. Recipe linking reads a book's item compendium even when dnd5e **Configure Sources** excludes it. Generated rewards still honor **Configure Sources**. If the SRD item compendiums are not installed, those 23 SRD-only recipes are absent and the total is 267.
+
 The Drakkenheim card keeps one enable/disable control and a Champion badge, with separate availability statuses for Dungeons of Drakkenheim and Monsters of Drakkenheim.
 
 ### Synchronize compendiums
@@ -203,7 +207,7 @@ Craftworks crafting checks use the listed artisan tool at the recipe’s DC. Mis
 
 ### Control recipe knowledge
 
-Recipes are either **Known** or **Unknown**. An Unknown recipe remains discoverable and can be marked as a crafting goal, but its ingredient requirements are concealed from players and a player cannot begin a new job from it.
+Recipes are either **Known** or **Unknown**. An Unknown recipe remains discoverable and can be marked as a crafting goal, but its ingredient requirements are concealed from players and a player cannot begin a new job from it. The toolbar count is the number of currently loaded recipes marked Unknown. Stored ids for recipes that are no longer loaded are not included.
 
 Use **Mark Context Known** or **Mark Context Unknown** to update only the recipes matched by the current search and filters. This makes it possible to reveal a family of recipes without changing unrelated entries.
 

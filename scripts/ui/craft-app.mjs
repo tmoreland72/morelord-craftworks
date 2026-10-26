@@ -835,7 +835,10 @@ export class CraftApp
 
     for (const itemName of requirementItemNames) {
       const item = await this.craftworks.recipes.dnd5eItemResolver
-        ?.resolveAny(itemName, { preferredSourceBook: sourcePack?.label });
+        ?.resolveAny(itemName, {
+          preferredSourceBook: sourcePack?.label,
+          includeDisabledSources: true
+        });
 
       if (item) {
         requirementItemMatches.set(itemName.toLowerCase(), item);

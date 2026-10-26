@@ -274,7 +274,7 @@ export class RecipeRegistry {
           };
       const item = await this.dnd5eItemResolver.resolve(
         parsed.name,
-        { sourceBook: candidateSourceBook }
+        { sourceBook: candidateSourceBook, includeDisabledSources: true }
       );
 
       if (!item) continue;

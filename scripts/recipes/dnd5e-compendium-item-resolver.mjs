@@ -142,19 +142,24 @@ export class Dnd5eCompendiumItemResolver {
       for (const collection of collections) {
         const pack = game.packs.get(collection);
         if (!pack || pack.documentName !== "Item") continue;
-        if (this.sourceFilter && !this.sourceFilter.isPackEnabled(pack)) continue;
 
+        // Recipe linking follows the Craftworks pack toggle. Index the
+        // compendium even when dnd5e Configure Sources excludes it; resolve()
+        // still applies that exclusion for generators and other callers.
+        const indexFields = ["name", "img", "type", "system.rarity", "system.rarities"];
         let index;
         try {
-          index = await pack.getIndex({
-            fields: ["name", "img", "type", "system.rarity", "system.rarities"]
-          });
+          index = await pack.getIndex({ fields: indexFields });
         } catch (error) {
-          console.warn(
-            `Morelord Craftworks | Unable to index ${sourceBook} Item pack ${collection}.`,
-            error
-          );
-          continue;
+          try {
+            index = await pack.getIndex({ fields: ["name", "img", "type"] });
+          } catch (retryError) {
+            console.warn(
+              `Morelord Craftworks | Unable to index ${sourceBook} Item pack ${collection}.`,
+              retryError
+            );
+            continue;
+          }
         }
 
         indexed.push(collection);
@@ -185,7 +190,7 @@ export class Dnd5eCompendiumItemResolver {
       .reduce((sum, map) => sum + map.size, 0);
   }
 
-  async resolve(name, { sourceBook } = {}) {
+  async resolve(name, { sourceBook, includeDisabledSources = false } = {}) {
     if (!sourceBook) {
       throw new Error("D&D5e Item resolution requires an explicit sourceBook.");
     }
@@ -205,7 +210,8 @@ export class Dnd5eCompendiumItemResolver {
       if (
         match
         && (
-          !this.sourceFilter
+          includeDisabledSources
+          || !this.sourceFilter
           || this.sourceFilter.isPackEnabled(match.packId)
         )
       ) return match;
@@ -214,7 +220,7 @@ export class Dnd5eCompendiumItemResolver {
     return null;
   }
 
-  async resolveAny(name, { preferredSourceBook = null } = {}) {
+  async resolveAny(name, { preferredSourceBook = null, includeDisabledSources = false } = {}) {
     if (!this._bySourceBook.size) {
       await this.refresh();
     }
@@ -227,7 +233,7 @@ export class Dnd5eCompendiumItemResolver {
     );
 
     for (const sourceBook of sourceBooks) {
-      const match = await this.resolve(name, { sourceBook });
+      const match = await this.resolve(name, { sourceBook, includeDisabledSources });
       if (match) return match;
     }
 

@@ -48,6 +48,14 @@ The dashboard Recipes total is the number of unique recipes loaded this way,
 including a custom world recipe. Content pack cards in Craftworks Settings do
 not list recipe or profile counts.
 
+With every pack enabled and its item compendium installed, that total is 290:
+SRD 5.2 supplies 16, SRD 5.1 supplies 7, Player's Handbook 57, Dungeon
+Master's Guide 134, and Monsters of Drakkenheim 76. Linking still reads a
+compendium when dnd5e Configure Sources excludes it. Missing SRD item
+compendiums leave those 23 recipes out, and the total is 267. Ingredient
+materials are not taken from the winning book. Kibbles materials come from
+Craftworks Standard.
+
 This allows campaign packs such as Monsters of Drakkenheim to intentionally
 override a generic Standard definition while both packs remain enabled.
 

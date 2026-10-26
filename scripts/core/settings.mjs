@@ -201,6 +201,13 @@ function registerString(key, name, defaultValue) {
   });
 }
 
+export function countLoadedHiddenRecipes(recipes = [], hiddenIds = getHiddenRecipeIds()) {
+  const hidden = hiddenIds instanceof Set
+    ? hiddenIds
+    : new Set([...hiddenIds ?? []].map(String));
+  return [...recipes].filter(recipe => hidden.has(String(recipe?.id ?? ""))).length;
+}
+
 export function getHiddenRecipeIds() {
   try {
     const raw = String(
