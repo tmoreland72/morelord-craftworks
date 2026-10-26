@@ -69,6 +69,7 @@ import { RecipeBrowserApp } from "./ui/recipe-browser-app.mjs";
 import { CustomRecipeApp } from "./ui/custom-recipe-app.mjs";
 import { CraftworksApp } from "./ui/craftworks-app.mjs";
 import { CraftApp } from "./ui/craft-app.mjs";
+import { registerCraftworksSceneTool } from "./ui/morelord-tool.mjs";
 import {
   getCraftworksMaterialId,
   isCraftworksItem,
@@ -111,30 +112,7 @@ Hooks.once("ready", () => {
   });
 });
 
-Hooks.on("getSceneControlButtons", controls => {
-  const tokenTools = controls?.tokens?.tools;
-  if (!tokenTools) return;
-
-  tokenTools.morelordCraftworks = {
-    name: "morelordCraftworks",
-    title: "Morelord Craftworks",
-    icon: "fa-solid fa-hammer",
-    order: Object.keys(tokenTools).length,
-    button: true,
-    visible: true,
-    onChange: () => {
-      const api = globalThis.MorelordCraftworks
-        ?? game.modules.get(MODULE_ID)?.api;
-
-      if (!api?.open) {
-        ui.notifications.warn("Morelord Craftworks is still initializing.");
-        return;
-      }
-
-      api.open();
-    }
-  };
-});
+registerCraftworksSceneTool();
 
 Hooks.once("ready", async () => {
   const { organizeCraftworksCompendiums } = await import("./compendium-organization.mjs");

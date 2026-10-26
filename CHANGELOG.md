@@ -1,5 +1,12 @@
 # Morelord Craftworks Changelog
 
+## 0.5.0
+
+### Improvements
+
+- Requires Morelord Core 0.6.0 or later. Update Core before Craftworks. Open **Morelord Tools** on the left side of a scene and select **Morelord Craftworks**. The hammer icon remains available to players and GMs. The dashboard still waits until Craftworks finishes initializing.
+- When Morelord Core is older than 0.6.0, **Morelord Craftworks** remains a button on the Token controls.
+
 ## 0.4.19
 
 ### Improvements

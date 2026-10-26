@@ -4,7 +4,7 @@ description: Browse materials and recipes, manage crafting projects, and partici
 slug: morelord-craftworks/player
 product: morelord-craftworks
 audience: player
-version: 0.4.19
+version: 0.5.0
 foundry: 14
 ---
 
@@ -12,7 +12,7 @@ foundry: 14
 
 Morelord Craftworks lets you browse your campaign's materials and recipes, plan crafting projects, work from personal or shared inventories, and take part in Harvest and Gather sessions started by your Game Master.
 
-This manual applies to Morelord Craftworks 0.4.9.
+This manual applies to Morelord Craftworks 0.5.0.
 
 ## Contents
 
@@ -35,8 +35,8 @@ Materials are normal dnd5e loot Items. Their Craftworks identity includes inform
 
 ## Open Craftworks
 
-1. Open **Token Controls** on the left side of the scene.
-2. Select the **Morelord Craftworks** control.
+1. Open **Morelord Tools** on the left side of the scene.
+2. Select **Morelord Craftworks**.
 3. Choose **Materials**, **Recipes**, or **Craft** from the dashboard.
 
 Harvest and Gather windows open automatically when the GM starts a session in which your character can participate. Use **Documentation** at the top of the dashboard for the current in-Foundry guide.
