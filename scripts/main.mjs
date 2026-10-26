@@ -3,7 +3,7 @@ import { getCraftworksDiagnostics } from "./core/diagnostics.mjs";
 import { initializeDeleriumChatRequests } from "./acquisition/delerium-chat-requests.mjs";
 import { combinedCraftingInventory } from "./crafting/group-membership.mjs";
 import { researchRecipeMatches } from "./recipes/recipe-filters.mjs";
-import { getHiddenRecipeIds, setHiddenRecipeIds } from "./core/settings.mjs";
+import { getHiddenRecipeIds, pruneHiddenRecipeIds, setHiddenRecipeIds } from "./core/settings.mjs";
 import { MODULE_ID } from "./constants.mjs";
 import { log } from "./core/logger.mjs";
 import {
@@ -11,6 +11,7 @@ import {
   exposePartyActorSetting,
   ensureStandardContentEnabled
 } from "./core/settings.mjs";
+import { CONTENT_PACK_MANIFESTS } from "../data/packs/manifests.mjs";
 import { RecipientResolver } from "./core/recipient-resolver.mjs";
 import { createSystemAdapter } from "./core/adapter-registry.mjs";
 import { MaterialRegistry } from "./materials/material-registry.mjs";
@@ -252,6 +253,26 @@ Hooks.once("ready", async () => {
   } else {
     await materials.indexConfiguredPacks();
     await recipes.loadStandardSeed();
+  }
+
+  if (game.user?.isGM) {
+    const ids = [];
+    for (const manifest of CONTENT_PACK_MANIFESTS) {
+      for (const recipe of manifest.recipes ?? []) {
+        if (recipe?.id) ids.push(recipe.id);
+      }
+    }
+    try {
+      for (const recipe of await customRecipes.all()) {
+        if (recipe?.id) ids.push(recipe.id);
+      }
+    } catch (error) {
+      console.warn(
+        "Morelord Craftworks | Could not read custom recipes while pruning hidden recipe ids.",
+        error
+      );
+    }
+    await pruneHiddenRecipeIds(ids);
   }
 
   const recipeEvaluator = new RecipeEvaluator({ materialRegistry: materials });

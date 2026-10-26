@@ -10,6 +10,7 @@ import {
   isContentPackEnabled
 } from "../core/settings.mjs";
 import { normalizeCraftEnvironment, recipeFacilityEnvironment } from "../crafting/crafting-environment-service.mjs";
+import { catalogAliasKey } from "./dnd5e-compendium-item-resolver.mjs";
 
 // One rank per source pack. Higher wins when the same recipe is in more
 // than one enabled book. Setting and third-party packs outrank the core
@@ -22,15 +23,33 @@ const SOURCE_PRIORITY = Object.freeze({
   "standard-core": -1
 });
 
+// Kibbles "1st-Level Spell" through "9th-Level Spell" are generic scroll
+// outputs. Craftworks already installs one scroll Item per spell and awards
+// it from the Spell Scroll Generator, so these nine recipes are not loaded.
+// "Cantrip" stays: the Player's Handbook has that single scroll item.
+// Drakkenheim's tier recipes ("Spell Scroll (2nd or 3rd Level)") stay too.
+const GENERIC_LEVEL_SPELL = /^[1-9](?:st|nd|rd|th)-level spell$/i;
+
 function sourcePriority(packId) {
   return SOURCE_PRIORITY[packId] ?? 4;
 }
 
-function recipeItemKey(name, id) {
-  const key = String(name ?? "")
+export function isGenericLevelSpellRecipe(name) {
+  return GENERIC_LEVEL_SPELL.test(String(name ?? "").trim());
+}
+
+function looseRecipeKey(name) {
+  return String(name ?? "")
     .normalize("NFKD")
     .toLowerCase()
     .replace(/[^a-z0-9]/g, "");
+}
+
+export function recipeItemKey(name, id, resolver = null) {
+  const alias = catalogAliasKey(name);
+  if (alias) return alias;
+  const canonical = resolver?.possessiveCanonicalName?.(name) ?? name;
+  const key = looseRecipeKey(canonical);
   return key || `id:${id}`;
 }
 
@@ -69,6 +88,8 @@ export class RecipeRegistry {
       const tie = Number(manifest.priority ?? 0);
 
       for (const raw of entries) {
+        if (isGenericLevelSpellRecipe(raw?.name)) continue;
+
         let preparedRaw = {
           ...raw,
           packId: raw.packId ?? packId
@@ -98,7 +119,7 @@ export class RecipeRegistry {
           }
         }
 
-        const key = recipeItemKey(raw.name, raw.id);
+        const key = recipeItemKey(raw.name, raw.id, this.dnd5eItemResolver);
         const current = itemWinners.get(key);
         if (current && current.packId !== packId) {
           const currentWins = current.rank > rank

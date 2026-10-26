@@ -31,7 +31,7 @@ export const CONTENT_PACKS = [
     description: "Kibbles crafting recipes whose finished output exists in the D&D5e SRD 5.1 Items/Trade Goods compendiums.",
     premium: false,
     requiredEntitlements: [],
-    enabledByDefault: false,
+    enabledByDefault: true,
     sort: 20,
     capabilities: ["materials", "recipes", "harvest", "gathering", "loot"]
   },

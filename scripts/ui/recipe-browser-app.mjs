@@ -3,7 +3,6 @@ import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-par
 import { MODULE_TITLE } from "../constants.mjs";
 import { materialTagsSatisfy } from "../materials/material-match-utils.mjs";
 import {
-  countLoadedHiddenRecipes,
   getHiddenRecipeIds,
   isRecipeKnownToActor,
   setHiddenRecipeIds
@@ -673,11 +672,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         name: candidate.name,
         selected: candidate.uuid === crafter?.uuid
       })),
-      canManageRecipeVisibility: game.user.isGM,
-      unknownRecipeCount: countLoadedHiddenRecipes(
-        this.craftworks.recipes.all(),
-        hiddenRecipeIds
-      )
+      canManageRecipeVisibility: game.user.isGM
     }, { inplace: false });
   }
 
