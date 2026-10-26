@@ -47,7 +47,7 @@ Harvest and Gather windows open automatically when the GM starts a session in wh
 
 Open **Materials** to search the complete active material catalog. A material card can show its name, image, rarity, category, processing stage, value, acquisition methods, tags, and recipes that use it.
 
-**Used in** lists enabled recipes whose ingredient requirements accept the material, including tag-based Drakkenheim components, required rarity, and alternatives. A recipe that only produces the material is listed under **Produced by** instead.
+**Recipes (N)** opens **Recipes** filtered to the enabled recipes that accept this material. Matching includes a direct material ID, the material name, tags, category, stage, rarity, and alternative requirements. Drakkenheim components match by component family, specific part, creature type, and rarity rather than by a single material name. The button is omitted when no recipe you can see accepts the material. A recipe that only produces the material is listed under **Produced by** instead. **Clear all filters** in Recipes returns to the full catalog.
 
 **Craftable** means an enabled recipe produces this material; **Produced by** lists its recipes. It does not indicate that your current inventory or character meets the crafting requirements. Standard **Gather**, **Harvest**, and **Loot** tags reflect active acquisition rules. GMs can click their orange source pills for details; players see passive reference tags.
 
@@ -65,7 +65,7 @@ Enter part of a name in Search or use facets such as Content Pack, rarity, categ
 
 You can include several useful values while excluding unwanted families. Counts update against the complete catalog as you adjust the context. For responsiveness, Craftworks initially displays up to 300 matching cards even when the total is larger.
 
-Use links between Materials and Recipes to move from an ingredient to recipes that use it or from a recipe requirement back to relevant materials.
+Use **Recipes (N)** on a material card to open the recipes that accept it, and use a recipe requirement image to open that material.
 
 ![The Materials browser combines full-catalog search, tri-state filters, and material details.](assets/materials-browser-overview.png)
 

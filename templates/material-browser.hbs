@@ -129,6 +129,7 @@
             {{#if purchasable}}<span class="ml-badge">Purchasable</span>{{/if}}
             {{#if producedBy.length}}<span class="ml-badge">Craftable</span>{{/if}}
             <span class="ml-badge">{{priceLabel}}</span>
+            {{#if recipeCount}}<button type="button" class="ml-badge" data-tone="action" data-action="show-material-recipes" data-material-id="{{materialId}}" aria-label="Recipes that use {{name}}">Recipes ({{recipeCount}})</button>{{/if}}
           </div>
 
           {{#if tags.length}}
@@ -145,12 +146,6 @@
             </p>
           {{/if}}
 
-          {{#if usedIn.length}}
-            <p>
-              <strong>Used in:</strong>
-              {{#each usedIn}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
-            </p>
-          {{/if}}
         </div>
       </article>
           {{else}}
