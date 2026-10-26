@@ -9,4 +9,5 @@
 
 ## Verification
 
-- Unit tests cover registration with Core `api.tools`, the initializing warning, and the Token-controls button when Core is older than 0.6.0.
+- `npm test`: 125 passed, 1 skipped, 0 failed. The skip is the local compendium index check, which this checkout does not include. New tests cover Core `api.tools` registration, the initializing warning, and the Token controls button when Core is older than 0.6.0.
+- Foundry Dev1 was not available in this environment, so the Morelord Tools control was not exercised in a world.
