@@ -114,7 +114,7 @@ When the same recipe is in more than one enabled book, Craftworks loads that rec
 
 Ingredients stay with the recipe. A book pack does not have its own material list; Kibbles materials still come from Craftworks Standard, and Drakkenheim materials still come from the Drakkenheim pack, whichever book won the finished item.
 
-With Craftworks Standard, SRD 5.1, SRD 5.2, Player's Handbook, Dungeon Master's Guide, and Drakkenheim all enabled, and with those item compendiums installed, the dashboard total is **290**: SRD 5.2 supplies 16, SRD 5.1 supplies 7, the Player's Handbook supplies 57, the Dungeon Master's Guide supplies 134, and Drakkenheim supplies 76. Recipe linking reads a book's item compendium even when dnd5e **Configure Sources** excludes it. Generated rewards still honor **Configure Sources**. If the SRD item compendiums are not installed, those 23 SRD-only recipes are absent and the total is 267.
+With Craftworks Standard, SRD 5.1, SRD 5.2, Player's Handbook, Dungeon Master's Guide, and Drakkenheim all enabled, and with those item compendiums installed, the dashboard total is **288**: SRD 5.2 supplies 16, SRD 5.1 supplies 7, the Player's Handbook supplies 55, the Dungeon Master's Guide supplies 134, and Drakkenheim supplies 76. Recipe linking reads a book's item compendium even when dnd5e **Configure Sources** excludes it. Generated rewards still honor **Configure Sources**. If the SRD item compendiums are not installed, those 23 SRD-only recipes are absent and the total is 265.
 
 The Drakkenheim card keeps one enable/disable control and a Champion badge, with separate availability statuses for Dungeons of Drakkenheim and Monsters of Drakkenheim.
 
@@ -169,7 +169,7 @@ Potion and spell-scroll rewards use enabled dnd5e Item sources. Material compone
 
 ### Browse large catalogs
 
-In **Craft**, clicking a crafted item's image opens that recipe in **Recipes** with the selected crafter retained. Clicking a specific material ingredient's image opens that entry in **Materials**. The actions are labeled **Open [recipe name] recipe** and **Open [material name] material** and support keyboard activation. Generic requirements without a single identifiable material keep a passive image. **Used in** on material cards includes enabled recipes accepting that material by ID, name, tags, category, stage, rarity, or alternatives; output-only recipes remain under **Produced by**.
+In **Craft**, clicking a crafted item's image opens that recipe in **Recipes** with the selected crafter retained. Clicking a specific material ingredient's image opens that entry in **Materials**. The actions are labeled **Open [recipe name] recipe** and **Open [material name] material** and support keyboard activation. Generic requirements without a single identifiable material keep a passive image. **Recipes (N)** on a material card opens **Recipes** filtered to enabled recipes that accept that material by ID, name, tags, category, stage, rarity, or alternatives, including Drakkenheim component family, part, creature type, and rarity. The count is the number of those recipes. Players see only recipes they know. The button is omitted when that list is empty. Unresolved catalog outputs from disabled packs are not included. **Clear all filters** returns to the full catalog. Output-only recipes remain under **Produced by**.
 
 Materials and Recipes use a search field and persistent filter rail. Facets cycle through three states:
 

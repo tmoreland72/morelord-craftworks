@@ -38,10 +38,10 @@ function index(resolver, sourceBook, names) {
 
 function registry(enabledIds) {
   const resolver = new Dnd5eCompendiumItemResolver();
-  index(resolver, "Player's Handbook", ["Potion of Healing", "Splint Armor", "Dart"]);
-  index(resolver, "Dungeon Master's Guide", ["Potion of Healing", "Dart"]);
-  index(resolver, "SRD 5.2", ["Potion of Healing", "Splint Armor", "Dart"]);
-  index(resolver, "SRD 5.1", ["Potion of Healing", "Dart"]);
+  index(resolver, "Player's Handbook", ["Potion of Healing", "Splint Armor", "Arrows"]);
+  index(resolver, "Dungeon Master's Guide", ["Potion of Healing", "Arrows"]);
+  index(resolver, "SRD 5.2", ["Potion of Healing", "Splint Armor", "Arrows"]);
+  index(resolver, "SRD 5.1", ["Potion of Healing", "Arrows"]);
   index(resolver, "Monsters of Drakkenheim", ["Amulet of Incineration"]);
   const enabled = new Set(enabledIds);
   return new RecipeRegistry({
@@ -71,7 +71,7 @@ test("a shared recipe loads once from the highest-priority enabled source", asyn
   await recipes.loadStandardSeed();
 
   assert.equal(supplied(recipes, "Potion of Healing"), "monsters-of-drakkenheim");
-  assert.equal(supplied(recipes, "10 x Dart"), "dmg");
+  assert.equal(supplied(recipes, "10 x Arrow"), "dmg");
   assert.equal(supplied(recipes, "Splint"), "phb");
   assert.equal(supplied(recipes, "Amulet of Incineration"), "monsters-of-drakkenheim");
 
@@ -90,18 +90,18 @@ test("disabling a higher-priority pack falls through to the next enabled source"
 
   const withoutDmg = registry(ALL.filter(id => id !== "dmg"));
   await withoutDmg.loadStandardSeed();
-  assert.equal(supplied(withoutDmg, "10 x Dart"), "phb");
+  assert.equal(supplied(withoutDmg, "10 x Arrow"), "phb");
   assert.equal(supplied(withoutDmg, "Potion of Healing"), "monsters-of-drakkenheim");
 
   const handbooksOff = registry(["srd-5.2", "srd-5.1", "standard-core"]);
   await handbooksOff.loadStandardSeed();
-  assert.equal(supplied(handbooksOff, "10 x Dart"), "srd-5.2");
+  assert.equal(supplied(handbooksOff, "10 x Arrow"), "srd-5.2");
   assert.equal(supplied(handbooksOff, "Splint"), "srd-5.2");
   assert.equal(supplied(handbooksOff, "Potion of Healing"), "srd-5.2");
 
   const onlySrd51 = registry(["srd-5.1"]);
   await onlySrd51.loadStandardSeed();
-  assert.equal(supplied(onlySrd51, "10 x Dart"), "srd-5.1");
+  assert.equal(supplied(onlySrd51, "10 x Arrow"), "srd-5.1");
   assert.equal(supplied(onlySrd51, "Potion of Healing"), "srd-5.1");
   assert.equal(onlySrd51.all().some(recipe => recipe.name === "Splint"), false);
 });

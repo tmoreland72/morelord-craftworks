@@ -1,5 +1,6 @@
 import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-participation.js";
 import { MODULE_ID, MODULE_TITLE } from "../constants.mjs";
+import { isRecipeKnownToActor } from "../core/settings.mjs";
 import { bindMultiselectBehavior } from "./multiselect-behavior.mjs";
 import { buildMaterialTagGroups } from "./material-filter-groups.mjs";
 import { MaterialSourcesApp } from "./material-sources-app.mjs";
@@ -217,9 +218,7 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
               priceLabel: Number(material.price?.value ?? 0) > 0
                 ? `${material.price.value} ${material.price?.denomination ?? "gp"}`
                 : "No value",
-              usedIn: this.craftworks.recipes
-                .recipesUsingMaterial(material.materialId)
-                .map(recipe => recipe.name),
+              recipeCount: this.#visibleRecipesFor(material, actor).length,
               producedBy: this.craftworks.recipes
                 .recipesProducingMaterial(material.materialId)
                 .map(recipe => recipe.name)
@@ -340,6 +339,24 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
         if (this.rendered && !this._sourceLookupCancelled) this.render();
       });
     }
+
+    this.element.querySelectorAll("[data-action='show-material-recipes']").forEach(button => {
+      button.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        const material = this.craftworks.materials.get(button.dataset.materialId);
+        const recipes = material ? this.#visibleRecipesFor(material, this.#selectedActor()) : [];
+        if (!recipes.length) return;
+        const count = recipes.length;
+        const noun = count === 1 ? "recipe" : "recipes";
+        const verb = count === 1 ? "uses" : "use";
+        void this.craftworks.openRecipes({
+          recipeIds: recipes.map(recipe => recipe.id),
+          crafterActorUuid: this.actorUuid,
+          recipeFocusNote: `Showing ${count} ${noun} that ${verb} ${material.name}.`
+        });
+      });
+    });
 
     this.element.querySelectorAll("[data-material-source]").forEach(button => {
       button.addEventListener("click", event => {
@@ -644,6 +661,16 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
         !hasCriteria
       );
     }
+  }
+
+  #visibleRecipesFor(material, actor) {
+    const recipes = this.craftworks.recipes.recipesUsingMaterial(material?.materialId) ?? [];
+    if (game.user?.isGM) return recipes;
+    return recipes.filter(recipe => isRecipeKnownToActor(recipe, actor, this.craftworks.toolInspector));
+  }
+
+  #selectedActor() {
+    return this.actorUuid ? globalThis.fromUuidSync?.(this.actorUuid) ?? null : null;
   }
 
   #materialInventory(actor) {

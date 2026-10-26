@@ -15318,75 +15318,7 @@ export const KIBBLES_RECIPE_SEED = [
       "itemType": "loot"
     }
   },
-  {
-    "schemaVersion": 1,
-    "packId": "standard-core",
-    "id": "woodcarving-10-x-dart",
-    "name": "10 x Dart",
-    "description": "",
-    "category": "woodcarving",
-    "kind": "crafting",
-    "tags": [
-      "woodcarving",
-      "common"
-    ],
-    "source": {
-      "title": "Kibbles' Compendium of Craft and Creation",
-      "version": "1.1.3",
-      "page": 290,
-      "craftingTime": "2 hours",
-      "checks": "1",
-      "difficulty": "DC 11",
-      "value": "5 sp",
-      "materialsText": "2 wood scraps 1 metal scraps 1 fletching"
-    },
-    "craft": {
-      "tool": "Woodcarver's Tools",
-      "ability": "Dexterity",
-      "skill": null,
-      "dc": 11,
-      "noToolDc": 16,
-      "hoursRequired": 2
-    },
-    "requirementGroups": [
-      {
-        "id": "default",
-        "requirements": [
-          {
-            "quantity": 2,
-            "sameMaterial": true,
-            "match": {
-              "materialId": "wood-scraps"
-            }
-          },
-          {
-            "quantity": 1,
-            "sameMaterial": false,
-            "match": {
-              "materialId": "metal-scraps"
-            }
-          },
-          {
-            "quantity": 1,
-            "sameMaterial": false,
-            "match": {
-              "materialId": "fletching"
-            }
-          }
-        ]
-      }
-    ],
-    "output": {
-      "type": "catalog-item",
-      "quantity": 1,
-      "label": "10 x Dart",
-      "img": "icons/commodities/wood/kindling-stick-tan.webp",
-      "rarity": "common",
-      "valueGp": 0.5,
-      "itemType": "loot"
-    }
-  },
-  {
+    {
     "schemaVersion": 1,
     "packId": "standard-core",
     "id": "engineering-ballista-large",
@@ -15616,60 +15548,7 @@ export const KIBBLES_RECIPE_SEED = [
       "itemType": "loot"
     }
   },
-  {
-    "schemaVersion": 1,
-    "packId": "standard-core",
-    "id": "glassblowing-glass-vial",
-    "name": "Glass Vial",
-    "description": "",
-    "category": "glassblowing",
-    "kind": "crafting",
-    "tags": [
-      "glassblowing",
-      "minor-craft"
-    ],
-    "source": {
-      "title": "Kibbles' Compendium of Craft and Creation",
-      "version": "1.1.3",
-      "page": 304,
-      "checks": "1",
-      "difficulty": "DC 9",
-      "value": "1 gp",
-      "materialsText": "Minor branch example recipe"
-    },
-    "craft": {
-      "tool": "Glassblower's Tools",
-      "ability": "Dexterity",
-      "skill": null,
-      "dc": 9,
-      "noToolDc": 14,
-      "hoursRequired": 2
-    },
-    "requirementGroups": [
-      {
-        "id": "default",
-        "requirements": [
-          {
-            "quantity": 1,
-            "sameMaterial": false,
-            "match": {
-              "materialId": "unformed-glass"
-            }
-          }
-        ]
-      }
-    ],
-    "output": {
-      "type": "catalog-item",
-      "quantity": 1,
-      "label": "Glass Vial",
-      "img": "icons/commodities/glass/bottle-empty.webp",
-      "rarity": "common",
-      "valueGp": 0,
-      "itemType": "loot"
-    }
-  },
-  {
+    {
     "schemaVersion": 1,
     "packId": "standard-core",
     "id": "tailoring-robe",

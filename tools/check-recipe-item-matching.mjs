@@ -10,8 +10,12 @@ import {
 } from "../scripts/recipes/recipe-item-match-utils.mjs";
 import { Dnd5eCompendiumItemResolver } from "../scripts/recipes/dnd5e-compendium-item-resolver.mjs";
 import { KIBBLES_RECIPE_SEED } from "../data/kibbles-recipes.seed.mjs";
+import { PHB_RECIPES } from "../data/phb-recipes.mjs";
+import { DMG_RECIPES } from "../data/dmg-recipes.mjs";
 import { SRD_51_RECIPES } from "../data/srd-5.1-recipes.mjs";
 import { SRD_52_RECIPES } from "../data/srd-5.2-recipes.mjs";
+import { MONSTERS_OF_DRAKKENHEIM_RECIPES } from "../data/monsters-of-drakkenheim-recipes.mjs";
+import { MM_RECIPES } from "../data/packs/mm/recipes.mjs";
 import { CONTENT_PACKS } from "../data/content-packs.mjs";
 
 const nativeScroll = {
@@ -277,7 +281,16 @@ const newlyResolvableMaterialIds = [
 for (const materialId of newlyResolvableMaterialIds) {
   assert.ok(standardMaterialIds.has(materialId));
 }
-for (const recipes of [KIBBLES_RECIPE_SEED, SRD_51_RECIPES, SRD_52_RECIPES]) {
+const recipeSources = [
+  KIBBLES_RECIPE_SEED,
+  PHB_RECIPES,
+  DMG_RECIPES,
+  SRD_51_RECIPES,
+  SRD_52_RECIPES,
+  MONSTERS_OF_DRAKKENHEIM_RECIPES,
+  MM_RECIPES
+];
+for (const recipes of recipeSources) {
   const itemNames = [];
   const materialIds = [];
   const collect = value => {
@@ -288,21 +301,20 @@ for (const recipes of [KIBBLES_RECIPE_SEED, SRD_51_RECIPES, SRD_52_RECIPES]) {
   };
   collect(recipes);
   assert.deepEqual(itemNames.filter(name => forbiddenUnlinkedNames.has(name)), []);
-
-  if (recipes !== KIBBLES_RECIPE_SEED) {
-    assert.deepEqual(
-      [...new Set(materialIds)].filter(materialId => !standardMaterialIds.has(materialId)),
-      []
-    );
-  }
-
-  const armorOfResistance = recipes.find(recipe =>
-    recipe.id?.endsWith("enchanting-armor-of-resistance")
+  assert.deepEqual(
+    [...new Set(materialIds)].filter(materialId => !standardMaterialIds.has(materialId)).sort(),
+    []
   );
-  const armorRequirement = armorOfResistance?.requirementGroups
-    ?.flatMap(group => group.requirements ?? [])
-    .find(requirement => requirement.match?.equipmentType === "armor");
-  assert.ok(armorRequirement);
+
+  if (![MONSTERS_OF_DRAKKENHEIM_RECIPES, MM_RECIPES].includes(recipes)) {
+    const armorOfResistance = recipes.find(recipe =>
+      recipe.id?.endsWith("enchanting-armor-of-resistance")
+    );
+    const armorRequirement = armorOfResistance?.requirementGroups
+      ?.flatMap(group => group.requirements ?? [])
+      .find(requirement => requirement.match?.equipmentType === "armor");
+    assert.ok(armorRequirement);
+  }
 }
 
 const malformedSpellNames = [];
@@ -314,7 +326,7 @@ const collectSpellNames = value => {
   }
   for (const child of Object.values(value)) Array.isArray(child) ? child.forEach(collectSpellNames) : collectSpellNames(child);
 };
-for (const recipes of [KIBBLES_RECIPE_SEED, SRD_51_RECIPES, SRD_52_RECIPES]) collectSpellNames(recipes);
+for (const recipes of recipeSources) collectSpellNames(recipes);
 assert.deepEqual(malformedSpellNames, []);
 
 console.log("Recipe item matching checks passed.");

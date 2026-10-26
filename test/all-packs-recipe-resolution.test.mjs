@@ -181,7 +181,7 @@ const srdRoot = "/tmp/dnd5e/packs/_source";
 const paidPath = "/home/ubuntu/.cursor/projects/workspace/uploads/item-names_3185.json";
 const indexesReady = fs.existsSync(path.join(srdRoot, "equipment24")) && fs.existsSync(paidPath);
 
-test("installed compendiums load 290 unique recipes, or 267 without the SRD books", { skip: indexesReady ? false : "local item indexes are not in this checkout" }, async () => {
+test("installed compendiums load 288 unique recipes, or 265 without the SRD books", { skip: indexesReady ? false : "local item indexes are not in this checkout" }, async () => {
   const paid = JSON.parse(fs.readFileSync(paidPath, "utf8"));
   const paidNames = key => (paid[key]?.names ?? []).filter(name => !String(name).startsWith("Activate "));
   const rowsFor = names => names.map((name, index) => ({
@@ -213,11 +213,11 @@ test("installed compendiums load 290 unique recipes, or 267 without the SRD book
   const linkedDespiteSources = registry({ sourceFilter: { isPackEnabled: () => false } });
   await linkedDespiteSources.loadStandardSeed();
   assert.deepEqual(counts(linkedDespiteSources), {
-    total: 290,
+    total: 288,
     byPack: {
       "srd-5.2": 16,
       "srd-5.1": 7,
-      phb: 57,
+      phb: 55,
       dmg: 134,
       "monsters-of-drakkenheim": 76
     }
@@ -233,9 +233,9 @@ test("installed compendiums load 290 unique recipes, or 267 without the SRD book
   const withoutSrdBooks = registry({});
   await withoutSrdBooks.loadStandardSeed();
   assert.deepEqual(counts(withoutSrdBooks), {
-    total: 267,
+    total: 265,
     byPack: {
-      phb: 57,
+      phb: 55,
       dmg: 134,
       "monsters-of-drakkenheim": 76
     }
