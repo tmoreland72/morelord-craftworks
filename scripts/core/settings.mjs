@@ -201,13 +201,6 @@ function registerString(key, name, defaultValue) {
   });
 }
 
-export function countLoadedHiddenRecipes(recipes = [], hiddenIds = getHiddenRecipeIds()) {
-  const hidden = hiddenIds instanceof Set
-    ? hiddenIds
-    : new Set([...hiddenIds ?? []].map(String));
-  return [...recipes].filter(recipe => hidden.has(String(recipe?.id ?? ""))).length;
-}
-
 export function getHiddenRecipeIds() {
   try {
     const raw = String(
@@ -244,6 +237,18 @@ export async function setHiddenRecipeIds(ids) {
   );
 
   return new Set(normalized);
+}
+
+// Drop stored ids that are not a current packaged or custom recipe. Ids for
+// recipes in a disabled pack stay, because those definitions still exist.
+export async function pruneHiddenRecipeIds(validIds = []) {
+  const valid = new Set(
+    [...validIds].map(id => String(id ?? "")).filter(Boolean)
+  );
+  const hidden = [...getHiddenRecipeIds()];
+  const kept = hidden.filter(id => valid.has(id));
+  if (kept.length === hidden.length) return new Set(hidden);
+  return setHiddenRecipeIds(kept);
 }
 
 export function isRecipeHidden(recipeId) {
@@ -344,6 +349,9 @@ export function getSetting(key) {
   return game.settings.get(MODULE_ID, key);
 }
 
+// First GM visit only. Turns Craftworks Standard and SRD 5.2 on, then
+// sets standardContentBootstrapped so a later saved choice is left alone.
+// SRD 5.1 is not written here; it follows enabledByDefault until saved.
 export async function ensureStandardContentEnabled() {
   if (!game.user.isGM) return false;
 

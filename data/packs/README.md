@@ -52,7 +52,8 @@ With every pack enabled and its item compendium installed, that total is 288:
 SRD 5.2 supplies 16, SRD 5.1 supplies 7, Player's Handbook 55, Dungeon
 Master's Guide 134, and Monsters of Drakkenheim 76. Linking still reads a
 compendium when dnd5e Configure Sources excludes it. Missing SRD item
-compendiums leave those 23 recipes out, and the total is 265. Ingredient
+compendiums, or SRD packs saved as disabled, leave those 23 recipes out,
+and the total is 265. Ingredient
 materials are not taken from the winning book. Kibbles materials come from
 Craftworks Standard.
 

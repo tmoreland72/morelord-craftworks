@@ -23,7 +23,6 @@ globalThis.game = {
 
 const { RecipeRegistry } = await import("../scripts/recipes/recipe-registry.mjs");
 const { Dnd5eCompendiumItemResolver } = await import("../scripts/recipes/dnd5e-compendium-item-resolver.mjs");
-const { countLoadedHiddenRecipes } = await import("../scripts/core/settings.mjs");
 
 const ALL = [
   "standard-core",
@@ -146,16 +145,6 @@ test("a rarity-field index error does not drop the SRD item book", async () => {
     recipes.all().find(recipe => recipe.name === "Crawler Mucus")?.packId,
     "srd-5.2"
   );
-});
-
-test("the unknown-ingredient count ignores hidden ids that are not loaded", () => {
-  const loaded = [{ id: "phb-splint" }, { id: "dmg-dart" }];
-  const hidden = new Set([
-    "phb-splint",
-    ...Array.from({ length: 230 }, (_, index) => `removed-${index}`)
-  ]);
-  assert.equal(countLoadedHiddenRecipes(loaded, hidden), 1);
-  assert.equal(countLoadedHiddenRecipes(loaded, new Set()), 0);
 });
 
 function yamlNames(root) {
