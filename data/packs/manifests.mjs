@@ -5,10 +5,10 @@ import { DMG_RECIPES } from "../dmg-recipes.mjs";
 import { KIBBLES_RECIPE_SEED } from "../kibbles-recipes.seed.mjs";
 
 // The curated SRD lists were built from Kibbles, but a few finished items
-// were left out when the label was not an exact compendium title ("10 x Dart",
-// "Robe", "Glass Vial"). Those candidates still have to be offered so the
-// resolver can link them. Recipes already represented by output label stay as
-// they are, including SRD spell-scroll levels that are not in the Kibbles seed.
+// were left out when the label was not an exact compendium title ("Robe",
+// "Cape"). Those candidates still have to be offered so the resolver can
+// link them. Recipes already represented by output label stay as they are,
+// including SRD spell-scroll levels that are not in the Kibbles seed.
 function withMissingKibblesCandidates(curated, packId, idPrefix) {
   const labels = new Set(
     curated.map(recipe => String(recipe.output?.label ?? recipe.name ?? "").trim().toLowerCase())
