@@ -1,58 +1,58 @@
 {
-  "id": "morelord-craftworks",
-  "title": "Morelord Craftworks",
-  "description": "System-agnostic gathering, harvesting, looting, selling, materials, recipes, and premium crafting workflows for Foundry VTT.",
-  "version": "0.4.18",
-  "authors": [
-    {
-      "name": "Morelord Gaming"
-    }
-  ],
-  "compatibility": {
-    "minimum": "14",
-    "verified": "14.369"
-  },
-  "esmodules": [
-    "scripts/main.mjs"
-  ],
-  "styles": [
-    "styles/craftworks.css"
-  ],
-  "relationships": {
-    "systems": [
-      {
-        "id": "dnd5e",
-        "type": "system",
-        "compatibility": {
-          "minimum": "5.3"
-        }
-      }
-    ],
-    "requires": [
-      {
-        "id": "socketlib",
-        "type": "module",
-        "manifest": "https://github.com/farling42/foundryvtt-socketlib/releases/latest/download/module.json",
-        "compatibility": {
-          "minimum": "1.1.3"
-        }
-      },
-      {
-        "id": "morelord-core",
-        "type": "module",
-        "compatibility": {
-          "minimum": "0.5.1"
-        },
-        "manifest": "https://raw.githubusercontent.com/tmoreland72/morelord-core/main/module.json"
-      }
-    ]
-  },
-  "flags": {
-    "canUpload": true
-  },
-  "socket": true,
-  "download": "https://github.com/tmoreland72/morelord-craftworks/releases/download/v0.4.18/morelord-craftworks.zip",
-  "url": "https://github.com/tmoreland72/morelord-craftworks",
-  "changelog": "https://github.com/tmoreland72/morelord-craftworks/releases",
-  "manifest": "https://raw.githubusercontent.com/tmoreland72/morelord-craftworks/main/module.json"
+    "id":  "morelord-craftworks",
+    "title":  "Morelord Craftworks",
+    "description":  "System-agnostic gathering, harvesting, looting, selling, materials, recipes, and premium crafting workflows for Foundry VTT.",
+    "version":  "0.4.19",
+    "authors":  [
+                    {
+                        "name":  "Morelord Gaming"
+                    }
+                ],
+    "compatibility":  {
+                          "minimum":  "14",
+                          "verified":  "14.369"
+                      },
+    "esmodules":  [
+                      "scripts/main.mjs"
+                  ],
+    "styles":  [
+                   "styles/craftworks.css"
+               ],
+    "relationships":  {
+                          "systems":  [
+                                          {
+                                              "id":  "dnd5e",
+                                              "type":  "system",
+                                              "compatibility":  {
+                                                                    "minimum":  "5.3"
+                                                                }
+                                          }
+                                      ],
+                          "requires":  [
+                                           {
+                                               "id":  "socketlib",
+                                               "type":  "module",
+                                               "manifest":  "https://github.com/farling42/foundryvtt-socketlib/releases/latest/download/module.json",
+                                               "compatibility":  {
+                                                                     "minimum":  "1.1.3"
+                                                                 }
+                                           },
+                                           {
+                                               "id":  "morelord-core",
+                                               "type":  "module",
+                                               "compatibility":  {
+                                                                     "minimum":  "0.5.1"
+                                                                 },
+                                               "manifest":  "https://raw.githubusercontent.com/tmoreland72/morelord-core/main/module.json"
+                                           }
+                                       ]
+                      },
+    "flags":  {
+                  "canUpload":  true
+              },
+    "socket":  true,
+    "download":  "https://github.com/tmoreland72/morelord-craftworks/releases/download/v0.4.19/morelord-craftworks.zip",
+    "url":  "https://github.com/tmoreland72/morelord-craftworks",
+    "changelog":  "https://github.com/tmoreland72/morelord-craftworks/releases",
+    "manifest":  "https://raw.githubusercontent.com/tmoreland72/morelord-craftworks/main/module.json"
 }
