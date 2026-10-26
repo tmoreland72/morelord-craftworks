@@ -108,6 +108,14 @@ Enable only the packs that should contribute to the campaign. Depending on insta
 
 An active pack can contribute materials, recipes, Harvest and Gather profiles, encounter-loot rules, economy profiles, and crafting definitions. Disabled or unavailable packs contribute no runtime content.
 
+Each content pack card shows the pack name, its access badge, availability, a short description, the rules version, and an **Enabled** or **Disabled** control. Cards for packs that depend on installed modules, such as Drakkenheim, also list those modules and each module's availability. The cards do not list material, recipe, harvest, gathering, loot, or encounter counts.
+
+When the same recipe is in more than one enabled book, Craftworks loads that recipe once, from the highest-priority source that has its finished item. Setting and third-party packs such as Drakkenheim win, then the Dungeon Master's Guide, then the Player's Handbook, then SRD 5.2, then SRD 5.1. Disabling a pack lets the next enabled source supply the recipe. The dashboard **Recipes** total counts those unique loaded recipes. A custom recipe created in the world is included in that total.
+
+Ingredients stay with the recipe. A book pack does not have its own material list; Kibbles materials still come from Craftworks Standard, and Drakkenheim materials still come from the Drakkenheim pack, whichever book won the finished item.
+
+With Craftworks Standard, SRD 5.1, SRD 5.2, Player's Handbook, Dungeon Master's Guide, and Drakkenheim all enabled, and with those item compendiums installed, the dashboard total is **288**: SRD 5.2 supplies 16, SRD 5.1 supplies 7, the Player's Handbook supplies 55, the Dungeon Master's Guide supplies 134, and Drakkenheim supplies 76. Recipe linking reads a book's item compendium even when dnd5e **Configure Sources** excludes it. Generated rewards still honor **Configure Sources**. If the SRD item compendiums are not installed, those 23 SRD-only recipes are absent and the total is 265.
+
 The Drakkenheim card keeps one enable/disable control and a Champion badge, with separate availability statuses for Dungeons of Drakkenheim and Monsters of Drakkenheim.
 
 ### Synchronize compendiums
@@ -199,7 +207,7 @@ Craftworks crafting checks use the listed artisan tool at the recipe’s DC. Mis
 
 ### Control recipe knowledge
 
-Recipes are either **Known** or **Unknown**. An Unknown recipe remains discoverable and can be marked as a crafting goal, but its ingredient requirements are concealed from players and a player cannot begin a new job from it.
+Recipes are either **Known** or **Unknown**. An Unknown recipe remains discoverable and can be marked as a crafting goal, but its ingredient requirements are concealed from players and a player cannot begin a new job from it. The toolbar count is the number of currently loaded recipes marked Unknown. Stored ids for recipes that are no longer loaded are not included.
 
 Use **Mark Context Known** or **Mark Context Unknown** to update only the recipes matched by the current search and filters. This makes it possible to reveal a family of recipes without changing unrelated entries.
 
@@ -451,7 +459,7 @@ The Materials and Recipes browsers group Drakkenheim filters into concise top-le
 
 Drakkenheim content is not isolated in a separate mode. When enabled, its materials, recipes, potions, and spells participate in the same searches and generators as other active sources. Results retain their source attribution: for example, a potion draft can mix core potions with **Trollblood Potion**, **Vampire Blood Potion**, and **Greater Rejuvenation Potion**, while scroll and spellbook drafts can include Drakkenheim spells beside core spells.
 
-Recipe outputs prefer enabled premium PHB or DMG documents when the connected account has access, then fall back to SRD 5.2. Healing potions can also use SRD 5.1. Enhanced armor, shield, and weapon recipes use the generic **+1, +2, or +3** source item; the GM configures the completed item as the intended equipment.
+Recipe outputs prefer enabled premium PHB or DMG documents when the connected account has access, then fall back to SRD 5.2. Healing potions can also use SRD 5.1. Setting-specific recipes resolve finished items from the installed Dungeons of Drakkenheim, Monsters of Drakkenheim, and Sebastian Crowe's Guide to Drakkenheim Item compendiums. Enhanced armor, shield, and weapon recipes use the generic **+1, +2, or +3** source item; the GM configures the completed item as the intended equipment.
 
 ### Harvest recipe inventory counts
 

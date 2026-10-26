@@ -10,7 +10,6 @@ import {
   CONTENT_PACKS,
   getContentPackSettingKey
 } from "../../data/content-packs.mjs";
-import { getContentPackManifest } from "../../data/packs/manifests.mjs";
 import { EntitlementService } from "../services/entitlement-service.mjs";
 import {
   getGatherProfiles
@@ -92,25 +91,13 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
           game.settings.get(MODULE_ID, getContentPackSettingKey(pack.id))
         );
 
-        const manifest = craftworks?.contentPacks?.manifest(pack.id) ?? getContentPackManifest(pack.id);
-
         return {
           ...pack,
           ...contentPackPresentation(pack, game.modules),
           active: state?.active ?? (enabled && hasAccess),
           enabled,
           canEnable: hasAccess,
-          accessRequired: !hasAccess,
-          counts: {
-            materials: manifest?.materials?.entries?.length ?? (
-              manifest?.materials?.seedPath ? "seed" : 0
-            ),
-            recipes: manifest?.recipes?.length ?? 0,
-            harvest: manifest?.harvestProfiles?.length ?? 0,
-            gathering: manifest?.gatheringProfiles?.length ?? 0,
-            loot: manifest?.lootTiers?.length ?? 0,
-            encounter: manifest?.encounterLootProfiles?.length ?? 0
-          },
+          accessRequired: !hasAccess
         };
       });
 

@@ -3,6 +3,7 @@ import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-par
 import { MODULE_TITLE } from "../constants.mjs";
 import { materialTagsSatisfy } from "../materials/material-match-utils.mjs";
 import {
+  countLoadedHiddenRecipes,
   getHiddenRecipeIds,
   isRecipeKnownToActor,
   setHiddenRecipeIds
@@ -353,7 +354,10 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
 
       for (const itemName of requirementItemNames) {
         const item = await this.craftworks.recipes.dnd5eItemResolver
-          ?.resolveAny(itemName, { preferredSourceBook: sourcePack?.label });
+          ?.resolveAny(itemName, {
+            preferredSourceBook: sourcePack?.label,
+            includeDisabledSources: true
+          });
 
         if (item) {
           requirementItemMatches.set(itemName.toLowerCase(), item);
@@ -670,7 +674,10 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         selected: candidate.uuid === crafter?.uuid
       })),
       canManageRecipeVisibility: game.user.isGM,
-      unknownRecipeCount: hiddenRecipeIds.size
+      unknownRecipeCount: countLoadedHiddenRecipes(
+        this.craftworks.recipes.all(),
+        hiddenRecipeIds
+      )
     }, { inplace: false });
   }
 

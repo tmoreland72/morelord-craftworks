@@ -2,6 +2,32 @@ import { SRD_52_RECIPES } from "../srd-5.2-recipes.mjs";
 import { SRD_51_RECIPES } from "../srd-5.1-recipes.mjs";
 import { PHB_RECIPES } from "../phb-recipes.mjs";
 import { DMG_RECIPES } from "../dmg-recipes.mjs";
+import { KIBBLES_RECIPE_SEED } from "../kibbles-recipes.seed.mjs";
+
+// The curated SRD lists were built from Kibbles, but a few finished items
+// were left out when the label was not an exact compendium title ("Robe",
+// "Cape"). Those candidates still have to be offered so the resolver can
+// link them. Recipes already represented by output label stay as they are,
+// including SRD spell-scroll levels that are not in the Kibbles seed.
+function withMissingKibblesCandidates(curated, packId, idPrefix) {
+  const labels = new Set(
+    curated.map(recipe => String(recipe.output?.label ?? recipe.name ?? "").trim().toLowerCase())
+  );
+
+  const extras = KIBBLES_RECIPE_SEED
+    .filter(recipe => recipe?.output?.type === "catalog-item")
+    .filter(recipe => !labels.has(String(recipe.output?.label ?? recipe.name ?? "").trim().toLowerCase()))
+    .map(recipe => ({
+      ...recipe,
+      packId,
+      id: `${idPrefix}-${recipe.id}`
+    }));
+
+  return [...curated, ...extras];
+}
+
+const SRD_52_RECIPE_CANDIDATES = withMissingKibblesCandidates(SRD_52_RECIPES, "srd-5.2", "srd52");
+const SRD_51_RECIPE_CANDIDATES = withMissingKibblesCandidates(SRD_51_RECIPES, "srd-5.1", "srd51");
 import { MONSTERS_OF_DRAKKENHEIM_RECIPES } from "../monsters-of-drakkenheim-recipes.mjs";
 import { MM_RECIPES } from "./mm/recipes.mjs";
 
@@ -54,7 +80,7 @@ export const CONTENT_PACK_MANIFESTS = [
     id: "srd-5.2",
     priority: 10,
     materials: { seedPath: null, entries: [] },
-    recipes: SRD_52_RECIPES,
+    recipes: SRD_52_RECIPE_CANDIDATES,
     harvestProfiles: SRD_52_HARVEST_PROFILES,
     gatheringProfiles: SRD_52_GATHERING_PROFILES,
     lootTiers: SRD_52_LOOT_TIERS,
@@ -64,7 +90,7 @@ export const CONTENT_PACK_MANIFESTS = [
     id: "srd-5.1",
     priority: 20,
     materials: { seedPath: null, entries: [] },
-    recipes: SRD_51_RECIPES,
+    recipes: SRD_51_RECIPE_CANDIDATES,
     harvestProfiles: SRD_51_HARVEST_PROFILES,
     gatheringProfiles: SRD_51_GATHERING_PROFILES,
     lootTiers: SRD_51_LOOT_TIERS,

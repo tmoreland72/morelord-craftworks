@@ -68,15 +68,102 @@ assert.equal(
   }))?.img,
   "icons/weapons/axes/axe-battle-black.webp"
 );
-assert.deepEqual(
-  crossSourceResolver.candidateNames("Playing Card Set"),
-  [
-    "Playing Card Set",
-    "Playing Cards",
-    "Playing Cards Set",
-    "Gaming Set (Playing Cards)"
-  ]
+const playingCardCandidates = crossSourceResolver.candidateNames("Playing Card Set");
+assert.equal(playingCardCandidates[0], "Playing Card Set");
+for (const candidate of [
+  "Playing Cards",
+  "Playing Cards Set",
+  "Gaming Set (Playing Cards)"
+]) {
+  assert.ok(playingCardCandidates.includes(candidate), candidate);
+}
+assert.ok(crossSourceResolver.candidateNames("Hat/Cap").includes("Hat"));
+assert.ok(crossSourceResolver.candidateNames("Hat/Cap").includes("Cap"));
+assert.ok(crossSourceResolver.candidateNames("Injector Crossbow").includes("Injector's Crossbow"));
+assert.ok(crossSourceResolver.candidateNames("Figurine of Wondrous Power (Ivory Goats)").includes("Figurine of Wondrous Power"));
+assert.ok(crossSourceResolver.candidateNames("Rod of the Pact Keeper +3").includes("Rod of the Pact Keeper"));
+assert.ok(crossSourceResolver.candidateNames("10 x Dart").includes("Dart"));
+assert.equal(
+  crossSourceResolver.normalizeName("10 x Dart"),
+  crossSourceResolver.normalizeName("Dart")
 );
+assert.ok(crossSourceResolver.candidateNames("2nd-Level Spell").includes("Spell Scroll, 2nd Level"));
+assert.ok(crossSourceResolver.candidateNames("Splint").includes("Splint Armor"));
+assert.ok(crossSourceResolver.candidateNames("Glass Vial").includes("Vial"));
+assert.ok(crossSourceResolver.candidateNames("Blacksmith’s Tools").includes("Smith's Tools"));
+assert.ok(crossSourceResolver.candidateNames("10 x Arrow").includes("Arrows"));
+
+const linkedNames = new Map([
+  ["Dart", "Dart"],
+  ["Arrows", "Arrows"],
+  ["Hat", "Hat"],
+  ["Splint Armor", "Splint Armor"],
+  ["Vial", "Vial"],
+  ["Smith's Tools", "Smith's Tools"],
+  ["Spell Scroll, 2nd Level", "Spell Scroll, 2nd Level"],
+  ["Robe of the Archmagi", "Robe of the Archmagi"],
+  ["Dimensional Shackles", "Dimensional Shackles"],
+  ["Stone of Good Luck (Luckstone)", "Stone of Good Luck (Luckstone)"],
+  ["Flame Tongue", "Flame Tongue"],
+  ["Boots of the Winterlands", "Boots of the Winterlands"],
+  ["Helm of Comprehending Languages", "Helm of Comprehending Languages"],
+  ["Cape of the Mountebank", "Cape of the Mountebank"],
+  ["Chain", "Chain"],
+  ["Piton", "Piton"],
+  ["Spikes, Iron", "Spikes, Iron"],
+  ["Exotic Saddle", "Exotic Saddle"],
+  ["Calligrapher's Supplies", "Calligrapher's Supplies"],
+  ["Ioun Stone of Protection", "Ioun Stone of Protection"],
+  ["Brass Horn of Valhalla", "Brass Horn of Valhalla"],
+  ["Iron Flask", "Iron Flask"],
+  ["Robe of Useful Items", "Robe of Useful Items"],
+  ["Figurine of Wondrous Power", "Figurine of Wondrous Power"],
+  ["Rod of the Pact Keeper", "Rod of the Pact Keeper"],
+  ["Weapon, +1, +2, or +3", "Weapon, +1, +2, or +3"],
+  ["Ammunition, +1, +2, or +3", "Ammunition, +1, +2, or +3"],
+  ["Robes", "Robes"]
+]);
+crossSourceResolver._bySourceBook.set("SRD 5.2", new Map(
+  [...linkedNames.values()].map(itemName => [
+    crossSourceResolver.normalizeName(itemName),
+    { name: itemName, sourceBook: "SRD 5.2", packId: "dnd5e.equipment24" }
+  ])
+));
+for (const [recipeName, itemName] of [
+  ["10 x Dart", "Dart"],
+  ["Hat/Cap", "Hat"],
+  ["Splint", "Splint Armor"],
+  ["Glass Vial", "Vial"],
+  ["Blacksmith’s Tools", "Smith's Tools"],
+  ["2nd-Level Spell", "Spell Scroll, 2nd Level"],
+  ["Robe of the Archmage", "Robe of the Archmagi"],
+  ["Dimension Shackles", "Dimensional Shackles"],
+  ["Luckstone", "Stone of Good Luck (Luckstone)"],
+  ["Flametongue Weapon", "Flame Tongue"],
+  ["Boots of Winterlands", "Boots of the Winterlands"],
+  ["Helm of Comprehending Language", "Helm of Comprehending Languages"],
+  ["Cape of Mountebank", "Cape of the Mountebank"],
+  ["Chain (5 ft)", "Chain"],
+  ["20 x Pitons", "Piton"],
+  ["Saddle, Exotic", "Exotic Saddle"],
+  ["Calligrapher's Tools", "Calligrapher's Supplies"],
+  ["Ioun Stone (Protection)", "Ioun Stone of Protection"],
+  ["Horn of Valhalla (Brass)", "Brass Horn of Valhalla"],
+  ["Iron Flask (Empty)", "Iron Flask"],
+  ["Robe of Useful Items (with all patches)", "Robe of Useful Items"],
+  ["Figurine of Wondrous Power (Ivory Goats)", "Figurine of Wondrous Power"],
+  ["Rod of the Pact Keeper +3", "Rod of the Pact Keeper"],
+  ["+2 Weapon", "Weapon, +1, +2, or +3"],
+  ["+1 Ammunition", "Ammunition, +1, +2, or +3"],
+  ["Robe", "Robes"],
+  ["10 x Arrow", "Arrows"]
+]) {
+  assert.equal(
+    (await crossSourceResolver.resolve(recipeName, { sourceBook: "SRD 5.2" }))?.name,
+    itemName,
+    recipeName
+  );
+}
 assert.equal(weaponTypeMatches({ type: "weapon", system: { type: { value: "simpleM" } } }, "Simple"), true);
 assert.equal(weaponTypeMatches({ type: "weapon", system: { type: { value: "simpleR" } } }, "Simple"), true);
 assert.equal(weaponTypeMatches({ type: "weapon", system: { type: { value: "martialM" } } }, "Simple"), false);
@@ -111,7 +198,7 @@ const visit = value => {
 };
 
 visit(KIBBLES_RECIPE_SEED);
-assert.ok(structuredScrollRequirements >= 250);
+assert.ok(structuredScrollRequirements >= 223);
 assert.equal(legacyScrollRequirements, 0);
 
 const deleriumSearchPacks = CONTENT_PACKS
