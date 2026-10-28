@@ -135,6 +135,12 @@ export function isUuidAllowed(uuid) {
   return bridgeAllows(pack);
 }
 
+/** The uuid when Core allows it. A disabled compendium uuid is not a link. */
+export function allowedUuid(uuid) {
+  const value = String(uuid ?? "").trim();
+  return value && isUuidAllowed(value) ? value : null;
+}
+
 /** Presence is for diagnostics. `pack` is returned only when Core allows it. */
 export function packAccess(collection) {
   const present = Boolean(readPack(collection));

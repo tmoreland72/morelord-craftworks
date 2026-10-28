@@ -62,6 +62,11 @@ export class SpecialTreasureService {
     this._sourceSignature = null;
   }
 
+  invalidateCache() {
+    this._itemPool = null;
+    this._sourceSignature = null;
+  }
+
   async rollForEncounter(maxCR) {
     const pool = await this.#getItemPool();
 

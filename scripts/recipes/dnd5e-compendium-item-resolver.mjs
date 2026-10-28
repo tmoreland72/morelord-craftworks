@@ -290,6 +290,9 @@ export class Dnd5eCompendiumItemResolver {
     return distinct.size === 1 ? tail : null;
   }
 
+  // Treasure text may search every allowed book. Recipe outputs and
+  // ingredients must use resolveRecipeItem so a disabled source is not
+  // replaced by another pack that happens to use the same name.
   async resolveAny(name, { preferredSourceBook = null } = {}) {
     if (!this._bySourceBook.size) {
       await this.refresh();
@@ -308,6 +311,16 @@ export class Dnd5eCompendiumItemResolver {
     }
 
     return null;
+  }
+
+  async resolveRecipeItem(name, { sourceBook = null } = {}) {
+    const book = String(sourceBook ?? "").trim();
+    if (!book) return null;
+    const match = await this.resolve(name, { sourceBook: book });
+    if (!match?.uuid || !isUuidAllowed(match.uuid)) return null;
+    const packId = match.packId || compendiumCollection(match.uuid);
+    if (packId && !getAllowedPack(packId)) return null;
+    return match;
   }
 
   async resolveDocument(name, { sourceBook } = {}) {

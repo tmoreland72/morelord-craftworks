@@ -1,5 +1,5 @@
 import { recipeRarity, normalizeRarity, recipeMatchesFilters } from "../recipes/recipe-filters.mjs";
-import { isUuidAllowed } from "../core/allowed-packs.mjs";
+import { allowedUuid, isUuidAllowed } from "../core/allowed-packs.mjs";
 import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-participation.js";
 import { MODULE_TITLE } from "../constants.mjs";
 import { materialTagsSatisfy } from "../materials/material-match-utils.mjs";
@@ -263,7 +263,11 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       )
       .slice(0, displayLimit);
 
-    const preparedRecipes = await Promise.all(recipes.map(async recipe => {
+    const preparedRecipes = (await Promise.all(recipes.map(async recipe => {
+      if (recipe.output?.type === "foundry-item" && !isUuidAllowed(recipe.output.uuid)) {
+        return null;
+      }
+
       const readiness = this.craftworks.recipePlanner.plan(
         recipe,
         actor,
@@ -302,14 +306,9 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
           // Compendium index metadata is sufficient for a reference card. Load the
           // full Item only when opened or crafted; world Items still resolve live.
           const indexed = recipe.output;
-          if (!isUuidAllowed(indexed.uuid)) {
-            outputResolutionWarning =
-              `${indexed.label ?? indexed.name ?? "This item"} is unavailable because its compendium is disabled in D&D5e Configure Sources.`;
-          } else {
-            outputDocument = indexed.uuid.startsWith("Compendium.") && indexed.label && indexed.img
-              ? { uuid: indexed.uuid, name: indexed.label, img: indexed.img, documentName: "Item" }
-              : await fromUuid(indexed.uuid);
-          }
+          outputDocument = indexed.uuid.startsWith("Compendium.") && indexed.label && indexed.img
+            ? { uuid: indexed.uuid, name: indexed.label, img: indexed.img, documentName: "Item" }
+            : await fromUuid(indexed.uuid);
         } catch (error) {
           console.warn(
             `Morelord Craftworks | Unable to resolve recipe output ${recipe.output.uuid}`,
@@ -359,8 +358,8 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
 
       for (const itemName of requirementItemNames) {
         const item = await this.craftworks.recipes.dnd5eItemResolver
-          ?.resolveAny(itemName, {
-            preferredSourceBook: sourcePack?.label
+          ?.resolveRecipeItem(itemName, {
+            sourceBook: sourcePack?.label
           });
 
         if (item) {
@@ -494,7 +493,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         }))
             : []
       };
-    }));
+    }))).filter(Boolean);
 
     const recipeGroups = Array.from(
       preparedRecipes.reduce((groups, recipe) => {
@@ -704,9 +703,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         img:
           material?.img
           ?? null,
-        uuid:
-          material?.uuid
-          ?? null,
+        uuid: allowedUuid(material?.uuid),
         label:
           material?.name
           ?? this.#friendlyRequirementLabel(
@@ -730,10 +727,12 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         );
       const item = requirementItemMatches.get(normalizedItemName);
 
+      const materialLink = allowedUuid(material?.uuid);
+      const itemLink = allowedUuid(item?.uuid);
       return {
         materialId: material?.materialId ?? null,
-        img: material?.img ?? item?.img ?? null,
-        uuid: material?.uuid ?? item?.uuid ?? null,
+        img: materialLink ? material?.img : itemLink ? item?.img : null,
+        uuid: materialLink ?? itemLink,
         label: material?.name ?? item?.name ?? String(match.itemName).trim(),
         rarity: material?.rarity ?? match.rarity ?? null
       };

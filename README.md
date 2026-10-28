@@ -345,6 +345,17 @@ name or UUID fallback. Craftworks Content Pack settings only narrow that set.
 That includes recipe linking, materials, monsters, generators, treasure, and
 awards.
 
+A recipe whose finished item comes from a compendium Core does not allow is
+omitted. The catalog does not keep the card after clearing the item link.
+Ingredient names for that recipe resolve only in its own source book, and only
+in packs Core allows. An item of the same name from another pack is not
+substituted. Treasure text may still search every allowed Item compendium.
+When Core reports that Configure Sources changed
+(`morelordCoreConfigureSourcesChanged`), Craftworks rebuilds those indexes and
+re-renders open Craftworks windows. Turning the compendium back on lists the
+recipe again. A custom recipe stays in Recipe Manager so its output can be
+changed; it stays out of the catalog while that output compendium is off.
+
 ### Hoard chat and special treasure
 
 Generated Hoards can be sent to chat as a formatted Craftworks card. Special

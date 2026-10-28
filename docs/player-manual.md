@@ -224,7 +224,7 @@ If the pack or its official source content is unavailable, Craftworks can use st
 
 - Clear Search and active filters.
 - Ask the GM whether the relevant Content Pack is enabled.
-- Ask the GM to confirm the required official source is installed and selected in dnd5e **Configure Sources**.
+- Ask the GM to confirm the required official source is installed and selected in dnd5e **Configure Sources**. A recipe whose finished item comes from a source that is turned off there is hidden, and it returns when that source is turned back on.
 - Ask the GM to run **Sync with Compendiums**.
 
 ### A recipe is Unknown

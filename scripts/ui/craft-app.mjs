@@ -1,5 +1,5 @@
 import { combinedCraftingInventory } from "../crafting/group-membership.mjs";
-import { isUuidAllowed } from "../core/allowed-packs.mjs";
+import { allowedUuid, isUuidAllowed } from "../core/allowed-packs.mjs";
 import { materialsMatchingIngredient } from "../recipes/recipe-filters.mjs";
 import { MODULE_TITLE } from "../constants.mjs";
 import { CraftCompletionApp } from "./craft-completion-app.mjs";
@@ -511,9 +511,7 @@ export class CraftApp
         img:
           material?.img
           ?? null,
-        uuid:
-          material?.uuid
-          ?? null,
+        uuid: allowedUuid(material?.uuid),
         label:
           material?.name
           ?? this.#friendlyRequirementLabel(
@@ -537,11 +535,13 @@ export class CraftApp
           === normalizedItemName
         );
       const item = requirementItemMatches.get(normalizedItemName);
+      const materialLink = allowedUuid(material?.uuid);
+      const itemLink = allowedUuid(item?.uuid);
 
       return {
         materialId: material?.materialId ?? null,
-        img: material?.img ?? item?.img ?? null,
-        uuid: material?.uuid ?? item?.uuid ?? null,
+        img: materialLink ? material?.img : itemLink ? item?.img : null,
+        uuid: materialLink ?? itemLink,
         label: material?.name ?? item?.name ?? String(match.itemName).trim(),
         rarity: material?.rarity ?? match.rarity ?? null
       };
@@ -836,8 +836,8 @@ export class CraftApp
 
     for (const itemName of requirementItemNames) {
       const item = await this.craftworks.recipes.dnd5eItemResolver
-        ?.resolveAny(itemName, {
-          preferredSourceBook: sourcePack?.label
+        ?.resolveRecipeItem(itemName, {
+          sourceBook: sourcePack?.label
         });
 
       if (item) {

@@ -39,6 +39,11 @@ export function isGenericLevelSpellRecipe(name) {
   return GENERIC_LEVEL_SPELL.test(String(name ?? "").trim());
 }
 
+export function recipeOutputAllowed(recipe) {
+  if (recipe?.output?.type !== "foundry-item") return true;
+  return isUuidAllowed(recipe.output?.uuid);
+}
+
 function looseRecipeKey(name) {
   return String(name ?? "")
     .normalize("NFKD")
@@ -186,13 +191,13 @@ export class RecipeRegistry {
 
   get(recipeId, { includeDisabled = false } = {}) {
     const recipe = this._recipes.get(recipeId) ?? null;
-    if (!recipe) return null;
+    if (!recipe || !recipeOutputAllowed(recipe)) return null;
     if (!includeDisabled && !this.#isRecipeEnabled(recipe)) return null;
     return recipe;
   }
 
   all({ includeDisabled = false } = {}) {
-    const recipes = Array.from(this._recipes.values());
+    const recipes = Array.from(this._recipes.values()).filter(recipeOutputAllowed);
 
     if (includeDisabled) return recipes;
 
