@@ -1,4 +1,5 @@
 import { recipeRarity, normalizeRarity, recipeMatchesFilters } from "../recipes/recipe-filters.mjs";
+import { isUuidAllowed } from "../core/allowed-packs.mjs";
 import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-participation.js";
 import { MODULE_TITLE } from "../constants.mjs";
 import { materialTagsSatisfy } from "../materials/material-match-utils.mjs";
@@ -301,9 +302,14 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
           // Compendium index metadata is sufficient for a reference card. Load the
           // full Item only when opened or crafted; world Items still resolve live.
           const indexed = recipe.output;
-          outputDocument = indexed.uuid.startsWith("Compendium.") && indexed.label && indexed.img
-            ? { uuid: indexed.uuid, name: indexed.label, img: indexed.img, documentName: "Item" }
-            : await fromUuid(indexed.uuid);
+          if (!isUuidAllowed(indexed.uuid)) {
+            outputResolutionWarning =
+              `${indexed.label ?? indexed.name ?? "This item"} is unavailable because its compendium is disabled in D&D5e Configure Sources.`;
+          } else {
+            outputDocument = indexed.uuid.startsWith("Compendium.") && indexed.label && indexed.img
+              ? { uuid: indexed.uuid, name: indexed.label, img: indexed.img, documentName: "Item" }
+              : await fromUuid(indexed.uuid);
+          }
         } catch (error) {
           console.warn(
             `Morelord Craftworks | Unable to resolve recipe output ${recipe.output.uuid}`,
@@ -320,7 +326,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
             sourceBook: recipe.output.sourceBook ?? null,
             sourcePackId: recipe.output.sourcePackId ?? null
           };
-        } else {
+        } else if (!outputResolutionWarning) {
           resolvedOutput = {
             ...recipe.output,
             label: recipe.output.fallbackLabel ?? "Missing Foundry Item",
@@ -354,8 +360,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       for (const itemName of requirementItemNames) {
         const item = await this.craftworks.recipes.dnd5eItemResolver
           ?.resolveAny(itemName, {
-            preferredSourceBook: sourcePack?.label,
-            includeDisabledSources: true
+            preferredSourceBook: sourcePack?.label
           });
 
         if (item) {
@@ -1255,6 +1260,10 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         const uuid = event.currentTarget.dataset.documentUuid;
         if (!uuid) return;
 
+        if (!isUuidAllowed(uuid)) {
+          ui.notifications.warn("That compendium is disabled in D&D5e Configure Sources.");
+          return;
+        }
         const item = await fromUuid(uuid);
         item?.sheet?.render(true);
       }));
@@ -1281,6 +1290,10 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
           const uuid = event.currentTarget.dataset.outputDocumentUuid;
           if (!uuid) return;
 
+          if (!isUuidAllowed(uuid)) {
+            ui.notifications.warn("That compendium is disabled in D&D5e Configure Sources.");
+            return;
+          }
           const document = await fromUuid(uuid);
           document?.sheet?.render(true);
         });

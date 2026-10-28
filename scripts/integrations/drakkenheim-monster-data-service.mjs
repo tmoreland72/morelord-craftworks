@@ -1,4 +1,5 @@
 import { log, warn, error } from "../core/logger.mjs";
+import { isUuidAllowed, packAccess } from "../core/allowed-packs.mjs";
 
 const PACKS = Object.freeze({
   monsters: "drakkenheim-monsters.monsters"
@@ -22,22 +23,22 @@ export class DrakkenheimMonsterDataService {
      * @returns {CompendiumCollection|null}
      */
     static getMonsterPack() {
-        if (this.#monsterPack) {
-            return this.#monsterPack;
-        }
-
-        const pack = game.packs.get(
-            PACKS.monsters
-        );
+        const access = packAccess(PACKS.monsters);
+        const pack = access.pack;
 
         if (!pack) {
-            Logger.error(
-                `Monster compendium "${PACKS.monsters}" could not be found.`
-            );
+            this.#monsterPack = null;
+            this.#monsterIndex = null;
+            if (!access.present) {
+                Logger.error(
+                    `Monster compendium "${PACKS.monsters}" could not be found.`
+                );
+            }
 
             return null;
         }
 
+        if (this.#monsterPack !== pack) this.#monsterIndex = null;
         this.#monsterPack = pack;
 
         return pack;
@@ -382,8 +383,9 @@ export class DrakkenheimMonsterDataService {
 
         for (const uuid of embedUuids) {
             try {
-                const document =
-                    await fromUuid(uuid);
+                const document = isUuidAllowed(uuid)
+                    ? await fromUuid(uuid)
+                    : null;
 
                 results.push({
                     uuid,

@@ -1,4 +1,5 @@
 import { CONTENT_PACKS, getContentPackSettingKey } from "../../data/content-packs.mjs";
+import { packAccess } from "./allowed-packs.mjs";
 
 // Only fixed keys, booleans, counts, timestamps, and controlled outcome codes.
 // Never export raw settings, sync signatures, errors, or game documents.
@@ -7,10 +8,11 @@ export function getCraftworksDiagnostics(api) {
   const materials = api.materials.all();
   const recipes = api.recipes.all();
   const compendium = collection => {
-    const pack = game.packs.get(collection);
+    const access = packAccess(collection);
+    const pack = access.pack;
     return {
-      present: Boolean(pack),
-      sourceEnabled: pack ? api.sourceFilter.isPackEnabled(pack) : null,
+      present: access.present,
+      sourceEnabled: access.present ? access.allowed : null,
       indexed: pack ? Boolean(pack.indexed) : null,
       indexCount: pack?.index?.size ?? null
     };

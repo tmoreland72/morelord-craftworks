@@ -92,7 +92,7 @@ test("a book-pack recipe still resolves Craftworks Standard materials", async ()
   assert.ok(labels.some(label => label.includes("Armor Padding")));
 });
 
-test("Configure Sources does not drop recipes from an enabled Craftworks pack", async () => {
+test("Configure Sources drops a catalog recipe whose item compendium is disabled", async () => {
   const pack = {
     collection: "dnd5e.equipment24",
     documentName: "Item",
@@ -107,16 +107,17 @@ test("Configure Sources does not drop recipes from an enabled Craftworks pack", 
     }
   };
   globalThis.game.packs = { get: id => id === pack.collection ? pack : null };
-  const recipes = registry({
-    sourceFilter: { isPackEnabled: () => false }
-  });
+  globalThis.game.modules = new Map([["morelord-core", { api: { sources: {
+    filter: { isPackEnabled: () => false }
+  } } }]]);
+  const recipes = registry({});
   await recipes.loadStandardSeed();
-  const loaded = recipes.all().find(recipe => recipe.name === "Crawler Mucus");
-  assert.equal(loaded?.packId, "srd-5.2");
+  assert.equal(recipes.all().find(recipe => recipe.name === "Crawler Mucus"), undefined);
   assert.equal(
     await recipes.dnd5eItemResolver.resolve("Crawler Mucus", { sourceBook: "SRD 5.2" }),
     null
   );
+  globalThis.game.modules = new Map();
 });
 
 test("a rarity-field index error does not drop the SRD item book", async () => {
@@ -137,9 +138,8 @@ test("a rarity-field index error does not drop the SRD item book", async () => {
     }
   };
   globalThis.game.packs = { get: id => id === pack.collection ? pack : null };
-  const recipes = registry({
-    sourceFilter: { isPackEnabled: () => false }
-  });
+  globalThis.game.modules = new Map();
+  const recipes = registry({});
   await recipes.loadStandardSeed();
   assert.equal(
     recipes.all().find(recipe => recipe.name === "Crawler Mucus")?.packId,
@@ -199,9 +199,10 @@ test("installed compendiums load 279 unique recipes, or 275 without the SRD book
   };
 
   use(new Set(Object.keys(collections)));
-  const linkedDespiteSources = registry({ sourceFilter: { isPackEnabled: () => false } });
-  await linkedDespiteSources.loadStandardSeed();
-  assert.deepEqual(counts(linkedDespiteSources), {
+  globalThis.game.modules = new Map();
+  const allowedSources = registry({});
+  await allowedSources.loadStandardSeed();
+  assert.deepEqual(counts(allowedSources), {
     total: 279,
     byPack: {
       "srd-5.1": 4,
@@ -210,21 +211,31 @@ test("installed compendiums load 279 unique recipes, or 275 without the SRD book
       "monsters-of-drakkenheim": 76
     }
   });
-  const loadedNames = linkedDespiteSources.all().map(recipe => recipe.name);
+  const loadedNames = allowedSources.all().map(recipe => recipe.name);
   for (const level of ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th"]) {
     assert.equal(loadedNames.includes(`${level}-Level Spell`), false);
   }
   for (const name of ["Saddle, Exotic", "Saddle, Pack", "Saddlebag", "Merchant\u2019s Scale"]) {
     assert.equal(
-      linkedDespiteSources.all().find(recipe => recipe.name === name)?.packId,
+      allowedSources.all().find(recipe => recipe.name === name)?.packId,
       "srd-5.1",
       name
     );
   }
   assert.equal(
-    linkedDespiteSources.all().find(recipe => recipe.name === "Instant Fortress")?.output.label,
+    allowedSources.all().find(recipe => recipe.name === "Instant Fortress")?.output.label,
     "Daern's Instant Fortress"
   );
+
+  globalThis.game.modules = new Map([["morelord-core", { api: { sources: {
+    filter: { isPackEnabled: () => false }
+  } } }]]);
+  const deniedSources = registry({});
+  await deniedSources.loadStandardSeed();
+  for (const packId of ["srd-5.1", "srd-5.2", "phb", "dmg", "monsters-of-drakkenheim"]) {
+    assert.equal(counts(deniedSources).byPack[packId] ?? 0, 0, packId);
+  }
+  globalThis.game.modules = new Map();
 
   use(new Set([
     "dnd-players-handbook.equipment",

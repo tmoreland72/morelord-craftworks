@@ -1,5 +1,6 @@
 import { SystemAdapter } from "../core/system-adapter.mjs";
 import { getMorelordCoreService } from "../core/morelord-core-api.mjs";
+import { compendiumCollection, isUuidAllowed } from "../core/allowed-packs.mjs";
 
 export class Dnd5eAdapter extends SystemAdapter {
   constructor({ sourceFilter = null } = {}) {
@@ -140,11 +141,11 @@ export class Dnd5eAdapter extends SystemAdapter {
   async addItemToActor(actor, sourceItem, quantity = 1) {
     if (!actor || !sourceItem) throw new Error("Actor and source Item are required.");
 
-    if (
-      sourceItem.pack
-      && this.sourceFilter
-      && !this.sourceFilter.isPackEnabled(sourceItem.pack)
-    ) {
+    const sourceUuid = sourceItem.uuid
+      ?? (sourceItem.pack
+        ? `Compendium.${sourceItem.pack}.${sourceItem.documentName ?? "Item"}.${sourceItem.id ?? sourceItem._id ?? "0"}`
+        : "");
+    if (compendiumCollection(sourceUuid) && !isUuidAllowed(sourceUuid)) {
       throw new Error(
         `${sourceItem.name} cannot be awarded because its compendium is disabled in D&D5e Configure Sources.`
       );

@@ -1,5 +1,6 @@
 import { MODULE_ID, SCHEMA_VERSION } from "../constants.mjs";
 import { organizeCraftworksCompendiums } from "../compendium-organization.mjs";
+import { packAccess } from "../core/allowed-packs.mjs";
 
 export class ContentPackMaterialInstaller {
   constructor({ registry, contentPacks }) {
@@ -39,7 +40,11 @@ export class ContentPackMaterialInstaller {
       : manifest.id === "monsters-of-drakkenheim" ? "Craftworks Drakkenheim Materials" : `Craftworks ${manifest.id} Materials`;
 
     const collection = `world.${packName}`;
-    let pack = game.packs.get(collection);
+    let access = packAccess(collection);
+    if (access.present && !access.allowed) {
+      return { packId: manifest.id, collection, creates: 0, updates: 0, deletes: 0, skipped: true };
+    }
+    let pack = access.pack;
 
     if (!pack) {
       const CompendiumCollection =
@@ -53,6 +58,12 @@ export class ContentPackMaterialInstaller {
         system: game.system.id
       });
     }
+
+    access = packAccess(collection);
+    if (access.present && !access.allowed) {
+      return { packId: manifest.id, collection, creates: 0, updates: 0, deletes: 0, skipped: true };
+    }
+    pack = access.pack ?? pack;
 
     await organizeCraftworksCompendiums();
     const existingIndex = await pack.getIndex({

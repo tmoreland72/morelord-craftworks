@@ -1,5 +1,6 @@
 import { MODULE_ID, SCHEMA_VERSION } from "../constants.mjs";
 import { organizeCraftworksCompendiums } from "../compendium-organization.mjs";
+import { packAccess } from "../core/allowed-packs.mjs";
 
 const PACK_NAME = "morelord-craftworks-spell-scrolls";
 
@@ -11,7 +12,6 @@ export class SpellScrollCatalogInstaller {
   async install() {
     if (!game.user.isGM || game.system.id !== "dnd5e") return null;
     const spells = (await this.spellScrollGenerator.availableSpells({
-      respectSourceConfiguration: false,
       dedupe: false
     }))
       .filter(spell => includedSource(spell.sourceLabel));
@@ -63,7 +63,9 @@ export class SpellScrollCatalogInstaller {
 
   async #getOrCreatePack() {
     const collection = `world.${PACK_NAME}`;
-    const pack = game.packs.get(collection)
+    let access = packAccess(collection);
+    if (access.present && !access.allowed) return null;
+    let pack = access.pack
       ?? await foundry.documents.collections.CompendiumCollection.createCompendium({
         name: PACK_NAME,
         label: "Craftworks Spell Scrolls",
@@ -71,6 +73,9 @@ export class SpellScrollCatalogInstaller {
         package: "world",
         system: game.system.id
       });
+    access = packAccess(collection);
+    if (access.present && !access.allowed) return null;
+    pack = access.pack ?? pack;
     await organizeCraftworksCompendiums();
     return pack;
   }

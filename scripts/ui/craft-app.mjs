@@ -1,4 +1,5 @@
 import { combinedCraftingInventory } from "../crafting/group-membership.mjs";
+import { isUuidAllowed } from "../core/allowed-packs.mjs";
 import { materialsMatchingIngredient } from "../recipes/recipe-filters.mjs";
 import { MODULE_TITLE } from "../constants.mjs";
 import { CraftCompletionApp } from "./craft-completion-app.mjs";
@@ -798,7 +799,7 @@ export class CraftApp
     };
     let outputDocumentUuid = null;
 
-    if (recipe.output?.type === "foundry-item") {
+    if (recipe.output?.type === "foundry-item" && isUuidAllowed(recipe.output.uuid)) {
       const source = await fromUuid(
         recipe.output.uuid
       );
@@ -836,8 +837,7 @@ export class CraftApp
     for (const itemName of requirementItemNames) {
       const item = await this.craftworks.recipes.dnd5eItemResolver
         ?.resolveAny(itemName, {
-          preferredSourceBook: sourcePack?.label,
-          includeDisabledSources: true
+          preferredSourceBook: sourcePack?.label
         });
 
       if (item) {

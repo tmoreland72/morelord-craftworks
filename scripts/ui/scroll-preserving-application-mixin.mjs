@@ -1,4 +1,5 @@
 import { renderPreservingScroll } from "../../../morelord-core/scripts/ui/scroll-preservation.js";
+import { isUuidAllowed } from "../core/allowed-packs.mjs";
 
 /**
  * Preserve all scrollable regions in a Craftworks ApplicationV2 across
@@ -19,6 +20,10 @@ export function ScrollPreservingApplicationMixin(Base) {
           event.preventDefault();
           const uuid = event.currentTarget.dataset.documentUuid;
           if (!uuid) return;
+          if (!isUuidAllowed(uuid)) {
+            ui.notifications.warn("That compendium is disabled in D&D5e Configure Sources.");
+            return;
+          }
           try {
             const document = await fromUuid(uuid);
             if (!document) throw new Error("Document not found");

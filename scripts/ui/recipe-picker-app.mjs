@@ -1,5 +1,6 @@
 import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
 import { MODULE_TITLE } from "../constants.mjs";
+import { getAllowedPacks, isUuidAllowed } from "../core/allowed-packs.mjs";
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 const CRAFTABLE_ITEM_TYPES = ["equipment", "consumable", "container", "tool", "weapon"];
@@ -68,7 +69,12 @@ export class RecipePickerApp extends ScrollPreservingApplicationMixin(Handlebars
       if (event.target.closest("button")) return;
       event.preventDefault();
       try {
-        const document = await fromUuid(element.dataset.openDocument);
+        const uuid = element.dataset.openDocument;
+        if (!isUuidAllowed(uuid)) {
+          ui.notifications.warn("That compendium is disabled in D&D5e Configure Sources.");
+          return;
+        }
+        const document = await fromUuid(uuid);
         if (!document) throw new Error("Document not found");
         document.sheet?.render(true);
       } catch { ui.notifications.warn("The source Item could not be opened."); }
@@ -87,7 +93,11 @@ export class RecipePickerApp extends ScrollPreservingApplicationMixin(Handlebars
   }
   async #items() {
     const rows = [];
-    for (const pack of this.craftworks.sourceFilter.enabledPacks({ documentName: "Item" }).filter(pack => pack.visible !== false)) {
+    const eligible = getAllowedPacks({ documentName: "Item", visible: true });
+    const packs = this.craftworks.sourceFilter?.sortPacks
+      ? this.craftworks.sourceFilter.sortPacks(eligible)
+      : eligible;
+    for (const pack of packs) {
       let index; try { index = await pack.getIndex({ fields: ["img", "type", "system.rarity", "system.rarities", "system.source"] }); } catch { continue; }
       for (const item of index) {
         if (!CRAFTABLE_ITEM_TYPES.includes(item.type)) continue;

@@ -1,4 +1,5 @@
 import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
+import { compendiumCollection, getAllowedPack, getAllowedPacks, isUuidAllowed } from "../core/allowed-packs.mjs";
 
 // Kibbles titles that are the same item as a differently named compendium
 // document. The first name is the recipe title; the rest share its identity.
@@ -169,23 +170,14 @@ export class Dnd5eCompendiumItemResolver {
 
       const collections = Array.isArray(source)
         ? source
-        : game.packs
-            .filter(pack =>
-              pack.documentName === "Item"
-              && (
-                pack.metadata?.packageName === source.packageId
-                || pack.collection.startsWith(`${source.packageId}.`)
-              )
-            )
+        : getAllowedPacks({ documentName: "Item", packageName: source.packageId })
             .map(pack => pack.collection);
 
       for (const collection of collections) {
-        const pack = game.packs.get(collection);
+        const pack = getAllowedPack(collection);
         if (!pack || pack.documentName !== "Item") continue;
 
-        // Recipe linking follows the Craftworks pack toggle. Index the
-        // compendium even when dnd5e Configure Sources excludes it; resolve()
-        // still applies that exclusion for generators and other callers.
+        // Module book lists only narrow packs Core already allowed.
         const indexFields = ["name", "img", "type", "system.rarity", "system.rarities"];
         let index;
         try {
@@ -230,7 +222,7 @@ export class Dnd5eCompendiumItemResolver {
       .reduce((sum, map) => sum + map.size, 0);
   }
 
-  async resolve(name, { sourceBook, includeDisabledSources = false } = {}) {
+  async resolve(name, { sourceBook } = {}) {
     if (!sourceBook) {
       throw new Error("D&D5e Item resolution requires an explicit sourceBook.");
     }
@@ -247,10 +239,10 @@ export class Dnd5eCompendiumItemResolver {
       if (!key) continue;
 
       const match = sourceIndex.get(key);
-      if (this.#sourceAllows(match, includeDisabledSources)) return match;
+      if (this.#sourceAllows(match)) return match;
     }
 
-    const possessive = this.#possessivePrefixMatches(sourceIndex, name, includeDisabledSources);
+    const possessive = this.#possessivePrefixMatches(sourceIndex, name);
     if (possessive.length === 1) return possessive[0];
 
     return null;
@@ -259,7 +251,7 @@ export class Dnd5eCompendiumItemResolver {
   // SRD drops a creator prefix ("Quaal's", "Heward's", "Daern's"). When this
   // book has exactly one item named "<Name>'s " plus the recipe title, that
   // item is the recipe output. Zero or several matches do not merge.
-  #possessivePrefixMatches(sourceIndex, name, includeDisabledSources) {
+  #possessivePrefixMatches(sourceIndex, name) {
     const needle = this.normalizeName(name);
     if (!needle || !sourceIndex) return [];
 
@@ -268,20 +260,17 @@ export class Dnd5eCompendiumItemResolver {
       const prefixed = String(item?.name ?? "").trim().match(POSSESSIVE_PREFIX);
       if (!prefixed) continue;
       if (this.normalizeName(prefixed[2]) !== needle) continue;
-      if (this.#sourceAllows(item, includeDisabledSources)) matches.push(item);
+      if (this.#sourceAllows(item)) matches.push(item);
     }
     return matches;
   }
 
-  #sourceAllows(match, includeDisabledSources) {
-    return Boolean(
-      match
-      && (
-        includeDisabledSources
-        || !this.sourceFilter
-        || this.sourceFilter.isPackEnabled(match.packId)
-      )
-    );
+  #sourceAllows(match) {
+    if (!match || !isUuidAllowed(match.uuid)) return false;
+    if (!match.packId || getAllowedPack(match.packId)) return true;
+    // A real compendium UUID whose pack is missing or disabled cannot be used.
+    // Synthetic catalog rows are not compendium documents.
+    return compendiumCollection(match.uuid) !== match.packId;
   }
 
   // Long form "Quaal's Feather Token (Bird)" shares the short recipe key
@@ -294,15 +283,14 @@ export class Dnd5eCompendiumItemResolver {
     for (const sourceBook of HANDBOOK_SOURCE_BOOKS) {
       hits.push(...this.#possessivePrefixMatches(
         this._bySourceBook.get(sourceBook),
-        tail,
-        true
+        tail
       ));
     }
     const distinct = new Set(hits.map(item => this.normalizeName(item.name)));
     return distinct.size === 1 ? tail : null;
   }
 
-  async resolveAny(name, { preferredSourceBook = null, includeDisabledSources = false } = {}) {
+  async resolveAny(name, { preferredSourceBook = null } = {}) {
     if (!this._bySourceBook.size) {
       await this.refresh();
     }
@@ -315,7 +303,7 @@ export class Dnd5eCompendiumItemResolver {
     );
 
     for (const sourceBook of sourceBooks) {
-      const match = await this.resolve(name, { sourceBook, includeDisabledSources });
+      const match = await this.resolve(name, { sourceBook });
       if (match) return match;
     }
 
@@ -324,7 +312,7 @@ export class Dnd5eCompendiumItemResolver {
 
   async resolveDocument(name, { sourceBook } = {}) {
     const match = await this.resolve(name, { sourceBook });
-    if (!match?.uuid) return null;
+    if (!match?.uuid || !isUuidAllowed(match.uuid)) return null;
 
     try {
       const document = await fromUuid(match.uuid);
@@ -340,10 +328,7 @@ export class Dnd5eCompendiumItemResolver {
 
   packsFor(sourceBook) {
     return [...(this._indexedPacks.get(sourceBook) ?? [])]
-      .filter(collection =>
-        !this.sourceFilter
-        || this.sourceFilter.isPackEnabled(collection)
-      );
+      .filter(collection => getAllowedPack(collection));
   }
 
   candidateNames(value) {

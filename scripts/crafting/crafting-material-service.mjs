@@ -1,4 +1,5 @@
 import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
+import { isUuidAllowed } from "../core/allowed-packs.mjs";
 import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
 import { MODULE_ID } from "../constants.mjs";
 import {
@@ -194,6 +195,9 @@ export class CraftingMaterialService {
         recipe.output.materialId
       );
     } else if (recipe.output.type === "foundry-item") {
+      if (!isUuidAllowed(recipe.output.uuid)) {
+        throw new Error(`${recipe.name} cannot be completed because its output compendium is disabled in D&D5e Configure Sources.`);
+      }
       source = await fromUuid(recipe.output.uuid);
     }
 

@@ -29,7 +29,9 @@ test("magic catalog excludes nonphysical/mundane and disabled content, deduplica
   const row = (name, type, rarity, subtype) => ({ _id: name, name, type, system: { rarity, type: { value: subtype } } });
   const pack = (collection, rows, visible = true) => ({ collection, visible, documentName: "Item", getIndex: async () => rows });
   const staff = row("Staff of Fire", "weapon", "veryRare", "simpleM");
-  globalThis.game = { user: { isGM: true }, packs: [
+  globalThis.game = { user: { isGM: true }, modules: new Map([["morelord-core", { api: { sources: {
+    filter: { isPackEnabled: pack => pack.collection !== "disabled" }
+  } } }]]), packs: [
     pack("preferred", [row("Sword", "weapon", "rare"), row("Shield", "equipment", "uncommon", "shield"), staff,
       row("Potion", "consumable", "common", "potion"), row("Spell", "spell", "rare"), row("Mundane", "weapon", ""),
       row("Disabled source", "equipment", "rare"), { _id: "v6", name: "Ring", type: "equipment", system: { rarities: ["rare", "legendary"], type: { value: "ring" } } }]),

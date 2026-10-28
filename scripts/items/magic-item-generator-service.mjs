@@ -1,5 +1,6 @@
 import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
 import { generatorQuantity } from "../core/generator-quantity.mjs";
+import { getAllowedPacks } from "../core/allowed-packs.mjs";
 
 export const MAGIC_ITEM_RARITIES = [
   { id: "common", label: "Common" },
@@ -47,8 +48,7 @@ export class MagicItemGeneratorService {
   async availableItems({ categories = null } = {}) {
     const items = [];
     const seen = new Set();
-    const eligible = Array.from(game.packs ?? []).filter(pack => pack.documentName === "Item"
-      && pack.visible !== false && (!this.sourceFilter || this.sourceFilter.isPackEnabled(pack)));
+    const eligible = getAllowedPacks({ documentName: "Item", visible: true });
     const packs = this.sourceFilter ? this.sourceFilter.sortPacks(eligible) : eligible;
     for (const pack of packs) {
       let index;

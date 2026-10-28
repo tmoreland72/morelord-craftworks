@@ -62,7 +62,7 @@ With every pack enabled and its item compendium installed, that total is 279:
 SRD 5.1 supplies 4 (Saddle, Exotic; Saddle, Pack; Saddlebag; Merchant's Scale),
 Player's Handbook 55, Dungeon Master's Guide 144, and Monsters of Drakkenheim
 76. SRD 5.2 adds nothing further while the Dungeon Master's Guide is enabled.
-Linking still reads a compendium when dnd5e Configure Sources excludes it.
+Linking reads a compendium only when dnd5e Configure Sources allows it.
 Missing SRD item compendiums, or SRD packs saved as disabled, leave those four
 recipes out, and the total is 275. The renamed items still load from the
 Dungeon Master's Guide. Ingredient materials are not taken from the winning

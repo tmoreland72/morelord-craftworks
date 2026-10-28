@@ -1,4 +1,5 @@
 import { MODULE_ID } from "../constants.mjs";
+import { getAllowedPacks } from "./allowed-packs.mjs";
 import {
   SETTINGS,
   getSetting
@@ -85,14 +86,7 @@ export class ContentSyncService {
         .sort();
 
     const itemCompendiums =
-      [...game.packs]
-        .filter(pack =>
-          String(
-            pack.documentName
-            ?? pack.metadata?.type
-            ?? ""
-          ) === "Item"
-        )
+      getAllowedPacks({ documentName: "Item" })
         .map(pack => ({
           collection:
             pack.collection,
@@ -115,18 +109,13 @@ export class ContentSyncService {
         .filter(module =>
           module.active
           && (
-            [...game.packs].some(pack =>
+            getAllowedPacks({ documentName: "Item" }).some(pack =>
               (
                 pack.metadata
                   ?.packageName
                 ?? pack.metadata
                   ?.package
               ) === module.id
-              && String(
-                pack.documentName
-                ?? pack.metadata?.type
-                ?? ""
-              ) === "Item"
             )
           )
         )
@@ -306,15 +295,7 @@ export class ContentSyncService {
   }
 
   #itemCompendiumCount() {
-    return [...game.packs]
-      .filter(pack =>
-        String(
-          pack.documentName
-          ?? pack.metadata?.type
-          ?? ""
-        ) === "Item"
-      )
-      .length;
+    return getAllowedPacks({ documentName: "Item" }).length;
   }
 }
 

@@ -1,4 +1,5 @@
 import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
+import { isUuidAllowed } from "../core/allowed-packs.mjs";
 import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
 import { MODULE_ID } from "../constants.mjs";
 import { SETTINGS, getSetting } from "../core/settings.mjs";
@@ -314,6 +315,7 @@ export class LootService {
     }
 
     for (const potion of result.potions ?? []) {
+      if (!isUuidAllowed(potion.uuid)) throw new Error(`${potion.name} cannot be awarded because its compendium is disabled in D&D5e Configure Sources.`);
       const source = await fromUuid(potion.uuid);
       if (!source) throw new Error(`Potion could not be resolved: ${potion.name}`);
       const created = await this.adapter.addItemToActor(recipient, source, 1);
@@ -330,6 +332,7 @@ export class LootService {
     }
 
     for (const added of result.customItems ?? []) {
+      if (!isUuidAllowed(added.uuid)) throw new Error(`${added.name} cannot be awarded because its compendium is disabled in D&D5e Configure Sources.`);
       const source = await fromUuid(added.uuid);
       if (!source || source.documentName !== "Item") throw new Error(`Added Item could not be resolved: ${added.name}`);
       const created = await this.adapter.addItemToActor(recipient, source, Number(added.quantity ?? 1));
@@ -344,6 +347,9 @@ export class LootService {
     }
 
     if (result.special?.itemUuid) {
+      if (!isUuidAllowed(result.special.itemUuid)) {
+        throw new Error(`${result.special.itemName ?? "Special treasure"} cannot be awarded because its compendium is disabled in D&D5e Configure Sources.`);
+      }
       const specialItem = await fromUuid(
         result.special.itemUuid
       );

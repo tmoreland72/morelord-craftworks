@@ -1,6 +1,7 @@
 import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
 import { generatorQuantity } from "../core/generator-quantity.mjs";
 import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
+import { getAllowedPacks, isUuidAllowed } from "../core/allowed-packs.mjs";
 
 export const POTION_RARITIES = [
   { id: "common", label: "Common" },
@@ -41,12 +42,7 @@ export class PotionGeneratorService {
 
   async availablePotions() {
     const potions = [];
-    const eligiblePacks = Array.from(game.packs ?? [])
-      .filter(pack =>
-        pack.documentName === "Item"
-        && pack.visible !== false
-        && (!this.sourceFilter || this.sourceFilter.isPackEnabled(pack))
-      );
+    const eligiblePacks = getAllowedPacks({ documentName: "Item", visible: true });
     const packs = this.sourceFilter
       ? this.sourceFilter.sortPacks(eligiblePacks)
       : eligiblePacks;
@@ -150,6 +146,9 @@ export class PotionGeneratorService {
 
     const awarded = [];
     for (const { potion, quantity } of grouped.values()) {
+      if (!isUuidAllowed(potion.uuid)) {
+        throw new Error(`${potion.name} cannot be awarded because its compendium is disabled in D&D5e Configure Sources.`);
+      }
       const source = await fromUuid(potion.uuid);
       if (!source) throw new Error(`Potion could not be resolved: ${potion.name}`);
       const created = await this.adapter.addItemToActor(recipient, source, quantity);

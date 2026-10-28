@@ -1,4 +1,5 @@
 import { MODULE_ID } from "../constants.mjs";
+import { getAllowedPacks, isUuidAllowed } from "../core/allowed-packs.mjs";
 import { log, warn } from "../core/logger.mjs";
 import { materialImage, repairCatalogImages } from "./material-images.mjs";
 
@@ -31,9 +32,7 @@ export class MaterialRegistry {
 
   async indexConfiguredPacks() {
     this.clear();
-    const packs = game.packs
-      .filter(pack => pack.documentName === "Item")
-      .filter(pack => this.sourceFilter?.isPackEnabled(pack) ?? true);
+    const packs = getAllowedPacks({ documentName: "Item" });
 
     for (const pack of packs) {
       const index = await pack.getIndex({ fields: [
@@ -104,7 +103,7 @@ export class MaterialRegistry {
 
   async resolveItem(materialId) {
     const entry = this.get(materialId);
-    if (!entry) return null;
+    if (!entry || !isUuidAllowed(entry.uuid)) return null;
     return fromUuid(entry.uuid);
   }
 }

@@ -1,4 +1,5 @@
 import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
+import { isUuidAllowed } from "../core/allowed-packs.mjs";
 import { materialMatchesIngredient } from "./recipe-filters.mjs";
 import {
   craftingSuccessesRequired,
@@ -139,7 +140,9 @@ export class RecipeRegistry {
     }
 
     for (const raw of await this.customRecipes?.all?.() ?? []) {
-      const item = raw.output?.uuid && typeof fromUuid === "function" ? await fromUuid(raw.output.uuid) : null;
+      const item = raw.output?.uuid && isUuidAllowed(raw.output.uuid) && typeof fromUuid === "function"
+        ? await fromUuid(raw.output.uuid)
+        : null;
       const recipe = this.#normalizeRecipe({ ...raw, output: { ...raw.output, rarity: itemRarity(item?.system) ?? raw.output?.rarity ?? raw.rarity } });
       recipe.craft.environment = recipeFacilityEnvironment(recipe);
       this._recipes.set(recipe.id, recipe);
@@ -295,7 +298,7 @@ export class RecipeRegistry {
           };
       const item = await this.dnd5eItemResolver.resolve(
         parsed.name,
-        { sourceBook: candidateSourceBook, includeDisabledSources: true }
+        { sourceBook: candidateSourceBook }
       );
 
       if (!item) continue;

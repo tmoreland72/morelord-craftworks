@@ -333,13 +333,17 @@ Core's existing access snapshot. Reports and captures go in `test/in-game-report
 
 ### D&D5e source filtering
 
-Randomized compendium-backed features respect the D&D5e system's
-`Configure Sources` selection. Craftworks treats a compendium as available
-unless D&D5e's `packSourceConfiguration` setting explicitly disables it.
+dnd5e **Configure Sources** is the primary compendium filter. Craftworks does
+not interpret that setting. Every Actor and Item compendium read goes through
+`scripts/core/allowed-packs.mjs`, which calls Morelord Core's shared helper
+(`sources.getAllowedPacks` and `sources.isUuidAllowed`) once Core exports it.
+Until that export exists, the same file forwards Actor and Item packs to the
+filter Core already publishes and does not copy the dnd5e rule.
 
-This source filter applies to Magic Item Generator, Spell Scroll Generator, Encounter Loot special
-treasure, and Hoard special treasure. Recipe catalogs intentionally use
-Craftworks Content Pack settings instead and do not follow D&D5e's source filter.
+A compendium Core does not allow is not indexed, listed, offered, or used as a
+name or UUID fallback. Craftworks Content Pack settings only narrow that set.
+That includes recipe linking, materials, monsters, generators, treasure, and
+awards.
 
 ### Hoard chat and special treasure
 
@@ -358,8 +362,8 @@ name, description, and Craftworks flags.
 
 ### Randomized Item source resolution
 
-For randomized treasure and generated scrolls, Craftworks uses the D&D5e
-system's Configure Sources setting, not Craftworks Content Pack settings.
+For randomized treasure and generated scrolls, Craftworks uses Morelord Core's
+Configure Sources helper, not Craftworks Content Pack settings.
 
 Treasure-table document links are treated as references to an item concept. If
 a table points at an Item in a disabled source, Craftworks uses that Item's name
@@ -505,7 +509,7 @@ Character choices for crafting, gathering, harvesting, delerium search, and item
 
 Settings use Morelord Core’s shared headers, sections, content cards, settings rows, and footer. Descriptions remain beside checkboxes at narrow widths.
 
-D&D5e Configure Sources filtering is provided by Core’s shared `Dnd5eSourceFilterService`, including canonical SRD exclusions for copied documents. Craftworks preserves its existing source and priority behavior while Marketplace and Downtime use the same shared rules.
+D&D5e Configure Sources filtering is delegated to Morelord Core. Craftworks keeps one call site, `scripts/core/allowed-packs.mjs`, for `getAllowedPacks` and `isUuidAllowed`. Content Pack settings and source priority only narrow packs that helper allows. Copied SRD documents still use Core's source-label check.
 
 ## Optional usage and error reports
 
