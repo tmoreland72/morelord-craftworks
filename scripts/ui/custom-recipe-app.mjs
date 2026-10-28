@@ -1,3 +1,4 @@
+import { isUuidAllowed } from "../core/allowed-packs.mjs";
 import { MODULE_TITLE } from "../constants.mjs";
 import { CustomRecipeEditorApp } from "./custom-recipe-editor-app.mjs";
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
@@ -17,7 +18,7 @@ export class CustomRecipeApp extends ScrollPreservingApplicationMixin(Handlebars
     const context = await super._prepareContext(options);
     const rows = await Promise.all((await this.craftworks.customRecipes.all()).map(async recipe => ({
       ...recipe, outputLabel: recipe.output?.label ?? "Unknown Item",
-      outputResolved: Boolean(await fromUuid(recipe.output?.uuid)),
+      outputResolved: Boolean(isUuidAllowed(recipe.output?.uuid) && await fromUuid(recipe.output.uuid)),
       missingMaterials: (recipe.requirementGroups ?? []).flatMap(group => group.requirements ?? [])
         .filter(requirement => !this.craftworks.materials.get(requirement.match?.materialId)).length,
       drakkenheim: recipe.source?.contentPackId === "monsters-of-drakkenheim"

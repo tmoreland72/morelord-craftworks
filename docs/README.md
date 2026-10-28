@@ -2,12 +2,12 @@
 title: Morelord Craftworks Documentation
 slug: morelord-craftworks
 product: morelord-craftworks
-version: 0.5.0
+version: 0.5.1
 ---
 
 # Morelord Craftworks Documentation
 
-Requires **Morelord Core 0.6.0 or later** for the Morelord Tools scene control, shared material-source cards, action pills, and image links.
+Requires **Morelord Core 0.7.0 or later** for the Morelord Tools scene control, shared material-source cards, action pills, and image links.
 
 ## Overview
 
@@ -56,7 +56,7 @@ Craftworks can also support exceptional add-on content packs that go beyond the 
 - [Game Master Manual](gm-manual.md) — installation, world configuration, content synchronization, Harvest, Gather, Loot, Hoard, generators, exceptional content packs, and troubleshooting.
 - [Player Manual](player-manual.md) — browsing materials and recipes, planning and completing crafting projects, Harvest, Gather, shared party storage, and optional Drakkenheim content.
 
-These manuals describe Morelord Craftworks 0.5.0 for Foundry Virtual Tabletop v14 and dnd5e 5.3 or later. The in-Foundry **Documentation** button on the Craftworks dashboard opens the current product guide through Morelord Core.
+These manuals describe Morelord Craftworks 0.5.1 for Foundry Virtual Tabletop v14 and dnd5e 5.3 or later. The in-Foundry **Documentation** button on the Craftworks dashboard opens the current product guide through Morelord Core.
 
 Page sections use Morelord Core bordered, shaded surfaces with shared padding, section headings, and spacing, matching Downtime. Older screenshots illustrate the workflows but may show the previous panel styling or omit the new add/remove controls. Refer to the manual text for current controls.
 

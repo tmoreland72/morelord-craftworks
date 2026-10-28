@@ -1,4 +1,5 @@
 import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
+import { getAllowedPacks, isUuidAllowed } from "../core/allowed-packs.mjs";
 import { weightedPick } from "./random-choice.mjs";
 
 /**
@@ -61,6 +62,11 @@ export class SpecialTreasureService {
     this._sourceSignature = null;
   }
 
+  invalidateCache() {
+    this._itemPool = null;
+    this._sourceSignature = null;
+  }
+
   async rollForEncounter(maxCR) {
     const pool = await this.#getItemPool();
 
@@ -114,7 +120,7 @@ export class SpecialTreasureService {
     try {
       item = itemRef.uuid.startsWith("Item.")
         ? game.items.get(itemRef.id)
-        : await fromUuid(itemRef.uuid);
+        : isUuidAllowed(itemRef.uuid) ? await fromUuid(itemRef.uuid) : null;
     } catch {
       item = null;
     }
@@ -167,7 +173,9 @@ export class SpecialTreasureService {
   }
 
   async #getItemPool() {
-    const sourceSignature = JSON.stringify(this.sourceFilter?.configuration ?? {});
+    const sourceSignature = getAllowedPacks({ documentName: "Item", visible: true })
+      .map(pack => pack.collection)
+      .join("|");
     if (!this._itemPool || this._sourceSignature !== sourceSignature) {
       this._itemPool = await this.#buildItemPool();
       this._sourceSignature = sourceSignature;
@@ -179,10 +187,7 @@ export class SpecialTreasureService {
     const entries = [];
     const seen = new Set();
 
-    const eligiblePacks = Array.from(game.packs ?? [])
-      .filter(pack => pack.documentName === "Item")
-      .filter(pack => pack.visible !== false)
-      .filter(pack => this.sourceFilter?.isPackEnabled(pack) ?? true);
+    const eligiblePacks = getAllowedPacks({ documentName: "Item", visible: true });
 
     for (const pack of eligiblePacks) {
       try {

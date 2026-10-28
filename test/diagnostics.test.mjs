@@ -6,8 +6,15 @@ test("diagnostics distinguish pack access, missing materials, source exclusions 
   const settings = { contentSyncSignature: "private-signature", contentSyncLastAt: "2026-09-18T21:02:26.934Z", recipePackEnabled_monsters_of_drakkenheim: true, partyActorUuid: "private-actor", token: "private-token" };
   globalThis.game = {
     settings: { get: (_id, key) => settings[key] },
-    modules: new Map([["drakkenheim-monsters", { active: true }]]),
-    packs: new Map([["drakkenheim-monsters.monsters", { indexed: true, index: new Map([["private-monster", {}]]) }]])
+    modules: new Map([
+      ["drakkenheim-monsters", { active: true }],
+      ["morelord-core", { api: { sources: { filter: { isPackEnabled: () => false } } } }]
+    ]),
+    packs: new Map([["drakkenheim-monsters.monsters", {
+      documentName: "Actor",
+      indexed: true,
+      index: new Map([["private-monster", {}]])
+    }]])
   };
   const api = {
     materials: { all: () => [] }, recipes: { all: () => [] },

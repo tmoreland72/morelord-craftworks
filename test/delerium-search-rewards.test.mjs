@@ -7,8 +7,9 @@ test("cumulative Drakkenheim rewards deliver once and resume partial awards with
   const sources = ["Chip", "Fragment", "Shard"].map(name => ({ _id: name,
     uuid: `Compendium.drakkenheim-monsters.items.Item.${name}`, name: `Delerium ${name}`, system: { rarity: "rare" } }));
   const official = { collection: "drakkenheim-monsters.items", documentName: "Item",
+    metadata: { packageName: "drakkenheim-monsters" },
     getIndex: async () => sources, getDocument: async id => sources.find(item => item._id === id) };
-  globalThis.game = { packs: [{ ...official, collection: "other-drakkenheim.items", getDocument: async () => assert.fail("Wrong source module") }, official] };
+  globalThis.game = { packs: [{ ...official, collection: "other-drakkenheim.items", metadata: { packageName: "other-drakkenheim" }, getDocument: async () => assert.fail("Wrong source module") }, official] };
   const recipients = [{ uuid: "Actor.character", type: "character", name: "Character" }, { uuid: "Actor.party", type: "group", name: "Party" }];
   globalThis.fromUuid = async uuid => [...sources, ...recipients].find(document => document.uuid === uuid);
   let formulas = [], deliveries = [], cards = [];

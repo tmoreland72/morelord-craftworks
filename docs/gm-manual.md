@@ -4,7 +4,7 @@ description: Install, configure, and operate Morelord Craftworks acquisition, cr
 slug: morelord-craftworks/gm
 product: morelord-craftworks
 audience: game-master
-version: 0.5.0
+version: 0.5.1
 foundry: 14
 ---
 
@@ -12,7 +12,7 @@ foundry: 14
 
 Morelord Craftworks gives a dnd5e world a connected system for harvesting creatures, gathering by terrain, generating encounter loot and hoards, managing materials and recipes, and running long-term crafting projects.
 
-This manual applies to Morelord Craftworks 0.5.0, Foundry VTT v14, and dnd5e 5.3 or later.
+This manual applies to Morelord Craftworks 0.5.1, Foundry VTT v14, and dnd5e 5.3 or later.
 
 ## Contents
 
@@ -50,9 +50,9 @@ Premium access is managed by Morelord Core. A content pack may also depend on of
 
 - Foundry Virtual Tabletop v14
 - dnd5e 5.3 or later
-- Morelord Core 0.6.0 or later. Update Core first, then refresh every connected GM and player client after updating Craftworks so each client registers the current source-availability socket handler
+- Morelord Core 0.7.0 or later. Update Core first, then refresh every connected GM and player client after updating Craftworks so each client registers the current source-availability socket handler
 - SocketLib 1.1.3 or later
-- Morelord Craftworks 0.5.0 or later
+- Morelord Craftworks 0.5.1 or later
 
 ### Install with the manifest
 
@@ -120,13 +120,13 @@ The recipe catalog does not include **1st-Level Spell** through **9th-Level Spel
 
 Ingredients stay with the recipe. A book pack does not have its own material list; Kibbles materials still come from Craftworks Standard, and Drakkenheim materials still come from the Drakkenheim pack, whichever book won the finished item.
 
-With Craftworks Standard, SRD 5.1, SRD 5.2, Player's Handbook, Dungeon Master's Guide, and Drakkenheim all enabled, and with those item compendiums installed, the dashboard total is **279**: SRD 5.1 supplies 4, the Player's Handbook supplies 55, the Dungeon Master's Guide supplies 144, and Drakkenheim supplies 76. SRD 5.2 adds no further recipe while the Dungeon Master's Guide is enabled. The four SRD 5.1 recipes are **Saddle, Exotic**, **Saddle, Pack**, **Saddlebag**, and **Merchant's Scale**, which have no matching handbook item. Recipe linking reads a book's item compendium even when dnd5e **Configure Sources** excludes it. Generated rewards still honor **Configure Sources**. If the SRD item compendiums are not installed, or SRD 5.2 and SRD 5.1 are saved as disabled, those four recipes are absent and the total is 275. The renamed items above still load from the Dungeon Master's Guide.
+With Craftworks Standard, SRD 5.1, SRD 5.2, Player's Handbook, Dungeon Master's Guide, and Drakkenheim all enabled, and with those item compendiums installed and enabled in dnd5e **Configure Sources**, the dashboard total is **279**: SRD 5.1 supplies 4, the Player's Handbook supplies 55, the Dungeon Master's Guide supplies 144, and Drakkenheim supplies 76. SRD 5.2 adds no further recipe while the Dungeon Master's Guide is enabled. The four SRD 5.1 recipes are **Saddle, Exotic**, **Saddle, Pack**, **Saddlebag**, and **Merchant's Scale**, which have no matching handbook item. Recipe linking uses a book's item compendium only when **Configure Sources** allows that compendium. A recipe whose finished item comes from a compendium that is off there is omitted from the catalog, the crafting list, and the dashboard **Recipes** total. Craftworks does not leave the card up with the item link removed. An ingredient name is resolved only in that recipe's source book. It is not replaced with the same name from another pack. Changing **Configure Sources** rebuilds the recipe and material indexes and refreshes open Craftworks windows. Turning the compendium back on lists the recipe again. A custom recipe remains in **Recipe Manager** so its output can be pointed at an allowed item; it stays out of the catalog while that output compendium is off. If the SRD item compendiums are not installed, or those compendiums are disabled in **Configure Sources** or in the SRD content packs, those four recipes are absent and the total is 275. The renamed items above still load from the Dungeon Master's Guide when that compendium is allowed.
 
 The Drakkenheim card keeps one enable/disable control and a Champion badge, with separate availability statuses for Dungeons of Drakkenheim and Monsters of Drakkenheim.
 
 ### Synchronize compendiums
 
-Craftworks automatically synchronizes when the first active GM enters the world and a relevant content signature has changed. The signature includes Craftworks and dnd5e versions, enabled content packs, available Item compendiums, and versions of active modules that supply Item compendiums.
+Craftworks automatically synchronizes when the first active GM enters the world and a relevant content signature has changed. The signature includes Craftworks and dnd5e versions, enabled content packs, Item compendiums allowed by dnd5e **Configure Sources**, and versions of active modules that supply those Item compendiums.
 
 **Save Changes** saves the settings and waits for a fresh compendium sync before closing. If synchronization fails, saved settings remain and the window stays open with an error so you can retry. Select **Sync with Compendiums** after installing or updating source content, changing dnd5e's configured sources, or troubleshooting a missing material or recipe. Synchronization updates Craftworks material compendiums, refreshes external Item discovery, and rebuilds the recipe index.
 

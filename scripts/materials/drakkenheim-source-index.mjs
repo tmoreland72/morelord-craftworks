@@ -1,5 +1,8 @@
 import { DrakkenheimMonsterDataService } from "../integrations/drakkenheim-monster-data-service.mjs";
 import { DrakkenheimMaterialMatchService } from "../integrations/drakkenheim-material-match-service.mjs";
+import { getAllowedPack } from "../core/allowed-packs.mjs";
+
+const MONSTER_PACK = "drakkenheim-monsters.monsters";
 
 let indexes = new WeakMap();
 let hooksRegistered = false;
@@ -9,7 +12,7 @@ export function clearDrakkenheimSourceCache() { indexes = new WeakMap(); }
 export function peekDrakkenheimSourceIndex(craftworks) {
   const entry = indexes.get(craftworks.materials);
   const materials = craftworks.materials.all();
-  if (!entry || entry.pack !== game.packs.get("drakkenheim-monsters.monsters")
+  if (!entry || entry.pack !== getAllowedPack(MONSTER_PACK)
     || materials.length !== entry.materials.length || materials.some((material, i) => material !== entry.materials[i])) return null;
   return entry.result ?? null;
 }
@@ -49,8 +52,8 @@ export async function getDrakkenheimHarvestableMaterialIds(craftworks) {
 export async function getDrakkenheimSourceIndex(craftworks, { onProgress = () => {} } = {}) {
   if (!game.user.isGM) throw new Error("Material source details are GM-only.");
   if (!craftworks.contentPacks.isEnabled("monsters-of-drakkenheim")) return { entries: [], notices: ["Enable the Monsters of Drakkenheim content pack to search monster sources."] };
-  const pack = game.packs.get("drakkenheim-monsters.monsters");
-  if (!pack) return { entries: [], notices: ["Monsters of Drakkenheim's monster compendium is unavailable; named monster sources could not be checked."] };
+  const pack = getAllowedPack(MONSTER_PACK);
+  if (!pack) return { entries: [], notices: ["Monsters of Drakkenheim's monster compendium is unavailable or disabled in D&D5e Configure Sources; named monster sources could not be checked."] };
   const materials = craftworks.materials.all();
   let entry = indexes.get(craftworks.materials);
   if (!entry || entry.pack !== pack || materials.length !== entry.materials.length || materials.some((material, i) => material !== entry.materials[i])) {

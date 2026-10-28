@@ -1,6 +1,7 @@
 import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
 import { DELERIUM_SEARCH_SKILLS_DND5E } from "../constants.mjs";
 import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
+import { getAllowedPacks, isUuidAllowed } from "../core/allowed-packs.mjs";
 
 const ZONES = Object.freeze({
   outer: { id: "outer", name: "Outer City", dc: 15 },
@@ -107,7 +108,8 @@ export class DeleriumSearchService {
       if (!recipient || !["character", "group"].includes(recipient.type)) throw new Error("Choose a valid party or character recipient.");
       // Resolve every source before changing the recipient's inventory.
       const sources = await Promise.all(session.rewards.map(async reward => {
-        const source = await fromUuid(reward.sourceUuid) ?? await this.#resolveSourceItem(reward.name);
+        const stored = isUuidAllowed(reward.sourceUuid) ? await fromUuid(reward.sourceUuid) : null;
+        const source = stored ?? await this.#resolveSourceItem(reward.name);
         if (!source) throw new Error(`${reward.name} is no longer available in the enabled compendiums.`);
         return source;
       }));
@@ -144,12 +146,10 @@ export class DeleriumSearchService {
   async #resolveSourceItem(name) {
     const normalizedName = String(name).trim().toLowerCase();
     const candidates = [];
-    for (const pack of game.packs.filter(pack =>
-      pack.documentName === "Item"
-      && (this.sourceFilter?.isPackEnabled(pack) ?? true)
-    )) {
-      if (pack.metadata?.packageName !== "drakkenheim-monsters"
-        && !String(pack.collection).startsWith("drakkenheim-monsters.")) continue;
+    for (const pack of getAllowedPacks({
+      documentName: "Item",
+      packageName: "drakkenheim-monsters"
+    })) {
       const index = await pack.getIndex({ fields: ["system.source"] });
       for (const entry of index) {
         if (String(entry.name ?? "").trim().toLowerCase() === normalizedName) {

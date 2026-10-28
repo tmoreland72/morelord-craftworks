@@ -1,4 +1,5 @@
 import { recipeRarity, normalizeRarity, recipeMatchesFilters } from "../recipes/recipe-filters.mjs";
+import { allowedUuid, isUuidAllowed } from "../core/allowed-packs.mjs";
 import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-participation.js";
 import { MODULE_TITLE } from "../constants.mjs";
 import { materialTagsSatisfy } from "../materials/material-match-utils.mjs";
@@ -262,7 +263,11 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       )
       .slice(0, displayLimit);
 
-    const preparedRecipes = await Promise.all(recipes.map(async recipe => {
+    const preparedRecipes = (await Promise.all(recipes.map(async recipe => {
+      if (recipe.output?.type === "foundry-item" && !isUuidAllowed(recipe.output.uuid)) {
+        return null;
+      }
+
       const readiness = this.craftworks.recipePlanner.plan(
         recipe,
         actor,
@@ -320,7 +325,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
             sourceBook: recipe.output.sourceBook ?? null,
             sourcePackId: recipe.output.sourcePackId ?? null
           };
-        } else {
+        } else if (!outputResolutionWarning) {
           resolvedOutput = {
             ...recipe.output,
             label: recipe.output.fallbackLabel ?? "Missing Foundry Item",
@@ -353,9 +358,8 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
 
       for (const itemName of requirementItemNames) {
         const item = await this.craftworks.recipes.dnd5eItemResolver
-          ?.resolveAny(itemName, {
-            preferredSourceBook: sourcePack?.label,
-            includeDisabledSources: true
+          ?.resolveRecipeItem(itemName, {
+            sourceBook: sourcePack?.label
           });
 
         if (item) {
@@ -489,7 +493,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         }))
             : []
       };
-    }));
+    }))).filter(Boolean);
 
     const recipeGroups = Array.from(
       preparedRecipes.reduce((groups, recipe) => {
@@ -699,9 +703,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         img:
           material?.img
           ?? null,
-        uuid:
-          material?.uuid
-          ?? null,
+        uuid: allowedUuid(material?.uuid),
         label:
           material?.name
           ?? this.#friendlyRequirementLabel(
@@ -725,10 +727,12 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         );
       const item = requirementItemMatches.get(normalizedItemName);
 
+      const materialLink = allowedUuid(material?.uuid);
+      const itemLink = allowedUuid(item?.uuid);
       return {
         materialId: material?.materialId ?? null,
-        img: material?.img ?? item?.img ?? null,
-        uuid: material?.uuid ?? item?.uuid ?? null,
+        img: materialLink ? material?.img : itemLink ? item?.img : null,
+        uuid: materialLink ?? itemLink,
         label: material?.name ?? item?.name ?? String(match.itemName).trim(),
         rarity: material?.rarity ?? match.rarity ?? null
       };
@@ -1255,6 +1259,10 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         const uuid = event.currentTarget.dataset.documentUuid;
         if (!uuid) return;
 
+        if (!isUuidAllowed(uuid)) {
+          ui.notifications.warn("That compendium is disabled in D&D5e Configure Sources.");
+          return;
+        }
         const item = await fromUuid(uuid);
         item?.sheet?.render(true);
       }));
@@ -1281,6 +1289,10 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
           const uuid = event.currentTarget.dataset.outputDocumentUuid;
           if (!uuid) return;
 
+          if (!isUuidAllowed(uuid)) {
+            ui.notifications.warn("That compendium is disabled in D&D5e Configure Sources.");
+            return;
+          }
           const document = await fromUuid(uuid);
           document?.sheet?.render(true);
         });

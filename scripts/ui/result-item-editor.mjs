@@ -1,3 +1,5 @@
+import { getAllowedPacks } from "../core/allowed-packs.mjs";
+
 const MAX_RESULTS = 20;
 const COIN_VALUES = Object.freeze({ pp: 1000, gp: 100, ep: 50, sp: 10, cp: 1 });
 
@@ -45,10 +47,8 @@ export async function searchItemsByName(query, { sourceFilter = null } = {}) {
     results.push(entry);
   };
 
-  const packs = (sourceFilter?.enabledPacks?.({ documentName: "Item" })
-    ?? Array.from(game.packs ?? []).filter(pack => pack.documentName === "Item"))
-    .filter(pack => pack.visible !== false)
-    .filter(pack => sourceFilter?.isPackEnabled(pack) ?? true);
+  const eligible = getAllowedPacks({ documentName: "Item", visible: true });
+  const packs = sourceFilter?.sortPacks ? sourceFilter.sortPacks(eligible) : eligible;
 
   for (const pack of packs) {
     let index;

@@ -1,4 +1,5 @@
 import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
+import { isUuidAllowed } from "../core/allowed-packs.mjs";
 import { materialMatchesIngredient } from "./recipe-filters.mjs";
 import {
   craftingSuccessesRequired,
@@ -36,6 +37,11 @@ function sourcePriority(packId) {
 
 export function isGenericLevelSpellRecipe(name) {
   return GENERIC_LEVEL_SPELL.test(String(name ?? "").trim());
+}
+
+export function recipeOutputAllowed(recipe) {
+  if (recipe?.output?.type !== "foundry-item") return true;
+  return isUuidAllowed(recipe.output?.uuid);
 }
 
 function looseRecipeKey(name) {
@@ -139,7 +145,9 @@ export class RecipeRegistry {
     }
 
     for (const raw of await this.customRecipes?.all?.() ?? []) {
-      const item = raw.output?.uuid && typeof fromUuid === "function" ? await fromUuid(raw.output.uuid) : null;
+      const item = raw.output?.uuid && isUuidAllowed(raw.output.uuid) && typeof fromUuid === "function"
+        ? await fromUuid(raw.output.uuid)
+        : null;
       const recipe = this.#normalizeRecipe({ ...raw, output: { ...raw.output, rarity: itemRarity(item?.system) ?? raw.output?.rarity ?? raw.rarity } });
       recipe.craft.environment = recipeFacilityEnvironment(recipe);
       this._recipes.set(recipe.id, recipe);
@@ -183,13 +191,13 @@ export class RecipeRegistry {
 
   get(recipeId, { includeDisabled = false } = {}) {
     const recipe = this._recipes.get(recipeId) ?? null;
-    if (!recipe) return null;
+    if (!recipe || !recipeOutputAllowed(recipe)) return null;
     if (!includeDisabled && !this.#isRecipeEnabled(recipe)) return null;
     return recipe;
   }
 
   all({ includeDisabled = false } = {}) {
-    const recipes = Array.from(this._recipes.values());
+    const recipes = Array.from(this._recipes.values()).filter(recipeOutputAllowed);
 
     if (includeDisabled) return recipes;
 
@@ -295,7 +303,7 @@ export class RecipeRegistry {
           };
       const item = await this.dnd5eItemResolver.resolve(
         parsed.name,
-        { sourceBook: candidateSourceBook, includeDisabledSources: true }
+        { sourceBook: candidateSourceBook }
       );
 
       if (!item) continue;

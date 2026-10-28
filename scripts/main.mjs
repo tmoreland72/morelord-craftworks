@@ -1,4 +1,5 @@
 import { registerDrakkenheimSourceCacheHooks, clearDrakkenheimSourceCache, getDrakkenheimHarvestableMaterialIds } from "./materials/drakkenheim-source-index.mjs";
+import { CONFIGURE_SOURCES_CHANGED, refreshAfterConfigureSourcesChange } from "./core/configure-sources-refresh.mjs";
 import { getCraftworksDiagnostics } from "./core/diagnostics.mjs";
 import { initializeDeleriumChatRequests } from "./acquisition/delerium-chat-requests.mjs";
 import { combinedCraftingInventory } from "./crafting/group-membership.mjs";
@@ -343,6 +344,22 @@ Hooks.once("ready", async () => {
   let magicItemGeneratorApp = null;
   let craftworksApp = null;
   let craftApp = null;
+  let refreshingSources = false;
+
+  Hooks.on(CONFIGURE_SOURCES_CHANGED, () => {
+    if (refreshingSources) return;
+    refreshingSources = true;
+    void refreshAfterConfigureSourcesChange({
+      itemResolver: dnd5eItemResolver,
+      materials,
+      recipes,
+      specialTreasure
+    }).catch(error => {
+      console.warn("Morelord Craftworks | Configure Sources refresh failed.", error);
+    }).finally(() => {
+      refreshingSources = false;
+    });
+  });
 
   const api = {
     getDiagnostics: () => getCraftworksDiagnostics(api),

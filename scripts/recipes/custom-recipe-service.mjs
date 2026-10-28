@@ -1,5 +1,6 @@
 import { MODULE_ID } from "../constants.mjs";
 import { organizeCraftworksCompendiums } from "../compendium-organization.mjs";
+import { packAccess } from "../core/allowed-packs.mjs";
 
 const PACK_NAME = "morelord-craftworks-custom-recipes";
 const FLAG_PATH = `flags.${MODULE_ID}.customRecipe`;
@@ -12,7 +13,7 @@ export class CustomRecipeService {
   get collection() { return `world.${PACK_NAME}`; }
 
   async all() {
-    const pack = game.packs.get(this.collection);
+    const pack = packAccess(this.collection).pack;
     if (!pack) return [];
     const index = await pack.getIndex({ fields: [FLAG_PATH] });
     return [...index].map(row => foundry.utils.deepClone(
@@ -41,7 +42,7 @@ export class CustomRecipeService {
 
   async delete(recipeId) {
     this.#assertGM();
-    const pack = game.packs.get(this.collection);
+    const pack = packAccess(this.collection).pack;
     if (!pack) return false;
     const current = (await this.#documents(pack)).get(String(recipeId));
     if (!current) return false;
@@ -139,7 +140,11 @@ export class CustomRecipeService {
   }
 
   async #pack() {
-    const pack = game.packs.get(this.collection)
+    const access = packAccess(this.collection);
+    if (access.present && !access.allowed) {
+      throw new Error("Craftworks Custom Recipes is disabled in D&D5e Configure Sources.");
+    }
+    const pack = access.pack
       ?? await foundry.documents.collections.CompendiumCollection.createCompendium({
         name: PACK_NAME, label: "Craftworks Custom Recipes",
         type: "JournalEntry", package: "world"

@@ -1,6 +1,7 @@
 import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
 import { generatorQuantity } from "../core/generator-quantity.mjs";
 import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
+import { getAllowedPack, getAllowedPacks, isUuidAllowed } from "../core/allowed-packs.mjs";
 import { SCROLL_RARITIES } from "./scroll-rarity.mjs";
 export class SpellScrollGeneratorService {
   constructor({
@@ -34,23 +35,13 @@ export class SpellScrollGeneratorService {
   async availableSpells({
     level = null,
     schools = null,
-    respectSourceConfiguration = true,
     dedupe = true
   } = {}) {
     const spells = [];
     const seen = new Set();
 
-    const eligiblePacks = Array.from(game.packs ?? [])
-      .filter(pack =>
-        pack.documentName === "Item"
-        && this.#packEnabled(pack)
-        && this.#contentPackEnabled(pack)
-        && (
-          !respectSourceConfiguration
-          || !this.sourceFilter
-          || this.sourceFilter.isPackEnabled(pack)
-        )
-      );
+    const eligiblePacks = getAllowedPacks({ documentName: "Item", visible: true })
+      .filter(pack => this.#contentPackEnabled(pack));
 
     const packs = this.sourceFilter
       ? this.sourceFilter.sortPacks(eligiblePacks)
@@ -236,6 +227,9 @@ export class SpellScrollGeneratorService {
   }
 
   async createScrollItem({ spellUuid, level } = {}) {
+    if (spellUuid && !isUuidAllowed(spellUuid)) {
+      throw new Error("The selected spell's compendium is disabled in D&D5e Configure Sources.");
+    }
     const spell = spellUuid ? await fromUuid(spellUuid) : null;
     if (!spell || spell.documentName !== "Item" || spell.type !== "spell") {
       throw new Error("The selected spell could not be resolved.");
@@ -256,7 +250,7 @@ export class SpellScrollGeneratorService {
 
     const data = scroll.toObject();
     delete data._id;
-    const sourcePack = spell.pack ? game.packs.get(spell.pack) : null;
+    const sourcePack = spell.pack ? getAllowedPack(spell.pack) : null;
     const sourceLabel = this.sourceFilter
       ? this.sourceFilter.sourceLabelForItem(spell, { pack: sourcePack })
       : "Unknown Source";
@@ -318,12 +312,6 @@ export class SpellScrollGeneratorService {
     });
 
     return { recipient, items: awarded, spells };
-  }
-
-  #packEnabled(pack) {
-    // Foundry only exposes packs that are available to the world. Avoid
-    // hidden/private packs and let active module/system compendiums participate.
-    return pack.visible !== false;
   }
 
   #contentPackEnabled(pack) {
