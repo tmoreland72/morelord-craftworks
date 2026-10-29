@@ -125,7 +125,7 @@ Progress persists between attempts. Recipe cards display the total duration, and
 
 The GM configures facility requirements by artisan tool. Recipes display the required facility and minimum rarity, derived from the item being crafted. Higher-rarity facilities also qualify: a Rare forge can craft an Uncommon item. A project pauses while that environment is unavailable and resumes when the requirement is met. Crafting projects can also appear in Morelord Downtime and open directly into a focused Craftworks recipe view.
 
-When the job completes, choose the destination in the completion window. Foundry Item outputs use their live name and image and can be opened from their linked reference.
+When the job completes, choose **Place in My Inventory** or **Place in {party name} Inventory**. **Place in My Inventory** adds the item to the crafter. **Place in {party name} Inventory** adds it to the party Group. A party member can use that button without owning the Group actor; a connected GM performs the inventory write. The button can be used once for that completed job. Foundry Item outputs use their live name and image and can be opened from their linked reference.
 
 If you cancel an active job, Craftworks returns materials consumed when that job began to their original inventories.
 
