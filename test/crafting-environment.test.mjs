@@ -175,6 +175,31 @@ test("facility options come from the Core location capability registry", () => {
   assert.equal(options.types[0].supportsSpecialty, true);
 });
 
+test("Core activeContext supplies the crafting location", () => {
+  const priorGame = globalThis.game;
+  globalThis.game = {
+    user: { id: "gm" },
+    settings: { get: () => { throw new Error("local downtime lookup should not run"); } }
+  };
+  try {
+    const service = new CraftingEnvironmentService();
+    const road = { id: "road", name: "On the Road", settlementType: "road", capabilities: [] };
+    Object.defineProperty(service, "locationApi", {
+      value: {
+        ...locationApi,
+        current: () => ({ capabilities: [{ type: "forge", tier: "legendary" }] }),
+        activeContext(user) {
+          assert.equal(user.id, "gm");
+          return { location: road, source: "road", sessionId: "active" };
+        }
+      }
+    });
+    assert.equal(service.evaluate(recipe).passed, false);
+  } finally {
+    globalThis.game = priorGame;
+  }
+});
+
 test("an active On the Road downtime session overrides the scene location", () => {
   const priorGame = globalThis.game;
   globalThis.game = {

@@ -136,6 +136,22 @@ export class CraftingEnvironmentService {
 
   #activeDowntimeContext(context) {
     if (context.location) return context;
+    if (typeof this.locationApi?.activeContext === "function") {
+      try {
+        const active = this.locationApi.activeContext(game.user);
+        if (active?.location) return { ...context, location: active.location };
+        if (active?.source === "downtime" || active?.source === "road") {
+          return { ...context, location: active.location ?? null };
+        }
+        if (active && typeof active === "object") return context;
+      } catch {
+        // Older or partial Core builds fall through to the local lookup.
+      }
+    }
+    return this.#legacyDowntimeContext(context);
+  }
+
+  #legacyDowntimeContext(context) {
     try {
       const state = game.settings.get("morelord-downtime", "projectState");
       const session = Object.values(state?.sessions ?? {})

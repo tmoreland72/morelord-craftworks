@@ -7,7 +7,7 @@ version: 0.5.2
 
 # Morelord Craftworks Documentation
 
-Requires **Morelord Core 0.7.0 or later** for the Morelord Tools scene control, shared material-source cards, action pills, and image links.
+Requires **Morelord Core 0.9.0 or later** for the Morelord Tools scene control, shared material-source cards, action pills, and image links.
 
 ## Overview
 

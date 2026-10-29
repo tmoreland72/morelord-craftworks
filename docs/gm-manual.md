@@ -50,7 +50,7 @@ Premium access is managed by Morelord Core. A content pack may also depend on of
 
 - Foundry Virtual Tabletop v14
 - dnd5e 5.3 or later
-- Morelord Core 0.7.0 or later. Update Core first, then refresh every connected GM and player client after updating Craftworks so each client registers the current source-availability socket handler
+- Morelord Core 0.9.0 or later. Update Core first, then refresh every connected GM and player client after updating Craftworks so each client registers the current source-availability socket handler
 - SocketLib 1.1.3 or later
 - Morelord Craftworks 0.5.2 or later
 
