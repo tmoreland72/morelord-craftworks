@@ -41,6 +41,15 @@ function environment(initial = []) {
   return { rows };
 }
 
+test("custom recipe saves store Smith's Tools for a legacy Blacksmith's Tools requirement", () => {
+  environment();
+  const entry = recipe();
+  entry.craft = { tool: "Blacksmith\u2019s Tools", ability: "Strength", dc: 11, hoursRequired: 8 };
+  const exported = JSON.parse(new CustomRecipeService().export(entry)).recipes[0];
+  assert.equal(exported.craft.tool, "Smith's Tools");
+  assert.equal(exported.craft.ability, "Strength");
+});
+
 test("custom recipe exports are versioned and portable", () => {
   environment();
   const payload = JSON.parse(new CustomRecipeService().export(recipe()));

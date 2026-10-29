@@ -1,3 +1,4 @@
+import { canonicalArtisanToolName } from "../crafting/crafting-environment-service.mjs";
 import { recipeRarity, normalizeRarity, recipeMatchesFilters } from "../recipes/recipe-filters.mjs";
 import { allowedUuid, isUuidAllowed } from "../core/allowed-packs.mjs";
 import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-participation.js";
@@ -131,12 +132,12 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
 
     const catalogTools = new Set(
       catalogRecipes
-        .map(recipe => String(recipe.craft?.tool ?? "").trim())
+        .map(recipe => canonicalArtisanToolName(recipe.craft?.tool))
         .filter(Boolean)
     );
     const visibleToolCounts = new Map();
     for (const recipe of visibleRecipes) {
-      const tool = String(recipe.craft?.tool ?? "").trim();
+      const tool = canonicalArtisanToolName(recipe.craft?.tool);
       if (tool) {
         visibleToolCounts.set(
           tool,
@@ -273,7 +274,10 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         actor,
         { includePartyInventory: false }
       );
-      const craft = recipe.craft ?? {};
+      const craft = {
+        ...(recipe.craft ?? {}),
+        ...(recipe.craft?.tool ? { tool: canonicalArtisanToolName(recipe.craft.tool) } : {})
+      };
       const checkParts = [
         craft.checkRequired === false ? "No check" : (craft.tool || craft.skill || craft.ability)
       ].filter(Boolean);

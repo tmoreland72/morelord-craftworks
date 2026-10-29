@@ -27,6 +27,18 @@ test('every standalone Craftworks page uses the shared hero and documentation ac
   }
 });
 
+test('the player dashboard does not include a Player Resources section', () => {
+  const source = readFileSync(new URL('templates/craftworks-dashboard.hbs', root), 'utf8');
+  assert.equal(source.includes('Player Resources'), false);
+  assert.equal(source.includes('Acquisition sessions are started by the GM'), false);
+  assert.match(source, /<h2>Acquire<\/h2>/);
+  assert.match(source, /<h2>Craft<\/h2>/);
+  assert.match(source, /<h2>Tools<\/h2>/);
+  assert.match(source, /data-action="materials"/);
+  assert.match(source, /data-action="recipes"/);
+  assert.match(source, /data-action="craft"/);
+});
+
 test('Craftworks consumes Core theme and typography tokens', () => {
   for (const file of readdirSync(new URL('styles/features/', root)).filter(name => name.endsWith('.css'))) {
     const source = readFileSync(new URL(`styles/features/${file}`, root), 'utf8');

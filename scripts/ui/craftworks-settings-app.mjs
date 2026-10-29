@@ -1,4 +1,4 @@
-import { ARTISAN_TOOLS, getCraftingFacilityRules } from "../crafting/crafting-environment-service.mjs";
+import { craftingFacilityToolNames, facilityRuleForTool, getCraftingFacilityRules } from "../crafting/crafting-environment-service.mjs";
 import { MODULE_ID, MODULE_TITLE } from "../constants.mjs";
 import {
   SETTINGS,
@@ -167,8 +167,10 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
     return foundry.utils.mergeObject(context, {
       core,
       contentSyncStatus,
-      facilityRules: [...new Set([...ARTISAN_TOOLS, ...(craftworks?.recipes.all() ?? []).map(recipe => recipe.craft?.tool).filter(Boolean)])].sort().map(tool => ({
-        tool, selected: getCraftingFacilityRules()[tool] ?? ""
+      facilityRules: craftingFacilityToolNames(
+        (craftworks?.recipes.all() ?? []).map(recipe => recipe.craft?.tool)
+      ).map(tool => ({
+        tool, selected: facilityRuleForTool(getCraftingFacilityRules(), tool)
       })),
       facilityOptions: Object.fromEntries([["", "No facility required"], ...(craftworks?.craftingEnvironment.facilityOptions().types ?? []).map(type => [type.id, type.name])]),
 

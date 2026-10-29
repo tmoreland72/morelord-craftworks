@@ -4,7 +4,7 @@ description: Install, configure, and operate Morelord Craftworks acquisition, cr
 slug: morelord-craftworks/gm
 product: morelord-craftworks
 audience: game-master
-version: 0.5.1
+version: 0.5.2
 foundry: 14
 ---
 
@@ -12,7 +12,7 @@ foundry: 14
 
 Morelord Craftworks gives a dnd5e world a connected system for harvesting creatures, gathering by terrain, generating encounter loot and hoards, managing materials and recipes, and running long-term crafting projects.
 
-This manual applies to Morelord Craftworks 0.5.1, Foundry VTT v14, and dnd5e 5.3 or later.
+This manual applies to Morelord Craftworks 0.5.2, Foundry VTT v14, and dnd5e 5.3 or later.
 
 ## Contents
 
@@ -52,7 +52,7 @@ Premium access is managed by Morelord Core. A content pack may also depend on of
 - dnd5e 5.3 or later
 - Morelord Core 0.7.0 or later. Update Core first, then refresh every connected GM and player client after updating Craftworks so each client registers the current source-availability socket handler
 - SocketLib 1.1.3 or later
-- Morelord Craftworks 0.5.1 or later
+- Morelord Craftworks 0.5.2 or later
 
 ### Install with the manifest
 
@@ -235,7 +235,7 @@ The **Crafter** performs checks and supplies tool possession and proficiency. Th
 
 Crafting progress belongs to the crafter-and-recipe combination and does not split when the inventory source changes. Each attempt represents two hours. Failed checks consume time but not recipe materials. Recipe durations must be positive multiples of two hours.
 
-In **Settings → Crafting**, choose the Core location activity required for each artisan tool, or **No facility required**. For example, Smith’s Tools can require a Forge while Alchemist’s Supplies can work anywhere. Recipes display this requirement instead of individual facility selectors. The minimum tier comes from the crafted item’s rarity; an Uncommon item can use an Uncommon, Rare, Very Rare, or Legendary facility. An active **On the Road** Downtime context overrides the scene location. A job pauses while its facility is unavailable and resumes when the requirement is met. **Manage Locations** is available with the other GM tools on the Craftworks dashboard.
+In **Settings → Crafting**, choose the Core location activity required for each artisan tool, or **No facility required**. The list uses the D&D 2024 artisan-tool names, and **Smith's Tools** appears once. For example, Smith's Tools can require a Forge while Alchemist's Supplies can work anywhere. A facility rule saved under the older name Blacksmith's Tools still applies to **Smith's Tools**, including a custom recipe that still stores that name. Recipes display this requirement instead of individual facility selectors. The minimum tier comes from the crafted item’s rarity; an Uncommon item can use an Uncommon, Rare, Very Rare, or Legendary facility. An active **On the Road** Downtime context overrides the scene location. A job pauses while its facility is unavailable and resumes when the requirement is met. **Manage Locations** is available with the other GM tools on the Craftworks dashboard.
 
 Craftworks exposes marked and active crafting projects to Morelord Downtime. Opening one from Downtime launches a focused Craft window for that crafter and recipe while Craftworks remains authoritative for ingredients, checks, progress, and output.
 

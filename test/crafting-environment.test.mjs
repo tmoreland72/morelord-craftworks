@@ -1,8 +1,15 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync, readdirSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import {
+  ARTISAN_TOOLS,
   CraftingEnvironmentService,
+  canonicalArtisanToolName,
+  craftingFacilityToolNames,
   evaluateCraftingEnvironment,
+  facilityRuleForTool,
   getCraftingFacilityOptions,
   normalizeCraftEnvironment,
   recipeFacilityEnvironment
@@ -27,6 +34,97 @@ test("all Drakkenheim recipes require an equal-or-higher Workshop regardless of 
     for (const [capabilities, passed] of [[[], false], [[{ type: "workshop", tier: "uncommon" }], false], [[{ type: "workshop", tier: "rare" }], true], [[{ type: "workshop", tier: "veryRare" }], true]]) {
       assert.equal(evaluateCraftingEnvironment(recipe, { location: { capabilities } }, locationApi).passed, passed);
     }
+  }
+});
+
+test("Smith's Tools is the only facility-list name and legacy Blacksmith's Tools rules still apply", () => {
+  assert.equal(canonicalArtisanToolName("Smith's Tools"), "Smith's Tools");
+  assert.equal(canonicalArtisanToolName("Blacksmith's Tools"), "Smith's Tools");
+  assert.equal(canonicalArtisanToolName("Blacksmith\u2019s Tools"), "Smith's Tools");
+  assert.equal(canonicalArtisanToolName(" Carpenter's Tools "), "Carpenter's Tools");
+
+  const names = craftingFacilityToolNames([
+    "Blacksmith's Tools",
+    "Blacksmith\u2019s Tools",
+    "Smith's Tools",
+    "Alchemist's Supplies",
+    "Herbalism Kit"
+  ]);
+  assert.equal(names.filter(name => name === "Smith's Tools").length, 1);
+  assert.equal(names.includes("Blacksmith's Tools"), false);
+  assert.equal(names.includes("Herbalism Kit"), true);
+  assert.equal(names.filter(name => ARTISAN_TOOLS.includes(name)).length, ARTISAN_TOOLS.length);
+
+  const smith = { craft: { tool: "Smith's Tools" }, output: { rarity: "common" } };
+  assert.deepEqual(
+    recipeFacilityEnvironment(smith, { "Blacksmith's Tools": "forge" }).facility,
+    { type: "forge", tier: "common" }
+  );
+  assert.deepEqual(
+    recipeFacilityEnvironment(
+      { craft: { tool: "Blacksmith's Tools" }, rarity: "uncommon" },
+      { "Smith's Tools": "forge" }
+    ).facility,
+    { type: "forge", tier: "uncommon" }
+  );
+  assert.deepEqual(
+    recipeFacilityEnvironment(
+      { craft: { tool: "Blacksmith\u2019s Tools" }, output: { rarity: "rare" } },
+      { "Blacksmith\u2019s Tools": "forge" }
+    ).facility,
+    { type: "forge", tier: "rare" }
+  );
+  assert.equal(
+    facilityRuleForTool({ "Smith's Tools": "", "Blacksmith's Tools": "forge" }, "Smith's Tools"),
+    "forge"
+  );
+  assert.equal(
+    facilityRuleForTool({ "Smith's Tools": "library", "Blacksmith's Tools": "forge" }, "Smith's Tools"),
+    "library"
+  );
+  assert.equal(
+    recipeFacilityEnvironment(
+      { craft: { tool: "Alchemist's Supplies" }, rarity: "rare" },
+      { "Blacksmith's Tools": "forge", "Alchemist's Supplies": "" }
+    ).portable,
+    true
+  );
+  const drakkenheim = {
+    packId: "monsters-of-drakkenheim",
+    output: { rarity: "uncommon" },
+    craft: { tool: "Blacksmith's Tools" }
+  };
+  assert.deepEqual(
+    recipeFacilityEnvironment(drakkenheim, { "Smith's Tools": "forge", "Blacksmith's Tools": "library" }).facility,
+    { type: "workshop", tier: "uncommon" }
+  );
+});
+
+test("packaged recipe data uses Smith's Tools and keeps the smith-tool recipe id", () => {
+  const dataDir = fileURLToPath(new URL("../data/", import.meta.url));
+  const files = [];
+  const walk = directory => {
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const full = path.join(directory, entry.name);
+      if (entry.isDirectory()) walk(full);
+      else if (entry.name.endsWith(".mjs") || entry.name.endsWith(".json")) files.push(full);
+    }
+  };
+  walk(dataDir);
+  const legacy = /Blacksmith['\u2019]s Tools|Blacksmith\\u2019s Tools/;
+  const hits = files.filter(file => legacy.test(readFileSync(file, "utf8")));
+  assert.deepEqual(hits, []);
+
+  const expected = [
+    ["data/kibbles-recipes.seed.mjs", "blacksmithing-blacksmiths-tools"],
+    ["data/srd-5.1-recipes.mjs", "srd51-blacksmithing-blacksmiths-tools"],
+    ["data/srd-5.2-recipes.mjs", "srd52-blacksmithing-blacksmiths-tools"]
+  ];
+  for (const [file, id] of expected) {
+    const text = readFileSync(new URL(`../${file}`, import.meta.url), "utf8");
+    assert.match(text, new RegExp(`"id": "${id}"[\\s\\S]{0,800}"name": "Smith's Tools"`));
+    assert.match(text, new RegExp(`"id": "${id}"[\\s\\S]{0,2500}"tool": "Smith's Tools"`));
+    assert.match(text, new RegExp(`"id": "${id}"[\\s\\S]{0,4000}"label": "Smith's Tools"`));
   }
 });
 

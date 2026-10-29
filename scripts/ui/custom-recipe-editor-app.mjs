@@ -1,4 +1,4 @@
-import { ARTISAN_TOOLS } from "../crafting/crafting-environment-service.mjs";
+import { ARTISAN_TOOLS, canonicalArtisanToolName } from "../crafting/crafting-environment-service.mjs";
 import { MODULE_TITLE } from "../constants.mjs";
 import { RecipePickerApp } from "./recipe-picker-app.mjs";
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
@@ -9,7 +9,7 @@ export class CustomRecipeEditorApp extends ScrollPreservingApplicationMixin(Hand
     super(); this.craftworks = craftworks; this.originalId = recipe?.id ?? null;
     this.drakkenheim = Boolean(drakkenheim); this.onSaved = onSaved; this.picker = null;
     this.output = recipe ? { uuid: recipe.output.uuid, name: recipe.output.label, img: recipe.output.img, rarity: recipe.output.rarity ?? recipe.rarity, type: recipe.output.itemType ?? recipe.category } : null;
-    this.draft = { description: recipe?.description ?? "", tool: recipe?.craft?.tool ?? "", ability: recipe?.craft?.ability ?? "Intelligence", dc: recipe?.craft?.dc ?? 13,
+    this.draft = { description: recipe?.description ?? "", tool: canonicalArtisanToolName(recipe?.craft?.tool ?? ""), ability: recipe?.craft?.ability ?? "Intelligence", dc: recipe?.craft?.dc ?? 13,
 
       hoursRequired: recipe?.craft?.hoursRequired ?? 2, outputQuantity: recipe?.output?.quantity ?? 1 };
     this.groups = recipe?.requirementGroups?.length
@@ -97,7 +97,8 @@ export class CustomRecipeEditorApp extends ScrollPreservingApplicationMixin(Hand
   }
   #tools() {
     const fallback = [...ARTISAN_TOOLS];
-    if (this.draft.tool && !fallback.includes(this.draft.tool)) fallback.push(this.draft.tool);
+    const tool = canonicalArtisanToolName(this.draft.tool);
+    if (tool && !fallback.includes(tool)) fallback.push(tool);
     return fallback.sort().map(label => ({ label }));
   }
   #recipeId(uuid) { return `custom-${String(uuid).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")}`; }

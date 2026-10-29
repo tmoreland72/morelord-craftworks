@@ -1,3 +1,4 @@
+import { canonicalArtisanToolName } from "../crafting/crafting-environment-service.mjs";
 import { MODULE_ID } from "../constants.mjs";
 import { organizeCraftworksCompendiums } from "../compendium-organization.mjs";
 import { packAccess } from "../core/allowed-packs.mjs";
@@ -119,6 +120,7 @@ export class CustomRecipeService {
         }
       }
     }
+    if (recipe.craft?.tool) recipe.craft.tool = canonicalArtisanToolName(recipe.craft.tool);
     if (drakkenheim) recipe.craft = { ...recipe.craft, checkRequired: false, dc: null, hoursRequired: 0 };
     const hours = Number(recipe.craft?.hoursRequired ?? 2);
     if (!drakkenheim && (!Number.isFinite(hours) || hours < 2 || hours % 2 !== 0)) {

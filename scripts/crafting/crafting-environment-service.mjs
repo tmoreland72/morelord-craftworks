@@ -4,6 +4,39 @@ const VALID_TIERS = new Set(["common", "uncommon", "rare", "veryRare", "legendar
 
 export const CRAFTING_FACILITY_RULES = "craftingFacilityRules";
 export const ARTISAN_TOOLS = ["Alchemist's Supplies", "Brewer's Supplies", "Calligrapher's Supplies", "Carpenter's Tools", "Cobbler's Tools", "Cook's Utensils", "Glassblower's Tools", "Jeweler's Tools", "Leatherworker's Tools", "Mason's Tools", "Painter's Supplies", "Potter's Tools", "Smith's Tools", "Tinker's Tools", "Weaver's Tools", "Woodcarver's Tools"];
+
+// D&D 2024 calls this Smith's Tools. Saved facility rules and world recipes
+// may still store the older name.
+const LEGACY_ARTISAN_TOOL_KEYS = new Map([
+  ["blacksmithstools", "Smith's Tools"]
+]);
+
+export function canonicalArtisanToolName(name) {
+  const text = String(name ?? "").trim();
+  if (!text) return "";
+  const key = text.normalize("NFKD").toLowerCase().replace(/[^a-z0-9]/g, "");
+  return LEGACY_ARTISAN_TOOL_KEYS.get(key) ?? text;
+}
+
+export function facilityRuleForTool(rules, tool) {
+  const source = rules && typeof rules === "object" && !Array.isArray(rules) ? rules : {};
+  const canonical = canonicalArtisanToolName(tool);
+  if (!canonical) return "";
+  const direct = source[canonical];
+  if (direct) return String(direct);
+  for (const [key, value] of Object.entries(source)) {
+    if (value && canonicalArtisanToolName(key) === canonical) return String(value);
+  }
+  return "";
+}
+
+export function craftingFacilityToolNames(recipeTools = []) {
+  return [...new Set([
+    ...ARTISAN_TOOLS,
+    ...[...recipeTools].map(name => canonicalArtisanToolName(name)).filter(Boolean)
+  ])].sort();
+}
+
 export function getCraftingFacilityRules() {
   try {
     const rules = JSON.parse(game.settings.get("morelord-craftworks", CRAFTING_FACILITY_RULES) || "{}");
@@ -13,7 +46,7 @@ export function getCraftingFacilityRules() {
 }
 export function recipeFacilityEnvironment(recipe, rules = getCraftingFacilityRules()) {
   const drakkenheim = recipe?.packId === "monsters-of-drakkenheim" || recipe?.source?.contentPackId === "monsters-of-drakkenheim";
-  const type = drakkenheim ? "workshop" : rules[recipe?.craft?.tool ?? ""] ?? "";
+  const type = drakkenheim ? "workshop" : facilityRuleForTool(rules, recipe?.craft?.tool ?? "");
   const rarity = String(recipe?.output?.rarity ?? recipe?.rarity ?? "common").replace(/[^a-z]/gi, "").toLowerCase();
   const tier = rarity === "veryrare" ? "veryRare" : VALID_TIERS.has(rarity) ? rarity : "common";
   return normalizeCraftEnvironment({ facility: type ? { type, tier } : null });
