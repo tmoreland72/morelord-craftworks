@@ -4,7 +4,7 @@
 
 ### Improvements
 
-- **Crafting** settings can require an activity, such as **Workshop** or **Forge**, or one specialty of that activity. Forge specialties are D&D 2024 equipment categories. Armor and Weapons cover their children. Individual weapons and weapon masteries are not listed. A saved Forge specialty that named a weapon or armor, such as Longsword, is kept as its category. A Forge recipe checks the crafted item’s category. A parent category on the location covers that item. **Forge** with no specialty accepts any Forge. The warning names the category, such as `Requires common forge (Martial Weapons or Any).` Workshop specialties are unchanged. A facility rule saved as Blacksmith's Tools still applies to Smith's Tools.
+- **Crafting** settings can require an activity, such as **Workshop**, or one Workshop or Instructor specialty. **Forge** is only the activity. A saved Forge specialty, including a weapon, armor, or category, is kept as **Forge**. A Forge recipe takes its category from the crafted item. A longsword needs a Forge specialty of Weapons, Martial Weapons, Martial Melee Weapons, or **Any**. Splint needs Armor, Heavy Armor, or **Any**. An item that is not armor, a weapon, or ammunition can use any Forge. The warning names the item’s category, such as `Requires common forge (Martial Melee Weapons or Any).` Workshop specialties are unchanged. A facility rule saved as Blacksmith's Tools still applies to Smith's Tools.
 
 ### Fixed
 

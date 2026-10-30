@@ -170,10 +170,7 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
       facilityRules: craftingFacilityToolNames(
         (craftworks?.recipes.all() ?? []).map(recipe => recipe.craft?.tool)
       ).map(tool => {
-        const selected = canonicalFacilityRule(
-          facilityRuleForTool(getCraftingFacilityRules(), tool),
-          craftworks?.craftingEnvironment?.locationApi
-        );
+        const selected = canonicalFacilityRule(facilityRuleForTool(getCraftingFacilityRules(), tool));
         const options = craftworks?.craftingEnvironment?.facilityOptions?.()
           ?? getCraftingFacilityOptions(craftworks?.craftingEnvironment?.locationApi);
         return { tool, selected, choices: facilityChoicesForSelection(options.choices ?? [], selected) };
@@ -373,8 +370,7 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
       }
 
       await setGatherDcOverrides(gatherDcOverrides);
-      const locationApi = this.craftworks?.craftingEnvironment?.locationApi;
-      const facilityRules = Object.fromEntries([...data.entries()].filter(([name]) => name.startsWith("facility:")).map(([name, value]) => [name.slice(9), canonicalFacilityRule(value, locationApi)]));
+      const facilityRules = Object.fromEntries([...data.entries()].filter(([name]) => name.startsWith("facility:")).map(([name, value]) => [name.slice(9), canonicalFacilityRule(value)]));
       await game.settings.set(MODULE_ID, SETTINGS.CRAFTING_FACILITY_RULES, JSON.stringify(facilityRules));
 
       for (const pack of CONTENT_PACKS) {

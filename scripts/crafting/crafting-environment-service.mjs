@@ -71,23 +71,23 @@ export function recipeFacilityEnvironment(recipe, rules = getCraftingFacilityRul
     : parseFacilityRule(facilityRuleForTool(rules, recipe?.craft?.tool ?? ""));
   const rarity = String(recipe?.output?.rarity ?? recipe?.rarity ?? "common").replace(/[^a-z]/gi, "").toLowerCase();
   const tier = rarity === "veryrare" ? "veryRare" : VALID_TIERS.has(rarity) ? rarity : "common";
-  const specialty = rule.type === "forge" ? resolveForgeCategory(rule.specialty, null) : rule.specialty;
+  const specialty = rule.type === "forge" ? "" : rule.specialty;
   return normalizeCraftEnvironment({
     facility: rule.type ? { type: rule.type, tier, specialty } : null
   });
 }
 
-export function canonicalFacilityRule(value, locationApi = null) {
+export function canonicalFacilityRule(value) {
   const parsed = parseFacilityRule(value);
   if (!parsed.type) return "";
-  if (parsed.type !== "forge" || !parsed.specialty) return facilityRuleValue(parsed.type, parsed.specialty);
-  const category = resolveForgeCategory(parsed.specialty, locationApi);
-  return category ? facilityRuleValue("forge", category) : "forge";
+  if (parsed.type === "forge") return "forge";
+  return facilityRuleValue(parsed.type, parsed.specialty);
 }
 
 function specialtyGroupsForType(type, locationApi) {
   const id = String(type?.id ?? "").trim();
-  if (id === "forge") return forgeCategoryGroups(locationApi);
+  // The crafted item chooses the Forge category. The tool rule stores only "forge".
+  if (id === "forge") return [];
   if (locationApi && typeof locationApi.buildSpecialtyOptions === "function") {
     try {
       const built = locationApi.buildSpecialtyOptions(id);
@@ -300,36 +300,13 @@ function forgeCoveringKeys(category, locationApi) {
   return chain.reverse();
 }
 
-function forgeCategoryGroups(locationApi) {
-  let entries = FORGE_CATEGORIES.map(([id, label, category]) => ({ id, label, category }));
-  if (typeof locationApi?.listForgeSpecialties === "function") {
-    try {
-      const listed = locationApi.listForgeSpecialties();
-      if (Array.isArray(listed) && listed.length && listed.every(entry => FORGE_CATEGORY_IDS.has(entry?.id))) {
-        entries = listed.map(entry => ({
-          id: String(entry.id),
-          label: String(entry.label ?? entry.id),
-          category: String(entry.category ?? entry.group ?? "Forge")
-        }));
-      }
-    } catch {
-      // The local category list stays in use.
-    }
-  }
-  const buckets = new Map();
-  for (const entry of entries) {
-    const bucket = buckets.get(entry.category) ?? [];
-    bucket.push({ value: entry.id, label: entry.label });
-    buckets.set(entry.category, bucket);
-  }
-  return [...buckets.entries()].map(([label, options]) => ({ label, options }));
-}
-
 function forgeKeysForRecipe(recipe, locationApi) {
   const output = recipe?.output;
+  const system = output?.system ?? {};
+  const systemType = system?.type?.value ?? system?.armor?.type ?? (typeof system?.type === "string" ? system.type : "");
   const candidates = [];
   if (output && typeof output === "object") candidates.push(output);
-  for (const value of [output?.label, output?.name, recipe?.name, output?.weaponType, output?.armorType]) {
+  for (const value of [systemType, output?.label, output?.name, recipe?.name, output?.weaponType, output?.armorType]) {
     if (value) candidates.push(value);
   }
   for (const candidate of candidates) {
@@ -441,6 +418,7 @@ export function describeWorkshopSpecialty(tool, locationApi = null) {
 }
 
 function specialtyLabel(type, key, locationApi) {
+  if (type === "forge" && FORGE_LABELS.has(key)) return FORGE_LABELS.get(key);
   const groups = specialtyGroupsForType({ id: type, name: type }, locationApi);
   for (const group of groups) {
     const found = group.options.find(option => option.value === key);
@@ -506,16 +484,12 @@ export function evaluateCraftingEnvironment(recipe, context = {}, locationApi = 
         ...(Array.isArray(context?.capabilities) ? context.capabilities : [])
       ]
     };
-    const assignedKey = environment.facility.type === "forge"
-      ? resolveForgeCategory(environment.facility.specialty, locationApi)
-      : String(environment.facility.specialty ?? "").trim();
-    const itemKeys = environment.facility.type === "forge" && assignedKey
-      ? forgeKeysForRecipe(recipe, locationApi)
-      : [];
-    const itemOutsideCategory = Boolean(assignedKey && itemKeys.length && !itemKeys.includes(assignedKey));
-    const checkKey = itemOutsideCategory
-      ? assignedKey
-      : (itemKeys.length ? String(itemKeys.at(-1)) : assignedKey);
+    const isForge = environment.facility.type === "forge";
+    const itemKeys = isForge ? forgeKeysForRecipe(recipe, locationApi) : [];
+    const assignedKey = isForge ? "" : String(environment.facility.specialty ?? "").trim();
+    const checkKey = isForge
+      ? (itemKeys.length ? String(itemKeys.at(-1)) : "")
+      : assignedKey;
     const label = checkKey ? specialtyLabel(environment.facility.type, checkKey, locationApi) : "";
     const place = checkKey ? placeSpecialties(specialtyLocation, environment.facility.type) : undefined;
     const labels = {};
@@ -535,7 +509,7 @@ export function evaluateCraftingEnvironment(recipe, context = {}, locationApi = 
     const result = locationApi.evaluate
       ? locationApi.evaluate([requirement], { ...context, location })
       : locationApi.evaluateRequirements([requirement], { ...context, location });
-    if (result.passed && checkKey && (itemOutsideCategory || !specialtyAllowed(location, context, environment.facility.type, checkKey, environment.facility.tier, locationApi))) {
+    if (result.passed && checkKey && !specialtyAllowed(location, context, environment.facility.type, checkKey, environment.facility.tier, locationApi)) {
       return {
         passed: false,
         mode: "facility",

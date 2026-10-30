@@ -211,24 +211,21 @@ test("facility choices offer a type or one Core specialty, and a saved type stay
   const values = options.choices.flatMap(choice => choice.options.map(option => option.value));
   assert.equal(values.includes("forge"), true);
   assert.equal(values.includes("forge:longsword"), false);
-  assert.equal(values.includes("forge:mar"), true);
-  assert.equal(values.includes("forge:martialM"), true);
-  assert.equal(values.includes("forge:hvy"), true);
-  assert.equal(values.includes("forge:ammo"), true);
-  assert.equal(options.choices.some(choice => choice.group === "Forge: Weapon Masteries"), false);
-  assert.equal(options.choices.find(choice => choice.group === "Forge: Armor").options.find(option => option.value === "forge:hvy").label, "Forge: Heavy Armor");
+  assert.equal(values.includes("forge:mar"), false);
+  assert.equal(values.includes("forge:martialM"), false);
+  assert.equal(values.includes("forge:hvy"), false);
+  assert.equal(options.choices.some(choice => String(choice.group).startsWith("Forge:")), false);
   const workshop = options.choices.find(choice => choice.group === "Workshop");
   assert.deepEqual(workshop.options.map(option => option.value), ["workshop", "workshop:leatherworker"]);
   assert.equal(workshop.options[1].label, "Workshop: Leatherworker's Tools");
-  assert.equal(canonicalFacilityRule("forge:longsword"), "forge:martialM");
-  assert.equal(canonicalFacilityRule("forge:plate"), "forge:hvy");
+  assert.equal(canonicalFacilityRule("forge:longsword"), "forge");
+  assert.equal(canonicalFacilityRule("forge:martialM"), "forge");
+  assert.equal(canonicalFacilityRule("forge:plate"), "forge");
   assert.equal(canonicalFacilityRule("forge:not-a-weapon"), "forge");
-  assert.equal(canonicalFacilityRule("workshop"), "workshop");
+  assert.equal(canonicalFacilityRule("workshop:leatherworker"), "workshop:leatherworker");
 
   const selected = facilityChoicesForSelection(options.choices, canonicalFacilityRule("forge:longsword"));
-  const melee = selected.flatMap(choice => choice.options).find(option => option.value === "forge:martialM");
-  assert.equal(melee.selected, true);
-  assert.equal(selected.flatMap(choice => choice.options).find(option => option.value === "forge").selected, false);
+  assert.equal(selected.flatMap(choice => choice.options).find(option => option.value === "forge").selected, true);
   assert.equal(parseFacilityRule("workshop").specialty, "");
   assert.deepEqual(parseFacilityRule("workshop:leatherworker"), { type: "workshop", specialty: "leatherworker" });
   assert.deepEqual(parseFacilityRule("forge"), { type: "forge", specialty: "" });
@@ -522,37 +519,35 @@ test("a saved type-only rule stays type-only and a specialty rule names that spe
     output: { rarity: "common", label: "Longsword" }
   };
   sword.craft.environment = recipeFacilityEnvironment(sword, { "Smith's Tools": "forge:longsword" });
-  assert.equal(sword.craft.environment.facility.specialty, "martialM");
+  assert.deepEqual(sword.craft.environment.facility, { type: "forge", tier: "common" });
   const forgeApi = specialtyApi({ locationAllowsSpecialty: false });
-  const martial = { capabilities: [{ type: "forge", tier: "common", specialty: "mar" }] };
-  const allowed = evaluateCraftingEnvironment(sword, { location: martial }, forgeApi);
-  assert.equal(allowed.passed, true);
-  assert.equal(allowed.reasons.length, 0);
+  for (const specialty of ["weapon", "mar", "martialM", "Any", ""]) {
+    assert.equal(evaluateCraftingEnvironment(sword, {
+      location: { capabilities: [{ type: "forge", tier: "common", specialty }] }
+    }, forgeApi).passed, true, specialty || "empty");
+  }
   const blocked = evaluateCraftingEnvironment(sword, {
     location: { capabilities: [{ type: "forge", tier: "common", specialty: "simpleM" }] }
   }, forgeApi);
   assert.equal(blocked.passed, false);
   assert.equal(blocked.reasons[0], "Requires common forge (Martial Melee Weapons or Any).");
-  const martialWeapons = { craft: { tool: "Smith's Tools" }, output: { rarity: "common", weaponType: "mar" } };
-  martialWeapons.craft.environment = recipeFacilityEnvironment(martialWeapons, { "Smith's Tools": "forge:mar" });
-  assert.equal(evaluateCraftingEnvironment(martialWeapons, {
-    location: { capabilities: [{ type: "forge", tier: "common", specialty: "sim" }] }
-  }, forgeApi).reasons[0], "Requires common forge (Martial Weapons or Any).");
-  assert.equal(evaluateCraftingEnvironment(martialWeapons, {
-    location: { capabilities: [{ type: "forge", tier: "common", specialty: "weapon" }] }
+  const splint = { name: "Splint", craft: { tool: "Smith's Tools" }, output: { rarity: "common", label: "Splint" } };
+  splint.craft.environment = recipeFacilityEnvironment(splint, { "Smith's Tools": "forge" });
+  assert.equal(evaluateCraftingEnvironment(splint, {
+    location: { capabilities: [{ type: "forge", tier: "common", specialty: "armor" }] }
   }, forgeApi).passed, true);
-  assert.equal(evaluateCraftingEnvironment(sword, {
-    location: { capabilities: [{ type: "forge", tier: "common", specialty: "Any" }] }
+  assert.equal(evaluateCraftingEnvironment(splint, {
+    location: { capabilities: [{ type: "forge", tier: "common", specialty: "hvy" }] }
   }, forgeApi).passed, true);
-  const typeOnly = { craft: { tool: "Smith's Tools" }, output: { label: "Longsword", rarity: "common" }, name: "Longsword" };
-  typeOnly.craft.environment = recipeFacilityEnvironment(typeOnly, { "Smith's Tools": "forge" });
-  assert.equal(typeOnly.craft.environment.facility.specialty, undefined);
-  assert.equal(evaluateCraftingEnvironment(typeOnly, {
+  assert.equal(evaluateCraftingEnvironment(splint, {
+    location: { capabilities: [{ type: "forge", tier: "common", specialty: "lgt" }] }
+  }, forgeApi).reasons[0], "Requires common forge (Heavy Armor or Any).");
+  const tongs = { name: "Tongs", craft: { tool: "Smith's Tools" }, output: { rarity: "common", label: "Tongs", itemType: "loot" } };
+  tongs.craft.environment = recipeFacilityEnvironment(tongs, { "Smith's Tools": "forge:martialM" });
+  assert.equal(tongs.craft.environment.facility.specialty, undefined);
+  assert.equal(evaluateCraftingEnvironment(tongs, {
     location: { capabilities: [{ type: "forge", tier: "common", specialty: "shl" }] }
   }, forgeApi).passed, true);
-  assert.equal(evaluateCraftingEnvironment(typeOnly, {
-    location: { capabilities: [{ type: "forge", tier: "common", specialty: "shl" }] }
-  }, forgeApi).reasons.length, 0);
 });
 
 test("the GM facility rule still chooses the activity, including a legacy Blacksmith's Tools rule", () => {
