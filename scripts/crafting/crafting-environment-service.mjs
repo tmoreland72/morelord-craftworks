@@ -325,11 +325,36 @@ export class CraftingEnvironmentService {
     if (!api) return null;
     try {
       if (typeof api.activeContext === "function") {
-        const active = api.activeContext(globalThis.game?.user);
-        if (active && Object.hasOwn(active, "location")) return active.location ?? null;
+        const resolved = this.#locationFromActiveContext(api.activeContext(globalThis.game?.user));
+        if (resolved !== undefined) return resolved;
       }
     } catch {
       // Older Core builds fall through to the scene location.
+    }
+    return this.#sceneLocation();
+  }
+
+  // An explicit Downtime session location wins. No Location is Core's virtual
+  // On the Road result; use the viewed scene's associated location instead.
+  #locationFromActiveContext(active) {
+    if (!active || typeof active !== "object") return undefined;
+    if (active.source === "downtime") return active.location ?? null;
+    if (active.source === "road") return this.#sceneLocation() ?? active.location ?? null;
+    if (Object.hasOwn(active, "location")) return active.location ?? null;
+    return undefined;
+  }
+
+  #sceneLocation() {
+    const api = this.locationApi;
+    if (!api) return null;
+    try {
+      const viewed = globalThis.game?.user?.viewedScene;
+      if (viewed && typeof api.forScene === "function") {
+        const associated = api.forScene(viewed);
+        if (associated) return associated;
+      }
+    } catch {
+      // Fall through to the active scene.
     }
     try {
       return typeof api.current === "function" ? api.current() ?? null : null;
@@ -343,11 +368,8 @@ export class CraftingEnvironmentService {
     if (typeof this.locationApi?.activeContext === "function") {
       try {
         const active = this.locationApi.activeContext(game.user);
-        if (active?.location) return { ...context, location: active.location };
-        if (active?.source === "downtime" || active?.source === "road") {
-          return { ...context, location: active.location ?? null };
-        }
-        if (active && typeof active === "object") return context;
+        const location = this.#locationFromActiveContext(active);
+        if (location !== undefined) return { ...context, location };
       } catch {
         // Older or partial Core builds fall through to the local lookup.
       }
@@ -361,15 +383,26 @@ export class CraftingEnvironmentService {
       const session = Object.values(state?.sessions ?? {})
         .find(entry => entry?.status === "active");
       if (!session) return context;
-      const location = session.locationId
-        ? this.locationApi?.get?.(session.locationId) ?? null
-        : {
-            id: "road",
-            name: "On the Road",
-            settlementType: "road",
-            capabilities: []
-          };
-      return { ...context, location, downtimeSession: session };
+      if (session.locationId) {
+        return {
+          ...context,
+          location: this.locationApi?.get?.(session.locationId) ?? null,
+          downtimeSession: session
+        };
+      }
+      const sceneLocation = this.#sceneLocation();
+      if (sceneLocation) return { ...context, location: sceneLocation, downtimeSession: session };
+      return {
+        ...context,
+        location: {
+          id: "road",
+          name: "On the Road",
+          settlementType: "road",
+          capabilities: [],
+          metadata: { virtual: true }
+        },
+        downtimeSession: session
+      };
     } catch {
       return context;
     }

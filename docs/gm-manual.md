@@ -238,7 +238,7 @@ When crafting finishes, the crafter chooses **Place in My Inventory** or **Place
 
 Crafting progress belongs to the crafter-and-recipe combination and does not split when the inventory source changes. Each attempt represents two hours. Failed checks consume time but not recipe materials. Recipe durations must be positive multiples of two hours.
 
-Facility requirements come from Morelord Core’s shared locations. In **Configure Craftworks → Crafting**, each artisan’s tool can require a location activity or **No facility required**. [Shared Locations](#shared-locations) explains that check, the tool map, Workshop specialties, and the messages players see when a place blocks a job. **Manage Locations** on the dashboard opens the Core location window. An active **On the Road** Downtime session replaces the scene location. A job pauses while its facility is unavailable and resumes when the requirement is met.
+Facility requirements come from Morelord Core’s shared locations. In **Configure Craftworks → Crafting**, each artisan’s tool can require a location activity or **No facility required**. [Shared Locations](#shared-locations) explains that check, the tool map, Workshop specialties, and the messages players see when a place blocks a job. **Manage Locations** on the dashboard opens the Core location window. An explicit Downtime session location replaces the viewed scene. A session set to **No Location** keeps the location associated with that scene. A job pauses while its facility is unavailable and resumes when the requirement is met.
 
 Craftworks exposes marked and active crafting projects to Morelord Downtime. Opening one from Downtime launches a focused Craft window for that crafter and recipe while Craftworks remains authoritative for ingredients, checks, progress, and output.
 
@@ -255,9 +255,9 @@ Craftworks reads the current place from Morelord Core’s shared locations. A sh
 Craftworks asks Morelord Core for the active place of the person who is crafting.
 
 - With no active Downtime session, the place is the shared location associated with the scene that person is viewing.
-- An active Morelord Downtime session replaces the scene. Craftworks uses the session’s location.
-- A Downtime session with no location is **On the Road**. On the Road has no facilities.
-- A viewed scene with no associated location has no facilities for this check.
+- An active Morelord Downtime session that has a location replaces the scene. Craftworks uses that session location.
+- A session set to **No Location** keeps the shared location associated with the viewed scene.
+- **On the Road** applies when that session has **No Location** and the viewed scene has no associated location. On the Road has no facilities.
 
 **Manage Locations** on the Craftworks dashboard opens Core’s location window. The same window is **Morelord Core → Manage Shared Locations** in Core’s module settings.
 
@@ -646,7 +646,7 @@ Confirm its compendium remains enabled in dnd5e **Configure Sources**. Craftwork
 
 ### A crafting job is paused for the location
 
-The Craft card shows **Paused - Environment** or **Environment Unavailable**, plus the location warning. Compare that activity and tier with the shared location for the viewed scene, or with the active Downtime location. **On the Road** has no facilities. For a Workshop tool, confirm **Specialty** includes that tool, or that nothing is selected. Forge and Alchemist are checked by activity and tier. See [Shared Locations](#shared-locations).
+The Craft card shows **Paused - Environment** or **Environment Unavailable**, plus the location warning. Compare that activity and tier with the shared location for the viewed scene. An explicit Downtime location replaces that scene. A session set to **No Location** does not. **On the Road** has no facilities, and it applies only when the session has **No Location** and the viewed scene has no associated location. For a Workshop tool, confirm **Specialty** includes that tool, or that nothing is selected. Forge and Alchemist are checked by activity and tier. See [Shared Locations](#shared-locations).
 
 ### A recipe reports missing materials
 

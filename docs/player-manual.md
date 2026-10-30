@@ -136,7 +136,7 @@ Actual crafting execution requires the appropriate premium access. Standard user
 
 ## Shared Locations
 
-Your GM decides whether a recipe needs a particular kind of place. Craftworks reads that place from Morelord Core’s shared locations. You use the place associated with the scene you are viewing. During an active Downtime session, Craftworks uses the session’s location instead. A session with no location is **On the Road**, which has no facilities.
+Your GM decides whether a recipe needs a particular kind of place. Craftworks reads that place from Morelord Core’s shared locations. You use the place associated with the scene you are viewing. During an active Downtime session, a chosen session location replaces that scene. **No Location** keeps the scene’s place. **On the Road** applies when the session has **No Location** and the scene you are viewing has no associated place. On the Road has no facilities.
 
 Recipe cards show a **Facility** line.
 

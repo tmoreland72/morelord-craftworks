@@ -182,23 +182,103 @@ test("facility options come from the Core location capability registry", () => {
 test("Core activeContext supplies the crafting location", () => {
   const priorGame = globalThis.game;
   globalThis.game = {
-    user: { id: "gm" },
+    user: { id: "gm", viewedScene: "scene-town" },
     settings: { get: () => { throw new Error("local downtime lookup should not run"); } }
   };
   try {
     const service = new CraftingEnvironmentService();
-    const road = { id: "road", name: "On the Road", settlementType: "road", capabilities: [] };
+    const town = { id: "town", capabilities: [{ type: "forge", tier: "legendary" }] };
+    const road = { id: "road", name: "On the Road", settlementType: "road", capabilities: [], metadata: { virtual: true } };
     Object.defineProperty(service, "locationApi", {
       value: {
         ...locationApi,
-        current: () => ({ capabilities: [{ type: "forge", tier: "legendary" }] }),
+        forScene: sceneId => sceneId === "scene-town" ? town : null,
+        current: () => { throw new Error("the viewed scene association should win"); },
         activeContext(user) {
           assert.equal(user.id, "gm");
           return { location: road, source: "road", sessionId: "active" };
         }
       }
     });
-    assert.equal(service.evaluate(recipe).passed, false);
+    assert.equal(service.evaluate(recipe).passed, true);
+
+    const explicit = new CraftingEnvironmentService();
+    Object.defineProperty(explicit, "locationApi", {
+      value: {
+        ...locationApi,
+        forScene: () => town,
+        current: () => town,
+        activeContext() {
+          return { location: { id: "keep", capabilities: [] }, source: "downtime", sessionId: "active" };
+        }
+      }
+    });
+    const blocked = explicit.evaluate(recipe);
+    assert.equal(blocked.passed, false);
+    assert.equal(blocked.reasons[0], "Requires rare forge.");
+  } finally {
+    globalThis.game = priorGame;
+  }
+});
+
+test("a Downtime session with No Location uses the scene-associated Alchemist", () => {
+  const priorGame = globalThis.game;
+  const alchemist = {
+    id: "phandalin",
+    name: "Phandalin",
+    settlementType: "village",
+    sceneIds: ["scene-town"],
+    capabilities: [{ type: "alchemist", tier: "common" }]
+  };
+  const antitoxin = {
+    craft: {
+      tool: "Alchemist's Supplies",
+      environment: { facility: { type: "alchemist", tier: "common" } }
+    }
+  };
+  globalThis.game = {
+    user: { id: "darro", viewedScene: "scene-town" },
+    settings: { get: () => { throw new Error("local downtime lookup should not run"); } }
+  };
+  try {
+    const service = new CraftingEnvironmentService();
+    Object.defineProperty(service, "locationApi", {
+      value: {
+        ...locationApi,
+        forScene: sceneId => sceneId === "scene-town" ? alchemist : null,
+        current: () => null,
+        activeContext(user) {
+          assert.equal(user.viewedScene, "scene-town");
+          return {
+            location: { id: "road", name: "On the Road", settlementType: "road", capabilities: [], metadata: { virtual: true } },
+            source: "road",
+            sessionId: "week"
+          };
+        }
+      }
+    });
+    const allowed = service.evaluate(antitoxin);
+    assert.equal(allowed.passed, true);
+    assert.equal(allowed.location.id, "phandalin");
+
+    const nowhere = new CraftingEnvironmentService();
+    Object.defineProperty(nowhere, "locationApi", {
+      value: {
+        ...locationApi,
+        forScene: () => null,
+        current: () => null,
+        activeContext() {
+          return {
+            location: { id: "road", name: "On the Road", settlementType: "road", capabilities: [], metadata: { virtual: true } },
+            source: "road",
+            sessionId: "week"
+          };
+        }
+      }
+    });
+    const blocked = nowhere.evaluate(antitoxin);
+    assert.equal(blocked.passed, false);
+    assert.equal(blocked.reasons[0], "Requires common alchemist.");
   } finally {
     globalThis.game = priorGame;
   }
@@ -424,22 +504,32 @@ test("Workshop specialty arrays, empty lists, and legacy strings match the same 
   assert.equal(formatWorkshopSpecialty(" weaver "), "Weaver's Tools");
 });
 
-test("an active On the Road downtime session overrides the scene location", () => {
+test("a Downtime session with No Location falls back to the active scene", () => {
   const priorGame = globalThis.game;
+  const sessions = { active: { id: "active", status: "active", locationId: null } };
   globalThis.game = {
-    settings: {
-      get: () => ({ sessions: { active: { id: "active", status: "active", locationId: null } } })
-    }
+    user: { id: "darro" },
+    settings: { get: () => ({ sessions }) }
   };
   try {
     const service = new CraftingEnvironmentService();
+    const town = { id: "town", capabilities: [{ type: "alchemist", tier: "common" }] };
+    const antitoxin = { craft: { environment: { facility: { type: "alchemist", tier: "common" } } } };
     Object.defineProperty(service, "locationApi", {
       value: {
         ...locationApi,
-        current: () => ({ capabilities: [{ type: "forge", tier: "legendary" }] })
+        current: () => town,
+        get: () => ({ id: "wilderness", capabilities: [] })
       }
     });
-    assert.equal(service.evaluate(recipe).passed, false);
+    const allowed = service.evaluate(antitoxin);
+    assert.equal(allowed.passed, true);
+    assert.equal(allowed.location.id, "town");
+
+    sessions.active.locationId = "wilderness";
+    const blocked = service.evaluate(antitoxin);
+    assert.equal(blocked.passed, false);
+    assert.equal(blocked.reasons[0], "Requires common alchemist.");
   } finally {
     globalThis.game = priorGame;
   }
