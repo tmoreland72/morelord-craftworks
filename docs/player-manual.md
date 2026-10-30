@@ -21,6 +21,7 @@ This manual applies to Morelord Craftworks 0.5.2.
 - [Browse materials](#browse-materials)
 - [Browse and learn recipes](#browse-and-learn-recipes)
 - [Plan and complete crafting](#plan-and-complete-crafting)
+- [Shared Locations](#shared-locations)
 - [Participate in Harvest](#participate-in-harvest)
 - [Participate in Gather](#participate-in-gather)
 - [Understand awards and storage](#understand-awards-and-storage)
@@ -115,7 +116,7 @@ Each ingredient row shows the amount available and required. Green counts satisf
 - alternative ingredients
 - several units that must come from one matching material
 
-Craftworks rolls the listed artisan tool at the recipe DC. Missing the tool in your crafter’s inventory or its proficiency imposes disadvantage, without changing the DC. Drakkenheim recipes require a Workshop matching or exceeding the item’s rarity, regardless of tool settings. A Drakkenheim recipe that names a Workshop tool also needs that tool as the Workshop Specialty, or Any. Bring the required materials and choose Craft Item; there is no crafting roll or time requirement, including for an older saved crafting project.
+Craftworks rolls the listed artisan tool at the recipe DC. Missing the tool in your crafter’s inventory or its proficiency imposes disadvantage, without changing the DC. Drakkenheim recipes require a Workshop matching or exceeding the item’s rarity. Bring the required materials and choose Craft Item; there is no crafting roll or time requirement, including for an older saved crafting project. [Shared Locations](#shared-locations) explains that Workshop, including Specialty.
 
 ### Make progress
 
@@ -123,7 +124,7 @@ Each crafting attempt represents two hours of work. A successful attempt adds pr
 
 Progress persists between attempts. Recipe cards display the total duration, and the active job records successful progress and total time spent.
 
-The GM configures facility requirements by artisan tool. Recipes display the required facility and minimum rarity, derived from the item being crafted. Higher-rarity facilities also qualify: a Rare forge can craft an Uncommon item. When the facility is Workshop and the recipe’s tool is one Core maps to Workshop, the card names that tool. The Workshop Specialty must include it, or be Any. A Specialty can list several tools. None selected means Any, and a Specialty saved as one tool still matches that tool. The card also lists the current location’s Workshop Specialty. A Forge or Alchemist requirement does not check Specialty. A project pauses while that environment is unavailable and resumes when the requirement is met. Crafting projects can also appear in Morelord Downtime and open directly into a focused Craftworks recipe view.
+Facility requirements, and what you see when a place blocks a job, are explained in [Shared Locations](#shared-locations). Crafting projects can also appear in Morelord Downtime and open directly into a focused Craftworks recipe view.
 
 When the job completes, choose **Place in My Inventory** or **Place in {party name} Inventory**. **Place in My Inventory** adds the item to the crafter. **Place in {party name} Inventory** adds it to the party Group. A party member can use that button without owning the Group actor; a connected GM performs the inventory write. The button can be used once for that completed job. Foundry Item outputs use their live name and image and can be opened from their linked reference.
 
@@ -132,6 +133,31 @@ If you cancel an active job, Craftworks returns materials consumed when that job
 Actual crafting execution requires the appropriate premium access. Standard users can still browse, evaluate requirements, mark goals, and review the Craft window.
 
 ![The Craft workspace brings selected goals, actor context, requirements, and progress together.](assets/craft-workspace.png)
+
+## Shared Locations
+
+Your GM decides whether a recipe needs a particular kind of place. Craftworks reads that place from Morelord Core’s shared locations. You use the place associated with the scene you are viewing. During an active Downtime session, Craftworks uses the session’s location instead. A session with no location is **On the Road**, which has no facilities.
+
+Recipe cards show a **Facility** line.
+
+- `No facility required` means you can craft in any place, including On the Road.
+- Otherwise the line names the item’s rarity and the activity, such as `Uncommon or higher Forge` or `Rare or higher Workshop (Carpenter's Tools or Any)`.
+- A higher rarity of that same activity qualifies. A Rare forge can craft an Uncommon item. A Workshop requirement is met by a Workshop of sufficient rarity.
+- When the activity is Workshop and the recipe’s tool is one Core assigns to Workshop, the card names that tool: `(Carpenter's Tools or Any)`. The Workshop **Specialty** must include that tool, or have nothing selected. Nothing selected means **Any**. A Specialty can list several tools, and the recipe’s tool must be one of them. A Specialty saved as a single tool still matches that tool. **Any** stored next to other tools is ignored, and those other tools are what count.
+- After the dot, the card lists the current place’s Workshop specialties, separated by commas, or `Any` when none are selected. A place with no Workshop omits that part.
+- The **Facility** line follows the activity your GM chose for that tool. Smith's Tools are assigned to Forge, and Alchemist's Supplies are assigned to Alchemist, so those recipes show the activity and rarity only. That stays true when the chosen activity is Workshop: the card does not add a specialty for them. A Forge specialty, such as a weapon, armor, or weapon mastery, is unused for crafting.
+
+In **Craft**, the same facts appear beside a location icon, using the stored words, such as `rare workshop (Carpenter's Tools or Any) · Carpenter's Tools, Weaver's Tools` or `uncommon forge`.
+
+When your current place does not qualify, the Craft card shows a warning. A missing activity or a tier that is too low reads `Requires rare forge.` or `Requires rare workshop.` A Workshop that is high enough, with the wrong specialty, reads `Requires rare workshop whose specialty is Carpenter's Tools or Any.`
+
+- You have the materials and have not started: the badge reads **Environment Unavailable**, and the footer reads **Missing Requirements**.
+- A job is already underway: the badge reads **Paused - Environment**, and **Roll Crafting Check** or **Craft Item** becomes **Paused here**. **Cancel** remains. Progress and materials already used stay as they are.
+- Trying to start or continue shows the same warning sentence again.
+
+When you are later at a place that meets the requirement, the crafting button returns. A job you have not started consumes no materials while it is blocked.
+
+Your GM creates these places in Morelord Core. The **Shared Locations** section of the [Morelord Core documentation](https://morelordgaming.com/docs/morelord-core) explains that setup. The [GM manual](gm-manual.md#shared-locations) explains how each tool is checked.
 
 ## Participate in Harvest
 
@@ -230,6 +256,10 @@ If the pack or its official source content is unavailable, Craftworks can use st
 ### A recipe is Unknown
 
 Unknown recipes intentionally conceal ingredients. You can mark one as a goal, but the GM must mark it Known before you can inspect its requirements or start a new job.
+
+### Crafting says the place is unavailable
+
+The Craft card shows a location warning such as `Requires rare forge.` or `Requires rare workshop whose specialty is Carpenter's Tools or Any.` **Environment Unavailable** means you have the materials and have not started, and the current place does not qualify. **Paused - Environment** and **Paused here** mean a job you already started is waiting for that place. Progress already made is kept. Ask the GM which scene or Downtime location has the required facility. See [Shared Locations](#shared-locations).
 
 ### Craft says an ingredient is missing
 

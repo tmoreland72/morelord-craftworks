@@ -242,6 +242,16 @@ values where available rather than inventing recipe durations.
 
 GMs can create and edit standard or supported Drakkenheim recipes, select output Items and materials through the full catalog picker, define AND requirements and OR alternatives, and import/export recipe JSON. See the [GM manual](docs/gm-manual.md#create-and-manage-custom-recipes) for the current workflow. General-purpose homebrew material authoring remains future work.
 
+## Shared locations
+
+Craftworks checks the current place through Morelord Core’s shared locations. In **Configure Craftworks → Crafting**, each artisan’s tool is **No facility required** or one registered activity (Forge, Alchemist, Workshop, and the other activities Core lists). That dropdown chooses the activity the recipe requires. The item’s rarity is the minimum tier. A higher tier of that same activity qualifies. Core assigns **Smith's Tools** to Forge and **Alchemist's Supplies** to Alchemist. Those tools are checked by activity and tier only, including when the dropdown is Workshop. The other D&D 2024 artisan’s tools are assigned to Workshop, and a Workshop requirement for one of them also checks Specialty. Brewer's Supplies and Cook's Utensils move to Tavern when Core has that activity registered, and they then skip the Workshop specialty check.
+
+A Workshop specialty is a list of those Workshop tools. Nothing selected, a blank value, or a specialty that is only **Any** allows every Workshop tool. Several selected tools qualify together. A specialty saved as a single tool still matches that tool. **Any** stored beside other tools is ignored. Players see the requirement on the recipe **Facility** line. A blocked Craft card warns with text such as `Requires rare forge.` or `Requires rare workshop whose specialty is Carpenter's Tools or Any.`, and an active job shows **Paused - Environment** and **Paused here**.
+
+Drakkenheim recipes always require a Workshop of the item’s rarity or higher, including when the tool is set to **No facility required**. Packaged Drakkenheim recipes name no tool, so any Workshop specialty of sufficient tier qualifies.
+
+The [GM manual](docs/gm-manual.md#shared-locations) and [player manual](docs/player-manual.md#shared-locations) state the full map, the card text, and every blocked-state message. Create the places from Core’s **Shared Locations** guide: [Morelord Core documentation](https://morelordgaming.com/docs/morelord-core). **Manage Locations** on the Craftworks dashboard opens that window.
+
 ## Development release history
 
 Development-build notes are maintained in [`RELEASES.md`](RELEASES.md).

@@ -53,7 +53,7 @@ Craftworks can also support exceptional add-on content packs that go beyond the 
 
 ## Choose a manual
 
-- [Game Master Manual](gm-manual.md) — installation, world configuration, content synchronization, Harvest, Gather, Loot, Hoard, generators, exceptional content packs, and troubleshooting.
+- [Game Master Manual](gm-manual.md) — installation, world configuration, content synchronization, Harvest, Gather, Loot, Hoard, generators, [shared locations](gm-manual.md#shared-locations), exceptional content packs, and troubleshooting.
 - [Player Manual](player-manual.md) — browsing materials and recipes, planning and completing crafting projects, Harvest, Gather, shared party storage, and optional Drakkenheim content.
 
 These manuals describe Morelord Craftworks 0.5.2 for Foundry Virtual Tabletop v14 and dnd5e 5.3 or later. The in-Foundry **Documentation** button on the Craftworks dashboard opens the current product guide through Morelord Core.
