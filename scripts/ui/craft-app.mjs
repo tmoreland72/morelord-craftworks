@@ -953,7 +953,7 @@ export class CraftApp
         hoursRequired:
           craft.hoursRequired,
         environment: environment.mode === "facility"
-          ? `${environment.environment.facility.tier} ${environment.environment.facility.type}`
+          ? `${environment.environment.facility.tier} ${environment.environment.facility.type}${environment.workshopSpecialty ? ` (${environment.workshopSpecialty.label} or Any)` : ""}`
           : environment.mode.charAt(0).toUpperCase() + environment.mode.slice(1)
       },
       environment,

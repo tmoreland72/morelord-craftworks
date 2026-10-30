@@ -115,7 +115,7 @@ Each ingredient row shows the amount available and required. Green counts satisf
 - alternative ingredients
 - several units that must come from one matching material
 
-Craftworks rolls the listed artisan tool at the recipe DC. Missing the tool in your crafter’s inventory or its proficiency imposes disadvantage, without changing the DC. Drakkenheim recipes require a Workshop matching or exceeding the item’s rarity, regardless of tool settings. Bring the required materials and choose Craft Item; there is no crafting roll or time requirement, including for an older saved crafting project.
+Craftworks rolls the listed artisan tool at the recipe DC. Missing the tool in your crafter’s inventory or its proficiency imposes disadvantage, without changing the DC. Drakkenheim recipes require a Workshop matching or exceeding the item’s rarity, regardless of tool settings. A Drakkenheim recipe that names a Workshop tool also needs that tool as the Workshop Specialty, or Any. Bring the required materials and choose Craft Item; there is no crafting roll or time requirement, including for an older saved crafting project.
 
 ### Make progress
 
@@ -123,7 +123,7 @@ Each crafting attempt represents two hours of work. A successful attempt adds pr
 
 Progress persists between attempts. Recipe cards display the total duration, and the active job records successful progress and total time spent.
 
-The GM configures facility requirements by artisan tool. Recipes display the required facility and minimum rarity, derived from the item being crafted. Higher-rarity facilities also qualify: a Rare forge can craft an Uncommon item. A project pauses while that environment is unavailable and resumes when the requirement is met. Crafting projects can also appear in Morelord Downtime and open directly into a focused Craftworks recipe view.
+The GM configures facility requirements by artisan tool. Recipes display the required facility and minimum rarity, derived from the item being crafted. Higher-rarity facilities also qualify: a Rare forge can craft an Uncommon item. When the facility is Workshop and the recipe’s tool is one Core maps to Workshop, the card also names that tool: the Workshop Specialty must be that tool or Any. A Forge or Alchemist requirement does not check Specialty. A project pauses while that environment is unavailable and resumes when the requirement is met. Crafting projects can also appear in Morelord Downtime and open directly into a focused Craftworks recipe view.
 
 When the job completes, choose **Place in My Inventory** or **Place in {party name} Inventory**. **Place in My Inventory** adds the item to the crafter. **Place in {party name} Inventory** adds it to the party Group. A party member can use that button without owning the Group actor; a connected GM performs the inventory write. The button can be used once for that completed job. Foundry Item outputs use their live name and image and can be opened from their linked reference.
 

@@ -2,6 +2,10 @@
 
 ## 0.5.2
 
+### Improvements
+
+- A recipe whose artisan tool Morelord Core maps to Workshop requires a Workshop of the item’s rarity or higher whose Specialty is that tool or Any. Recipe cards and the Craft window show that specialty. Smith's Tools still use Forge, and Alchemist's Supplies still use Alchemist. Forge weapon and armor Specialties are not checked. **Settings → Crafting** still chooses the activity for each tool, and a facility rule saved as Blacksmith's Tools still applies to Smith's Tools.
+
 ### Fixed
 
 - **Settings → Crafting** lists **Smith's Tools** once, using the D&D 2024 name. Packaged recipes that asked for Blacksmith's Tools now ask for Smith's Tools, including the recipe that crafts those tools. A facility chosen for Smith's Tools applies to those recipes. A facility rule already saved as Blacksmith's Tools still applies to Smith's Tools, including a custom recipe that still stores the older name.

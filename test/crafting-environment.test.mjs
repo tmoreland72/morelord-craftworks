@@ -8,6 +8,7 @@ import {
   CraftingEnvironmentService,
   canonicalArtisanToolName,
   craftingFacilityToolNames,
+  describeWorkshopSpecialty,
   evaluateCraftingEnvironment,
   facilityRuleForTool,
   getCraftingFacilityOptions,
@@ -19,7 +20,9 @@ const tiers = ["common", "uncommon", "rare", "veryRare", "legendary"];
 const locationApi = {
   evaluate(requirements, { location }) {
     const required = requirements[0];
-    const actual = location.capabilities.find(capability => capability.type === required.type);
+    const actual = (location.capabilities ?? [])
+      .filter(capability => capability.type === required.type)
+      .sort((left, right) => tiers.indexOf(right.tier) - tiers.indexOf(left.tier))[0];
     return { passed: Boolean(actual && tiers.indexOf(actual.tier) >= tiers.indexOf(required.tier)) };
   }
 };
@@ -198,6 +201,175 @@ test("Core activeContext supplies the crafting location", () => {
   } finally {
     globalThis.game = priorGame;
   }
+});
+
+const WORKSHOP_SPECIALTIES = [
+  ["brewer", "Brewer's Supplies"],
+  ["calligrapher", "Calligrapher's Supplies"],
+  ["carpenter", "Carpenter's Tools"],
+  ["cartographer", "Cartographer's Tools"],
+  ["cobbler", "Cobbler's Tools"],
+  ["cook", "Cook's Utensils"],
+  ["glassblower", "Glassblower's Tools"],
+  ["jeweler", "Jeweler's Tools"],
+  ["leatherworker", "Leatherworker's Tools"],
+  ["mason", "Mason's Tools"],
+  ["painter", "Painter's Supplies"],
+  ["potter", "Potter's Tools"],
+  ["tinker", "Tinker's Tools"],
+  ["weaver", "Weaver's Tools"],
+  ["woodcarver", "Woodcarver's Tools"]
+].map(([id, label]) => ({ id, label }));
+
+function coreToolCapabilityType(tool) {
+  const key = String(tool ?? "").normalize("NFKD").toLowerCase().replace(/[^a-z0-9]/g, "");
+  if (key === "smith" || key === "smithstools" || key === "blacksmithstools") return "forge";
+  if (key === "alchemist" || key === "alchemistssupplies") return "alchemist";
+  if (WORKSHOP_SPECIALTIES.some(entry => entry.id === key || entry.label.normalize("NFKD").toLowerCase().replace(/[^a-z0-9]/g, "") === key)) return "workshop";
+  return null;
+}
+
+function specialtyApi({ locationAllowsSpecialty = true, listSpecialties = true } = {}) {
+  const calls = [];
+  const api = {
+    ...locationApi,
+    calls,
+    toolCapabilityType: coreToolCapabilityType,
+    ...(listSpecialties ? { listWorkshopSpecialties: () => WORKSHOP_SPECIALTIES } : {}),
+    ...(locationAllowsSpecialty ? {
+      locationAllowsSpecialty(location, type, toolKey) {
+        calls.push({ type, toolKey, capabilities: location.capabilities.map(capability => ({
+          type: capability.type,
+          tier: capability.tier,
+          specialty: capability.specialty ?? null
+        })) });
+        const matches = (location.capabilities ?? []).filter(capability => capability.type === type);
+        if (!matches.length) return false;
+        if (!String(toolKey ?? "").trim()) return true;
+        return matches.some(capability => {
+          const stored = String(capability.specialty ?? "").trim().toLowerCase();
+          return stored === "" || stored === "any" || String(capability.specialty).trim() === toolKey;
+        });
+      }
+    } : {})
+  };
+  return api;
+}
+
+function workshopRecipe(tool, tier = "rare", facility = "workshop") {
+  return { craft: { tool, environment: { facility: { type: facility, tier } } } };
+}
+
+test("a Workshop-mapped tool needs that specialty or Any at the required tier", () => {
+  const api = specialtyApi();
+  const carpenter = workshopRecipe("Carpenter's Tools", "rare");
+  const location = capabilities => ({ capabilities });
+  assert.equal(evaluateCraftingEnvironment(carpenter, { location: location([{ type: "workshop", tier: "rare", specialty: "carpenter" }]) }, api).passed, true);
+  assert.deepEqual(api.calls[0], {
+    type: "workshop",
+    toolKey: "carpenter",
+    capabilities: [{ type: "workshop", tier: "rare", specialty: "carpenter" }]
+  });
+  for (const specialty of [null, "", "Any", " any "]) {
+    assert.equal(
+      evaluateCraftingEnvironment(carpenter, { location: location([{ type: "workshop", tier: "veryRare", specialty }]) }, api).passed,
+      true,
+      `specialty ${JSON.stringify(specialty)}`
+    );
+  }
+  const wrong = evaluateCraftingEnvironment(carpenter, { location: location([{ type: "workshop", tier: "legendary", specialty: "weaver" }]) }, api);
+  assert.equal(wrong.passed, false);
+  assert.equal(wrong.reasons[0], "Requires rare workshop whose specialty is Carpenter's Tools or Any.");
+  assert.equal(
+    evaluateCraftingEnvironment(carpenter, { location: location([
+      { type: "workshop", tier: "common", specialty: null },
+      { type: "workshop", tier: "rare", specialty: "weaver" }
+    ]) }, api).passed,
+    false
+  );
+  assert.deepEqual(api.calls.at(-1).capabilities, [{ type: "workshop", tier: "rare", specialty: "weaver" }]);
+  assert.equal(
+    evaluateCraftingEnvironment(carpenter, { location: location([
+      { type: "workshop", tier: "common", specialty: "carpenter" },
+      { type: "workshop", tier: "rare", specialty: "weaver" }
+    ]) }, api).passed,
+    false
+  );
+  assert.equal(
+    evaluateCraftingEnvironment(carpenter, { location: location([
+      { type: "workshop", tier: "rare", specialty: "weaver" },
+      { type: "workshop", tier: "legendary", specialty: "" }
+    ]) }, api).passed,
+    true
+  );
+});
+
+test("Smith's Tools stay on Forge and Alchemist's Supplies stay on Alchemist without a specialty gate", () => {
+  const api = specialtyApi();
+  api.locationAllowsSpecialty = () => { throw new Error("Forge and Alchemist specialties must not be checked."); };
+  const smith = workshopRecipe("Smith's Tools", "rare", "forge");
+  const swordForge = { capabilities: [{ type: "forge", tier: "rare", specialty: "longsword" }] };
+  assert.equal(evaluateCraftingEnvironment(smith, { location: swordForge }, api).passed, true);
+  assert.equal(describeWorkshopSpecialty("Smith's Tools", api), null);
+  assert.equal(describeWorkshopSpecialty("Blacksmith's Tools", api), null);
+
+  const alchemist = workshopRecipe("Alchemist's Supplies", "uncommon", "alchemist");
+  assert.equal(evaluateCraftingEnvironment(alchemist, { location: { capabilities: [{ type: "alchemist", tier: "rare", specialty: "potion" }] } }, api).passed, true);
+  assert.equal(describeWorkshopSpecialty("Alchemist's Supplies", api), null);
+
+  const smithAtWorkshop = workshopRecipe("Smith's Tools", "common", "workshop");
+  assert.equal(
+    evaluateCraftingEnvironment(smithAtWorkshop, { location: { capabilities: [{ type: "workshop", tier: "common", specialty: "cobbler" }] } }, api).passed,
+    true
+  );
+});
+
+test("the GM facility rule still chooses the activity, including a legacy Blacksmith's Tools rule", () => {
+  const api = specialtyApi();
+  api.locationAllowsSpecialty = () => { throw new Error("A non-Workshop facility must not check Workshop specialty."); };
+  const carpenterAtForge = { craft: { tool: "Carpenter's Tools" }, rarity: "common" };
+  carpenterAtForge.craft.environment = recipeFacilityEnvironment(carpenterAtForge, { "Carpenter's Tools": "forge" });
+  assert.equal(evaluateCraftingEnvironment(carpenterAtForge, { location: { capabilities: [{ type: "forge", tier: "common", specialty: "longsword" }] } }, api).passed, true);
+  assert.equal(recipeFacilityEnvironment({ craft: { tool: "Carpenter's Tools" }, rarity: "rare" }, { "Carpenter's Tools": "" }).portable, true);
+
+  const legacy = { craft: { tool: "Blacksmith's Tools" }, output: { rarity: "uncommon" } };
+  legacy.craft.environment = recipeFacilityEnvironment(legacy, { "Blacksmith's Tools": "forge" });
+  assert.deepEqual(legacy.craft.environment.facility, { type: "forge", tier: "uncommon" });
+  assert.equal(evaluateCraftingEnvironment(legacy, { location: { capabilities: [{ type: "forge", tier: "rare", specialty: "maul" }] } }, api).passed, true);
+});
+
+test("Workshop specialty falls back locally when locationAllowsSpecialty is absent", () => {
+  const api = specialtyApi({ locationAllowsSpecialty: false, listSpecialties: false });
+  const weaver = workshopRecipe("Weaver's Tools", "uncommon");
+  assert.deepEqual(describeWorkshopSpecialty("Weaver's Tools", api), { toolKey: "weaver", label: "Weaver's Tools" });
+  assert.equal(evaluateCraftingEnvironment(weaver, { location: { capabilities: [{ type: "workshop", tier: "rare", specialty: "weaver" }] } }, api).passed, true);
+  for (const specialty of [null, "", "Any", " any "]) {
+    assert.equal(evaluateCraftingEnvironment(weaver, { location: { capabilities: [{ type: "workshop", tier: "rare", specialty }] } }, api).passed, true);
+  }
+  assert.equal(evaluateCraftingEnvironment(weaver, { location: { capabilities: [{ type: "workshop", tier: "rare", specialty: "potter" }] } }, api).passed, false);
+  assert.equal(describeWorkshopSpecialty("Carpenter's Tools", { evaluate() { return { passed: true }; } }), null);
+  const untyped = workshopRecipe("Carpenter's Tools", "common");
+  assert.equal(evaluateCraftingEnvironment(untyped, { location: { capabilities: [{ type: "workshop", tier: "common", specialty: "weaver" }] } }, locationApi).passed, true);
+});
+
+test("a Drakkenheim recipe with no tool accepts any Workshop specialty", () => {
+  const api = specialtyApi();
+  const recipe = {
+    packId: "monsters-of-drakkenheim",
+    output: { rarity: "rare" },
+    craft: { tool: null }
+  };
+  recipe.craft.environment = recipeFacilityEnvironment(recipe, { "Carpenter's Tools": "forge" });
+  assert.equal(evaluateCraftingEnvironment(recipe, { location: { capabilities: [{ type: "workshop", tier: "rare", specialty: "cobbler" }] } }, api).passed, true);
+  assert.equal(api.calls.length, 0);
+  const tooled = {
+    source: { contentPackId: "monsters-of-drakkenheim" },
+    output: { rarity: "rare" },
+    craft: { tool: "Carpenter's Tools" }
+  };
+  tooled.craft.environment = recipeFacilityEnvironment(tooled, {});
+  assert.equal(evaluateCraftingEnvironment(tooled, { location: { capabilities: [{ type: "workshop", tier: "rare", specialty: "cobbler" }] } }, api).passed, false);
+  assert.equal(evaluateCraftingEnvironment(tooled, { location: { capabilities: [{ type: "workshop", tier: "rare", specialty: "carpenter" }] } }, api).passed, true);
 });
 
 test("an active On the Road downtime session overrides the scene location", () => {

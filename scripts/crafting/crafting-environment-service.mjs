@@ -81,6 +81,127 @@ export function normalizeCraftEnvironment(raw = {}) {
   };
 }
 
+const TIER_ORDER = ["common", "uncommon", "rare", "veryRare", "legendary", "artifact"];
+
+// Tool ids Core stores on a Workshop specialty. Smith's Tools and Alchemist's
+// Supplies are absent: Core maps those to Forge and Alchemist.
+const WORKSHOP_TOOL_KEYS = new Map([
+  ["brewer", "brewer"],
+  ["brewerssupplies", "brewer"],
+  ["calligrapher", "calligrapher"],
+  ["calligrapherssupplies", "calligrapher"],
+  ["carpenter", "carpenter"],
+  ["carpenterstools", "carpenter"],
+  ["cartographer", "cartographer"],
+  ["cartographerstools", "cartographer"],
+  ["cobbler", "cobbler"],
+  ["cobblerstools", "cobbler"],
+  ["cook", "cook"],
+  ["cooksutensils", "cook"],
+  ["glassblower", "glassblower"],
+  ["glassblowerstools", "glassblower"],
+  ["jeweler", "jeweler"],
+  ["jewelerstools", "jeweler"],
+  ["leatherworker", "leatherworker"],
+  ["leatherworkerstools", "leatherworker"],
+  ["mason", "mason"],
+  ["masonstools", "mason"],
+  ["painter", "painter"],
+  ["painterssupplies", "painter"],
+  ["potter", "potter"],
+  ["potterstools", "potter"],
+  ["tinker", "tinker"],
+  ["tinkerstools", "tinker"],
+  ["weaver", "weaver"],
+  ["weaverstools", "weaver"],
+  ["woodcarver", "woodcarver"],
+  ["woodcarverstools", "woodcarver"]
+]);
+
+function lookupKey(value) {
+  return String(value ?? "").normalize("NFKD").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function isUnrestrictedSpecialty(value) {
+  const text = String(value ?? "").trim().toLowerCase();
+  return text === "" || text === "any";
+}
+
+function fallbackLocationAllowsSpecialty(location, type, specialtyKey) {
+  const typeId = String(type ?? "").trim();
+  if (!typeId || !location || typeof location !== "object") return false;
+  const capabilities = Array.isArray(location.capabilities) ? location.capabilities : [];
+  const matches = capabilities.filter(capability => String(capability?.type ?? "").trim() === typeId);
+  if (!matches.length) return false;
+  if (isUnrestrictedSpecialty(specialtyKey)) return true;
+  const requested = String(specialtyKey).trim();
+  return matches.some(capability => {
+    const stored = String(capability?.specialty ?? "").trim();
+    return isUnrestrictedSpecialty(stored) || stored === requested;
+  });
+}
+
+function capabilityMeetsTier(actual, required, locationApi) {
+  if (typeof locationApi?.meetsTier === "function") return locationApi.meetsTier(actual, required) === true;
+  const order = locationApi?.capabilityTiers
+    ? Array.from(locationApi.capabilityTiers, String)
+    : TIER_ORDER;
+  const ranks = new Map(order.map((tier, index) => [tier, index]));
+  const actualRank = ranks.get(String(actual ?? ""));
+  const requiredRank = ranks.get(String(required ?? ""));
+  if (actualRank === undefined || requiredRank === undefined) return String(actual ?? "") === String(required ?? "");
+  return actualRank >= requiredRank;
+}
+
+function listedWorkshopToolKey(tool, specialties) {
+  if (!Array.isArray(specialties)) return null;
+  const wanted = new Set([lookupKey(tool), lookupKey(canonicalArtisanToolName(tool))].filter(Boolean));
+  for (const entry of specialties) {
+    const id = lookupKey(entry?.id);
+    const label = lookupKey(entry?.label);
+    if ((id && wanted.has(id)) || (label && wanted.has(label))) return String(entry.id);
+  }
+  return null;
+}
+
+function localWorkshopToolKey(tool) {
+  return WORKSHOP_TOOL_KEYS.get(lookupKey(canonicalArtisanToolName(tool))) ?? null;
+}
+
+export function describeWorkshopSpecialty(tool, locationApi = null) {
+  const label = canonicalArtisanToolName(tool);
+  if (!label || typeof locationApi?.toolCapabilityType !== "function") return null;
+  let capabilityType = null;
+  try {
+    capabilityType = locationApi.toolCapabilityType(label);
+  } catch {
+    return null;
+  }
+  if (capabilityType !== "workshop") return null;
+  let listed = null;
+  if (typeof locationApi.listWorkshopSpecialties === "function") {
+    try { listed = locationApi.listWorkshopSpecialties(); }
+    catch { listed = null; }
+  }
+  const toolKey = listedWorkshopToolKey(label, listed) ?? localWorkshopToolKey(label);
+  return toolKey ? { toolKey, label } : null;
+}
+
+function workshopSpecialtyAllowed(location, context, toolKey, tier, locationApi) {
+  const capabilities = [
+    ...(Array.isArray(location?.capabilities) ? location.capabilities : []),
+    ...(Array.isArray(context?.capabilities) ? context.capabilities : [])
+  ].filter(capability =>
+    String(capability?.type ?? "").trim() === "workshop"
+    && capabilityMeetsTier(capability?.tier, tier, locationApi)
+  );
+  const narrowed = { ...(location && typeof location === "object" ? location : {}), capabilities };
+  if (typeof locationApi?.locationAllowsSpecialty === "function") {
+    return locationApi.locationAllowsSpecialty(narrowed, "workshop", toolKey) === true;
+  }
+  return fallbackLocationAllowsSpecialty(narrowed, "workshop", toolKey);
+}
+
 export function evaluateCraftingEnvironment(recipe, context = {}, locationApi = null) {
   const environment = normalizeCraftEnvironment(recipe?.craft?.environment ?? recipe?.craft ?? {});
   const location = context.location ?? locationApi?.current?.() ?? null;
@@ -94,22 +215,38 @@ export function evaluateCraftingEnvironment(recipe, context = {}, locationApi = 
     return { passed: true, mode: "settlement", environment, location, reasons: [] };
   }
   if (environment.facility) {
+    const workshopSpecialty = environment.facility.type === "workshop"
+      ? describeWorkshopSpecialty(recipe?.craft?.tool, locationApi)
+      : null;
     if (!locationApi?.evaluate && !locationApi?.evaluateRequirements) {
-      return { passed: false, mode: "facility", environment, location, reasons: ["Morelord Core Location services are unavailable."] };
+      return { passed: false, mode: "facility", environment, location, workshopSpecialty, reasons: ["Morelord Core Location services are unavailable."] };
     }
     if (locationApi.capabilityTiers && !Array.from(locationApi.capabilityTiers).includes(environment.facility.tier)) {
-      return { passed: false, mode: "facility", environment, location, reasons: [`No ${environment.facility.tier} facility tier is available in Core.`] };
+      return { passed: false, mode: "facility", environment, location, workshopSpecialty, reasons: [`No ${environment.facility.tier} facility tier is available in Core.`] };
     }
-    const requirement = { kind: "capability", ...environment.facility };
+    // Type and tier only. Naming a specialty here would reject a Workshop whose specialty is Any.
+    const requirement = { kind: "capability", type: environment.facility.type, tier: environment.facility.tier };
     const result = locationApi.evaluate
       ? locationApi.evaluate([requirement], { ...context, location })
       : locationApi.evaluateRequirements([requirement], { ...context, location });
-    if (result.passed) return { passed: true, mode: "facility", environment, location, reasons: [] };
+    if (result.passed && workshopSpecialty && !workshopSpecialtyAllowed(location, context, workshopSpecialty.toolKey, environment.facility.tier, locationApi)) {
+      return {
+        passed: false,
+        mode: "facility",
+        environment,
+        location,
+        workshopSpecialty,
+        reasons: [`Requires ${environment.facility.tier} workshop whose specialty is ${workshopSpecialty.label} or Any.`],
+        evaluation: result
+      };
+    }
+    if (result.passed) return { passed: true, mode: "facility", environment, location, workshopSpecialty, reasons: [] };
     return {
       passed: false,
       mode: "facility",
       environment,
       location,
+      workshopSpecialty,
       reasons: [`Requires ${environment.facility.tier} ${environment.facility.type}.`],
       evaluation: result
     };
@@ -132,6 +269,11 @@ export class CraftingEnvironmentService {
 
   facilityOptions() {
     return getCraftingFacilityOptions(this.locationApi);
+  }
+
+  workshopSpecialty(recipe) {
+    if (recipe?.craft?.environment?.facility?.type !== "workshop") return null;
+    return describeWorkshopSpecialty(recipe?.craft?.tool, this.locationApi);
   }
 
   #activeDowntimeContext(context) {

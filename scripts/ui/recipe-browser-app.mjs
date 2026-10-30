@@ -411,6 +411,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
           requiredSuccesses: craft.requiredSuccesses ?? 0,
           facilityType: facilityOptions.types.find(type => type.id === craft.environment?.facility?.type)?.name ?? craft.environment?.facility?.type ?? "",
           facilityTier: this.#formatFacilityTier(craft.environment?.facility?.tier ?? "common"),
+          facilitySpecialty: this.craftworks.craftingEnvironment.workshopSpecialty?.(recipe)?.label ?? "",
           toolStatus: {
             hasActor: Boolean(actor),
             hasTool: toolStatus.hasTool,
