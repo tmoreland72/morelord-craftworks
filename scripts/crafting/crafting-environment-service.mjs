@@ -71,13 +71,23 @@ export function recipeFacilityEnvironment(recipe, rules = getCraftingFacilityRul
     : parseFacilityRule(facilityRuleForTool(rules, recipe?.craft?.tool ?? ""));
   const rarity = String(recipe?.output?.rarity ?? recipe?.rarity ?? "common").replace(/[^a-z]/gi, "").toLowerCase();
   const tier = rarity === "veryrare" ? "veryRare" : VALID_TIERS.has(rarity) ? rarity : "common";
+  const specialty = rule.type === "forge" ? resolveForgeCategory(rule.specialty, null) : rule.specialty;
   return normalizeCraftEnvironment({
-    facility: rule.type ? { type: rule.type, tier, specialty: rule.specialty } : null
+    facility: rule.type ? { type: rule.type, tier, specialty } : null
   });
+}
+
+export function canonicalFacilityRule(value, locationApi = null) {
+  const parsed = parseFacilityRule(value);
+  if (!parsed.type) return "";
+  if (parsed.type !== "forge" || !parsed.specialty) return facilityRuleValue(parsed.type, parsed.specialty);
+  const category = resolveForgeCategory(parsed.specialty, locationApi);
+  return category ? facilityRuleValue("forge", category) : "forge";
 }
 
 function specialtyGroupsForType(type, locationApi) {
   const id = String(type?.id ?? "").trim();
+  if (id === "forge") return forgeCategoryGroups(locationApi);
   if (locationApi && typeof locationApi.buildSpecialtyOptions === "function") {
     try {
       const built = locationApi.buildSpecialtyOptions(id);
@@ -208,6 +218,134 @@ for (const [id, label] of WORKSHOP_TOOLS) {
   WORKSHOP_TOOL_KEYS.set(lookupKey(label), id);
 }
 
+// D&D 2024 Forge categories. A parent covers its children. Individual weapons and armor migrate to a category.
+const FORGE_CATEGORIES = Object.freeze([
+  ["armor", "Armor", "Armor", null],
+  ["lgt", "Light Armor", "Armor", "armor"],
+  ["med", "Medium Armor", "Armor", "armor"],
+  ["hvy", "Heavy Armor", "Armor", "armor"],
+  ["shl", "Shields", "Armor", "armor"],
+  ["weapon", "Weapons", "Weapons", null],
+  ["sim", "Simple Weapons", "Weapons", "weapon"],
+  ["simpleM", "Simple Melee Weapons", "Weapons", "sim"],
+  ["simpleR", "Simple Ranged Weapons", "Weapons", "sim"],
+  ["mar", "Martial Weapons", "Weapons", "weapon"],
+  ["martialM", "Martial Melee Weapons", "Weapons", "mar"],
+  ["martialR", "Martial Ranged Weapons", "Weapons", "mar"],
+  ["ammo", "Ammunition", "Weapons", "weapon"]
+]);
+const FORGE_CATEGORY_IDS = new Set(FORGE_CATEGORIES.map(([id]) => id));
+const FORGE_PARENTS = new Map(FORGE_CATEGORIES.map(([id, , , parent]) => [id, parent]));
+const FORGE_LABELS = new Map(FORGE_CATEGORIES.map(([id, label]) => [id, label]));
+const FORGE_LEGACY = new Map([
+  ["light", "lgt"], ["medium", "med"], ["heavy", "hvy"], ["shield", "shl"],
+  ["club", "simpleM"], ["dagger", "simpleM"], ["greatclub", "simpleM"], ["handaxe", "simpleM"], ["javelin", "simpleM"], ["lighthammer", "simpleM"], ["mace", "simpleM"], ["quarterstaff", "simpleM"], ["sickle", "simpleM"], ["spear", "simpleM"],
+  ["dart", "simpleR"], ["lightcrossbow", "simpleR"], ["shortbow", "simpleR"], ["sling", "simpleR"],
+  ["battleaxe", "martialM"], ["flail", "martialM"], ["glaive", "martialM"], ["greataxe", "martialM"], ["greatsword", "martialM"], ["halberd", "martialM"], ["lance", "martialM"], ["longsword", "martialM"], ["maul", "martialM"], ["morningstar", "martialM"], ["pike", "martialM"], ["rapier", "martialM"], ["scimitar", "martialM"], ["shortsword", "martialM"], ["trident", "martialM"], ["warpick", "martialM"], ["warhammer", "martialM"], ["whip", "martialM"],
+  ["blowgun", "martialR"], ["handcrossbow", "martialR"], ["heavycrossbow", "martialR"], ["longbow", "martialR"], ["musket", "martialR"], ["pistol", "martialR"],
+  ["padded", "lgt"], ["leather", "lgt"], ["studded", "lgt"],
+  ["hide", "med"], ["chainshirt", "med"], ["scalemail", "med"], ["breastplate", "med"], ["halfplate", "med"],
+  ["ringmail", "hvy"], ["chainmail", "hvy"], ["splint", "hvy"], ["plate", "hvy"]
+]);
+
+function forgeLookupKey(value) {
+  return String(value ?? "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function localForgeCategory(value) {
+  const raw = String(value ?? "").trim();
+  if (!raw) return "";
+  if (FORGE_CATEGORY_IDS.has(raw)) return raw;
+  const compact = forgeLookupKey(raw);
+  if (FORGE_CATEGORY_IDS.has(compact)) return compact;
+  return FORGE_LEGACY.get(compact) ?? FORGE_LEGACY.get(raw) ?? "";
+}
+
+function forgeCategoryKeysFromApi(value, locationApi) {
+  if (!locationApi || typeof locationApi.forgeCategoryKeys !== "function") return [];
+  try {
+    const keys = locationApi.forgeCategoryKeys(value);
+    return Array.isArray(keys) ? keys.map(key => String(key)).filter(Boolean) : [];
+  } catch {
+    return [];
+  }
+}
+
+function resolveForgeCategory(value, locationApi) {
+  const raw = String(value ?? "").trim();
+  if (!raw) return "";
+  const direct = forgeCategoryKeysFromApi(raw, locationApi);
+  if (direct.length) return String(direct.at(-1));
+  const compact = forgeLookupKey(raw);
+  if (compact && compact !== raw) {
+    const again = forgeCategoryKeysFromApi(compact, locationApi);
+    if (again.length) return String(again.at(-1));
+  }
+  return localForgeCategory(raw);
+}
+
+function forgeCoveringKeys(category, locationApi) {
+  const fromApi = forgeCategoryKeysFromApi(category, locationApi);
+  if (fromApi.length) return fromApi;
+  const start = localForgeCategory(category);
+  if (!start) return [];
+  const chain = [];
+  let current = start;
+  const seen = new Set();
+  while (current && !seen.has(current)) {
+    seen.add(current);
+    chain.push(current);
+    current = FORGE_PARENTS.get(current) ?? null;
+  }
+  return chain.reverse();
+}
+
+function forgeCategoryGroups(locationApi) {
+  let entries = FORGE_CATEGORIES.map(([id, label, category]) => ({ id, label, category }));
+  if (typeof locationApi?.listForgeSpecialties === "function") {
+    try {
+      const listed = locationApi.listForgeSpecialties();
+      if (Array.isArray(listed) && listed.length && listed.every(entry => FORGE_CATEGORY_IDS.has(entry?.id))) {
+        entries = listed.map(entry => ({
+          id: String(entry.id),
+          label: String(entry.label ?? entry.id),
+          category: String(entry.category ?? entry.group ?? "Forge")
+        }));
+      }
+    } catch {
+      // The local category list stays in use.
+    }
+  }
+  const buckets = new Map();
+  for (const entry of entries) {
+    const bucket = buckets.get(entry.category) ?? [];
+    bucket.push({ value: entry.id, label: entry.label });
+    buckets.set(entry.category, bucket);
+  }
+  return [...buckets.entries()].map(([label, options]) => ({ label, options }));
+}
+
+function forgeKeysForRecipe(recipe, locationApi) {
+  const output = recipe?.output;
+  const candidates = [];
+  if (output && typeof output === "object") candidates.push(output);
+  for (const value of [output?.label, output?.name, recipe?.name, output?.weaponType, output?.armorType]) {
+    if (value) candidates.push(value);
+  }
+  for (const candidate of candidates) {
+    const fromApi = forgeCategoryKeysFromApi(candidate, locationApi);
+    if (fromApi.length) return fromApi;
+    if (typeof candidate === "string") {
+      const compact = forgeLookupKey(candidate);
+      const compactKeys = compact ? forgeCategoryKeysFromApi(compact, locationApi) : [];
+      if (compactKeys.length) return compactKeys;
+      const category = localForgeCategory(candidate);
+      if (category) return forgeCoveringKeys(category, null);
+    }
+  }
+  return [];
+}
+
 function isUnrestrictedSpecialty(value) {
   const text = String(value ?? "").trim().toLowerCase();
   return text === "" || text === "any";
@@ -229,9 +367,16 @@ function normalizeSpecialtyList(value) {
 
 function capabilityAllowsSpecialty(capability, specialtyKey) {
   if (isUnrestrictedSpecialty(specialtyKey)) return true;
-  const keys = normalizeSpecialtyList(capability?.specialty);
+  const requested = String(specialtyKey ?? "").trim();
+  let keys = normalizeSpecialtyList(capability?.specialty);
+  if (String(capability?.type ?? "") === "forge") {
+    keys = [...new Set(keys.map(key => resolveForgeCategory(key, null) || key).filter(Boolean))];
+    if (!keys.length) return true;
+    const covered = new Set(forgeCoveringKeys(requested, null));
+    if (covered.size) return keys.some(key => covered.has(key));
+  }
   if (!keys.length) return true;
-  return keys.includes(String(specialtyKey).trim());
+  return keys.includes(requested);
 }
 
 export function formatWorkshopSpecialty(specialty, labels = null) {
@@ -361,13 +506,22 @@ export function evaluateCraftingEnvironment(recipe, context = {}, locationApi = 
         ...(Array.isArray(context?.capabilities) ? context.capabilities : [])
       ]
     };
-    const assignedKey = String(environment.facility.specialty ?? "").trim();
-    const label = assignedKey ? specialtyLabel(environment.facility.type, assignedKey, locationApi) : "";
-    const place = assignedKey ? placeSpecialties(specialtyLocation, environment.facility.type) : undefined;
+    const assignedKey = environment.facility.type === "forge"
+      ? resolveForgeCategory(environment.facility.specialty, locationApi)
+      : String(environment.facility.specialty ?? "").trim();
+    const itemKeys = environment.facility.type === "forge" && assignedKey
+      ? forgeKeysForRecipe(recipe, locationApi)
+      : [];
+    const itemOutsideCategory = Boolean(assignedKey && itemKeys.length && !itemKeys.includes(assignedKey));
+    const checkKey = itemOutsideCategory
+      ? assignedKey
+      : (itemKeys.length ? String(itemKeys.at(-1)) : assignedKey);
+    const label = checkKey ? specialtyLabel(environment.facility.type, checkKey, locationApi) : "";
+    const place = checkKey ? placeSpecialties(specialtyLocation, environment.facility.type) : undefined;
     const labels = {};
     for (const key of place ?? []) labels[key] = specialtyLabel(environment.facility.type, key, locationApi);
-    const facilitySpecialty = assignedKey
-      ? { key: assignedKey, label, ...(place === undefined ? {} : { place, labels }) }
+    const facilitySpecialty = checkKey
+      ? { key: checkKey, label, ...(place === undefined ? {} : { place, labels }) }
       : null;
     const phrase = `Requires ${facilityRequirementPhrase(environment.facility, label)}.`;
     if (!locationApi?.evaluate && !locationApi?.evaluateRequirements) {
@@ -381,7 +535,7 @@ export function evaluateCraftingEnvironment(recipe, context = {}, locationApi = 
     const result = locationApi.evaluate
       ? locationApi.evaluate([requirement], { ...context, location })
       : locationApi.evaluateRequirements([requirement], { ...context, location });
-    if (result.passed && assignedKey && !specialtyAllowed(location, context, environment.facility.type, assignedKey, environment.facility.tier, locationApi)) {
+    if (result.passed && checkKey && (itemOutsideCategory || !specialtyAllowed(location, context, environment.facility.type, checkKey, environment.facility.tier, locationApi))) {
       return {
         passed: false,
         mode: "facility",

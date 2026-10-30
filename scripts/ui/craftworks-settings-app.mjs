@@ -1,4 +1,4 @@
-import { craftingFacilityToolNames, facilityChoicesForSelection, facilityRuleForTool, getCraftingFacilityOptions, getCraftingFacilityRules } from "../crafting/crafting-environment-service.mjs";
+import { canonicalFacilityRule, craftingFacilityToolNames, facilityChoicesForSelection, facilityRuleForTool, getCraftingFacilityOptions, getCraftingFacilityRules } from "../crafting/crafting-environment-service.mjs";
 import { MODULE_ID, MODULE_TITLE } from "../constants.mjs";
 import {
   SETTINGS,
@@ -170,7 +170,10 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
       facilityRules: craftingFacilityToolNames(
         (craftworks?.recipes.all() ?? []).map(recipe => recipe.craft?.tool)
       ).map(tool => {
-        const selected = facilityRuleForTool(getCraftingFacilityRules(), tool);
+        const selected = canonicalFacilityRule(
+          facilityRuleForTool(getCraftingFacilityRules(), tool),
+          craftworks?.craftingEnvironment?.locationApi
+        );
         const options = craftworks?.craftingEnvironment?.facilityOptions?.()
           ?? getCraftingFacilityOptions(craftworks?.craftingEnvironment?.locationApi);
         return { tool, selected, choices: facilityChoicesForSelection(options.choices ?? [], selected) };
@@ -370,7 +373,8 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
       }
 
       await setGatherDcOverrides(gatherDcOverrides);
-      const facilityRules = Object.fromEntries([...data.entries()].filter(([name]) => name.startsWith("facility:")).map(([name, value]) => [name.slice(9), String(value)]));
+      const locationApi = this.craftworks?.craftingEnvironment?.locationApi;
+      const facilityRules = Object.fromEntries([...data.entries()].filter(([name]) => name.startsWith("facility:")).map(([name, value]) => [name.slice(9), canonicalFacilityRule(value, locationApi)]));
       await game.settings.set(MODULE_ID, SETTINGS.CRAFTING_FACILITY_RULES, JSON.stringify(facilityRules));
 
       for (const pack of CONTENT_PACKS) {

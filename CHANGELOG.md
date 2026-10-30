@@ -4,7 +4,7 @@
 
 ### Improvements
 
-- **Crafting** settings can require an activity, such as **Workshop**, or one specialty of that activity, such as **Workshop: Leatherworker's Tools**. The specialty lists use Morelord Core’s groups. An activity alone accepts any specialty of that activity. A named specialty accepts a row of sufficient tier that includes it or is **Any**, including a specialty saved as a single value. A setting saved earlier as only the activity stays type-only. Recipe cards and the Craft window say `Requires common workshop.` or `Requires common workshop (Leatherworker's Tools or Any).` A facility rule saved as Blacksmith's Tools still applies to Smith's Tools.
+- **Crafting** settings can require an activity, such as **Workshop** or **Forge**, or one specialty of that activity. Forge specialties are D&D 2024 equipment categories. Armor and Weapons cover their children. Individual weapons and weapon masteries are not listed. A saved Forge specialty that named a weapon or armor, such as Longsword, is kept as its category. A Forge recipe checks the crafted item’s category. A parent category on the location covers that item. **Forge** with no specialty accepts any Forge. The warning names the category, such as `Requires common forge (Martial Weapons or Any).` Workshop specialties are unchanged. A facility rule saved as Blacksmith's Tools still applies to Smith's Tools.
 
 ### Fixed
 
