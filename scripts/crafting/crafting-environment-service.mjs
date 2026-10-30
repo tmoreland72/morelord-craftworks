@@ -85,46 +85,65 @@ const TIER_ORDER = ["common", "uncommon", "rare", "veryRare", "legendary", "arti
 
 // Tool ids Core stores on a Workshop specialty. Smith's Tools and Alchemist's
 // Supplies are absent: Core maps those to Forge and Alchemist.
-const WORKSHOP_TOOL_KEYS = new Map([
-  ["brewer", "brewer"],
-  ["brewerssupplies", "brewer"],
-  ["calligrapher", "calligrapher"],
-  ["calligrapherssupplies", "calligrapher"],
-  ["carpenter", "carpenter"],
-  ["carpenterstools", "carpenter"],
-  ["cartographer", "cartographer"],
-  ["cartographerstools", "cartographer"],
-  ["cobbler", "cobbler"],
-  ["cobblerstools", "cobbler"],
-  ["cook", "cook"],
-  ["cooksutensils", "cook"],
-  ["glassblower", "glassblower"],
-  ["glassblowerstools", "glassblower"],
-  ["jeweler", "jeweler"],
-  ["jewelerstools", "jeweler"],
-  ["leatherworker", "leatherworker"],
-  ["leatherworkerstools", "leatherworker"],
-  ["mason", "mason"],
-  ["masonstools", "mason"],
-  ["painter", "painter"],
-  ["painterssupplies", "painter"],
-  ["potter", "potter"],
-  ["potterstools", "potter"],
-  ["tinker", "tinker"],
-  ["tinkerstools", "tinker"],
-  ["weaver", "weaver"],
-  ["weaverstools", "weaver"],
-  ["woodcarver", "woodcarver"],
-  ["woodcarverstools", "woodcarver"]
-]);
+const WORKSHOP_TOOLS = [
+  ["brewer", "Brewer's Supplies"],
+  ["calligrapher", "Calligrapher's Supplies"],
+  ["carpenter", "Carpenter's Tools"],
+  ["cartographer", "Cartographer's Tools"],
+  ["cobbler", "Cobbler's Tools"],
+  ["cook", "Cook's Utensils"],
+  ["glassblower", "Glassblower's Tools"],
+  ["jeweler", "Jeweler's Tools"],
+  ["leatherworker", "Leatherworker's Tools"],
+  ["mason", "Mason's Tools"],
+  ["painter", "Painter's Supplies"],
+  ["potter", "Potter's Tools"],
+  ["tinker", "Tinker's Tools"],
+  ["weaver", "Weaver's Tools"],
+  ["woodcarver", "Woodcarver's Tools"]
+];
+const WORKSHOP_TOOL_LABELS = new Map(WORKSHOP_TOOLS);
 
 function lookupKey(value) {
   return String(value ?? "").normalize("NFKD").toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
+const WORKSHOP_TOOL_KEYS = new Map();
+for (const [id, label] of WORKSHOP_TOOLS) {
+  WORKSHOP_TOOL_KEYS.set(lookupKey(id), id);
+  WORKSHOP_TOOL_KEYS.set(lookupKey(label), id);
+}
+
 function isUnrestrictedSpecialty(value) {
   const text = String(value ?? "").trim().toLowerCase();
   return text === "" || text === "any";
+}
+
+// Core stores specialty as an array of keys. Empty means Any. A legacy string is one key.
+function normalizeSpecialtyList(value) {
+  const raw = Array.isArray(value) ? value : [value];
+  const keys = [];
+  const seen = new Set();
+  for (const entry of raw) {
+    const key = String(entry ?? "").trim();
+    if (!key || isUnrestrictedSpecialty(key) || seen.has(key)) continue;
+    seen.add(key);
+    keys.push(key);
+  }
+  return keys;
+}
+
+function capabilityAllowsSpecialty(capability, specialtyKey) {
+  if (isUnrestrictedSpecialty(specialtyKey)) return true;
+  const keys = normalizeSpecialtyList(capability?.specialty);
+  if (!keys.length) return true;
+  return keys.includes(String(specialtyKey).trim());
+}
+
+export function formatWorkshopSpecialty(specialty) {
+  const keys = normalizeSpecialtyList(specialty);
+  if (!keys.length) return "Any";
+  return keys.map(key => WORKSHOP_TOOL_LABELS.get(key) ?? key).join(", ");
 }
 
 function fallbackLocationAllowsSpecialty(location, type, specialtyKey) {
@@ -133,12 +152,30 @@ function fallbackLocationAllowsSpecialty(location, type, specialtyKey) {
   const capabilities = Array.isArray(location.capabilities) ? location.capabilities : [];
   const matches = capabilities.filter(capability => String(capability?.type ?? "").trim() === typeId);
   if (!matches.length) return false;
-  if (isUnrestrictedSpecialty(specialtyKey)) return true;
-  const requested = String(specialtyKey).trim();
-  return matches.some(capability => {
-    const stored = String(capability?.specialty ?? "").trim();
-    return isUnrestrictedSpecialty(stored) || stored === requested;
-  });
+  return matches.some(capability => capabilityAllowsSpecialty(capability, specialtyKey));
+}
+
+function placeWorkshopSpecialty(location) {
+  const workshops = (Array.isArray(location?.capabilities) ? location.capabilities : [])
+    .filter(capability => String(capability?.type ?? "").trim() === "workshop");
+  if (!workshops.length) return undefined;
+  if (workshops.some(capability => normalizeSpecialtyList(capability.specialty).length === 0)) return [];
+  const keys = [];
+  const seen = new Set();
+  for (const capability of workshops) {
+    for (const key of normalizeSpecialtyList(capability.specialty)) {
+      if (seen.has(key)) continue;
+      seen.add(key);
+      keys.push(key);
+    }
+  }
+  return keys;
+}
+
+function withPlace(specialty, location) {
+  if (!specialty) return null;
+  const place = placeWorkshopSpecialty(location);
+  return place === undefined ? specialty : { ...specialty, place };
 }
 
 function capabilityMeetsTier(actual, required, locationApi) {
@@ -215,8 +252,15 @@ export function evaluateCraftingEnvironment(recipe, context = {}, locationApi = 
     return { passed: true, mode: "settlement", environment, location, reasons: [] };
   }
   if (environment.facility) {
+    const specialtyLocation = {
+      ...(location && typeof location === "object" ? location : {}),
+      capabilities: [
+        ...(Array.isArray(location?.capabilities) ? location.capabilities : []),
+        ...(Array.isArray(context?.capabilities) ? context.capabilities : [])
+      ]
+    };
     const workshopSpecialty = environment.facility.type === "workshop"
-      ? describeWorkshopSpecialty(recipe?.craft?.tool, locationApi)
+      ? withPlace(describeWorkshopSpecialty(recipe?.craft?.tool, locationApi), specialtyLocation)
       : null;
     if (!locationApi?.evaluate && !locationApi?.evaluateRequirements) {
       return { passed: false, mode: "facility", environment, location, workshopSpecialty, reasons: ["Morelord Core Location services are unavailable."] };
@@ -273,7 +317,25 @@ export class CraftingEnvironmentService {
 
   workshopSpecialty(recipe) {
     if (recipe?.craft?.environment?.facility?.type !== "workshop") return null;
-    return describeWorkshopSpecialty(recipe?.craft?.tool, this.locationApi);
+    return withPlace(describeWorkshopSpecialty(recipe?.craft?.tool, this.locationApi), this.#viewedLocation());
+  }
+
+  #viewedLocation() {
+    const api = this.locationApi;
+    if (!api) return null;
+    try {
+      if (typeof api.activeContext === "function") {
+        const active = api.activeContext(globalThis.game?.user);
+        if (active && Object.hasOwn(active, "location")) return active.location ?? null;
+      }
+    } catch {
+      // Older Core builds fall through to the scene location.
+    }
+    try {
+      return typeof api.current === "function" ? api.current() ?? null : null;
+    } catch {
+      return null;
+    }
   }
 
   #activeDowntimeContext(context) {

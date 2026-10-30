@@ -1,4 +1,4 @@
-import { canonicalArtisanToolName } from "../crafting/crafting-environment-service.mjs";
+import { canonicalArtisanToolName, formatWorkshopSpecialty } from "../crafting/crafting-environment-service.mjs";
 import { recipeRarity, normalizeRarity, recipeMatchesFilters } from "../recipes/recipe-filters.mjs";
 import { allowedUuid, isUuidAllowed } from "../core/allowed-packs.mjs";
 import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-participation.js";
@@ -412,6 +412,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
           facilityType: facilityOptions.types.find(type => type.id === craft.environment?.facility?.type)?.name ?? craft.environment?.facility?.type ?? "",
           facilityTier: this.#formatFacilityTier(craft.environment?.facility?.tier ?? "common"),
           facilitySpecialty: this.craftworks.craftingEnvironment.workshopSpecialty?.(recipe)?.label ?? "",
+          facilityPlace: this.#facilityPlace(recipe),
           toolStatus: {
             hasActor: Boolean(actor),
             hasTool: toolStatus.hasTool,
@@ -1312,6 +1313,12 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     return game.actors.find(
       actor => actor.uuid === this.actorUuid
     ) ?? null;
+  }
+
+  #facilityPlace(recipe) {
+    const specialty = this.craftworks.craftingEnvironment.workshopSpecialty?.(recipe);
+    if (!specialty || !Object.hasOwn(specialty, "place")) return "";
+    return formatWorkshopSpecialty(specialty.place);
   }
 
   #formatFacilityTier(tier) {

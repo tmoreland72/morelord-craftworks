@@ -11,6 +11,7 @@ import {
   describeWorkshopSpecialty,
   evaluateCraftingEnvironment,
   facilityRuleForTool,
+  formatWorkshopSpecialty,
   getCraftingFacilityOptions,
   normalizeCraftEnvironment,
   recipeFacilityEnvironment
@@ -229,6 +230,19 @@ function coreToolCapabilityType(tool) {
   return null;
 }
 
+function storedSpecialtyKeys(value) {
+  const raw = Array.isArray(value) ? value : [value];
+  const keys = [];
+  const seen = new Set();
+  for (const entry of raw) {
+    const key = String(entry ?? "").trim();
+    if (!key || key.toLowerCase() === "any" || seen.has(key)) continue;
+    seen.add(key);
+    keys.push(key);
+  }
+  return keys;
+}
+
 function specialtyApi({ locationAllowsSpecialty = true, listSpecialties = true } = {}) {
   const calls = [];
   const api = {
@@ -245,10 +259,11 @@ function specialtyApi({ locationAllowsSpecialty = true, listSpecialties = true }
         })) });
         const matches = (location.capabilities ?? []).filter(capability => capability.type === type);
         if (!matches.length) return false;
-        if (!String(toolKey ?? "").trim()) return true;
+        const requested = String(toolKey ?? "").trim();
+        if (!requested || requested.toLowerCase() === "any") return true;
         return matches.some(capability => {
-          const stored = String(capability.specialty ?? "").trim().toLowerCase();
-          return stored === "" || stored === "any" || String(capability.specialty).trim() === toolKey;
+          const keys = storedSpecialtyKeys(capability.specialty);
+          return !keys.length || keys.includes(requested);
         });
       }
     } : {})
@@ -370,6 +385,43 @@ test("a Drakkenheim recipe with no tool accepts any Workshop specialty", () => {
   tooled.craft.environment = recipeFacilityEnvironment(tooled, {});
   assert.equal(evaluateCraftingEnvironment(tooled, { location: { capabilities: [{ type: "workshop", tier: "rare", specialty: "cobbler" }] } }, api).passed, false);
   assert.equal(evaluateCraftingEnvironment(tooled, { location: { capabilities: [{ type: "workshop", tier: "rare", specialty: "carpenter" }] } }, api).passed, true);
+});
+
+test("Workshop specialty arrays, empty lists, and legacy strings match the same way", () => {
+  const carpenter = workshopRecipe("Carpenter's Tools", "rare");
+  const location = capabilities => ({ capabilities });
+  const shapes = [
+    ["several keys", ["cobbler", "carpenter", "weaver"], true],
+    ["several keys without the tool", ["cobbler", "weaver"], false],
+    ["empty array", [], true],
+    ["legacy string", "carpenter", true],
+    ["other legacy string", "weaver", false]
+  ];
+  for (const useApi of [true, false]) {
+    const api = specialtyApi({ locationAllowsSpecialty: useApi, listSpecialties: useApi });
+    for (const [name, specialty, passed] of shapes) {
+      const result = evaluateCraftingEnvironment(carpenter, {
+        location: location([{ type: "workshop", tier: "rare", specialty }])
+      }, api);
+      assert.equal(result.passed, passed, `${useApi ? "api" : "fallback"} ${name}`);
+      if (useApi) {
+        assert.deepEqual(api.calls.at(-1).capabilities[0].specialty, specialty ?? null);
+      }
+    }
+    const trimmed = evaluateCraftingEnvironment(carpenter, {
+      location: location([{ type: "workshop", tier: "rare", specialty: ["weaver", "Any", "weaver", " carpenter "] }])
+    }, api);
+    assert.equal(trimmed.passed, true, `${useApi ? "api" : "fallback"} trims a mixed list`);
+    const onlyAny = evaluateCraftingEnvironment(carpenter, {
+      location: location([{ type: "workshop", tier: "rare", specialty: ["Any"] }])
+    }, api);
+    assert.equal(onlyAny.passed, true, `${useApi ? "api" : "fallback"} Any in a list is unrestricted`);
+  }
+  assert.equal(formatWorkshopSpecialty(["carpenter", "weaver"]), "Carpenter's Tools, Weaver's Tools");
+  assert.equal(formatWorkshopSpecialty([]), "Any");
+  assert.equal(formatWorkshopSpecialty("carpenter"), "Carpenter's Tools");
+  assert.equal(formatWorkshopSpecialty(["Any", ""]), "Any");
+  assert.equal(formatWorkshopSpecialty(" weaver "), "Weaver's Tools");
 });
 
 test("an active On the Road downtime session overrides the scene location", () => {

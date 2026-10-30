@@ -4,7 +4,7 @@
 
 ### Improvements
 
-- A recipe whose artisan tool Morelord Core maps to Workshop requires a Workshop of the item’s rarity or higher whose Specialty is that tool or Any. Recipe cards and the Craft window show that specialty. Smith's Tools still use Forge, and Alchemist's Supplies still use Alchemist. Forge weapon and armor Specialties are not checked. **Settings → Crafting** still chooses the activity for each tool, and a facility rule saved as Blacksmith's Tools still applies to Smith's Tools.
+- A recipe whose artisan tool Morelord Core maps to Workshop requires a Workshop of the item’s rarity or higher whose Specialty includes that tool or is Any. Specialty may be several tools, an empty list, or a single saved tool. Recipe cards and the Craft window show that specialty. Smith's Tools still use Forge, and Alchemist's Supplies still use Alchemist. Forge weapon and armor Specialties are not checked. **Settings → Crafting** still chooses the activity for each tool, and a facility rule saved as Blacksmith's Tools still applies to Smith's Tools.
 
 ### Fixed
 
@@ -18,6 +18,6 @@
 
 ## Verification
 
-- `npm test`: 147 passed, 1 skipped. The skip is the local compendium index check. Tests cover Smith's Tools normalization, Workshop specialty checks, party-inventory placement through the GM, background Configure Sources refresh, and Core's active location.
+- `npm test`: 149 passed, 1 skipped. The skip is the local compendium index check. Tests cover Smith's Tools normalization, Workshop specialty lists, party-inventory placement through the GM, background Configure Sources refresh, and Core's active location.
 - `npm run build` passed for 0.5.2. `npm run check:recipes` passed.
 - Live Foundry verification in world Dev1 was not run from this environment.

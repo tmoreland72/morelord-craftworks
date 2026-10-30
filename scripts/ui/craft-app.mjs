@@ -1,4 +1,5 @@
 import { combinedCraftingInventory } from "../crafting/group-membership.mjs";
+import { formatWorkshopSpecialty } from "../crafting/crafting-environment-service.mjs";
 import { allowedUuid, isUuidAllowed } from "../core/allowed-packs.mjs";
 import { materialsMatchingIngredient } from "../recipes/recipe-filters.mjs";
 import { MODULE_TITLE } from "../constants.mjs";
@@ -14,6 +15,21 @@ const {
   ApplicationV2,
   HandlebarsApplicationMixin
 } = foundry.applications.api;
+
+export function craftFacilityText(environment) {
+  if (environment?.mode !== "facility") {
+    const mode = String(environment?.mode ?? "");
+    return mode ? mode.charAt(0).toUpperCase() + mode.slice(1) : "";
+  }
+  const facility = environment.environment.facility;
+  const required = environment.workshopSpecialty?.label
+    ? ` (${environment.workshopSpecialty.label} or Any)`
+    : "";
+  const place = environment.workshopSpecialty && Object.hasOwn(environment.workshopSpecialty, "place")
+    ? ` · ${formatWorkshopSpecialty(environment.workshopSpecialty.place)}`
+    : "";
+  return `${facility.tier} ${facility.type}${required}${place}`;
+}
 
 function requirementFallbackImg(match) {
   if (match?.itemType === "spellScroll") {
@@ -952,9 +968,7 @@ export class CraftApp
         activeDc: craft.checkRequired === false ? null : activeDc,
         hoursRequired:
           craft.hoursRequired,
-        environment: environment.mode === "facility"
-          ? `${environment.environment.facility.tier} ${environment.environment.facility.type}${environment.workshopSpecialty ? ` (${environment.workshopSpecialty.label} or Any)` : ""}`
-          : environment.mode.charAt(0).toUpperCase() + environment.mode.slice(1)
+        environment: craftFacilityText(environment)
       },
       environment,
       readiness,
