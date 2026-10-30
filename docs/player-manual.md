@@ -141,15 +141,14 @@ Your GM decides whether a recipe needs a particular kind of place. Craftworks re
 Recipe cards show a **Facility** line.
 
 - `No facility required` means you can craft in any place, including On the Road.
-- Otherwise the line names the item’s rarity and the activity, such as `Uncommon or higher Forge` or `Rare or higher Workshop (Carpenter's Tools or Any)`.
-- A higher rarity of that same activity qualifies. A Rare forge can craft an Uncommon item. A Workshop requirement is met by a Workshop of sufficient rarity.
-- When the activity is Workshop and the recipe’s tool is one Core assigns to Workshop, the card names that tool: `(Carpenter's Tools or Any)`. The Workshop **Specialty** must include that tool, or have nothing selected. Nothing selected means **Any**. A Specialty can list several tools, and the recipe’s tool must be one of them. A Specialty saved as a single tool still matches that tool. **Any** stored next to other tools is ignored, and those other tools are what count.
-- After the dot, the card lists the current place’s Workshop specialties, separated by commas, or `Any` when none are selected. A place with no Workshop omits that part.
-- The **Facility** line follows the activity your GM chose for that tool. Smith's Tools are assigned to Forge, and Alchemist's Supplies are assigned to Alchemist, so those recipes show the activity and rarity only. That stays true when the chosen activity is Workshop: the card does not add a specialty for them. A Forge specialty, such as a weapon, armor, or weapon mastery, is unused for crafting.
+- Otherwise the line names the item’s rarity and the activity your GM chose, such as `Uncommon or higher Forge` or `Common or higher Workshop (Leatherworker's Tools or Any)`.
+- A higher rarity of that same activity qualifies. A Rare forge can craft an Uncommon item.
+- An activity with no specialty in parentheses accepts any specialty of that activity. Parentheses name one required specialty. The place must include that specialty, or have nothing selected. Nothing selected means **Any**. A Specialty can list several choices, and the required one must be one of them. A Specialty saved as a single choice still matches that choice. **Any** stored next to other choices is ignored.
+- After the dot, the card lists the current place’s specialties for that activity, separated by commas, or `Any` when none are selected.
 
-In **Craft**, the same facts appear beside a location icon, using the stored words, such as `rare workshop (Carpenter's Tools or Any) · Carpenter's Tools, Weaver's Tools` or `uncommon forge`.
+In **Craft**, the same facts appear beside a location icon, using the stored words, such as `common workshop (Leatherworker's Tools or Any)` or `common workshop`.
 
-When your current place does not qualify, the Craft card shows a warning. A missing activity or a tier that is too low reads `Requires rare forge.` or `Requires rare workshop.` A Workshop that is high enough, with the wrong specialty, reads `Requires rare workshop whose specialty is Carpenter's Tools or Any.`
+When your current place does not qualify, the Craft card shows a warning such as `Requires common workshop.` or `Requires common workshop (Leatherworker's Tools or Any).`
 
 - You have the materials and have not started: the badge reads **Environment Unavailable**, and the footer reads **Missing Requirements**.
 - A job is already underway: the badge reads **Paused - Environment**, and **Roll Crafting Check** or **Craft Item** becomes **Paused here**. **Cancel** remains. Progress and materials already used stay as they are.
@@ -259,7 +258,7 @@ Unknown recipes intentionally conceal ingredients. You can mark one as a goal, b
 
 ### Crafting says the place is unavailable
 
-The Craft card shows a location warning such as `Requires rare forge.` or `Requires rare workshop whose specialty is Carpenter's Tools or Any.` **Environment Unavailable** means you have the materials and have not started, and the current place does not qualify. **Paused - Environment** and **Paused here** mean a job you already started is waiting for that place. Progress already made is kept. Ask the GM which scene or Downtime location has the required facility. See [Shared Locations](#shared-locations).
+The Craft card shows a location warning such as `Requires common workshop.` or `Requires common workshop (Leatherworker's Tools or Any).` **Environment Unavailable** means you have the materials and have not started, and the current place does not qualify. **Paused - Environment** and **Paused here** mean a job you already started is waiting for that place. Progress already made is kept. Ask the GM which scene or Downtime location has the required facility. See [Shared Locations](#shared-locations).
 
 ### Craft says an ingredient is missing
 

@@ -263,7 +263,7 @@ Craftworks asks Morelord Core for the active place of the person who is crafting
 
 ### Facility rules in Crafting settings
 
-Open **Game Settings → Configure Settings → Module Settings → Morelord Craftworks**, select **Configure Craftworks**, and find the **Crafting** section. Each artisan’s tool has its own dropdown. The choices are **No facility required** and every activity Morelord Core has registered. The built-in activities are Forge, Marketplace, Alchemist, Library, Temple, Contractor, Instructor, and Workshop. The dropdown shows Core’s names for those activities.
+Open **Game Settings → Configure Settings → Module Settings → Morelord Craftworks**, select **Configure Craftworks**, and find the **Crafting** section. Each artisan’s tool has its own dropdown. **No facility required** is the first choice. The other choices are the activities Morelord Core has registered. The built-in activities are Forge, Marketplace, Alchemist, Library, Temple, Contractor, Instructor, and Workshop. An activity that has specialties is a group. The activity name alone, such as **Workshop**, means that activity with any specialty. Under it, Core’s specialty list is grouped the same way as Core’s location menu: Forge uses **Forge: Weapons**, **Forge: Armor**, and **Forge: Weapon Masteries**; Workshop lists its tools in the **Workshop** group, such as **Workshop: Leatherworker's Tools**; Instructor uses its language, skill, tool, weapon, armor, and weapon mastery groups. A saved choice that is only the activity, such as `workshop` or `forge`, stays that activity with any specialty.
 
 The list uses the D&D 2024 artisan’s tool names, and **Smith's Tools** appears once. A facility rule saved under the older name Blacksmith's Tools still applies to **Smith's Tools**, including a custom recipe that still stores that name. A recipe whose tool is outside the standard list, such as Cartographer's Tools, adds that tool to the **Crafting** list.
 
@@ -273,61 +273,25 @@ The required tier is the rarity of the item being crafted. Craftworks reads Comm
 
 Core’s location tiers are Common, Uncommon, Rare, Very Rare, and Legendary. An Artifact item that requires a facility has no matching Core tier. Craftworks reports `No artifact facility tier is available in Core.`
 
-Monsters of Drakkenheim recipes, including custom Drakkenheim recipes, always require a Workshop of the item’s rarity or higher. That requirement stands on its own, including when the tool’s **Crafting** dropdown is **No facility required** or another activity. Packaged Drakkenheim recipes name no tool, so any Workshop specialty of sufficient tier qualifies. A Drakkenheim recipe that names a tool Core assigns to Workshop also needs that tool in the Workshop specialty, or a specialty with nothing selected, including **Any**. Drakkenheim crafting still has no roll and no time requirement.
+Monsters of Drakkenheim recipes, including custom Drakkenheim recipes, always require a Workshop of the item’s rarity or higher, with any Workshop specialty. That requirement stands on its own, including when the tool’s **Crafting** dropdown is **No facility required** or another activity. Drakkenheim crafting still has no roll and no time requirement.
 
 ### What each activity checks
 
-Craftworks checks the activity named in **Crafting**, at the item’s tier or higher.
+Craftworks checks the choice in **Crafting**, at the item’s tier or higher.
 
 **No facility required** passes in every place.
 
-Forge, Alchemist, Marketplace, Library, Temple, Contractor, and Instructor match on activity and tier. A Forge **Specialty** lists weapon proficiencies, armor proficiencies, and weapon masteries for other Morelord workflows. Craftworks matches a Forge by activity and tier. Alchemist has no specialty control.
+Choosing the activity alone, such as **Workshop** or **Forge**, accepts any capability of that activity at a sufficient tier. The specialties stored on that capability do not matter. A Workshop limited to Cobbler's Tools can still craft a recipe whose tool is set to **Workshop**.
 
-Workshop is checked by activity and tier, and then by specialty when the recipe’s tool belongs to Workshop. Craftworks asks Morelord Core which activity that tool uses. The specialty check runs only when Core answers Workshop. A tool Core assigns to Forge or Alchemist is matched by activity and tier only, including when its **Crafting** dropdown is Workshop. **Smith's Tools** set to Workshop therefore accepts any Workshop of sufficient tier, including a Workshop whose specialty is only Cobbler's Tools. **Alchemist's Supplies** set to Workshop works the same way.
+Choosing a specialty, such as **Workshop: Leatherworker's Tools** or **Forge: Longsword**, accepts a capability of that activity at a sufficient tier whose specialty includes that choice, or whose specialty is unrestricted. Craftworks uses the same match as Morelord Core: nothing selected, a blank value, and **Any** allow the specialty. Several checked specialties qualify together when the chosen one is among them. A specialty saved earlier as a single value still matches that one value. **Any** or a blank entry stored beside other specialties is ignored, and those other specialties are what count. A matching specialty on a row below the required tier does not qualify. An unrestricted row of sufficient tier does qualify, including when another row of that tier names a different specialty.
 
-A location can list the same activity on more than one row. For the specialty check, Craftworks considers Workshop rows that meet the tier. One of those rows must allow the tool. A matching specialty on a Workshop below the required tier leaves the requirement unmet. An unrestricted Workshop of sufficient tier meets it, including when another Workshop row of that tier names a different tool.
+### Assigned specialties
 
-### Tool-to-activity map
+The dropdown’s specialty choices come from Morelord Core. Forge lists weapon proficiencies, armor proficiencies, and weapon masteries. Workshop lists the workshop artisan’s tools. Instructor lists languages, skills, tools, weapons, armor, and weapon masteries. Activities without a specialty list, such as Alchemist, offer only the activity.
 
-Morelord Core assigns each D&D 2024 artisan’s tool to one activity. Craftworks uses this map for the Workshop specialty check. The **Crafting** dropdown still chooses which activity the recipe requires.
+On a recipe card, an assigned specialty is named in parentheses, such as `(Leatherworker's Tools or Any)`. After the dot, the card lists that activity’s specialties at the current place. Several names are separated by commas. When any row of that activity at the place has nothing selected, the card shows `Any`. When the place has no row of that activity, the card omits the place text. A type-only choice has no parentheses.
 
-| Artisan’s tool | Activity Core assigns |
-| --- | --- |
-| Smith's Tools | Forge |
-| Alchemist's Supplies | Alchemist |
-| Brewer's Supplies | Workshop |
-| Calligrapher's Supplies | Workshop |
-| Carpenter's Tools | Workshop |
-| Cartographer's Tools | Workshop |
-| Cobbler's Tools | Workshop |
-| Cook's Utensils | Workshop |
-| Glassblower's Tools | Workshop |
-| Jeweler's Tools | Workshop |
-| Leatherworker's Tools | Workshop |
-| Mason's Tools | Workshop |
-| Painter's Supplies | Workshop |
-| Potter's Tools | Workshop |
-| Tinker's Tools | Workshop |
-| Weaver's Tools | Workshop |
-| Woodcarver's Tools | Workshop |
-
-When Core has a Tavern activity registered, Brewer's Supplies and Cook's Utensils belong to Tavern, and they leave the Workshop specialty list. Craftworks then skips the Workshop specialty check for those tools. A **Crafting** dropdown set to Workshop still requires a Workshop of sufficient tier.
-
-### Workshop Specialty
-
-On a Workshop row, **Specialty** is a checkbox list of the artisan’s tools Core still assigns to Workshop. Check every tool that one Workshop covers. With nothing checked, the closed control reads **Any**.
-
-Craftworks reads that specialty as follows.
-
-- Nothing checked, a blank value, or a specialty that is only **Any** allows every Workshop tool.
-- **Any** and blank entries stored beside real tools are ignored. The remaining tools are the ones that qualify.
-- Several checked tools qualify together. The recipe’s tool must be one of them.
-- A specialty saved earlier as a single tool, rather than a list, still matches that one tool.
-- Spaces around a stored tool are ignored. A stored specialty key with no matching tool name is shown as that key.
-
-On a recipe card, a Workshop tool Core assigns to Workshop is named in parentheses, such as `(Carpenter's Tools or Any)`. After the dot, the card lists the specialties of the Workshop rows at the current place. Several tools appear separated by commas, such as `Carpenter's Tools, Weaver's Tools`. When any Workshop row at that place has nothing selected, the card shows `Any` for the place, including when another row lists tools. When the place has no Workshop row, the card omits the place text. Forge and Alchemist lines have no specialty text.
-
-The place text lists every Workshop at the location, including rows below the item’s tier. The check itself still requires a Workshop of sufficient tier whose specialty allows the tool.
+The place text includes rows below the item’s tier. The check itself still requires a row of sufficient tier.
 
 ### What players see when the place blocks crafting
 
@@ -335,17 +299,16 @@ The place text lists every Workshop at the location, including rows below the it
 
 - `No facility required`
 - `Uncommon or higher Forge`
-- `Rare or higher Workshop (Carpenter's Tools or Any) · Carpenter's Tools, Weaver's Tools`
-- `Common or higher Workshop (Weaver's Tools or Any) · Any`
+- `Rare or higher Workshop`
+- `Common or higher Workshop (Leatherworker's Tools or Any) · Leatherworker's Tools`
 
 The tier on that line is the item rarity, written Common, Uncommon, Rare, Very Rare, Legendary, or Artifact, followed by “or higher” and Core’s name for the activity.
 
-In **Craft**, the same facts appear beside a location icon. That line uses the stored tier and activity id, for example `rare workshop (Carpenter's Tools or Any) · Carpenter's Tools, Weaver's Tools` or `uncommon forge`.
+In **Craft**, the same facts appear beside a location icon. That line uses the stored tier and activity id, for example `common workshop (Leatherworker's Tools or Any)` or `common workshop`.
 
 When the place fails, a warning callout on the Craft card states the reason in these words:
 
-- The activity is missing, or its tier is too low: `Requires rare forge.` The warning names the item’s tier and the activity id, so a Workshop reads `Requires rare workshop.` and an Alchemist reads `Requires uncommon alchemist.` Very Rare appears as `veryRare` in that warning and on the Craft line, and as `Very Rare` on the recipe **Facility** line.
-- A Workshop meets the tier and its specialty omits the tool: `Requires rare workshop whose specialty is Carpenter's Tools or Any.`
+- The activity is missing, its tier is too low, or an assigned specialty is not allowed: `Requires common workshop.` for a type-only Workshop, and `Requires common workshop (Leatherworker's Tools or Any).` when that specialty was chosen. A Forge specialty uses the same shape, such as `Requires uncommon forge (Longsword or Any).` Very Rare appears as `veryRare` in that warning and on the Craft line, and as `Very Rare` on the recipe **Facility** line.
 - Core’s location service is missing: `Morelord Core Location services are unavailable.`
 - The item rarity is Artifact: `No artifact facility tier is available in Core.`
 - The recipe’s environment cannot be resolved: `This recipe cannot be worked in the current environment.`
@@ -646,7 +609,7 @@ Confirm its compendium remains enabled in dnd5e **Configure Sources**. Craftwork
 
 ### A crafting job is paused for the location
 
-The Craft card shows **Paused - Environment** or **Environment Unavailable**, plus the location warning. Compare that activity and tier with the shared location for the viewed scene. An explicit Downtime location replaces that scene. A session set to **No Location** does not. **On the Road** has no facilities, and it applies only when the session has **No Location** and the viewed scene has no associated location. For a Workshop tool, confirm **Specialty** includes that tool, or that nothing is selected. Forge and Alchemist are checked by activity and tier. See [Shared Locations](#shared-locations).
+The Craft card shows **Paused - Environment** or **Environment Unavailable**, plus the location warning. Compare that activity and tier with the shared location for the viewed scene. An explicit Downtime location replaces that scene. A session set to **No Location** does not. **On the Road** has no facilities, and it applies only when the session has **No Location** and the viewed scene has no associated location. A warning that names a specialty, such as `Requires common workshop (Leatherworker's Tools or Any).`, needs that specialty or **Any** on a row of sufficient tier. A warning without parentheses needs only the activity and tier. See [Shared Locations](#shared-locations).
 
 ### A recipe reports missing materials
 

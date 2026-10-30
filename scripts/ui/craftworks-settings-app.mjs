@@ -1,4 +1,4 @@
-import { craftingFacilityToolNames, facilityRuleForTool, getCraftingFacilityRules } from "../crafting/crafting-environment-service.mjs";
+import { craftingFacilityToolNames, facilityChoicesForSelection, facilityRuleForTool, getCraftingFacilityOptions, getCraftingFacilityRules } from "../crafting/crafting-environment-service.mjs";
 import { MODULE_ID, MODULE_TITLE } from "../constants.mjs";
 import {
   SETTINGS,
@@ -169,10 +169,12 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
       contentSyncStatus,
       facilityRules: craftingFacilityToolNames(
         (craftworks?.recipes.all() ?? []).map(recipe => recipe.craft?.tool)
-      ).map(tool => ({
-        tool, selected: facilityRuleForTool(getCraftingFacilityRules(), tool)
-      })),
-      facilityOptions: Object.fromEntries([["", "No facility required"], ...(craftworks?.craftingEnvironment.facilityOptions().types ?? []).map(type => [type.id, type.name])]),
+      ).map(tool => {
+        const selected = facilityRuleForTool(getCraftingFacilityRules(), tool);
+        const options = craftworks?.craftingEnvironment?.facilityOptions?.()
+          ?? getCraftingFacilityOptions(craftworks?.craftingEnvironment?.locationApi);
+        return { tool, selected, choices: facilityChoicesForSelection(options.choices ?? [], selected) };
+      }),
 
       packs,
       groups,

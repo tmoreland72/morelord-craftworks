@@ -4,7 +4,7 @@
 
 ### Improvements
 
-- A recipe whose artisan tool Morelord Core maps to Workshop requires a Workshop of the item’s rarity or higher whose Specialty includes that tool or is Any. Specialty may be several tools, an empty list, or a single saved tool. Recipe cards and the Craft window show that specialty. Smith's Tools still use Forge, and Alchemist's Supplies still use Alchemist. Forge weapon and armor Specialties are not checked. **Settings → Crafting** still chooses the activity for each tool, and a facility rule saved as Blacksmith's Tools still applies to Smith's Tools.
+- **Crafting** settings can require an activity, such as **Workshop**, or one specialty of that activity, such as **Workshop: Leatherworker's Tools**. The specialty lists use Morelord Core’s groups. An activity alone accepts any specialty of that activity. A named specialty accepts a row of sufficient tier that includes it or is **Any**, including a specialty saved as a single value. A setting saved earlier as only the activity stays type-only. Recipe cards and the Craft window say `Requires common workshop.` or `Requires common workshop (Leatherworker's Tools or Any).` A facility rule saved as Blacksmith's Tools still applies to Smith's Tools.
 
 ### Fixed
 
@@ -19,6 +19,6 @@
 
 ## Verification
 
-- `npm test` previously reported 149 passed and 1 skipped. The skip is the local compendium index check. Tests cover Smith's Tools normalization, Workshop specialty lists, party-inventory placement through the GM, background Configure Sources refresh, and Core's active location. New cases cover a Downtime session set to **No Location**: Craftworks uses the location associated with the viewed scene, including a Common Alchemist for an Alchemist's Supplies recipe. An explicit session location still replaces that scene.
+- `npm test`: 152 passed, 1 skipped. The skip is the local compendium index check. Tests cover type-only facility rules, an assigned specialty match, **Any**, a mismatch, a legacy single specialty and a saved type-only rule, Smith's Tools normalization, party-inventory placement through the GM, background Configure Sources refresh, and a Downtime session set to **No Location** using the viewed scene.
 - `npm run build` passed for 0.5.2. `npm run check:recipes` passed.
 - Live Foundry verification in world Dev1 was not run from this environment.

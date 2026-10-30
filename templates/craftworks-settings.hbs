@@ -269,10 +269,24 @@
         {{/if}}
       </div>
 
-      <p class="notes">Choose the location activity required for each artisan tool, or allow crafting anywhere. Required facilities must match or exceed the rarity of the item to be crafted.</p>
+      <p class="notes">Choose a location activity, or one specialty of that activity, for each artisan tool. Required facilities must match or exceed the rarity of the item to be crafted. An activity with no specialty allows every specialty of that activity.</p>
       <div class="ml-stack" data-gap="3">
         {{#each facilityRules}}
-          <label><span>{{tool}}</span><select name="facility:{{tool}}">{{selectOptions @root.facilityOptions selected=selected}}</select></label>
+          <label>
+            <span>{{tool}}</span>
+            <select name="facility:{{tool}}">
+              <option value="" {{#unless selected}}selected{{/unless}}>No facility required</option>
+              {{#each choices}}
+                {{#if group}}
+                  <optgroup label="{{group}}">
+                    {{#each options}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+                  </optgroup>
+                {{else}}
+                  {{#each options}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}
+                {{/if}}
+              {{/each}}
+            </select>
+          </label>
         {{/each}}
       </div>
     </section>

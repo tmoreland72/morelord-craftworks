@@ -174,14 +174,15 @@ test("recipe cards and the Craft window list several specialties, an empty Speci
   setup();
   game.settings.get = () => "[]";
   const places = {
-    "Carpenter's Tools": ["carpenter", "weaver"],
-    "Potter's Tools": [],
-    "Mason's Tools": "mason"
+    carpenter: ["carpenter", "weaver"],
+    potter: [],
+    mason: "mason"
   };
-  const recipes = Object.keys(places).map(tool => ({
-    id: tool, name: tool, packId: "test", category: "gear", rarity: "common", tags: [],
-    craft: { tool, environment: { facility: { type: "workshop", tier: "common" } } },
-    output: { type: "catalog-item", label: tool },
+  const labels = { carpenter: "Carpenter's Tools", potter: "Potter's Tools", mason: "Mason's Tools" };
+  const recipes = ["carpenter", "potter", "mason", ""].map(specialty => ({
+    id: specialty || "type-only", name: specialty || "Type only", packId: "test", category: "gear", rarity: "common", tags: [],
+    craft: { tool: labels[specialty] ?? "Smith's Tools", environment: { facility: { type: "workshop", tier: "common", ...(specialty ? { specialty } : {}) } } },
+    output: { type: "catalog-item", label: specialty || "Type only" },
     requirementGroups: [{ requirements: [] }]
   }));
   const app = new RecipeBrowserApp({
@@ -191,7 +192,11 @@ test("recipe cards and the Craft window list several specialties, an empty Speci
     recipePlanner: { plan: () => ({ requirementGroups: [] }) },
     craftingEnvironment: {
       facilityOptions: () => ({ types: [{ id: "workshop", name: "Workshop" }] }),
-      workshopSpecialty: recipe => ({ label: recipe.craft.tool, place: places[recipe.craft.tool] })
+      facilitySpecialty: recipe => {
+        const key = recipe.craft.environment.facility.specialty;
+        if (!key) return null;
+        return { label: labels[key], place: places[key] };
+      }
     }
   });
   const cards = (await app._prepareContext()).recipeGroups[0].recipes;
@@ -199,9 +204,11 @@ test("recipe cards and the Craft window list several specialties, an empty Speci
   assert.deepEqual(placeByTool, {
     "Carpenter's Tools": "Carpenter's Tools, Weaver's Tools",
     "Potter's Tools": "Any",
-    "Mason's Tools": "Mason's Tools"
+    "Mason's Tools": "Mason's Tools",
+    "Smith's Tools": ""
   });
-  assert.equal(cards[0].craftMeta.facilitySpecialty, cards[0].craftMeta.tool);
+  assert.equal(cards[0].craftMeta.facilitySpecialty, "Carpenter's Tools");
+  assert.equal(cards.at(-1).craftMeta.facilitySpecialty, "");
 
   const requirement = { toolKey: "carpenter", label: "Carpenter's Tools" };
   assert.equal(craftFacilityText({
@@ -219,6 +226,10 @@ test("recipe cards and the Craft window list several specialties, an empty Speci
     environment: { facility: { type: "workshop", tier: "rare" } },
     workshopSpecialty: { ...requirement, place: "mason" }
   }), "rare workshop (Carpenter's Tools or Any) · Mason's Tools");
+  assert.equal(craftFacilityText({
+    mode: "facility",
+    environment: { facility: { type: "workshop", tier: "common" } }
+  }), "common workshop");
 });
 
 test("recipe browsing snapshots materials once and uses indexed outputs without loading full documents", async () => {

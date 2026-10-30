@@ -411,7 +411,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
           requiredSuccesses: craft.requiredSuccesses ?? 0,
           facilityType: facilityOptions.types.find(type => type.id === craft.environment?.facility?.type)?.name ?? craft.environment?.facility?.type ?? "",
           facilityTier: this.#formatFacilityTier(craft.environment?.facility?.tier ?? "common"),
-          facilitySpecialty: this.craftworks.craftingEnvironment.workshopSpecialty?.(recipe)?.label ?? "",
+          facilitySpecialty: this.#facilitySpecialty(recipe)?.label ?? "",
           facilityPlace: this.#facilityPlace(recipe),
           toolStatus: {
             hasActor: Boolean(actor),
@@ -1315,10 +1315,16 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     ) ?? null;
   }
 
+  #facilitySpecialty(recipe) {
+    return this.craftworks.craftingEnvironment.facilitySpecialty?.(recipe)
+      ?? this.craftworks.craftingEnvironment.workshopSpecialty?.(recipe)
+      ?? null;
+  }
+
   #facilityPlace(recipe) {
-    const specialty = this.craftworks.craftingEnvironment.workshopSpecialty?.(recipe);
+    const specialty = this.#facilitySpecialty(recipe);
     if (!specialty || !Object.hasOwn(specialty, "place")) return "";
-    return formatWorkshopSpecialty(specialty.place);
+    return formatWorkshopSpecialty(specialty.place, specialty.labels);
   }
 
   #formatFacilityTier(tier) {

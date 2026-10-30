@@ -10,10 +10,13 @@ import {
   craftingFacilityToolNames,
   describeWorkshopSpecialty,
   evaluateCraftingEnvironment,
+  facilityChoicesForSelection,
+  facilityRequirementPhrase,
   facilityRuleForTool,
   formatWorkshopSpecialty,
   getCraftingFacilityOptions,
   normalizeCraftEnvironment,
+  parseFacilityRule,
   recipeFacilityEnvironment
 } from "../scripts/crafting/crafting-environment-service.mjs";
 
@@ -177,6 +180,43 @@ test("facility options come from the Core location capability registry", () => {
   assert.deepEqual(options.tiers, ["basic", "masterwork"]);
   assert.deepEqual(options.types.map(type => type.id), ["forge", "library"]);
   assert.equal(options.types[0].supportsSpecialty, true);
+});
+
+test("facility choices offer a type or one Core specialty, and a saved type stays selected", () => {
+  const options = getCraftingFacilityOptions({
+    listCapabilities: () => [
+      { id: "forge", name: "Forge", supportsSpecialty: true },
+      { id: "workshop", name: "Workshop", supportsSpecialty: true },
+      { id: "alchemist", name: "Alchemist" }
+    ],
+    buildSpecialtyOptions(typeId) {
+      if (typeId === "forge") return { groups: [
+        { label: "Weapons", options: [{ value: "longsword", label: "Longsword" }] },
+        { label: "Armor", options: [{ value: "plate", label: "Plate Armor" }] }
+      ] };
+      if (typeId === "workshop") return { groups: [
+        { label: "", options: [{ value: "leatherworker", label: "Leatherworker's Tools" }] }
+      ] };
+      return null;
+    }
+  });
+  assert.deepEqual(options.choices.map(choice => ({
+    group: choice.group,
+    values: choice.options.map(option => option.value)
+  })), [
+    { group: "Forge", values: ["forge"] },
+    { group: "Forge: Weapons", values: ["forge:longsword"] },
+    { group: "Forge: Armor", values: ["forge:plate"] },
+    { group: "Workshop", values: ["workshop", "workshop:leatherworker"] },
+    { group: "", values: ["alchemist"] }
+  ]);
+  assert.equal(options.choices[3].options[1].label, "Workshop: Leatherworker's Tools");
+
+  const selected = facilityChoicesForSelection(options.choices, "workshop");
+  assert.equal(selected[3].options.find(option => option.value === "workshop").selected, true);
+  assert.equal(parseFacilityRule("workshop").specialty, "");
+  assert.deepEqual(parseFacilityRule("workshop:leatherworker"), { type: "workshop", specialty: "leatherworker" });
+  assert.deepEqual(parseFacilityRule("forge"), { type: "forge", specialty: "" });
 });
 
 test("Core activeContext supplies the crafting location", () => {
@@ -351,13 +391,24 @@ function specialtyApi({ locationAllowsSpecialty = true, listSpecialties = true }
   return api;
 }
 
-function workshopRecipe(tool, tier = "rare", facility = "workshop") {
-  return { craft: { tool, environment: { facility: { type: facility, tier } } } };
+function workshopRecipe(tool, tier = "rare", facility = "workshop", specialty = "") {
+  const facilityObject = { type: facility, tier };
+  if (specialty) facilityObject.specialty = specialty;
+  return { craft: { tool, environment: { facility: facilityObject } } };
 }
 
-test("a Workshop-mapped tool needs that specialty or Any at the required tier", () => {
+test("a type-only facility ignores specialties and an assigned specialty uses Core's match", () => {
   const api = specialtyApi();
-  const carpenter = workshopRecipe("Carpenter's Tools", "rare");
+  const typeOnly = workshopRecipe("Carpenter's Tools", "rare");
+  const weaverPlace = { capabilities: [{ type: "workshop", tier: "rare", specialty: "weaver" }] };
+  assert.equal(evaluateCraftingEnvironment(typeOnly, { location: weaverPlace }, api).passed, true);
+  assert.equal(api.calls.length, 0);
+  assert.equal(
+    evaluateCraftingEnvironment(typeOnly, { location: weaverPlace }, api).reasons.length,
+    0
+  );
+
+  const carpenter = workshopRecipe("Carpenter's Tools", "rare", "workshop", "carpenter");
   const location = capabilities => ({ capabilities });
   assert.equal(evaluateCraftingEnvironment(carpenter, { location: location([{ type: "workshop", tier: "rare", specialty: "carpenter" }]) }, api).passed, true);
   assert.deepEqual(api.calls[0], {
@@ -374,7 +425,9 @@ test("a Workshop-mapped tool needs that specialty or Any at the required tier", 
   }
   const wrong = evaluateCraftingEnvironment(carpenter, { location: location([{ type: "workshop", tier: "legendary", specialty: "weaver" }]) }, api);
   assert.equal(wrong.passed, false);
-  assert.equal(wrong.reasons[0], "Requires rare workshop whose specialty is Carpenter's Tools or Any.");
+  assert.equal(wrong.reasons[0], "Requires rare workshop (Carpenter's Tools or Any).");
+  assert.equal(facilityRequirementPhrase({ tier: "common", type: "workshop" }, "Leatherworker's Tools"), "common workshop (Leatherworker's Tools or Any)");
+  assert.equal(facilityRequirementPhrase({ tier: "common", type: "workshop" }), "common workshop");
   assert.equal(
     evaluateCraftingEnvironment(carpenter, { location: location([
       { type: "workshop", tier: "common", specialty: null },
@@ -419,6 +472,50 @@ test("Smith's Tools stay on Forge and Alchemist's Supplies stay on Alchemist wit
   );
 });
 
+test("a saved type-only rule stays type-only and a specialty rule names that specialty", () => {
+  const leather = { craft: { tool: "Leatherworker's Tools" }, output: { rarity: "common" } };
+  leather.craft.environment = recipeFacilityEnvironment(leather, { "Leatherworker's Tools": "workshop" });
+  assert.deepEqual(leather.craft.environment.facility, { type: "workshop", tier: "common" });
+  const api = specialtyApi();
+  api.locationAllowsSpecialty = () => { throw new Error("A type-only rule must not check specialty."); };
+  assert.equal(evaluateCraftingEnvironment(leather, {
+    location: { capabilities: [{ type: "workshop", tier: "common", specialty: "weaver" }] }
+  }, api).passed, true);
+
+  const named = { craft: { tool: "Leatherworker's Tools" }, output: { rarity: "common" } };
+  named.craft.environment = recipeFacilityEnvironment(named, { "Leatherworker's Tools": "workshop:leatherworker" });
+  assert.deepEqual(named.craft.environment.facility, { type: "workshop", tier: "common", specialty: "leatherworker" });
+  const matching = specialtyApi();
+  assert.equal(evaluateCraftingEnvironment(named, {
+    location: { capabilities: [{ type: "workshop", tier: "rare", specialty: "leatherworker" }] }
+  }, matching).passed, true);
+  const legacy = evaluateCraftingEnvironment(named, {
+    location: { capabilities: [{ type: "workshop", tier: "common", specialty: "leatherworker" }] }
+  }, matching);
+  assert.equal(legacy.passed, true);
+  const storedString = evaluateCraftingEnvironment(workshopRecipe("Leatherworker's Tools", "common", "workshop", "leatherworker"), {
+    location: { capabilities: [{ type: "workshop", tier: "common", specialty: "leatherworker" }] }
+  }, specialtyApi({ locationAllowsSpecialty: false }));
+  assert.equal(storedString.passed, true);
+  assert.equal(evaluateCraftingEnvironment(named, {
+    location: { capabilities: [{ type: "workshop", tier: "common", specialty: "cobbler" }] }
+  }, matching).reasons[0], "Requires common workshop (Leatherworker's Tools or Any).");
+
+  const sword = { craft: { tool: "Smith's Tools" }, output: { rarity: "uncommon" } };
+  sword.craft.environment = recipeFacilityEnvironment(sword, { "Smith's Tools": "forge:longsword" });
+  assert.equal(sword.craft.environment.facility.specialty, "longsword");
+  const forgeApi = specialtyApi();
+  assert.equal(evaluateCraftingEnvironment(sword, {
+    location: { capabilities: [{ type: "forge", tier: "rare", specialty: ["longsword", "plate"] }] }
+  }, forgeApi).passed, true);
+  assert.equal(evaluateCraftingEnvironment(sword, {
+    location: { capabilities: [{ type: "forge", tier: "rare", specialty: "Any" }] }
+  }, forgeApi).passed, true);
+  assert.equal(evaluateCraftingEnvironment(sword, {
+    location: { capabilities: [{ type: "forge", tier: "rare", specialty: "maul" }] }
+  }, forgeApi).passed, false);
+});
+
 test("the GM facility rule still chooses the activity, including a legacy Blacksmith's Tools rule", () => {
   const api = specialtyApi();
   api.locationAllowsSpecialty = () => { throw new Error("A non-Workshop facility must not check Workshop specialty."); };
@@ -435,7 +532,7 @@ test("the GM facility rule still chooses the activity, including a legacy Blacks
 
 test("Workshop specialty falls back locally when locationAllowsSpecialty is absent", () => {
   const api = specialtyApi({ locationAllowsSpecialty: false, listSpecialties: false });
-  const weaver = workshopRecipe("Weaver's Tools", "uncommon");
+  const weaver = workshopRecipe("Weaver's Tools", "uncommon", "workshop", "weaver");
   assert.deepEqual(describeWorkshopSpecialty("Weaver's Tools", api), { toolKey: "weaver", label: "Weaver's Tools" });
   assert.equal(evaluateCraftingEnvironment(weaver, { location: { capabilities: [{ type: "workshop", tier: "rare", specialty: "weaver" }] } }, api).passed, true);
   for (const specialty of [null, "", "Any", " any "]) {
@@ -463,12 +560,12 @@ test("a Drakkenheim recipe with no tool accepts any Workshop specialty", () => {
     craft: { tool: "Carpenter's Tools" }
   };
   tooled.craft.environment = recipeFacilityEnvironment(tooled, {});
-  assert.equal(evaluateCraftingEnvironment(tooled, { location: { capabilities: [{ type: "workshop", tier: "rare", specialty: "cobbler" }] } }, api).passed, false);
-  assert.equal(evaluateCraftingEnvironment(tooled, { location: { capabilities: [{ type: "workshop", tier: "rare", specialty: "carpenter" }] } }, api).passed, true);
+  assert.deepEqual(tooled.craft.environment.facility, { type: "workshop", tier: "rare" });
+  assert.equal(evaluateCraftingEnvironment(tooled, { location: { capabilities: [{ type: "workshop", tier: "rare", specialty: "cobbler" }] } }, api).passed, true);
 });
 
 test("Workshop specialty arrays, empty lists, and legacy strings match the same way", () => {
-  const carpenter = workshopRecipe("Carpenter's Tools", "rare");
+  const carpenter = workshopRecipe("Carpenter's Tools", "rare", "workshop", "carpenter");
   const location = capabilities => ({ capabilities });
   const shapes = [
     ["several keys", ["cobbler", "carpenter", "weaver"], true],

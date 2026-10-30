@@ -22,11 +22,10 @@ export function craftFacilityText(environment) {
     return mode ? mode.charAt(0).toUpperCase() + mode.slice(1) : "";
   }
   const facility = environment.environment.facility;
-  const required = environment.workshopSpecialty?.label
-    ? ` (${environment.workshopSpecialty.label} or Any)`
-    : "";
-  const place = environment.workshopSpecialty && Object.hasOwn(environment.workshopSpecialty, "place")
-    ? ` · ${formatWorkshopSpecialty(environment.workshopSpecialty.place)}`
+  const specialty = environment.facilitySpecialty ?? environment.workshopSpecialty ?? null;
+  const required = specialty?.label ? ` (${specialty.label} or Any)` : "";
+  const place = specialty && Object.hasOwn(specialty, "place")
+    ? ` · ${formatWorkshopSpecialty(specialty.place, specialty.labels)}`
     : "";
   return `${facility.tier} ${facility.type}${required}${place}`;
 }
