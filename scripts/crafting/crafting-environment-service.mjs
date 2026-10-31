@@ -5,9 +5,8 @@ const VALID_TIERS = new Set(["common", "uncommon", "rare", "veryRare", "legendar
 export const CRAFTING_FACILITY_RULES = "craftingFacilityRules";
 export const ARTISAN_TOOLS = ["Alchemist's Supplies", "Brewer's Supplies", "Calligrapher's Supplies", "Carpenter's Tools", "Cobbler's Tools", "Cook's Utensils", "Glassblower's Tools", "Jeweler's Tools", "Leatherworker's Tools", "Mason's Tools", "Painter's Supplies", "Potter's Tools", "Smith's Tools", "Tinker's Tools", "Weaver's Tools", "Woodcarver's Tools"];
 
-// Best-guess facility defaults from the built-in tool mapping. Smith's Tools use
-// Forge and Alchemist's Supplies use Alchemist. The other artisan's tools use the
-// Workshop specialty for that tool. A fresh world stays empty until Assign Defaults.
+// Facility defaults from the Demo1 world setting craftingFacilityRules.
+// A fresh world stays empty until Assign Defaults.
 export const DEFAULT_CRAFTING_FACILITY_RULES = Object.freeze({
   "Alchemist's Supplies": "alchemist",
   "Brewer's Supplies": "workshop:brewer",
@@ -20,6 +19,7 @@ export const DEFAULT_CRAFTING_FACILITY_RULES = Object.freeze({
   "Leatherworker's Tools": "workshop:leatherworker",
   "Mason's Tools": "workshop:mason",
   "Painter's Supplies": "workshop:painter",
+  "Poisoner's Kit": "alchemist",
   "Potter's Tools": "workshop:potter",
   "Smith's Tools": "forge",
   "Tinker's Tools": "workshop:tinker",
@@ -59,8 +59,17 @@ export function facilityRuleForTool(rules, tool) {
 export function craftingFacilityToolNames(recipeTools = []) {
   return [...new Set([
     ...ARTISAN_TOOLS,
+    ...Object.keys(DEFAULT_CRAFTING_FACILITY_RULES),
     ...[...recipeTools].map(name => canonicalArtisanToolName(name)).filter(Boolean)
   ])].sort();
+}
+
+export function assignFacilityDefaults(tools = craftingFacilityToolNames()) {
+  return Object.fromEntries(
+    tools
+      .map(tool => [canonicalArtisanToolName(tool), canonicalFacilityRule(defaultFacilityRuleForTool(tool))])
+      .filter(([, value]) => value)
+  );
 }
 
 export function getCraftingFacilityRules() {

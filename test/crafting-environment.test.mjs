@@ -12,6 +12,7 @@ import {
   evaluateCraftingEnvironment,
   DEFAULT_CRAFTING_FACILITY_RULES,
   canonicalFacilityRule,
+  assignFacilityDefaults,
   defaultFacilityRuleForTool,
   facilityAssignmentsAreSet,
   facilityChoicesForSelection,
@@ -240,6 +241,28 @@ test("facility choices offer a type or one Core specialty, and a saved type stay
   assert.equal(parseFacilityRule("workshop").specialty, "");
   assert.deepEqual(parseFacilityRule("workshop:leatherworker"), { type: "workshop", specialty: "leatherworker" });
   assert.deepEqual(parseFacilityRule("forge"), { type: "forge", specialty: "" });
+});
+
+test("Assign Defaults produces the Demo1 facility map", () => {
+  assert.deepEqual(assignFacilityDefaults(), {
+    "Alchemist's Supplies": "alchemist",
+    "Brewer's Supplies": "workshop:brewer",
+    "Calligrapher's Supplies": "workshop:calligrapher",
+    "Carpenter's Tools": "workshop:carpenter",
+    "Cobbler's Tools": "workshop:cobbler",
+    "Cook's Utensils": "workshop:cook",
+    "Glassblower's Tools": "workshop:glassblower",
+    "Jeweler's Tools": "workshop:jeweler",
+    "Leatherworker's Tools": "workshop:leatherworker",
+    "Mason's Tools": "workshop:mason",
+    "Painter's Supplies": "workshop:painter",
+    "Poisoner's Kit": "alchemist",
+    "Potter's Tools": "workshop:potter",
+    "Smith's Tools": "forge",
+    "Tinker's Tools": "workshop:tinker",
+    "Weaver's Tools": "workshop:weaver",
+    "Woodcarver's Tools": "workshop:woodcarver"
+  });
 });
 
 test("Core activeContext supplies the crafting location", () => {
