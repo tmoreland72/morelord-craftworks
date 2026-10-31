@@ -15,6 +15,7 @@ import {
   getGatherProfiles
 } from "../acquisition/gather-profiles.mjs";
 
+import { confirmChoice, confirmContent } from "./confirm-choice.mjs";
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 import { contentPackPresentation } from "./content-pack-presentation.mjs";
 
@@ -309,14 +310,8 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
     return [...(this.element?.querySelectorAll("select[name^='facility:']") ?? [])];
   }
 
-  async #confirmFacilityOverwrite(title, message) {
-    const dialog = foundry.applications?.api?.DialogV2;
-    if (typeof dialog?.confirm !== "function") return globalThis.confirm?.(message) !== false;
-    return dialog.confirm({
-      classes: ["ml-window", "ml-craftworks-module"],
-      window: { title },
-      content: `<div><div class="ml-app ml-app-shell ml-dialog-shell"><p>${message}</p></div></div>`
-    });
+  async #confirmFacilityOverwrite(title, message, { danger = false } = {}) {
+    return confirmChoice({ title, content: confirmContent(message), danger });
   }
 
   async #assignFacilityDefaults(event) {
@@ -346,7 +341,8 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
     if (facilityAssignmentsAreSet(selects.map(select => select.value))) {
       const confirmed = await this.#confirmFacilityOverwrite(
         "Clear All",
-        "Clear every facility assignment that is already set?"
+        "Clear every facility assignment that is already set?",
+        { danger: true }
       );
       if (!confirmed) return;
     }
