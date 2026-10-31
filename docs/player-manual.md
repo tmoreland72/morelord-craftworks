@@ -120,7 +120,7 @@ Craftworks rolls the listed artisan tool at the recipe DC. Missing the tool in y
 
 ### Make progress
 
-Each crafting attempt represents two hours of work. A successful attempt adds progress. A failed check spends the two hours but does not consume recipe materials. Some recipes define no check and advance through their own supported workflow.
+Each crafting attempt represents two hours of work. A successful attempt adds progress. A failed check spends the two hours and does not advance the project. The materials and items already set aside for the project are not lost. They stay set aside for the next attempt. **Cancel** returns those materials and items to the inventories they came from. Some recipes define no check and advance through their own supported workflow.
 
 Progress persists between attempts. Recipe cards display the total duration, and the active job records successful progress and total time spent.
 

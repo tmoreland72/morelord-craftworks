@@ -5,6 +5,32 @@ const VALID_TIERS = new Set(["common", "uncommon", "rare", "veryRare", "legendar
 export const CRAFTING_FACILITY_RULES = "craftingFacilityRules";
 export const ARTISAN_TOOLS = ["Alchemist's Supplies", "Brewer's Supplies", "Calligrapher's Supplies", "Carpenter's Tools", "Cobbler's Tools", "Cook's Utensils", "Glassblower's Tools", "Jeweler's Tools", "Leatherworker's Tools", "Mason's Tools", "Painter's Supplies", "Potter's Tools", "Smith's Tools", "Tinker's Tools", "Weaver's Tools", "Woodcarver's Tools"];
 
+// Best-guess facility defaults from the built-in tool mapping. Smith's Tools use
+// Forge and Alchemist's Supplies use Alchemist. The other artisan's tools use the
+// Workshop specialty for that tool. A fresh world stays empty until Assign Defaults.
+export const DEFAULT_CRAFTING_FACILITY_RULES = Object.freeze({
+  "Alchemist's Supplies": "alchemist",
+  "Brewer's Supplies": "workshop:brewer",
+  "Calligrapher's Supplies": "workshop:calligrapher",
+  "Carpenter's Tools": "workshop:carpenter",
+  "Cobbler's Tools": "workshop:cobbler",
+  "Cook's Utensils": "workshop:cook",
+  "Glassblower's Tools": "workshop:glassblower",
+  "Jeweler's Tools": "workshop:jeweler",
+  "Leatherworker's Tools": "workshop:leatherworker",
+  "Mason's Tools": "workshop:mason",
+  "Painter's Supplies": "workshop:painter",
+  "Potter's Tools": "workshop:potter",
+  "Smith's Tools": "forge",
+  "Tinker's Tools": "workshop:tinker",
+  "Weaver's Tools": "workshop:weaver",
+  "Woodcarver's Tools": "workshop:woodcarver"
+});
+
+export function defaultFacilityRuleForTool(tool) {
+  return DEFAULT_CRAFTING_FACILITY_RULES[canonicalArtisanToolName(tool)] ?? "";
+}
+
 // D&D 2024 calls this Smith's Tools. Saved facility rules and world recipes
 // may still store the older name.
 const LEGACY_ARTISAN_TOOL_KEYS = new Map([
@@ -82,6 +108,10 @@ export function canonicalFacilityRule(value) {
   if (!parsed.type) return "";
   if (parsed.type === "forge") return "forge";
   return facilityRuleValue(parsed.type, parsed.specialty);
+}
+
+export function facilityAssignmentsAreSet(values = []) {
+  return [...values].some(value => String(value ?? "").trim());
 }
 
 function specialtyGroupsForType(type, locationApi) {

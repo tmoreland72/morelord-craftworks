@@ -11,6 +11,8 @@
 - **Settings → Crafting** lists **Smith's Tools** once, using the D&D 2024 name. Packaged recipes that asked for Blacksmith's Tools now ask for Smith's Tools, including the recipe that crafts those tools. A facility chosen for Smith's Tools applies to those recipes. A facility rule already saved as Blacksmith's Tools still applies to Smith's Tools, including a custom recipe that still stores the older name.
 - The player Craftworks dashboard no longer shows a Player Resources section. Players still open **Materials**, **Recipes**, and **Craft** from the Craft section.
 - **Place in {party name} Inventory** after crafting success creates the item through the connected GM. A party member does not need to own the Group actor. One click places the item once.
+- **Crafting** settings include **Assign Defaults** and **Clear All**. A new world still starts with no facility assignments. **Assign Defaults** fills the built-in tool mapping. **Clear All** empties every assignment. Either button asks before it replaces an assignment that is already set.
+- A failed crafting check spends two hours and does not advance the project. The Craft window, the active project note, and the chat card say that the materials and items set aside for the project are not lost and stay set aside for the next attempt.
 
 ### Requires
 

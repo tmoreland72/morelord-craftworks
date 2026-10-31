@@ -15,7 +15,7 @@ export function isValidCraftingDuration(hoursRequired) {
  * - every attempt consumes the full check interval in character time;
  * - success adds the interval to crafting progress;
  * - failure adds no progress;
- * - failed checks do not consume recipe materials.
+ * - a failed check does not discard the materials and items set aside for the project.
  */
 export function resolveCraftingAttempt({
   success,

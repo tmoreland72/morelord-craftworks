@@ -269,7 +269,11 @@
         {{/if}}
       </div>
 
-      <p class="notes">Choose a location activity, or one specialty of that activity, for each artisan tool. Required facilities must match or exceed the rarity of the item to be crafted. An activity with no specialty allows every specialty of that activity.</p>
+      <p class="notes">Choose a location activity, or one specialty of that activity, for each artisan tool. Required facilities must match or exceed the rarity of the item to be crafted. An activity with no specialty allows every specialty of that activity. A new world starts with no assignments.</p>
+      <div class="ml-actions">
+        <button type="button" data-action="assign-facility-defaults"><i class="fa-solid fa-list-check"></i> Assign Defaults</button>
+        <button type="button" data-action="clear-facility-assignments"><i class="fa-solid fa-xmark"></i> Clear All</button>
+      </div>
       <div class="ml-stack" data-gap="3">
         {{#each facilityRules}}
           <label>

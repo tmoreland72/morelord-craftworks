@@ -10,7 +10,10 @@ import {
   craftingFacilityToolNames,
   describeWorkshopSpecialty,
   evaluateCraftingEnvironment,
+  DEFAULT_CRAFTING_FACILITY_RULES,
   canonicalFacilityRule,
+  defaultFacilityRuleForTool,
+  facilityAssignmentsAreSet,
   facilityChoicesForSelection,
   facilityRequirementPhrase,
   facilityRuleForTool,
@@ -223,6 +226,14 @@ test("facility choices offer a type or one Core specialty, and a saved type stay
   assert.equal(canonicalFacilityRule("forge:plate"), "forge");
   assert.equal(canonicalFacilityRule("forge:not-a-weapon"), "forge");
   assert.equal(canonicalFacilityRule("workshop:leatherworker"), "workshop:leatherworker");
+  assert.equal(defaultFacilityRuleForTool("Smith's Tools"), "forge");
+  assert.equal(defaultFacilityRuleForTool("Blacksmith's Tools"), "forge");
+  assert.equal(defaultFacilityRuleForTool("Alchemist's Supplies"), "alchemist");
+  assert.equal(defaultFacilityRuleForTool("Leatherworker's Tools"), "workshop:leatherworker");
+  assert.equal(defaultFacilityRuleForTool("Cartographer's Tools"), "");
+  assert.equal(Object.keys(DEFAULT_CRAFTING_FACILITY_RULES).includes("Smith's Tools"), true);
+  assert.equal(facilityAssignmentsAreSet(["", "forge"]), true);
+  assert.equal(facilityAssignmentsAreSet(["", ""]), false);
 
   const selected = facilityChoicesForSelection(options.choices, canonicalFacilityRule("forge:longsword"));
   assert.equal(selected.flatMap(choice => choice.options).find(option => option.value === "forge").selected, true);

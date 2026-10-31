@@ -242,7 +242,7 @@ Facility requirements come from Morelord Core’s shared locations. In **Configu
 
 Craftworks exposes marked and active crafting projects to Morelord Downtime. Opening one from Downtime launches a focused Craft window for that crafter and recipe while Craftworks remains authoritative for ingredients, checks, progress, and output.
 
-Standard Craftworks recipes advance through two-hour crafting attempts. Successful checks advance progress; failed checks spend time without advancing progress or consuming additional materials. Recipe cards show the artisan tool and recipe DC. Missing tool possession or proficiency imposes disadvantage at that same DC. Drakkenheim recipes complete without a roll once their requirements are met.
+Standard Craftworks recipes advance through two-hour crafting attempts. Starting a project sets the chosen materials and items aside from inventory. Successful checks advance progress. A failed check spends the two hours and does not advance the project. Those materials and items are not lost. They stay set aside for the next attempt. **Cancel** returns them to the inventories they came from. The Craft window and the failed check’s chat card both say so. Recipe cards show the artisan tool and recipe DC. Missing tool possession or proficiency imposes disadvantage at that same DC. Drakkenheim recipes complete without a roll once their requirements are met.
 
 ![The Craft workspace separates filtering, crafter and inventory context, requirements, and project progress.](assets/craft-workspace.png)
 

@@ -1195,7 +1195,7 @@ export class CraftApp
           ? `Natural 1: 2 hours of progress lost where applicable. ${progress.successes} of ${progress.requiredSuccesses} successes.`
           : result.success
             ? `Success: ${result.total} vs DC ${dc}. ${progress.successes} of ${progress.requiredSuccesses} successes.`
-            : `Failure: ${result.total} vs DC ${dc}. 2 hours spent with no progress.`,
+            : `Failure: ${result.total} vs DC ${dc}. 2 hours spent with no progress. The materials and items set aside for this project are not lost. They stay set aside for the next attempt.`,
       kind:
         result.success
           ? "success"
@@ -1321,7 +1321,7 @@ export class CraftApp
         kind: "neutral",
         text:
           inventoryActor
-            ? `Canceled; consumed materials returned to ${inventoryActor.name}.`
+            ? `Canceled. The materials and items set aside for this project were returned to ${inventoryActor.name}.`
             : "Canceled."
       });
     }

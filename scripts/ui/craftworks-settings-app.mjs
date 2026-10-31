@@ -1,4 +1,4 @@
-import { canonicalFacilityRule, craftingFacilityToolNames, facilityChoicesForSelection, facilityRuleForTool, getCraftingFacilityOptions, getCraftingFacilityRules } from "../crafting/crafting-environment-service.mjs";
+import { canonicalFacilityRule, craftingFacilityToolNames, defaultFacilityRuleForTool, facilityAssignmentsAreSet, facilityChoicesForSelection, facilityRuleForTool, getCraftingFacilityOptions, getCraftingFacilityRules } from "../crafting/crafting-environment-service.mjs";
 import { MODULE_ID, MODULE_TITLE } from "../constants.mjs";
 import {
   SETTINGS,
@@ -221,6 +221,10 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
 
     this.element.querySelector("[data-action='save']")
       ?.addEventListener("click", event => this.#save(event));
+    this.element.querySelector("[data-action='assign-facility-defaults']")
+      ?.addEventListener("click", event => this.#assignFacilityDefaults(event));
+    this.element.querySelector("[data-action='clear-facility-assignments']")
+      ?.addEventListener("click", event => this.#clearFacilityAssignments(event));
 
     this.element.querySelector("[data-action='manage-account']")
       ?.addEventListener("click", event => {
@@ -299,6 +303,54 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
           }
         }
       );
+  }
+
+  #facilitySelects() {
+    return [...(this.element?.querySelectorAll("select[name^='facility:']") ?? [])];
+  }
+
+  async #confirmFacilityOverwrite(title, message) {
+    const confirm = foundry.applications?.api?.DialogV2?.confirm;
+    if (typeof confirm !== "function") return globalThis.confirm?.(message) !== false;
+    return confirm({
+      classes: ["ml-window", "ml-craftworks-module"],
+      window: { title },
+      content: `<div><div class="ml-app ml-app-shell ml-dialog-shell"><p>${message}</p></div></div>`
+    });
+  }
+
+  async #assignFacilityDefaults(event) {
+    event.preventDefault();
+    const selects = this.#facilitySelects();
+    const overwrites = selects.some(select => {
+      const tool = String(select.name ?? "").slice("facility:".length);
+      return defaultFacilityRuleForTool(tool) && String(select.value ?? "").trim();
+    });
+    if (overwrites) {
+      const confirmed = await this.#confirmFacilityOverwrite(
+        "Assign Defaults",
+        "Replace the facility assignments that are already set with the defaults?"
+      );
+      if (!confirmed) return;
+    }
+    for (const select of selects) {
+      const tool = String(select.name ?? "").slice("facility:".length);
+      const next = defaultFacilityRuleForTool(tool);
+      if (next) select.value = next;
+    }
+  }
+
+  async #clearFacilityAssignments(event) {
+    event.preventDefault();
+    const selects = this.#facilitySelects();
+    if (facilityAssignmentsAreSet(selects.map(select => select.value))) {
+      const confirmed = await this.#confirmFacilityOverwrite(
+        "Clear All",
+        "Clear every facility assignment that is already set?"
+      );
+      if (!confirmed) return;
+    }
+    for (const select of selects) select.value = "";
   }
 
   async #save(event) {

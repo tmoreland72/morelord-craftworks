@@ -57,7 +57,7 @@ Current Standard functionality includes:
 - Recipe browser filters include knowledge, Content Pack, Category, Preferred Artisan Tool, and rarity
 - recipe reference details including tools, recipe DCs, and crafting-hour requirements
 - Craftworks-wide crafting attempts representing 2 hours of work each
-- failed crafting checks consume time but do not consume recipe materials
+- failed crafting checks spend the two hours and do not advance the project; materials and items already set aside are not lost and stay set aside for the next attempt
 - direct navigation between recipe ingredients/outputs and the Materials browser
 - Foundry Item recipe outputs resolve their live Item name/icon from UUID and can open the Item sheet directly
 - recipe inventory readiness
@@ -196,7 +196,7 @@ the Recipe browser exposes a Craft action.
 
 - starting a job chooses a complete valid material path
 - if multiple valid OR paths are available, the player chooses which materials to use
-- recipe materials are consumed once when crafting begins
+- recipe materials and items are set aside once when crafting begins and stay set aside through failed attempts
 - the first Craft click then rolls the first crafting check
 - later clicks roll additional crafting checks without consuming more materials
 - rolls are posted to Foundry chat
@@ -228,8 +228,8 @@ Craftworks uses a common timing model for recipe execution:
 - internally, each crafting check represents **2 hours** of work
 - the total time determines how many successful checks are required
 - a successful check contributes 2 hours of crafting progress
-- a failed check still consumes 2 hours of character time but contributes no progress
-- failed checks do not consume the recipe's materials
+- a failed check still spends 2 hours of character time but contributes no progress
+- the materials and items set aside at the start of the project are not lost on a failed check; they stay set aside for the next attempt, and Cancel returns them
 - once crafting is initiated, recipe UI can display progress such as `✅ 1 of 4 Successes`
 - the check itself does not change when the required tool is missing
 - lacking the required tool or its proficiency imposes disadvantage without changing the recipe DC

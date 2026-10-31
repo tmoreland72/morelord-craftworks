@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { CraftingRollService } from "../scripts/crafting/crafting-roll-service.mjs";
+import { CraftingRollService, FAILED_ATTEMPT_MATERIALS_NOTE } from "../scripts/crafting/crafting-roll-service.mjs";
 import { MONSTERS_OF_DRAKKENHEIM_RECIPES } from "../data/monsters-of-drakkenheim-recipes.mjs";
 
 
@@ -27,6 +27,15 @@ for (const [hasTool, proficient] of [[true, true], [true, false], [false, true],
     assert.equal(calls[0][2].create, true);
   });
 }
+
+test("a failed tool roll says the set-aside materials are not lost", async () => {
+  const roll = { total: 5, dice: [] };
+  const message = { flavor: "<strong>Antitoxin</strong><br>Crafting Check", rolls: [roll], update: async data => { message.flavor = data.flavor; } };
+  globalThis.game.messages = { contents: [message] };
+  const result = await new CraftingRollService().roll({ recipe, crafter: { rollToolCheck: async () => roll }, dc: 13, toolStatus: { hasTool: true, proficient: true } });
+  assert.equal(result.success, false);
+  assert.match(message.flavor, new RegExp(FAILED_ATTEMPT_MATERIALS_NOTE.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+});
 
 test("canceling a tool roll does not count as failure", async () => {
   const result = await new CraftingRollService().roll({ recipe, crafter: { rollToolCheck: async () => null }, toolStatus: { hasTool: true, proficient: true } });
