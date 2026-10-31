@@ -108,7 +108,7 @@ You do not need to switch inventories to use party materials. Other charactersâ€
 
 ### Read requirement status
 
-Each ingredient row shows the amount available and required. Green counts satisfy a requirement; red counts do not. Requirements can identify:
+Each ingredient row shows the amount available and required. Green counts satisfy a requirement; red counts do not. While a craft is in progress, ingredients already taken from inventory stay reserved for that craft. Each reserved ingredient shows a **Set aside for this craft** badge with the quantity held, and the Requirements section says: Materials are set aside, not lost, until the craft finishes or is abandoned. **Cancel** returns them. Requirements can identify:
 
 - an exact Craftworks material
 - a rarity, category, or processing stage

@@ -1,4 +1,5 @@
 import { combinedCraftingInventory } from "../crafting/group-membership.mjs";
+import { annotateSetAsideMaterials } from "../crafting/set-aside-display.mjs";
 import { formatWorkshopSpecialty } from "../crafting/crafting-environment-service.mjs";
 import { allowedUuid, isUuidAllowed } from "../core/allowed-packs.mjs";
 import { materialsMatchingIngredient } from "../recipes/recipe-filters.mjs";
@@ -946,6 +947,12 @@ export class CraftApp
       )
         : [];
 
+    const holdingMaterials = Boolean(progress?.materialsConsumed && !progress?.outputAwarded);
+    const setAside = annotateSetAsideMaterials(
+      requirementGroupRows,
+      holdingMaterials ? progress?.consumedMaterials ?? [] : []
+    );
+
     return {
       ...recipe,
       output,
@@ -971,7 +978,10 @@ export class CraftApp
       },
       environment,
       readiness,
-      requirementGroupRows,
+      requirementGroupRows: setAside.requirementGroupRows,
+      materialsSetAside: setAside.materialsSetAside,
+      setAsideNote: setAside.setAsideNote,
+      setAsideExtras: setAside.setAsideExtras,
       progress,
       inventoryActorName:
         effectiveInventory?.name
