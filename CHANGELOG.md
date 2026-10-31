@@ -13,7 +13,8 @@
 - The player Craftworks dashboard no longer shows a Player Resources section. Players still open **Materials**, **Recipes**, and **Craft** from the Craft section.
 - **Place in {party name} Inventory** after crafting success creates the item through the connected GM. A party member does not need to own the Group actor. One click places the item once.
 - **Crafting** settings include **Assign Defaults** and **Clear All**. A new world still starts with no facility assignments. **Assign Defaults** fills the Demo1 facility map. **Alchemist's Supplies** and **Poisoner's Kit** are **Workshop: Alchemist's Supplies**. **Clear All** empties every assignment. Either button asks before it replaces an assignment that is already set. Neither button saves until **Save Changes**.
-- A failed crafting check spends two hours and does not advance the project. The Craft window, the active project note, and the chat card say that the materials and items set aside for the project are not lost and stay set aside for the next attempt.
+- A failed crafting check spends two hours and does not advance the project. The Craft window, the active project note, and the chat card say that the materials and items set aside for the project are not lost and stay set aside for the next attempt. That note is added to the native skill, tool, and ability chat card after Foundry rebuilds the roll.
+- **Assign Defaults** and **Clear All** open their confirmation when an assignment is already set.
 
 ### Requires
 

@@ -310,9 +310,9 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
   }
 
   async #confirmFacilityOverwrite(title, message) {
-    const confirm = foundry.applications?.api?.DialogV2?.confirm;
-    if (typeof confirm !== "function") return globalThis.confirm?.(message) !== false;
-    return confirm({
+    const dialog = foundry.applications?.api?.DialogV2;
+    if (typeof dialog?.confirm !== "function") return globalThis.confirm?.(message) !== false;
+    return dialog.confirm({
       classes: ["ml-window", "ml-craftworks-module"],
       window: { title },
       content: `<div><div class="ml-app ml-app-shell ml-dialog-shell"><p>${message}</p></div></div>`

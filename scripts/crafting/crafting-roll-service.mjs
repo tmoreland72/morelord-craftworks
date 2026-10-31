@@ -272,15 +272,40 @@ export class CraftingRollService {
   }
 
   #messageForRoll(roll) {
-    const collection = globalThis.game?.messages;
-    const messages = collection?.contents ?? (typeof collection?.filter === "function" ? collection.filter(() => true) : []);
-    const list = Array.isArray(messages) ? messages : Array.from(messages ?? []);
+    const list = this.#chatMessages();
+    const messageId = this.#rollMessageId(roll);
+    if (messageId) {
+      const byId = list.find(message => String(message?.id ?? "") === messageId);
+      if (byId) return byId;
+    }
+    const total = Number(roll?.total);
+    const formula = String(roll?.formula ?? "").trim();
     for (let index = list.length - 1; index >= 0; index -= 1) {
       const message = list[index];
       const rolls = message?.rolls ?? [];
-      if (rolls.some(entry => entry === roll)) return message;
+      if (rolls.some(entry => entry === roll || this.#samePostedRoll(entry, total, formula))) return message;
     }
     return null;
+  }
+
+  #chatMessages() {
+    const collection = globalThis.game?.messages;
+    const messages = collection?.contents ?? (typeof collection?.filter === "function" ? collection.filter(() => true) : []);
+    return Array.isArray(messages) ? messages : Array.from(messages ?? []);
+  }
+
+  #rollMessageId(roll) {
+    for (const value of [roll?.messageId, roll?.message?.id, roll?.options?.messageId, roll?.options?.chatMessage]) {
+      const id = String(value ?? "").trim();
+      if (id) return id;
+    }
+    return "";
+  }
+
+  // ChatMessage rebuilds each roll, so the object from the check is not the one on the card.
+  #samePostedRoll(entry, total, formula) {
+    if (!Number.isFinite(total) || !formula) return false;
+    return Number(entry?.total) === total && String(entry?.formula ?? "").trim() === formula;
   }
 
   #title({

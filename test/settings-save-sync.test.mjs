@@ -81,4 +81,65 @@ test('Save Changes persists settings before syncing, blocks duplicate saves, and
   } finally { globalThis.FormData = originalFormData; }
 });
 
+test('Assign Defaults and Clear All keep DialogV2.confirm bound when an assignment exists', async () => {
+  const titles = [];
+  let answer = true;
+  class DialogV2 {
+    static async wait() { return answer; }
+    static async confirm(config) {
+      if (this?.wait == null) throw new TypeError("Cannot read properties of undefined (reading 'wait')");
+      titles.push(config?.window?.title);
+      return this.wait(config);
+    }
+  }
+  globalThis.foundry = {
+    applications: {
+      api: {
+        ApplicationV2: class { async _onRender() {} async close() { this.closed = true; } },
+        HandlebarsApplicationMixin: Base => Base,
+        DialogV2
+      }
+    }
+  };
+  const { CraftworksSettingsApp } = await import('../scripts/ui/craftworks-settings-app.mjs');
+  const smith = { name: "facility:Smith's Tools", value: "library" };
+  const cartographer = { name: "facility:Cartographer's Tools", value: "workshop" };
+  const selects = [smith, cartographer];
+  const listeners = {};
+  const app = new CraftworksSettingsApp();
+  app.element = {
+    querySelector(selector) {
+      if (selector === "[data-action='assign-facility-defaults']") return { addEventListener: (_name, fn) => { listeners.assign = fn; } };
+      if (selector === "[data-action='clear-facility-assignments']") return { addEventListener: (_name, fn) => { listeners.clear = fn; } };
+      return null;
+    },
+    querySelectorAll(selector) {
+      return selector === "select[name^='facility:']" ? selects : [];
+    }
+  };
+  await app._onRender({}, {});
+
+  answer = false;
+  await listeners.assign({ preventDefault() {} });
+  assert.deepEqual(titles, ["Assign Defaults"]);
+  assert.equal(smith.value, "library");
+  assert.equal(cartographer.value, "workshop");
+
+  answer = true;
+  await listeners.assign({ preventDefault() {} });
+  assert.equal(smith.value, "forge");
+  assert.equal(cartographer.value, "workshop");
+
+  answer = false;
+  await listeners.clear({ preventDefault() {} });
+  assert.equal(titles.at(-1), "Clear All");
+  assert.equal(smith.value, "forge");
+
+  answer = true;
+  await listeners.clear({ preventDefault() {} });
+  assert.equal(smith.value, "");
+  assert.equal(cartographer.value, "");
+  assert.deepEqual(titles, ["Assign Defaults", "Assign Defaults", "Clear All", "Clear All"]);
+});
+
 });
