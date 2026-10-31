@@ -4,7 +4,7 @@ description: Browse materials and recipes, manage crafting projects, and partici
 slug: morelord-craftworks/player
 product: morelord-craftworks
 audience: player
-version: 0.5.1
+version: 0.5.2
 foundry: 14
 ---
 
@@ -12,7 +12,7 @@ foundry: 14
 
 Morelord Craftworks lets you browse your campaign's materials and recipes, plan crafting projects, work from personal or shared inventories, and take part in Harvest and Gather sessions started by your Game Master.
 
-This manual applies to Morelord Craftworks 0.5.1.
+This manual applies to Morelord Craftworks 0.5.2.
 
 ## Contents
 
@@ -21,6 +21,7 @@ This manual applies to Morelord Craftworks 0.5.1.
 - [Browse materials](#browse-materials)
 - [Browse and learn recipes](#browse-and-learn-recipes)
 - [Plan and complete crafting](#plan-and-complete-crafting)
+- [Shared Locations](#shared-locations)
 - [Participate in Harvest](#participate-in-harvest)
 - [Participate in Gather](#participate-in-gather)
 - [Understand awards and storage](#understand-awards-and-storage)
@@ -39,7 +40,7 @@ Materials are normal dnd5e loot Items. Their Craftworks identity includes inform
 2. Select **Morelord Craftworks**.
 3. Choose **Materials**, **Recipes**, or **Craft** from the dashboard.
 
-Harvest and Gather windows open automatically when the GM starts a session in which your character can participate. Use **Documentation** at the top of the dashboard for the current in-Foundry guide.
+The player dashboard shows that Craft section: **Materials**, **Recipes**, and **Craft**. Harvest and Gather windows open automatically when the GM starts a session in which your character can participate. Use **Documentation** at the top of the dashboard for the current in-Foundry guide.
 
 ![The Craftworks dashboard gives players direct access to Materials, Recipes, and Craft.](assets/craftworks-dashboard.png)
 
@@ -107,7 +108,7 @@ You do not need to switch inventories to use party materials. Other characters�
 
 ### Read requirement status
 
-Each ingredient row shows the amount available and required. Green counts satisfy a requirement; red counts do not. Requirements can identify:
+Each ingredient row shows the amount available and required. Green counts satisfy a requirement; red counts do not. While a craft is in progress, ingredients already taken from inventory stay reserved for that craft. Each reserved ingredient shows a **Set aside for this craft** badge with the quantity held, and the Requirements section says: Materials are set aside, not lost, until the craft finishes or is abandoned. **Cancel** returns them. Requirements can identify:
 
 - an exact Craftworks material
 - a rarity, category, or processing stage
@@ -115,23 +116,49 @@ Each ingredient row shows the amount available and required. Green counts satisf
 - alternative ingredients
 - several units that must come from one matching material
 
-Craftworks rolls the listed artisan tool at the recipe DC. Missing the tool in your crafter’s inventory or its proficiency imposes disadvantage, without changing the DC. Drakkenheim recipes require a Workshop matching or exceeding the item’s rarity, regardless of tool settings. Bring the required materials and choose Craft Item; there is no crafting roll or time requirement, including for an older saved crafting project.
+Craftworks rolls the listed artisan tool at the recipe DC. Missing the tool in your crafter’s inventory or its proficiency imposes disadvantage, without changing the DC. Drakkenheim recipes require a Workshop matching or exceeding the item’s rarity. Bring the required materials and choose Craft Item; there is no crafting roll or time requirement, including for an older saved crafting project. [Shared Locations](#shared-locations) explains that Workshop, including Specialty.
 
 ### Make progress
 
-Each crafting attempt represents two hours of work. A successful attempt adds progress. A failed check spends the two hours but does not consume recipe materials. Some recipes define no check and advance through their own supported workflow.
+Each crafting attempt represents two hours of work. A successful attempt adds progress. A failed check spends the two hours and does not advance the project. The materials and items already set aside for the project are not lost. They stay set aside for the next attempt. **Cancel** returns those materials and items to the inventories they came from. Some recipes define no check and advance through their own supported workflow.
 
-Progress persists between attempts. Recipe cards display the total duration, and the active job records successful progress and total time spent.
+Progress persists between attempts. Recipe cards display the total duration, and the active job records successful progress and total time spent. Successes never rise above the number required, including after a natural 20. When the finished item is placed, that recipe card returns to 0 successes, 0 hours of progress, and 0 hours spent so the next craft starts fresh. The craft log keeps the completed attempt. Downtime still counts the hours already spent.
 
-The GM configures facility requirements by artisan tool. Recipes display the required facility and minimum rarity, derived from the item being crafted. Higher-rarity facilities also qualify: a Rare forge can craft an Uncommon item. A project pauses while that environment is unavailable and resumes when the requirement is met. Crafting projects can also appear in Morelord Downtime and open directly into a focused Craftworks recipe view.
+Facility requirements, and what you see when a place blocks a job, are explained in [Shared Locations](#shared-locations). Crafting projects can also appear in Morelord Downtime and open directly into a focused Craftworks recipe view.
 
-When the job completes, choose the destination in the completion window. Foundry Item outputs use their live name and image and can be opened from their linked reference.
+When the job completes, choose **Place in My Inventory** or **Place in {party name} Inventory**. **Place in My Inventory** adds the item to the crafter. **Place in {party name} Inventory** adds it to the party Group. A party member can use that button without owning the Group actor; a connected GM performs the inventory write. The button can be used once for that completed job. Foundry Item outputs use their live name and image and can be opened from their linked reference.
 
 If you cancel an active job, Craftworks returns materials consumed when that job began to their original inventories.
 
 Actual crafting execution requires the appropriate premium access. Standard users can still browse, evaluate requirements, mark goals, and review the Craft window.
 
 ![The Craft workspace brings selected goals, actor context, requirements, and progress together.](assets/craft-workspace.png)
+
+## Shared Locations
+
+Your GM decides whether a recipe needs a particular kind of place. Craftworks reads that place from Morelord Core’s shared locations. You use the place associated with the scene you are viewing. During an active Downtime session, a chosen session location replaces that scene. **No Location** keeps the scene’s place. **On the Road** applies when the session has **No Location** and the scene you are viewing has no associated place. On the Road has no facilities.
+
+Recipe cards show a **Facility** line.
+
+- `No facility required` means you can craft in any place, including On the Road.
+- Otherwise the line names the item’s rarity and the activity your GM chose, such as `Uncommon or higher Forge` or `Common or higher Workshop (Leatherworker's Tools or Any)`.
+- A higher rarity of that same activity qualifies. A Rare forge can craft an Uncommon item.
+- A Workshop or Instructor line with no specialty in parentheses accepts any specialty of that activity. Parentheses name one required specialty. The place must include that specialty, or have nothing selected. Nothing selected means **Any**. A Specialty can list several choices, and the required one must be one of them. A Specialty saved as a single choice still matches that choice. **Any** stored next to other choices is ignored.
+- Alchemist's Supplies and Poisoner's Kit, when your GM uses the standard assignment, need a Workshop whose Specialty includes Alchemist's Supplies or is **Any**. The warning reads `Requires common workshop (Alchemist's Supplies or Any).` for a Common item.
+- A Forge line names the item you are making. A longsword reads `(Martial Melee Weapons or Any)`. Splint reads `(Heavy Armor or Any)`. Weapons, Martial Weapons, or Martial Melee Weapons on the Forge all cover a longsword. Armor or Heavy Armor covers splint. An item that is not armor, a weapon, or ammunition can use any Forge.
+- After the dot, the card lists the current place’s specialties for that activity, separated by commas, or `Any` when none are selected.
+
+In **Craft**, the same facts appear beside a location icon, using the stored words, such as `common workshop (Leatherworker's Tools or Any)` or `common workshop`.
+
+When your current place does not qualify, the Craft card shows a warning such as `Requires common workshop.` or `Requires common workshop (Leatherworker's Tools or Any).`
+
+- You have the materials and have not started: the badge reads **Environment Unavailable**, and the footer reads **Missing Requirements**.
+- A job is already underway: the badge reads **Paused - Environment**, and **Roll Crafting Check** or **Craft Item** becomes **Paused here**. **Cancel** remains. Progress and materials already used stay as they are.
+- Trying to start or continue shows the same warning sentence again.
+
+When you are later at a place that meets the requirement, the crafting button returns. A job you have not started consumes no materials while it is blocked.
+
+Your GM creates these places in Morelord Core. The **Shared Locations** section of the [Morelord Core documentation](https://morelordgaming.com/docs/morelord-core) explains that setup. The [GM manual](gm-manual.md#shared-locations) explains how each tool is checked.
 
 ## Participate in Harvest
 
@@ -230,6 +257,10 @@ If the pack or its official source content is unavailable, Craftworks can use st
 ### A recipe is Unknown
 
 Unknown recipes intentionally conceal ingredients. You can mark one as a goal, but the GM must mark it Known before you can inspect its requirements or start a new job.
+
+### Crafting says the place is unavailable
+
+The Craft card shows a location warning such as `Requires common workshop.` or `Requires common workshop (Leatherworker's Tools or Any).` **Environment Unavailable** means you have the materials and have not started, and the current place does not qualify. **Paused - Environment** and **Paused here** mean a job you already started is waiting for that place. Progress already made is kept. Ask the GM which scene or Downtime location has the required facility. See [Shared Locations](#shared-locations).
 
 ### Craft says an ingredient is missing
 

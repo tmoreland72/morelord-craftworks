@@ -35,7 +35,7 @@ The Recipes browser counts ingredient tags in one pass per recipe using a shared
 
 - Foundry Virtual Tabletop v14
 - D&D5e 5.3+
-- Morelord Core 0.7.0 or later for the Morelord Tools scene control, shared UI components, Morelord Gaming account access, and premium entitlements
+- Morelord Core 0.9.0 or later for the Morelord Tools scene control, shared UI components, Morelord Gaming account access, and premium entitlements
 - `socketlib` for multiplayer acquisition sessions
 
 Foundry v13 compatibility is intentionally out of scope.
@@ -57,7 +57,7 @@ Current Standard functionality includes:
 - Recipe browser filters include knowledge, Content Pack, Category, Preferred Artisan Tool, and rarity
 - recipe reference details including tools, recipe DCs, and crafting-hour requirements
 - Craftworks-wide crafting attempts representing 2 hours of work each
-- failed crafting checks consume time but do not consume recipe materials
+- failed crafting checks spend the two hours and do not advance the project; materials and items already set aside are not lost and stay set aside for the next attempt
 - direct navigation between recipe ingredients/outputs and the Materials browser
 - Foundry Item recipe outputs resolve their live Item name/icon from UUID and can open the Item sheet directly
 - recipe inventory readiness
@@ -196,7 +196,7 @@ the Recipe browser exposes a Craft action.
 
 - starting a job chooses a complete valid material path
 - if multiple valid OR paths are available, the player chooses which materials to use
-- recipe materials are consumed once when crafting begins
+- recipe materials and items are set aside once when crafting begins and stay set aside through failed attempts
 - the first Craft click then rolls the first crafting check
 - later clicks roll additional crafting checks without consuming more materials
 - rolls are posted to Foundry chat
@@ -228,8 +228,8 @@ Craftworks uses a common timing model for recipe execution:
 - internally, each crafting check represents **2 hours** of work
 - the total time determines how many successful checks are required
 - a successful check contributes 2 hours of crafting progress
-- a failed check still consumes 2 hours of character time but contributes no progress
-- failed checks do not consume the recipe's materials
+- a failed check still spends 2 hours of character time but contributes no progress
+- the materials and items set aside at the start of the project are not lost on a failed check; they stay set aside for the next attempt, and Cancel returns them
 - once crafting is initiated, recipe UI can display progress such as `✅ 1 of 4 Successes`
 - the check itself does not change when the required tool is missing
 - lacking the required tool or its proficiency imposes disadvantage without changing the recipe DC
@@ -241,6 +241,16 @@ values where available rather than inventing recipe durations.
 ## Custom recipes
 
 GMs can create and edit standard or supported Drakkenheim recipes, select output Items and materials through the full catalog picker, define AND requirements and OR alternatives, and import/export recipe JSON. See the [GM manual](docs/gm-manual.md#create-and-manage-custom-recipes) for the current workflow. General-purpose homebrew material authoring remains future work.
+
+## Shared locations
+
+Craftworks checks the current place through Morelord Core’s shared locations. In **Configure Craftworks → Crafting**, each artisan’s tool is **No facility required**, one registered activity, or one specialty of that activity. The lists and group headers come from Core for Workshop tools and Instructor subjects. Alchemist is not its own activity. **Alchemist's Supplies** and **Poisoner's Kit** use **Workshop: Alchemist's Supplies** (`workshop:alchemist`). A saved `alchemist` setting is kept as `workshop:alchemist`. Choosing **Workshop** accepts any Workshop of sufficient tier. Choosing **Workshop: Leatherworker's Tools** or **Workshop: Alchemist's Supplies** accepts a Workshop of sufficient tier whose specialty includes that choice or is **Any**. **Forge** is only the activity. A saved `forge:<category>` rule is kept as `forge`. Each Forge recipe takes its category from the crafted item: a longsword needs Weapons, Martial Weapons, Martial Melee Weapons, or **Any**, and splint needs Armor, Heavy Armor, or **Any**. An item with no armor, weapon, or ammunition category can use any Forge. The warning names that category, such as `Requires common forge (Martial Melee Weapons or Any).` An alchemy recipe warns with `Requires common workshop (Alchemist's Supplies or Any).` An empty specialty, **Any**, and a specialty saved as one value follow Core’s `locationAllowsSpecialty` rules. A saved setting that names only the activity stays type-only. The item’s rarity is the minimum tier. A higher tier of that same activity qualifies.
+
+Players see the requirement on the recipe **Facility** line. A blocked Craft card warns with `Requires common workshop.` or `Requires common workshop (Leatherworker's Tools or Any).`, and an active job shows **Paused - Environment** and **Paused here**.
+
+Drakkenheim recipes always require a Workshop of the item’s rarity or higher, with any Workshop specialty, including when the tool is set to **No facility required**.
+
+The [GM manual](docs/gm-manual.md#shared-locations) and [player manual](docs/player-manual.md#shared-locations) state the full map, the card text, and every blocked-state message. Create the places from Core’s **Shared Locations** guide: [Morelord Core documentation](https://morelordgaming.com/docs/morelord-core). **Manage Locations** on the Craftworks dashboard opens that window.
 
 ## Development release history
 
@@ -505,11 +515,11 @@ Publish the release:
 .\release.ps1 -Version 0.1.0
 ```
 
-Crafting facility requirements are configured per artisan tool in module Settings. Recipe cards show the resulting requirement, with the crafted item’s rarity as the minimum facility tier; higher tiers qualify. The recipe DC and all recipe filter counts are visible. The recipe editor begins with Item to Be Crafted and supports mandatory AND groups containing OR material choices. Offline Harvest and Gather characters can be played by the GM. Potion and scroll draft quantities default to one and may be edited before sharing or awarding.
+Crafting facility requirements are configured per artisan tool in module Settings. Each tool can require an activity, or one specialty of that activity. An activity alone accepts any specialty. A named specialty accepts a sufficient tier whose specialty includes it or is Any, including a legacy single saved specialty. Alchemist's Supplies and Poisoner's Kit use the Workshop specialty Alchemist's Supplies. A saved `alchemist` setting is kept as `workshop:alchemist`. Recipe cards show the resulting requirement, with the crafted item’s rarity as the minimum facility tier; higher tiers qualify. A saved Blacksmith's Tools facility rule still applies to Smith's Tools. The recipe DC and all recipe filter counts are visible. The recipe editor begins with Item to Be Crafted and supports mandatory AND groups containing OR material choices. Offline Harvest and Gather characters can be played by the GM. Potion and scroll draft quantities default to one and may be edited before sharing or awarding.
 
 ### Shared UI and current crafting rules
 
-Craftworks consumes Core's page and nested-scroll preservation along with its shared surfaces, typography, and controls. Standard recipes use two-hour attempts at the recipe DC; missing tool possession or proficiency imposes disadvantage. Monsters of Drakkenheim recipes instead complete without rolls or tracked hours when their materials and equal-or-higher Workshop requirements are met. The Workshop requirement is independent of artisan-tool facility settings.
+Craftworks consumes Core's page and nested-scroll preservation along with its shared surfaces, typography, and controls. Standard recipes use two-hour attempts at the recipe DC; missing tool possession or proficiency imposes disadvantage. Monsters of Drakkenheim recipes instead complete without rolls or tracked hours when their materials and equal-or-higher Workshop requirements are met. That Workshop requirement accepts any Workshop specialty and is independent of artisan-tool facility settings.
 ### Release documentation check
 
 Production releases require the `docs` directory in the archive. Before releasing, update the manuals and set `docs/README.md` frontmatter to the target version; the shared release script rejects a missing or mismatched documentation landing page. Review all manuals as part of each code change, including behavior and compatibility requirements.

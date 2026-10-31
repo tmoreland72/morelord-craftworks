@@ -27,6 +27,34 @@ test('every standalone Craftworks page uses the shared hero and documentation ac
   }
 });
 
+test('the player dashboard does not include a Player Resources section', () => {
+  const source = readFileSync(new URL('templates/craftworks-dashboard.hbs', root), 'utf8');
+  assert.equal(source.includes('Player Resources'), false);
+  assert.equal(source.includes('Acquisition sessions are started by the GM'), false);
+  assert.match(source, /<h2>Acquire<\/h2>/);
+  assert.match(source, /<h2>Craft<\/h2>/);
+  assert.match(source, /<h2>Tools<\/h2>/);
+  assert.match(source, /data-action="materials"/);
+  assert.match(source, /data-action="recipes"/);
+  assert.match(source, /data-action="craft"/);
+});
+
+test('page actions use the right-justified form footer', () => {
+  const css = readFileSync(new URL('styles/features/craftworks-foundation.css', root), 'utf8');
+  assert.match(css, /\.ml-window \.ml-page-footer\.ml-form-footer \{[^}]*justify-content: flex-end;/s);
+  assert.match(css, /\.ml-window \.ml-page-footer\.ml-form-footer > button:not\(\.ml-icon-button\) \{[^}]*width: auto;/s);
+  assert.doesNotMatch(css, /\.ml-confirm-dialog[^{]*ml-form-footer/);
+  for (const file of templates.filter(name => !name.includes('partials'))) {
+    const source = readFileSync(new URL(`templates/${file.replaceAll('\\', '/')}`, root), 'utf8');
+    for (const match of source.matchAll(/class="([^"]*\bml-page-footer\b[^"]*)"/g)) {
+      assert.match(match[1], /\bml-form-footer\b/, `${file}: page actions use ml-form-footer`);
+    }
+  }
+  const confirm = readFileSync(new URL('scripts/ui/confirm-choice.mjs', root), 'utf8');
+  assert.doesNotMatch(confirm, /ml-form-footer/);
+  assert.match(confirm, /ui\?\.confirm/);
+});
+
 test('Craftworks consumes Core theme and typography tokens', () => {
   for (const file of readdirSync(new URL('styles/features/', root)).filter(name => name.endsWith('.css'))) {
     const source = readFileSync(new URL(`styles/features/${file}`, root), 'utf8');

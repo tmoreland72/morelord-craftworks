@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { CraftingRollService } from "../scripts/crafting/crafting-roll-service.mjs";
+import { CraftingRollService, FAILED_ATTEMPT_MATERIALS_NOTE } from "../scripts/crafting/crafting-roll-service.mjs";
 import { MONSTERS_OF_DRAKKENHEIM_RECIPES } from "../data/monsters-of-drakkenheim-recipes.mjs";
 
 
@@ -27,6 +27,74 @@ for (const [hasTool, proficient] of [[true, true], [true, false], [false, true],
     assert.equal(calls[0][2].create, true);
   });
 }
+
+test("a failed tool roll says the set-aside materials are not lost", async () => {
+  const roll = { total: 5, dice: [] };
+  const message = { flavor: "<strong>Antitoxin</strong><br>Crafting Check", rolls: [roll], update: async data => { message.flavor = data.flavor; } };
+  globalThis.game.messages = { contents: [message] };
+  const result = await new CraftingRollService().roll({ recipe, crafter: { rollToolCheck: async () => roll }, dc: 13, toolStatus: { hasTool: true, proficient: true } });
+  assert.equal(result.success, false);
+  assert.match(message.flavor, new RegExp(FAILED_ATTEMPT_MATERIALS_NOTE.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+});
+
+test("a failed native roll annotates the chat card when Foundry rebuilds the roll", async () => {
+  const note = new RegExp(FAILED_ATTEMPT_MATERIALS_NOTE.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  const cases = [
+    {
+      name: "tool",
+      recipe,
+      crafter(roll) {
+        return { rollToolCheck: async () => roll, rollSkill() { assert.fail("tool"); }, rollAbilityCheck() { assert.fail("tool"); } };
+      },
+      toolStatus: { hasTool: true, proficient: true }
+    },
+    {
+      name: "skill",
+      recipe: { name: "Antitoxin", craft: { ability: "Intelligence", skill: "Arcana", dc: 13 } },
+      crafter(roll) {
+        return { rollSkill: async () => roll, rollToolCheck() { assert.fail("skill"); }, rollAbilityCheck() { assert.fail("skill"); } };
+      }
+    },
+    {
+      name: "ability",
+      recipe: { name: "Antitoxin", craft: { ability: "Intelligence", dc: 13 } },
+      crafter(roll) {
+        return { rollAbilityCheck: async () => roll, rollSkill() { assert.fail("ability"); }, rollToolCheck() { assert.fail("ability"); } };
+      }
+    }
+  ];
+  for (const entry of cases) {
+    const roll = { total: 4, formula: "1d20 - 1", dice: [] };
+    const rebuilt = { total: 4, formula: "1d20 - 1" };
+    assert.notEqual(rebuilt, roll);
+    const decoy = { flavor: "other", rolls: [{ total: 4, formula: "2d20kl" }], update: async () => { throw new Error(`${entry.name} updated the wrong card`); } };
+    const message = { flavor: `${entry.name} check`, rolls: [rebuilt], update: async data => { message.flavor = data.flavor; } };
+    globalThis.game.messages = { contents: [decoy, message] };
+    const result = await new CraftingRollService().roll({
+      recipe: entry.recipe,
+      crafter: entry.crafter(roll),
+      dc: 13,
+      toolStatus: entry.toolStatus
+    });
+    assert.equal(result.success, false, entry.name);
+    assert.equal(result.rollType, entry.name);
+    assert.match(message.flavor, note, entry.name);
+    assert.equal(decoy.flavor, "other");
+  }
+
+  const identified = { total: 4, formula: "1d20 - 1", messageId: "craft-1", dice: [] };
+  const other = { id: "other", flavor: "same numbers", rolls: [{ total: 4, formula: "1d20 - 1" }], update: async () => { throw new Error("message id should win"); } };
+  const card = { id: "craft-1", flavor: "identified", rolls: [{ total: 9, formula: "2d6" }], update: async data => { card.flavor = data.flavor; } };
+  globalThis.game.messages = { contents: [other, card] };
+  const byId = await new CraftingRollService().roll({
+    recipe,
+    crafter: { rollToolCheck: async () => identified },
+    dc: 13,
+    toolStatus: { hasTool: true, proficient: true }
+  });
+  assert.equal(byId.success, false);
+  assert.match(card.flavor, note);
+});
 
 test("canceling a tool roll does not count as failure", async () => {
   const result = await new CraftingRollService().roll({ recipe, crafter: { rollToolCheck: async () => null }, toolStatus: { hasTool: true, proficient: true } });

@@ -4,7 +4,7 @@ For Craftworks 0.4.6 on Foundry VTT v14 and dnd5e 5.3+.
 
 The maintained guides are:
 
-- [Game Master Manual](docs/gm-manual.md): setup, Content Packs, Harvest, Gather, Loot, Hoard, Delerium Search, generators, custom recipes, and troubleshooting.
+- [Game Master Manual](docs/gm-manual.md): setup, Content Packs, Harvest, Gather, Loot, Hoard, Delerium Search, generators, custom recipes, [shared locations](docs/gm-manual.md#shared-locations), and troubleshooting.
 - [Player Manual](docs/player-manual.md): materials, recipes, crafting, shared inventories, and acquisition sessions.
 - [Documentation overview](docs/README.md): module overview and illustrated workflows.
 

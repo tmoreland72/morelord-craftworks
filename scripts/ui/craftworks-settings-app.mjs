@@ -1,4 +1,4 @@
-import { ARTISAN_TOOLS, getCraftingFacilityRules } from "../crafting/crafting-environment-service.mjs";
+import { canonicalFacilityRule, craftingFacilityToolNames, defaultFacilityRuleForTool, facilityAssignmentsAreSet, facilityChoicesForSelection, facilityRuleForTool, getCraftingFacilityOptions, getCraftingFacilityRules } from "../crafting/crafting-environment-service.mjs";
 import { MODULE_ID, MODULE_TITLE } from "../constants.mjs";
 import {
   SETTINGS,
@@ -15,6 +15,7 @@ import {
   getGatherProfiles
 } from "../acquisition/gather-profiles.mjs";
 
+import { confirmChoice, confirmContent } from "./confirm-choice.mjs";
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 import { contentPackPresentation } from "./content-pack-presentation.mjs";
 
@@ -167,10 +168,14 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
     return foundry.utils.mergeObject(context, {
       core,
       contentSyncStatus,
-      facilityRules: [...new Set([...ARTISAN_TOOLS, ...(craftworks?.recipes.all() ?? []).map(recipe => recipe.craft?.tool).filter(Boolean)])].sort().map(tool => ({
-        tool, selected: getCraftingFacilityRules()[tool] ?? ""
-      })),
-      facilityOptions: Object.fromEntries([["", "No facility required"], ...(craftworks?.craftingEnvironment.facilityOptions().types ?? []).map(type => [type.id, type.name])]),
+      facilityRules: craftingFacilityToolNames(
+        (craftworks?.recipes.all() ?? []).map(recipe => recipe.craft?.tool)
+      ).map(tool => {
+        const selected = canonicalFacilityRule(facilityRuleForTool(getCraftingFacilityRules(), tool));
+        const options = craftworks?.craftingEnvironment?.facilityOptions?.()
+          ?? getCraftingFacilityOptions(craftworks?.craftingEnvironment?.locationApi);
+        return { tool, selected, choices: facilityChoicesForSelection(options.choices ?? [], selected) };
+      }),
 
       packs,
       groups,
@@ -217,6 +222,10 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
 
     this.element.querySelector("[data-action='save']")
       ?.addEventListener("click", event => this.#save(event));
+    this.element.querySelector("[data-action='assign-facility-defaults']")
+      ?.addEventListener("click", event => this.#assignFacilityDefaults(event));
+    this.element.querySelector("[data-action='clear-facility-assignments']")
+      ?.addEventListener("click", event => this.#clearFacilityAssignments(event));
 
     this.element.querySelector("[data-action='manage-account']")
       ?.addEventListener("click", event => {
@@ -297,6 +306,49 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
       );
   }
 
+  #facilitySelects() {
+    return [...(this.element?.querySelectorAll("select[name^='facility:']") ?? [])];
+  }
+
+  async #confirmFacilityOverwrite(title, message, { danger = false } = {}) {
+    return confirmChoice({ title, content: confirmContent(message), danger });
+  }
+
+  async #assignFacilityDefaults(event) {
+    event.preventDefault();
+    const selects = this.#facilitySelects();
+    const overwrites = selects.some(select => {
+      const tool = String(select.name ?? "").slice("facility:".length);
+      return defaultFacilityRuleForTool(tool) && String(select.value ?? "").trim();
+    });
+    if (overwrites) {
+      const confirmed = await this.#confirmFacilityOverwrite(
+        "Assign Defaults",
+        "Replace the facility assignments that are already set with the defaults?"
+      );
+      if (!confirmed) return;
+    }
+    for (const select of selects) {
+      const tool = String(select.name ?? "").slice("facility:".length);
+      const next = canonicalFacilityRule(defaultFacilityRuleForTool(tool));
+      if (next) select.value = next;
+    }
+  }
+
+  async #clearFacilityAssignments(event) {
+    event.preventDefault();
+    const selects = this.#facilitySelects();
+    if (facilityAssignmentsAreSet(selects.map(select => select.value))) {
+      const confirmed = await this.#confirmFacilityOverwrite(
+        "Clear All",
+        "Clear every facility assignment that is already set?",
+        { danger: true }
+      );
+      if (!confirmed) return;
+    }
+    for (const select of selects) select.value = "";
+  }
+
   async #save(event) {
     event.preventDefault();
     if (this.saving) return;
@@ -366,7 +418,7 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
       }
 
       await setGatherDcOverrides(gatherDcOverrides);
-      const facilityRules = Object.fromEntries([...data.entries()].filter(([name]) => name.startsWith("facility:")).map(([name, value]) => [name.slice(9), String(value)]));
+      const facilityRules = Object.fromEntries([...data.entries()].filter(([name]) => name.startsWith("facility:")).map(([name, value]) => [name.slice(9), canonicalFacilityRule(value)]));
       await game.settings.set(MODULE_ID, SETTINGS.CRAFTING_FACILITY_RULES, JSON.stringify(facilityRules));
 
       for (const pack of CONTENT_PACKS) {

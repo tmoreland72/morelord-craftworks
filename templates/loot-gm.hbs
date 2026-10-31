@@ -27,7 +27,7 @@
           {{/each}}
         </div>
 
-        <footer class="ml-page-footer ml-actions">
+        <footer class="ml-form-footer ml-page-footer ml-actions">
           <button type="button" data-action="roll">
             <i class="fa-solid fa-dice-d20"></i> Roll Encounter Loot
           </button>
@@ -201,7 +201,7 @@
         </label>
         {{#if partyInfo.valid}}<p class="notes ml-craftworks-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
 
-        <footer class="ml-page-footer ml-actions">
+        <footer class="ml-form-footer ml-page-footer ml-actions">
           <button type="button" data-action="reroll-loot"><i class="fa-solid fa-dice"></i> Reroll</button>
           <button type="button" data-action="reset-loot"><i class="fa-solid fa-rotate-left"></i> Reset</button>
           <button type="button" data-action="award" {{#unless session.result.found}}disabled{{/unless}}>

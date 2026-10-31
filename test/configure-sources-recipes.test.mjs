@@ -142,11 +142,12 @@ test("a recipe item name does not fall back to another allowed pack", async () =
 
 test("Configure Sources changes refresh catalogs and open Craftworks windows", async () => {
   const calls = [];
+  const renders = [];
   const window = {
     rendered: true,
     options: { classes: ["ml-craftworks-window"] },
     catalog: [{ name: "stale" }],
-    async render() { calls.push("render"); }
+    async render(options) { renders.push(options); calls.push("render"); }
   };
   const dialog = {
     rendered: true,
@@ -162,6 +163,26 @@ test("Configure Sources changes refresh catalogs and open Craftworks windows", a
     applications: [window, dialog, { rendered: false, options: { classes: ["ml-craftworks-window"] }, async render() { calls.push("closed"); } }]
   });
   assert.deepEqual(calls, ["resolver", "materials", "recipes", "treasure", "drakkenheim", "render"]);
+  assert.deepEqual(renders, [{ force: false }]);
+  assert.equal(window.catalog, null);
+
+  const api = game.modules.get("morelord-core").api;
+  const priorUi = api.ui;
+  api.ui = {
+    renderInBackground(app) {
+      calls.push("background");
+      return app.render({ force: false, focus: false });
+    }
+  };
+  window.catalog = [{ name: "stale again" }];
+  renders.length = 0;
+  try {
+    await refreshAfterConfigureSourcesChange({ applications: [window] });
+  } finally {
+    api.ui = priorUi;
+  }
+  assert.equal(calls.at(-2), "background");
+  assert.deepEqual(renders, [{ force: false, focus: false }]);
   assert.equal(window.catalog, null);
 
   const main = readFileSync(new URL("../scripts/main.mjs", import.meta.url), "utf8");

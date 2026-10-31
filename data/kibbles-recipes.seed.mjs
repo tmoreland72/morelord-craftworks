@@ -1354,7 +1354,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "0.5 ingot"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 10,
@@ -1407,7 +1407,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "1 ingot 1 short haft"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 9,
@@ -1467,7 +1467,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "2 ingots 1 short haft"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 9,
@@ -1527,7 +1527,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "1 ingot 1 long haft"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 9,
@@ -1587,7 +1587,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "3 ingots 1 short haft"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 12,
@@ -1647,7 +1647,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "4 ingots 1 long haft"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 13,
@@ -1707,7 +1707,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "10 ingots"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 15,
@@ -1760,7 +1760,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "4 ingots"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 14,
@@ -1813,7 +1813,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "4 ingots 1 short haft"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 14,
@@ -1873,7 +1873,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "1 ingot"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 15,
@@ -1926,7 +1926,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "2 ingots"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 12,
@@ -1985,7 +1985,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "4 ingots 1 short haft"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 12,
@@ -2045,7 +2045,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "5 ingots"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 13,
@@ -2098,7 +2098,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "10 ingots"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 16,
@@ -2151,7 +2151,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "4 ingots 1 armor padding"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 11,
@@ -2211,7 +2211,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "12 ingots 1 armor padding"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 14,
@@ -2271,7 +2271,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "2 ingots"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 10,
@@ -2330,7 +2330,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "2 metal scraps"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 9,
@@ -2384,7 +2384,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "1 ingot"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 8,
@@ -2437,7 +2437,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "1 ingot"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 10,
@@ -2490,7 +2490,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "1 iron ingot"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 8,
@@ -2544,7 +2544,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "1 iron ingot"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 8,
@@ -2598,7 +2598,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "2 ingots 1 lock 1 chain (5 feet)"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 12,
@@ -2644,7 +2644,7 @@ export const KIBBLES_RECIPE_SEED = [
     "schemaVersion": 1,
     "packId": "standard-core",
     "id": "blacksmithing-blacksmiths-tools",
-    "name": "Blacksmith\u2019s Tools",
+    "name": "Smith's Tools",
     "description": "",
     "category": "blacksmithing",
     "kind": "crafting",
@@ -2663,7 +2663,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "4 ingots 2 parts"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 11,
@@ -2693,7 +2693,7 @@ export const KIBBLES_RECIPE_SEED = [
     "output": {
       "type": "catalog-item",
       "quantity": 1,
-      "label": "Blacksmith\u2019s Tools",
+      "label": "Smith's Tools",
       "img": "icons/weapons/swords/sword-guard-steel.webp",
       "rarity": "common",
       "valueGp": 20.0,
@@ -2723,7 +2723,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "3 ingots 4 parts 2 fancy parts"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 16,
@@ -2790,7 +2790,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "8 ingots 4 parts 2 fancy parts 2 esoteric parts"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 19,
@@ -2864,7 +2864,7 @@ export const KIBBLES_RECIPE_SEED = [
       "materialsText": "2 ingots"
     },
     "craft": {
-      "tool": "Blacksmith's Tools",
+      "tool": "Smith's Tools",
       "ability": "Strength",
       "skill": null,
       "dc": 14,

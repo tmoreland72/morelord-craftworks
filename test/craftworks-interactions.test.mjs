@@ -11,7 +11,7 @@ const { HarvestPlayerApp } = await import("../scripts/ui/harvest-player-app.mjs"
 const { CustomRecipeEditorApp } = await import("../scripts/ui/custom-recipe-editor-app.mjs");
 const { RecipeBrowserApp } = await import("../scripts/ui/recipe-browser-app.mjs");
 const { SocketService } = await import("../scripts/socket/socket-service.mjs");
-const { CraftApp } = await import("../scripts/ui/craft-app.mjs");
+const { CraftApp, craftFacilityText } = await import("../scripts/ui/craft-app.mjs");
 const { CraftingRollService } = await import("../scripts/crafting/crafting-roll-service.mjs");
 const { ToolInspector } = await import("../scripts/recipes/tool-inspector.mjs");
 
@@ -164,9 +164,72 @@ test("recipe facets count the visible catalog and cards expose tool checks and a
   assert.equal(card.craftMeta.check, "Smith's Tools");
   assert.equal(card.craftMeta.dc, 13);
   assert.equal(card.craftMeta.facilityType, "Forge");
+  assert.equal(card.craftMeta.facilityPlace, "");
   assert.equal(context.hasToolChecks, true);
   app.unknownFilterState = 1;
   assert.equal((await app._prepareContext()).prospectiveCount, 1);
+});
+
+test("recipe cards and the Craft window list several specialties, an empty Specialty, and a legacy string", async () => {
+  setup();
+  game.settings.get = () => "[]";
+  const places = {
+    carpenter: ["carpenter", "weaver"],
+    potter: [],
+    mason: "mason"
+  };
+  const labels = { carpenter: "Carpenter's Tools", potter: "Potter's Tools", mason: "Mason's Tools" };
+  const recipes = ["carpenter", "potter", "mason", ""].map(specialty => ({
+    id: specialty || "type-only", name: specialty || "Type only", packId: "test", category: "gear", rarity: "common", tags: [],
+    craft: { tool: labels[specialty] ?? "Smith's Tools", environment: { facility: { type: "workshop", tier: "common", ...(specialty ? { specialty } : {}) } } },
+    output: { type: "catalog-item", label: specialty || "Type only" },
+    requirementGroups: [{ requirements: [] }]
+  }));
+  const app = new RecipeBrowserApp({
+    crafterContext: { availableCharacters: () => [], resolve: () => null }, markedRecipes: { list: () => [] },
+    recipes: { all: () => recipes, search: () => recipes, packs: () => [{ id: "test" }] },
+    materials: { get: () => null, all: () => [] },
+    recipePlanner: { plan: () => ({ requirementGroups: [] }) },
+    craftingEnvironment: {
+      facilityOptions: () => ({ types: [{ id: "workshop", name: "Workshop" }] }),
+      facilitySpecialty: recipe => {
+        const key = recipe.craft.environment.facility.specialty;
+        if (!key) return null;
+        return { label: labels[key], place: places[key] };
+      }
+    }
+  });
+  const cards = (await app._prepareContext()).recipeGroups[0].recipes;
+  const placeByTool = Object.fromEntries(cards.map(card => [card.craftMeta.tool, card.craftMeta.facilityPlace]));
+  assert.deepEqual(placeByTool, {
+    "Carpenter's Tools": "Carpenter's Tools, Weaver's Tools",
+    "Potter's Tools": "Any",
+    "Mason's Tools": "Mason's Tools",
+    "Smith's Tools": ""
+  });
+  assert.equal(cards[0].craftMeta.facilitySpecialty, "Carpenter's Tools");
+  assert.equal(cards.at(-1).craftMeta.facilitySpecialty, "");
+
+  const requirement = { toolKey: "carpenter", label: "Carpenter's Tools" };
+  assert.equal(craftFacilityText({
+    mode: "facility",
+    environment: { facility: { type: "workshop", tier: "rare" } },
+    workshopSpecialty: { ...requirement, place: ["carpenter", "weaver"] }
+  }), "rare workshop (Carpenter's Tools or Any) · Carpenter's Tools, Weaver's Tools");
+  assert.equal(craftFacilityText({
+    mode: "facility",
+    environment: { facility: { type: "workshop", tier: "rare" } },
+    workshopSpecialty: { ...requirement, place: [] }
+  }), "rare workshop (Carpenter's Tools or Any) · Any");
+  assert.equal(craftFacilityText({
+    mode: "facility",
+    environment: { facility: { type: "workshop", tier: "rare" } },
+    workshopSpecialty: { ...requirement, place: "mason" }
+  }), "rare workshop (Carpenter's Tools or Any) · Mason's Tools");
+  assert.equal(craftFacilityText({
+    mode: "facility",
+    environment: { facility: { type: "workshop", tier: "common" } }
+  }), "common workshop");
 });
 
 test("recipe browsing snapshots materials once and uses indexed outputs without loading full documents", async () => {

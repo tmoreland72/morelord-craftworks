@@ -2431,3 +2431,22 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Page and window actions use Core's ml-form-footer: right side, natural width.
+   These rules match that layout when an older Core stylesheet has not defined it.
+   A leading status stays on the left. Confirmation dialogs keep equal-width Yes and No. */
+.ml-window .ml-page-footer.ml-form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: var(--ml-space-2);
+}
+.ml-window .ml-page-footer.ml-form-footer > :first-child:not(button) {
+  margin-right: auto;
+}
+.ml-window .ml-page-footer.ml-form-footer > button:not(.ml-icon-button) {
+  width: auto;
+  flex: 0 0 auto;
+  max-width: none;
+}

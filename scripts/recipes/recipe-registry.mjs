@@ -10,7 +10,7 @@ import { CONTENT_PACK_MANIFESTS } from "../../data/packs/manifests.mjs";
 import {
   isContentPackEnabled
 } from "../core/settings.mjs";
-import { normalizeCraftEnvironment, recipeFacilityEnvironment } from "../crafting/crafting-environment-service.mjs";
+import { canonicalArtisanToolName, normalizeCraftEnvironment, recipeFacilityEnvironment } from "../crafting/crafting-environment-service.mjs";
 import { catalogAliasKey } from "./dnd5e-compendium-item-resolver.mjs";
 
 // One rank per source pack. Higher wins when the same recipe is in more
@@ -435,7 +435,7 @@ export class RecipeRegistry {
     }
 
     return {
-      tool: raw.tool ? String(raw.tool) : null,
+      tool: raw.tool ? canonicalArtisanToolName(String(raw.tool)) : null,
       ability: raw.ability ? String(raw.ability) : null,
       skill: raw.skill ? String(raw.skill) : null,
       dc,
