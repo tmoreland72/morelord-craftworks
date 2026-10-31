@@ -32,7 +32,7 @@
         {{/each}}
       </div>
 
-      <footer class="ml-page-footer ml-actions">
+      <footer class="ml-form-footer ml-page-footer ml-actions">
         <button type="button" data-action="generate-potions"><i class="fa-solid fa-dice"></i> Generate</button>
       </footer>
     </section>
@@ -71,7 +71,7 @@
           </select>
         </label>
         {{#if partyInfo.valid}}<p class="notes ml-craftworks-muted">The configured default is {{partyInfo.actorName}}.</p>{{/if}}
-        <footer class="ml-page-footer ml-actions">
+        <footer class="ml-form-footer ml-page-footer ml-actions">
           <button type="button" data-action="reroll-potions"><i class="fa-solid fa-arrows-rotate"></i> Reroll</button>
           <button type="button" data-action="share-potions"><i class="fa-solid fa-message"></i> Display Results in Chat</button>
           <button type="button" data-action="award-potions"><i class="fa-solid fa-flask"></i> Award Generated Potions</button>
