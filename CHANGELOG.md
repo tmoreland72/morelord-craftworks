@@ -15,6 +15,7 @@
 - **Crafting** settings include **Assign Defaults** and **Clear All**. A new world still starts with no facility assignments. **Assign Defaults** fills the Demo1 facility map. **Alchemist's Supplies** and **Poisoner's Kit** are **Workshop: Alchemist's Supplies**. **Clear All** empties every assignment. Either button asks before it replaces an assignment that is already set. Neither button saves until **Save Changes**.
 - A failed crafting check spends two hours and does not advance the project. The Craft window, the active project note, and the chat card say that the materials and items set aside for the project are not lost and stay set aside for the next attempt. That note is added to the native skill, tool, and ability chat card after Foundry rebuilds the roll. While the craft is in progress, each recipe card’s **Requirements** section marks every reserved ingredient with **Set aside for this craft** and the quantity held, and says: Materials are set aside, not lost, until the craft finishes or is abandoned.
 - **Assign Defaults** and **Clear All** open their confirmation when an assignment is already set.
+- A finished craft no longer leaves extra successes or hours on the recipe card. Stored and displayed successes stop at the number required. Placing the finished item resets that recipe’s successes, hours of progress, and hours spent on the card to 0. The completed attempt stays in the craft history, and Downtime still reads the hours spent.
 
 ### Requires
 

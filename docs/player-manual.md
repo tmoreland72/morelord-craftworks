@@ -122,7 +122,7 @@ Craftworks rolls the listed artisan tool at the recipe DC. Missing the tool in y
 
 Each crafting attempt represents two hours of work. A successful attempt adds progress. A failed check spends the two hours and does not advance the project. The materials and items already set aside for the project are not lost. They stay set aside for the next attempt. **Cancel** returns those materials and items to the inventories they came from. Some recipes define no check and advance through their own supported workflow.
 
-Progress persists between attempts. Recipe cards display the total duration, and the active job records successful progress and total time spent.
+Progress persists between attempts. Recipe cards display the total duration, and the active job records successful progress and total time spent. Successes never rise above the number required, including after a natural 20. When the finished item is placed, that recipe card returns to 0 successes, 0 hours of progress, and 0 hours spent so the next craft starts fresh. The craft log keeps the completed attempt. Downtime still counts the hours already spent.
 
 Facility requirements, and what you see when a place blocks a job, are explained in [Shared Locations](#shared-locations). Crafting projects can also appear in Morelord Downtime and open directly into a focused Craftworks recipe view.
 

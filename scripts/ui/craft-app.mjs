@@ -1,4 +1,5 @@
 import { combinedCraftingInventory } from "../crafting/group-membership.mjs";
+import { craftCardProgress } from "../crafting/crafting-rules.mjs";
 import { annotateSetAsideMaterials } from "../crafting/set-aside-display.mjs";
 import { formatWorkshopSpecialty } from "../crafting/crafting-environment-service.mjs";
 import { allowedUuid, isUuidAllowed } from "../core/allowed-packs.mjs";
@@ -982,7 +983,7 @@ export class CraftApp
       materialsSetAside: setAside.materialsSetAside,
       setAsideNote: setAside.setAsideNote,
       setAsideExtras: setAside.setAsideExtras,
-      progress,
+      progress: craftCardProgress(progress),
       inventoryActorName:
         effectiveInventory?.name
         ?? "Missing inventory actor",
@@ -1055,13 +1056,7 @@ export class CraftApp
       return;
     }
 
-    if (job?.outputAwarded) {
-      await this.craftworks.craftingJobs.clear(
-        recipe.id,
-        crafter
-      );
-      job = null;
-    }
+    if (job?.outputAwarded) job = null;
 
     if (!job) {
       const readiness =
