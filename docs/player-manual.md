@@ -144,6 +144,7 @@ Recipe cards show a **Facility** line.
 - Otherwise the line names the item’s rarity and the activity your GM chose, such as `Uncommon or higher Forge` or `Common or higher Workshop (Leatherworker's Tools or Any)`.
 - A higher rarity of that same activity qualifies. A Rare forge can craft an Uncommon item.
 - A Workshop or Instructor line with no specialty in parentheses accepts any specialty of that activity. Parentheses name one required specialty. The place must include that specialty, or have nothing selected. Nothing selected means **Any**. A Specialty can list several choices, and the required one must be one of them. A Specialty saved as a single choice still matches that choice. **Any** stored next to other choices is ignored.
+- Alchemist's Supplies and Poisoner's Kit, when your GM uses the standard assignment, need a Workshop whose Specialty includes Alchemist's Supplies or is **Any**. The warning reads `Requires common workshop (Alchemist's Supplies or Any).` for a Common item.
 - A Forge line names the item you are making. A longsword reads `(Martial Melee Weapons or Any)`. Splint reads `(Heavy Armor or Any)`. Weapons, Martial Weapons, or Martial Melee Weapons on the Forge all cover a longsword. Armor or Heavy Armor covers splint. An item that is not armor, a weapon, or ammunition can use any Forge.
 - After the dot, the card lists the current place’s specialties for that activity, separated by commas, or `Any` when none are selected.
 

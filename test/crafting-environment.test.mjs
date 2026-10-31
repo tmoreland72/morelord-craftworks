@@ -220,16 +220,23 @@ test("facility choices offer a type or one Core specialty, and a saved type stay
   assert.equal(values.includes("forge:hvy"), false);
   assert.equal(options.choices.some(choice => String(choice.group).startsWith("Forge:")), false);
   const workshop = options.choices.find(choice => choice.group === "Workshop");
-  assert.deepEqual(workshop.options.map(option => option.value), ["workshop", "workshop:leatherworker"]);
-  assert.equal(workshop.options[1].label, "Workshop: Leatherworker's Tools");
+  assert.deepEqual(workshop.options.map(option => option.value), ["workshop", "workshop:alchemist", "workshop:leatherworker"]);
+  assert.equal(workshop.options[1].label, "Workshop: Alchemist's Supplies");
+  assert.equal(workshop.options[2].label, "Workshop: Leatherworker's Tools");
+  assert.equal(values.includes("alchemist"), false);
+  assert.equal(options.types.some(type => type.id === "alchemist"), false);
   assert.equal(canonicalFacilityRule("forge:longsword"), "forge");
   assert.equal(canonicalFacilityRule("forge:martialM"), "forge");
   assert.equal(canonicalFacilityRule("forge:plate"), "forge");
   assert.equal(canonicalFacilityRule("forge:not-a-weapon"), "forge");
+  assert.equal(canonicalFacilityRule("alchemist"), "workshop:alchemist");
+  assert.equal(canonicalFacilityRule("alchemist:potion"), "workshop:alchemist");
+  assert.equal(canonicalFacilityRule("workshop:alchemist"), "workshop:alchemist");
   assert.equal(canonicalFacilityRule("workshop:leatherworker"), "workshop:leatherworker");
   assert.equal(defaultFacilityRuleForTool("Smith's Tools"), "forge");
   assert.equal(defaultFacilityRuleForTool("Blacksmith's Tools"), "forge");
-  assert.equal(defaultFacilityRuleForTool("Alchemist's Supplies"), "alchemist");
+  assert.equal(defaultFacilityRuleForTool("Alchemist's Supplies"), "workshop:alchemist");
+  assert.equal(defaultFacilityRuleForTool("Poisoner's Kit"), "workshop:alchemist");
   assert.equal(defaultFacilityRuleForTool("Leatherworker's Tools"), "workshop:leatherworker");
   assert.equal(defaultFacilityRuleForTool("Cartographer's Tools"), "");
   assert.equal(Object.keys(DEFAULT_CRAFTING_FACILITY_RULES).includes("Smith's Tools"), true);
@@ -238,6 +245,9 @@ test("facility choices offer a type or one Core specialty, and a saved type stay
 
   const selected = facilityChoicesForSelection(options.choices, canonicalFacilityRule("forge:longsword"));
   assert.equal(selected.flatMap(choice => choice.options).find(option => option.value === "forge").selected, true);
+  const migratedAlchemist = facilityChoicesForSelection(options.choices, "alchemist");
+  assert.equal(migratedAlchemist.flatMap(choice => choice.options).find(option => option.value === "workshop:alchemist").selected, true);
+  assert.equal(migratedAlchemist.flatMap(choice => choice.options).some(option => option.value === "alchemist"), false);
   assert.equal(parseFacilityRule("workshop").specialty, "");
   assert.deepEqual(parseFacilityRule("workshop:leatherworker"), { type: "workshop", specialty: "leatherworker" });
   assert.deepEqual(parseFacilityRule("forge"), { type: "forge", specialty: "" });
@@ -245,7 +255,7 @@ test("facility choices offer a type or one Core specialty, and a saved type stay
 
 test("Assign Defaults produces the Demo1 facility map", () => {
   assert.deepEqual(assignFacilityDefaults(), {
-    "Alchemist's Supplies": "alchemist",
+    "Alchemist's Supplies": "workshop:alchemist",
     "Brewer's Supplies": "workshop:brewer",
     "Calligrapher's Supplies": "workshop:calligrapher",
     "Carpenter's Tools": "workshop:carpenter",
@@ -256,7 +266,7 @@ test("Assign Defaults produces the Demo1 facility map", () => {
     "Leatherworker's Tools": "workshop:leatherworker",
     "Mason's Tools": "workshop:mason",
     "Painter's Supplies": "workshop:painter",
-    "Poisoner's Kit": "alchemist",
+    "Poisoner's Kit": "workshop:alchemist",
     "Potter's Tools": "workshop:potter",
     "Smith's Tools": "forge",
     "Tinker's Tools": "workshop:tinker",
@@ -307,14 +317,14 @@ test("Core activeContext supplies the crafting location", () => {
   }
 });
 
-test("a Downtime session with No Location uses the scene-associated Alchemist", () => {
+test("a Downtime session with No Location uses the scene-associated Workshop", () => {
   const priorGame = globalThis.game;
   const alchemist = {
     id: "phandalin",
     name: "Phandalin",
     settlementType: "village",
     sceneIds: ["scene-town"],
-    capabilities: [{ type: "alchemist", tier: "common" }]
+    capabilities: [{ type: "workshop", tier: "common", specialty: "alchemist" }]
   };
   const antitoxin = {
     craft: {
@@ -364,13 +374,14 @@ test("a Downtime session with No Location uses the scene-associated Alchemist", 
     });
     const blocked = nowhere.evaluate(antitoxin);
     assert.equal(blocked.passed, false);
-    assert.equal(blocked.reasons[0], "Requires common alchemist.");
+    assert.equal(blocked.reasons[0], "Requires common workshop (Alchemist's Supplies or Any).");
   } finally {
     globalThis.game = priorGame;
   }
 });
 
 const WORKSHOP_SPECIALTIES = [
+  ["alchemist", "Alchemist's Supplies"],
   ["brewer", "Brewer's Supplies"],
   ["calligrapher", "Calligrapher's Supplies"],
   ["carpenter", "Carpenter's Tools"],
@@ -391,7 +402,7 @@ const WORKSHOP_SPECIALTIES = [
 function coreToolCapabilityType(tool) {
   const key = String(tool ?? "").normalize("NFKD").toLowerCase().replace(/[^a-z0-9]/g, "");
   if (key === "smith" || key === "smithstools" || key === "blacksmithstools") return "forge";
-  if (key === "alchemist" || key === "alchemistssupplies") return "alchemist";
+  if (key === "alchemist" || key === "alchemistssupplies") return "workshop";
   if (WORKSHOP_SPECIALTIES.some(entry => entry.id === key || entry.label.normalize("NFKD").toLowerCase().replace(/[^a-z0-9]/g, "") === key)) return "workshop";
   return null;
 }
@@ -498,24 +509,62 @@ test("a type-only facility ignores specialties and an assigned specialty uses Co
   );
 });
 
-test("Smith's Tools stay on Forge and Alchemist's Supplies stay on Alchemist without a specialty gate", () => {
+test("Smith's Tools stay on Forge without a tool specialty gate", () => {
   const api = specialtyApi();
-  api.locationAllowsSpecialty = () => { throw new Error("Forge and Alchemist specialties must not be checked."); };
+  api.locationAllowsSpecialty = () => { throw new Error("Forge specialties must not be checked for an item with no category."); };
   const smith = workshopRecipe("Smith's Tools", "rare", "forge");
   const swordForge = { capabilities: [{ type: "forge", tier: "rare", specialty: "longsword" }] };
   assert.equal(evaluateCraftingEnvironment(smith, { location: swordForge }, api).passed, true);
   assert.equal(describeWorkshopSpecialty("Smith's Tools", api), null);
   assert.equal(describeWorkshopSpecialty("Blacksmith's Tools", api), null);
 
-  const alchemist = workshopRecipe("Alchemist's Supplies", "uncommon", "alchemist");
-  assert.equal(evaluateCraftingEnvironment(alchemist, { location: { capabilities: [{ type: "alchemist", tier: "rare", specialty: "potion" }] } }, api).passed, true);
-  assert.equal(describeWorkshopSpecialty("Alchemist's Supplies", api), null);
-
   const smithAtWorkshop = workshopRecipe("Smith's Tools", "common", "workshop");
   assert.equal(
     evaluateCraftingEnvironment(smithAtWorkshop, { location: { capabilities: [{ type: "workshop", tier: "common", specialty: "cobbler" }] } }, api).passed,
     true
   );
+});
+
+test("saved alchemist tool settings require Workshop specialty alchemist", () => {
+  const supplies = { craft: { tool: "Alchemist's Supplies" }, output: { rarity: "uncommon" } };
+  supplies.craft.environment = recipeFacilityEnvironment(supplies, { "Alchemist's Supplies": "alchemist" });
+  assert.deepEqual(supplies.craft.environment.facility, { type: "workshop", tier: "uncommon", specialty: "alchemist" });
+  const poison = { craft: { tool: "Poisoner's Kit" }, output: { rarity: "common" } };
+  poison.craft.environment = recipeFacilityEnvironment(poison, { "Poisoner's Kit": "alchemist" });
+  assert.deepEqual(poison.craft.environment.facility, { type: "workshop", tier: "common", specialty: "alchemist" });
+  assert.deepEqual(
+    normalizeCraftEnvironment({ facility: { type: "alchemist", tier: "rare", specialty: "potion" } }).facility,
+    { type: "workshop", tier: "rare", specialty: "alchemist" }
+  );
+
+  const api = specialtyApi();
+  const migrated = workshopRecipe("Alchemist's Supplies", "uncommon", "alchemist");
+  assert.equal(evaluateCraftingEnvironment(migrated, {
+    location: { capabilities: [{ type: "workshop", tier: "rare", specialty: "alchemist" }] }
+  }, api).passed, true);
+  for (const specialty of ["Any", "", "alchemist"]) {
+    assert.equal(evaluateCraftingEnvironment(migrated, {
+      location: { capabilities: [{ type: "workshop", tier: "rare", specialty }] }
+    }, specialtyApi({ locationAllowsSpecialty: false })).passed, true, specialty || "empty");
+  }
+  const mismatch = evaluateCraftingEnvironment(migrated, {
+    location: { capabilities: [{ type: "workshop", tier: "rare", specialty: "brewer" }] }
+  }, api);
+  assert.equal(mismatch.passed, false);
+  assert.equal(mismatch.reasons[0], "Requires uncommon workshop (Alchemist's Supplies or Any).");
+  assert.equal(evaluateCraftingEnvironment(migrated, {
+    location: { capabilities: [{ type: "alchemist", tier: "rare" }] }
+  }, api).passed, false);
+  assert.deepEqual(describeWorkshopSpecialty("Alchemist's Supplies", api), { toolKey: "alchemist", label: "Alchemist's Supplies" });
+
+  const typeOnly = { craft: { tool: "Alchemist's Supplies" }, output: { rarity: "common" } };
+  typeOnly.craft.environment = recipeFacilityEnvironment(typeOnly, { "Alchemist's Supplies": "workshop" });
+  assert.equal(typeOnly.craft.environment.facility.specialty, undefined);
+  const ignore = specialtyApi();
+  ignore.locationAllowsSpecialty = () => { throw new Error("A type-only Workshop must not check specialty."); };
+  assert.equal(evaluateCraftingEnvironment(typeOnly, {
+    location: { capabilities: [{ type: "workshop", tier: "common", specialty: "brewer" }] }
+  }, ignore).passed, true);
 });
 
 test("a saved type-only rule stays type-only and a specialty rule names that specialty", () => {
@@ -678,7 +727,7 @@ test("a Downtime session with No Location falls back to the active scene", () =>
   };
   try {
     const service = new CraftingEnvironmentService();
-    const town = { id: "town", capabilities: [{ type: "alchemist", tier: "common" }] };
+    const town = { id: "town", capabilities: [{ type: "workshop", tier: "common", specialty: "alchemist" }] };
     const antitoxin = { craft: { environment: { facility: { type: "alchemist", tier: "common" } } } };
     Object.defineProperty(service, "locationApi", {
       value: {
@@ -694,7 +743,7 @@ test("a Downtime session with No Location falls back to the active scene", () =>
     sessions.active.locationId = "wilderness";
     const blocked = service.evaluate(antitoxin);
     assert.equal(blocked.passed, false);
-    assert.equal(blocked.reasons[0], "Requires common alchemist.");
+    assert.equal(blocked.reasons[0], "Requires common workshop (Alchemist's Supplies or Any).");
   } finally {
     globalThis.game = priorGame;
   }

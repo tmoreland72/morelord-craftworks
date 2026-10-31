@@ -6,9 +6,11 @@ export const CRAFTING_FACILITY_RULES = "craftingFacilityRules";
 export const ARTISAN_TOOLS = ["Alchemist's Supplies", "Brewer's Supplies", "Calligrapher's Supplies", "Carpenter's Tools", "Cobbler's Tools", "Cook's Utensils", "Glassblower's Tools", "Jeweler's Tools", "Leatherworker's Tools", "Mason's Tools", "Painter's Supplies", "Potter's Tools", "Smith's Tools", "Tinker's Tools", "Weaver's Tools", "Woodcarver's Tools"];
 
 // Facility defaults from the Demo1 world setting craftingFacilityRules.
+// Alchemist's Supplies and Poisoner's Kit were stored as the Alchemist
+// activity. That activity is now the Workshop specialty "alchemist".
 // A fresh world stays empty until Assign Defaults.
 export const DEFAULT_CRAFTING_FACILITY_RULES = Object.freeze({
-  "Alchemist's Supplies": "alchemist",
+  "Alchemist's Supplies": "workshop:alchemist",
   "Brewer's Supplies": "workshop:brewer",
   "Calligrapher's Supplies": "workshop:calligrapher",
   "Carpenter's Tools": "workshop:carpenter",
@@ -19,7 +21,7 @@ export const DEFAULT_CRAFTING_FACILITY_RULES = Object.freeze({
   "Leatherworker's Tools": "workshop:leatherworker",
   "Mason's Tools": "workshop:mason",
   "Painter's Supplies": "workshop:painter",
-  "Poisoner's Kit": "alchemist",
+  "Poisoner's Kit": "workshop:alchemist",
   "Potter's Tools": "workshop:potter",
   "Smith's Tools": "forge",
   "Tinker's Tools": "workshop:tinker",
@@ -103,7 +105,7 @@ export function recipeFacilityEnvironment(recipe, rules = getCraftingFacilityRul
   const drakkenheim = recipe?.packId === "monsters-of-drakkenheim" || recipe?.source?.contentPackId === "monsters-of-drakkenheim";
   const rule = drakkenheim
     ? { type: "workshop", specialty: "" }
-    : parseFacilityRule(facilityRuleForTool(rules, recipe?.craft?.tool ?? ""));
+    : parseFacilityRule(canonicalFacilityRule(facilityRuleForTool(rules, recipe?.craft?.tool ?? "")));
   const rarity = String(recipe?.output?.rarity ?? recipe?.rarity ?? "common").replace(/[^a-z]/gi, "").toLowerCase();
   const tier = rarity === "veryrare" ? "veryRare" : VALID_TIERS.has(rarity) ? rarity : "common";
   const specialty = rule.type === "forge" ? "" : rule.specialty;
@@ -116,6 +118,8 @@ export function canonicalFacilityRule(value) {
   const parsed = parseFacilityRule(value);
   if (!parsed.type) return "";
   if (parsed.type === "forge") return "forge";
+  // Alchemist is a Workshop specialty. Saved activity-only settings migrate here.
+  if (parsed.type === "alchemist") return "workshop:alchemist";
   return facilityRuleValue(parsed.type, parsed.specialty);
 }
 
@@ -123,10 +127,21 @@ export function facilityAssignmentsAreSet(values = []) {
   return [...values].some(value => String(value ?? "").trim());
 }
 
+function ensureAlchemistWorkshopSpecialty(groups) {
+  if (groups.some(group => group.options.some(option => option.value === "alchemist"))) return groups;
+  const option = { value: "alchemist", label: "Alchemist's Supplies" };
+  const unlabeledIndex = groups.findIndex(group => !String(group.label ?? "").trim());
+  if (unlabeledIndex < 0) return [{ label: "", options: [option] }, ...groups];
+  return groups.map((group, index) => index === unlabeledIndex
+    ? { ...group, options: [option, ...group.options] }
+    : group);
+}
+
 function specialtyGroupsForType(type, locationApi) {
   const id = String(type?.id ?? "").trim();
   // The crafted item chooses the Forge category. The tool rule stores only "forge".
-  if (id === "forge") return [];
+  // Alchemist is not its own activity. It is the Workshop specialty "alchemist".
+  if (id === "forge" || id === "alchemist") return [];
   if (locationApi && typeof locationApi.buildSpecialtyOptions === "function") {
     try {
       const built = locationApi.buildSpecialtyOptions(id);
@@ -141,13 +156,15 @@ function specialtyGroupsForType(type, locationApi) {
             .filter(option => option.value)
         }))
         .filter(group => group.options.length);
-      if (groups.length) return groups;
+      if (groups.length) return id === "workshop" ? ensureAlchemistWorkshopSpecialty(groups) : groups;
     } catch {
       // Fall back to the workshop list Craftworks already knows.
     }
   }
   if (id === "workshop") {
-    return [{ label: "", options: WORKSHOP_TOOLS.map(([value, label]) => ({ value, label })) }];
+    return ensureAlchemistWorkshopSpecialty([
+      { label: "", options: WORKSHOP_TOOLS.map(([value, label]) => ({ value, label })) }
+    ]);
   }
   return [];
 }
@@ -158,7 +175,7 @@ export function getCraftingFacilityOptions(locationApi = null) {
     name: String(type.name ?? type.id),
     icon: String(type.icon ?? "fa-solid fa-location-dot"),
     supportsSpecialty: type.supportsSpecialty === true
-  }));
+  })).filter(type => type.id !== "alchemist");
   const tiers = locationApi?.capabilityTiers ?? Array.from(VALID_TIERS);
   const choices = [];
   for (const type of types) {
@@ -185,7 +202,7 @@ export function getCraftingFacilityOptions(locationApi = null) {
 }
 
 export function facilityChoicesForSelection(choices, selected = "") {
-  const wanted = String(selected ?? "");
+  const wanted = canonicalFacilityRule(selected);
   const parsed = parseFacilityRule(wanted);
   const known = choices.some(choice => choice.options.some(option => option.value === wanted));
   const withCurrent = known || !parsed.type ? choices : [
@@ -205,9 +222,13 @@ export function facilityChoicesForSelection(choices, selected = "") {
 }
 
 export function normalizeCraftEnvironment(raw = {}) {
-  const facilityType = String(raw.facility?.type ?? raw.facilityType ?? "").trim() || null;
+  let facilityType = String(raw.facility?.type ?? raw.facilityType ?? "").trim() || null;
   const facilityTier = String(raw.facility?.tier ?? raw.facilityTier ?? "common").trim();
-  const specialty = String(raw.facility?.specialty ?? raw.facilitySpecialty ?? "").trim();
+  let specialty = String(raw.facility?.specialty ?? raw.facilitySpecialty ?? "").trim();
+  if (facilityType === "alchemist") {
+    facilityType = "workshop";
+    specialty = "alchemist";
+  }
   if (facilityType && !VALID_TIERS.has(facilityTier)) {
     throw new Error(`Unknown crafting facility tier: ${facilityTier}.`);
   }
@@ -226,9 +247,11 @@ export function normalizeCraftEnvironment(raw = {}) {
 
 const TIER_ORDER = ["common", "uncommon", "rare", "veryRare", "legendary", "artifact"];
 
-// Tool ids Core stores on a Workshop specialty. Smith's Tools and Alchemist's
-// Supplies are absent: Core maps those to Forge and Alchemist.
+// Tool ids stored on a Workshop specialty. Smith's Tools stay on Forge.
+// Alchemist's Supplies is the Workshop specialty "alchemist", including when
+// Core's specialty list still omits it. Poisoner's Kit uses that same specialty.
 const WORKSHOP_TOOLS = [
+  ["alchemist", "Alchemist's Supplies"],
   ["brewer", "Brewer's Supplies"],
   ["calligrapher", "Calligrapher's Supplies"],
   ["carpenter", "Carpenter's Tools"],

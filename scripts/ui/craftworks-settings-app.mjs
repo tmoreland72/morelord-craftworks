@@ -335,7 +335,7 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
     }
     for (const select of selects) {
       const tool = String(select.name ?? "").slice("facility:".length);
-      const next = defaultFacilityRuleForTool(tool);
+      const next = canonicalFacilityRule(defaultFacilityRuleForTool(tool));
       if (next) select.value = next;
     }
   }
