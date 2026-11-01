@@ -21,7 +21,7 @@
 
 ### Requires
 
-- Morelord Core 0.9.0 or later. Update Core before Craftworks. Open Craftworks windows refresh in the background when Configure Sources changes, and crafting uses Core's active location.
+- Morelord Core 0.8.2 or later. Update Core before Craftworks. Core 0.8.2 supplies the compact Yes/No confirmation and the right-aligned form footer. Open Craftworks windows refresh in the background when Configure Sources changes, and crafting uses Core's active location.
 
 ## Verification
 
