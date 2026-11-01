@@ -1,6 +1,7 @@
 import { isUuidAllowed } from "../core/allowed-packs.mjs";
 import { MODULE_TITLE } from "../constants.mjs";
 import { CustomRecipeEditorApp } from "./custom-recipe-editor-app.mjs";
+import { confirmChoice } from "./confirm-choice.mjs";
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -67,7 +68,7 @@ export class CustomRecipeApp extends ScrollPreservingApplicationMixin(Handlebars
     }
   }
   async #delete(id) {
-    if (!await foundry.applications.api.DialogV2.confirm({ classes: ["ml-window", "ml-craftworks-module"], window: { title: "Delete Custom Recipe" }, content: "<div><div class=\"ml-app ml-app-shell ml-dialog-shell\"><p>Delete this custom recipe?</p></div></div>" })) return;
+    if (!await confirmChoice({ title: "Delete Custom Recipe", content: "<p>Delete this custom recipe?</p>", yesLabel: "Delete", noLabel: "No", danger: true })) return;
     await this.craftworks.customRecipes.delete(id); await this.craftworks.recipes.loadStandardSeed(); await this.render({ force: true });
   }
   async #exportAll() {

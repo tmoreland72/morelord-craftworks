@@ -63,6 +63,7 @@ import { CraftingRollService } from "./crafting/crafting-roll-service.mjs";
 import { CraftingEnvironmentService } from "./crafting/crafting-environment-service.mjs";
 import { isCharacterMemberOfGroup } from "./crafting/group-membership.mjs";
 import { getMorelordCoreApi } from "./core/morelord-core-api.mjs";
+import { startCraftworksPartyInventoryRelay } from "./core/party-inventory-relay.mjs";
 import { CRAFTWORKS_DOCUMENTATION } from "./documentation/product-documentation.mjs";
 import { CraftworksSettingsApp } from "./ui/craftworks-settings-app.mjs";
 import { MaterialBrowserApp } from "./ui/material-browser-app.mjs";
@@ -121,6 +122,7 @@ Hooks.once("ready", async () => {
   exposePartyActorSetting();
   const sourceFilter = new Dnd5eSourceFilterService();
   const adapter = createSystemAdapter({ sourceFilter });
+  startCraftworksPartyInventoryRelay(adapter);
   const coreAccess = new MorelordCoreAccessService();
   await coreAccess.refresh();
   const contentPacks = new ContentPackService({ coreAccess });

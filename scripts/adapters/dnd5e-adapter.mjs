@@ -1,6 +1,7 @@
 import { SystemAdapter } from "../core/system-adapter.mjs";
 import { getMorelordCoreService } from "../core/morelord-core-api.mjs";
 import { compendiumCollection, isUuidAllowed } from "../core/allowed-packs.mjs";
+import { addItemAsGm, needsGmForInventoryWrite } from "../core/party-inventory-relay.mjs";
 
 export class Dnd5eAdapter extends SystemAdapter {
   constructor({ sourceFilter = null } = {}) {
@@ -140,7 +141,11 @@ export class Dnd5eAdapter extends SystemAdapter {
 
   async addItemToActor(actor, sourceItem, quantity = 1) {
     if (!actor || !sourceItem) throw new Error("Actor and source Item are required.");
+    if (needsGmForInventoryWrite(actor)) return addItemAsGm(actor, sourceItem, quantity);
+    return this.#commitItem(actor, sourceItem, quantity);
+  }
 
+  async #commitItem(actor, sourceItem, quantity) {
     const sourceUuid = sourceItem.uuid
       ?? (sourceItem.pack
         ? `Compendium.${sourceItem.pack}.${sourceItem.documentName ?? "Item"}.${sourceItem.id ?? sourceItem._id ?? "0"}`

@@ -30,6 +30,6 @@
       <label><span>Recipient</span><select name="recipientUuid"><option value="">Choose character or group…</option>{{#each recipients}}<option value="{{uuid}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select></label>
       {{#unless recipients.length}}<p class="ml-text" data-tone="danger">No player character or group Actor is available.</p>{{/unless}}
     </section>
-    <footer class="ml-page-footer ml-actions"><button type="button" data-action="roll-award" {{#unless canAward}}disabled{{/unless}}><i class="fa-solid fa-dice"></i> Roll &amp; Award All Delerium</button></footer>
+    <footer class="ml-form-footer ml-page-footer ml-actions"><button type="button" data-action="roll-award" {{#unless canAward}}disabled{{/unless}}><i class="fa-solid fa-dice"></i> Roll &amp; Award All Delerium</button></footer>
   {{/unless}}{{/if}}
 </section>

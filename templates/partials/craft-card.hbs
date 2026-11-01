@@ -60,6 +60,12 @@
   <div class="ml-craftworks-craft-card-body">
     <section>
       <h4>Requirements</h4>
+      {{#if materialsSetAside}}
+        <p class="notes">{{setAsideNote}}</p>
+        {{#each setAsideExtras}}
+          <span class="ml-badge" data-tone="info" title="{{setAsideLabel}}"><span class="ml-badge__label">{{setAsideLabel}}</span><span class="ml-badge__value">{{quantity}} {{name}}</span></span>
+        {{/each}}
+      {{/if}}
       {{#if requirementsKnown}}
         <div class="ml-craftworks-craft-requirements">
           {{#each requirementGroupRows}}
@@ -69,7 +75,7 @@
                 <div class="ml-craftworks-craft-alternative-group">
                   <strong>Choose one:</strong>
                   {{#each alternativeRows}}
-                    <div class="ml-craftworks-craft-requirement-row {{#if inventory.ready}}ml-craftworks-ready{{else}}ml-craftworks-missing{{/if}}" data-document-uuid="{{materialUuid}}">
+                    <div class="ml-craftworks-craft-requirement-row {{#if setAside}}ml-craftworks-ready{{else if inventory.ready}}ml-craftworks-ready{{else}}ml-craftworks-missing{{/if}}" data-document-uuid="{{materialUuid}}">
                       {{#if materialImg}}
                         {{#if materialId}}
                           <button type="button"
@@ -89,6 +95,9 @@
             <small class="ml-craftworks-requirement-rarity">{{displayRarity}}</small>
           {{/if}}
         </span>
+                      {{#if setAside}}
+                        <span class="ml-badge" data-tone="info" title="{{setAsideLabel}}"><span class="ml-badge__label">{{setAsideLabel}}</span><span class="ml-badge__value">{{setAsideQuantity}}</span></span>
+                      {{/if}}
                       {{#if inventory}}
                         <strong>{{inventory.available}} / {{inventory.required}}</strong>
                       {{/if}}
@@ -96,7 +105,7 @@
                   {{/each}}
                 </div>
               {{else}}
-                <div class="ml-craftworks-craft-requirement-row {{#if inventory.ready}}ml-craftworks-ready{{else}}ml-craftworks-missing{{/if}}" data-document-uuid="{{materialUuid}}">
+                <div class="ml-craftworks-craft-requirement-row {{#if setAside}}ml-craftworks-ready{{else if inventory.ready}}ml-craftworks-ready{{else}}ml-craftworks-missing{{/if}}" data-document-uuid="{{materialUuid}}">
                   {{#if materialImg}}
                     {{#if materialId}}
                       <button type="button"
@@ -116,6 +125,9 @@
             <small class="ml-craftworks-requirement-rarity">{{displayRarity}}</small>
           {{/if}}
         </span>
+                  {{#if setAside}}
+                    <span class="ml-badge" data-tone="info" title="{{setAsideLabel}}"><span class="ml-badge__label">{{setAsideLabel}}</span><span class="ml-badge__value">{{setAsideQuantity}}</span></span>
+                  {{/if}}
                   {{#if inventory}}
                     <strong>{{inventory.available}} / {{inventory.required}}</strong>
                   {{/if}}
@@ -166,7 +178,7 @@
     {{else}}
       {{#if isActive}}
         <span class="ml-craftworks-muted">
-          Materials were consumed from {{inventoryActorName}}.
+          Materials and items are set aside from {{inventoryActorName}} for further attempts.
         </span>
         <button type="button"
                 data-action="craft"

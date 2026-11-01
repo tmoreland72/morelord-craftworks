@@ -1,4 +1,7 @@
 import { resolveArtisanToolId } from "../recipes/artisan-tools.mjs";
+
+export const FAILED_ATTEMPT_MATERIALS_NOTE = "The materials and items set aside for this project are not lost. They stay set aside for the next attempt.";
+
 export class CraftingRollService {
   async roll({
     recipe,
@@ -135,6 +138,7 @@ export class CraftingRollService {
       ? total >= target
       : true;
     const naturalD20 = this.#naturalD20(roll);
+    if (success === false) await this.#annotateFailedAttempt(roll);
 
     return {
       cancelled: false,
@@ -235,9 +239,7 @@ export class CraftingRollService {
       speaker: ChatMessage.getSpeaker({
         actor: crafter
       }),
-      flavor:
-        `<strong>${recipe.name}</strong>`
-        + `<br>Crafting Check`
+      flavor: this.#craftingFlavor(recipe.name, success)
     });
 
     return {
@@ -254,6 +256,56 @@ export class CraftingRollService {
       rollType: "legacy",
       success
     };
+  }
+
+  #craftingFlavor(recipeName, success) {
+    const heading = `<strong>${recipeName}</strong><br>Crafting Check`;
+    return success === false ? `${heading}<br>${FAILED_ATTEMPT_MATERIALS_NOTE}` : heading;
+  }
+
+  async #annotateFailedAttempt(roll) {
+    const message = this.#messageForRoll(roll);
+    if (!message?.update) return;
+    if (String(message.flavor ?? "").includes(FAILED_ATTEMPT_MATERIALS_NOTE)) return;
+    const flavor = [message.flavor, FAILED_ATTEMPT_MATERIALS_NOTE].filter(Boolean).join("<br>");
+    await message.update({ flavor });
+  }
+
+  #messageForRoll(roll) {
+    const list = this.#chatMessages();
+    const messageId = this.#rollMessageId(roll);
+    if (messageId) {
+      const byId = list.find(message => String(message?.id ?? "") === messageId);
+      if (byId) return byId;
+    }
+    const total = Number(roll?.total);
+    const formula = String(roll?.formula ?? "").trim();
+    for (let index = list.length - 1; index >= 0; index -= 1) {
+      const message = list[index];
+      const rolls = message?.rolls ?? [];
+      if (rolls.some(entry => entry === roll || this.#samePostedRoll(entry, total, formula))) return message;
+    }
+    return null;
+  }
+
+  #chatMessages() {
+    const collection = globalThis.game?.messages;
+    const messages = collection?.contents ?? (typeof collection?.filter === "function" ? collection.filter(() => true) : []);
+    return Array.isArray(messages) ? messages : Array.from(messages ?? []);
+  }
+
+  #rollMessageId(roll) {
+    for (const value of [roll?.messageId, roll?.message?.id, roll?.options?.messageId, roll?.options?.chatMessage]) {
+      const id = String(value ?? "").trim();
+      if (id) return id;
+    }
+    return "";
+  }
+
+  // ChatMessage rebuilds each roll, so the object from the check is not the one on the card.
+  #samePostedRoll(entry, total, formula) {
+    if (!Number.isFinite(total) || !formula) return false;
+    return Number(entry?.total) === total && String(entry?.formula ?? "").trim() === formula;
   }
 
   #title({

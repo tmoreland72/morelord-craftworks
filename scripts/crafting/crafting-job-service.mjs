@@ -1,5 +1,5 @@
 import { MODULE_ID } from "../constants.mjs";
-import { craftingProgressSummary } from "./crafting-rules.mjs";
+import { cappedCraftingSuccesses, craftingProgressSummary } from "./crafting-rules.mjs";
 
 const FLAG_KEY = "craftingJobs";
 
@@ -105,6 +105,8 @@ export class CraftingJobService {
       hoursRequired: found.job.hoursRequired ?? null,
       successes: Math.max(0, Number(found.job.successes ?? 0)),
       attempts: Math.max(0, Number(found.job.attempts ?? 0)),
+      ledgerTimeSpentHours: Math.max(0, Number(found.job.ledgerTimeSpentHours ?? 0)),
+      history: Array.isArray(found.job.history) ? foundry.utils.deepClone(found.job.history) : [],
       materialsConsumed: found.job.materialsConsumed === true,
       consumedMaterials: Array.isArray(found.job.consumedMaterials)
         ? foundry.utils.deepClone(found.job.consumedMaterials)
@@ -130,13 +132,22 @@ export class CraftingJobService {
 
     if (!job) return null;
 
+    const summary = craftingProgressSummary({
+      hoursRequired: job.hoursRequired,
+      successes: job.successes,
+      attempts: job.attempts
+    });
+    const currentTimeSpentHours = job.completedWithoutCheck
+      ? Math.max(0, Number(job.hoursRequired ?? 0))
+      : summary.timeSpentHours;
+    const ledgerTimeSpentHours = Math.max(0, Number(job.ledgerTimeSpentHours ?? 0));
+
     return {
-      ...craftingProgressSummary({
-        hoursRequired: job.hoursRequired,
-        successes: job.successes,
-        attempts: job.attempts
-      }),
-      ...(job.completedWithoutCheck ? { complete: true, requiredSuccesses: 0, progressHours: Number(job.hoursRequired ?? 0), timeSpentHours: Number(job.hoursRequired ?? 0) } : {}),
+      ...summary,
+      ...(job.completedWithoutCheck ? { complete: true, requiredSuccesses: 0, progressHours: Number(job.hoursRequired ?? 0) } : {}),
+      currentTimeSpentHours,
+      ledgerTimeSpentHours,
+      timeSpentHours: job.outputAwarded ? ledgerTimeSpentHours : ledgerTimeSpentHours + currentTimeSpentHours,
       recipeId: job.recipeId,
       crafterUuid: crafter.uuid,
       inventoryActorUuid: job.inventoryActorUuid ?? null,
@@ -144,6 +155,7 @@ export class CraftingJobService {
       consumedMaterials: foundry.utils.deepClone(job.consumedMaterials ?? []),
       materialPlanSummary: job.materialPlanSummary ?? null,
       outputAwarded: job.outputAwarded,
+      history: foundry.utils.deepClone(job.history ?? []),
       completedAt: job.completedAt,
       startedAt: job.startedAt,
       updatedAt: job.updatedAt
@@ -192,6 +204,7 @@ export class CraftingJobService {
     const jobs = this.#jobs(crafter);
     const key = this.#key(recipeId);
     const now = Date.now();
+    const previous = jobs[key];
 
     const job = {
       recipeId: String(recipeId),
@@ -199,6 +212,8 @@ export class CraftingJobService {
       hoursRequired: Number(hoursRequired),
       successes: 0,
       attempts: 0,
+      ledgerTimeSpentHours: Math.max(0, Number(previous?.ledgerTimeSpentHours ?? 0)),
+      history: Array.isArray(previous?.history) ? foundry.utils.deepClone(previous.history) : [],
       materialsConsumed: true,
       consumedMaterials: foundry.utils.deepClone(consumedMaterials ?? []),
       materialPlanSummary: materialPlanSummary ?? null,
@@ -243,10 +258,11 @@ export class CraftingJobService {
       throw new Error("This crafting job is already complete.");
     }
 
+    const added = existing.successes + (progressDelta ?? (success ? 1 : 0));
     const job = {
       ...existing,
       attempts: existing.attempts + 1,
-      successes: Math.max(0, existing.successes + (progressDelta ?? (success ? 1 : 0))),
+      successes: cappedCraftingSuccesses(added, existing.hoursRequired),
       updatedAt: Date.now()
     };
 
@@ -342,8 +358,33 @@ export class CraftingJobService {
     }
 
     const now = Date.now();
+    const summary = craftingProgressSummary({
+      hoursRequired: existing.hoursRequired,
+      successes: existing.successes,
+      attempts: existing.attempts
+    });
+    const spent = existing.completedWithoutCheck
+      ? Math.max(0, Number(existing.hoursRequired ?? 0))
+      : summary.timeSpentHours;
+    const history = [
+      ...(existing.history ?? []),
+      {
+        successes: summary.successes,
+        requiredSuccesses: summary.requiredSuccesses,
+        progressHours: existing.completedWithoutCheck
+          ? Math.max(0, Number(existing.hoursRequired ?? 0))
+          : summary.progressHours,
+        timeSpentHours: spent,
+        attempts: existing.attempts,
+        completedAt: now
+      }
+    ];
     const job = {
       ...existing,
+      successes: 0,
+      attempts: 0,
+      ledgerTimeSpentHours: Math.max(0, Number(existing.ledgerTimeSpentHours ?? 0)) + spent,
+      history,
       outputAwarded: true,
       completedAt: now,
       updatedAt: now

@@ -245,7 +245,7 @@
                         {{craftMeta.hoursRequired}} hours
                       </span>
                     {{/if}}
-                    <span><i class="fa-solid fa-building"></i><strong>Facility:</strong> {{#if craftMeta.facilityType}}{{craftMeta.facilityTier}} or higher {{craftMeta.facilityType}}{{else}}No facility required{{/if}}</span>
+                    <span><i class="fa-solid fa-building"></i><strong>Facility:</strong> {{#if craftMeta.facilityType}}{{craftMeta.facilityTier}} or higher {{craftMeta.facilityType}}{{#if craftMeta.facilitySpecialty}} ({{craftMeta.facilitySpecialty}} or Any){{/if}}{{#if craftMeta.facilityPlace}} · {{craftMeta.facilityPlace}}{{/if}}{{else}}No facility required{{/if}}</span>
                   </div>
 
                   <div class="ml-craftworks-recipe-grid">

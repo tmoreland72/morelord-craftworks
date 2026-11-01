@@ -15,7 +15,7 @@ export function isValidCraftingDuration(hoursRequired) {
  * - every attempt consumes the full check interval in character time;
  * - success adds the interval to crafting progress;
  * - failure adds no progress;
- * - failed checks do not consume recipe materials.
+ * - a failed check does not discard the materials and items set aside for the project.
  */
 export function resolveCraftingAttempt({
   success,
@@ -53,7 +53,10 @@ export function craftingProgressSummary({
     hoursRequired,
     intervalHours
   );
-  const successfulChecks = Math.max(0, Number(successes ?? 0));
+  const recordedSuccesses = Math.max(0, Number(successes ?? 0));
+  const successfulChecks = requiredSuccesses > 0
+    ? Math.min(requiredSuccesses, recordedSuccesses)
+    : recordedSuccesses;
   const attemptedChecks = Math.max(0, Number(attempts ?? 0));
   const interval = Math.max(0, Number(intervalHours ?? CRAFTING_CHECK_INTERVAL_HOURS));
 
@@ -68,5 +71,31 @@ export function craftingProgressSummary({
     ),
     timeSpentHours: attemptedChecks * interval,
     complete: requiredSuccesses > 0 && successfulChecks >= requiredSuccesses
+  };
+}
+
+export function cappedCraftingSuccesses(successes, hoursRequired, intervalHours = CRAFTING_CHECK_INTERVAL_HOURS) {
+  const required = craftingSuccessesRequired(hoursRequired, intervalHours);
+  const recorded = Math.max(0, Number(successes ?? 0));
+  return required > 0 ? Math.min(required, recorded) : recorded;
+}
+
+// The recipe card shows the current craft. Downtime keeps reading timeSpentHours,
+// which includes hours from crafts already awarded.
+export function craftCardProgress(progress) {
+  if (!progress) return null;
+  if (!progress.outputAwarded) {
+    return {
+      ...progress,
+      timeSpentHours: Number(progress.currentTimeSpentHours ?? progress.timeSpentHours ?? 0)
+    };
+  }
+  return {
+    ...progress,
+    successes: 0,
+    progressHours: 0,
+    timeSpentHours: 0,
+    attempts: 0,
+    complete: false
   };
 }

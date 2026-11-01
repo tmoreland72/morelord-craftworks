@@ -1,4 +1,7 @@
 import { combinedCraftingInventory } from "../crafting/group-membership.mjs";
+import { craftCardProgress } from "../crafting/crafting-rules.mjs";
+import { annotateSetAsideMaterials } from "../crafting/set-aside-display.mjs";
+import { formatWorkshopSpecialty } from "../crafting/crafting-environment-service.mjs";
 import { allowedUuid, isUuidAllowed } from "../core/allowed-packs.mjs";
 import { materialsMatchingIngredient } from "../recipes/recipe-filters.mjs";
 import { MODULE_TITLE } from "../constants.mjs";
@@ -14,6 +17,20 @@ const {
   ApplicationV2,
   HandlebarsApplicationMixin
 } = foundry.applications.api;
+
+export function craftFacilityText(environment) {
+  if (environment?.mode !== "facility") {
+    const mode = String(environment?.mode ?? "");
+    return mode ? mode.charAt(0).toUpperCase() + mode.slice(1) : "";
+  }
+  const facility = environment.environment.facility;
+  const specialty = environment.facilitySpecialty ?? environment.workshopSpecialty ?? null;
+  const required = specialty?.label ? ` (${specialty.label} or Any)` : "";
+  const place = specialty && Object.hasOwn(specialty, "place")
+    ? ` · ${formatWorkshopSpecialty(specialty.place, specialty.labels)}`
+    : "";
+  return `${facility.tier} ${facility.type}${required}${place}`;
+}
 
 function requirementFallbackImg(match) {
   if (match?.itemType === "spellScroll") {
@@ -931,6 +948,12 @@ export class CraftApp
       )
         : [];
 
+    const holdingMaterials = Boolean(progress?.materialsConsumed && !progress?.outputAwarded);
+    const setAside = annotateSetAsideMaterials(
+      requirementGroupRows,
+      holdingMaterials ? progress?.consumedMaterials ?? [] : []
+    );
+
     return {
       ...recipe,
       output,
@@ -952,14 +975,15 @@ export class CraftApp
         activeDc: craft.checkRequired === false ? null : activeDc,
         hoursRequired:
           craft.hoursRequired,
-        environment: environment.mode === "facility"
-          ? `${environment.environment.facility.tier} ${environment.environment.facility.type}`
-          : environment.mode.charAt(0).toUpperCase() + environment.mode.slice(1)
+        environment: craftFacilityText(environment)
       },
       environment,
       readiness,
-      requirementGroupRows,
-      progress,
+      requirementGroupRows: setAside.requirementGroupRows,
+      materialsSetAside: setAside.materialsSetAside,
+      setAsideNote: setAside.setAsideNote,
+      setAsideExtras: setAside.setAsideExtras,
+      progress: craftCardProgress(progress),
       inventoryActorName:
         effectiveInventory?.name
         ?? "Missing inventory actor",
@@ -1032,13 +1056,7 @@ export class CraftApp
       return;
     }
 
-    if (job?.outputAwarded) {
-      await this.craftworks.craftingJobs.clear(
-        recipe.id,
-        crafter
-      );
-      job = null;
-    }
+    if (job?.outputAwarded) job = null;
 
     if (!job) {
       const readiness =
@@ -1182,7 +1200,7 @@ export class CraftApp
           ? `Natural 1: 2 hours of progress lost where applicable. ${progress.successes} of ${progress.requiredSuccesses} successes.`
           : result.success
             ? `Success: ${result.total} vs DC ${dc}. ${progress.successes} of ${progress.requiredSuccesses} successes.`
-            : `Failure: ${result.total} vs DC ${dc}. 2 hours spent with no progress.`,
+            : `Failure: ${result.total} vs DC ${dc}. 2 hours spent with no progress. The materials and items set aside for this project are not lost. They stay set aside for the next attempt.`,
       kind:
         result.success
           ? "success"
@@ -1308,7 +1326,7 @@ export class CraftApp
         kind: "neutral",
         text:
           inventoryActor
-            ? `Canceled; consumed materials returned to ${inventoryActor.name}.`
+            ? `Canceled. The materials and items set aside for this project were returned to ${inventoryActor.name}.`
             : "Canceled."
       });
     }

@@ -1,4 +1,5 @@
 import { clearDrakkenheimSourceCache } from "../materials/drakkenheim-source-index.mjs";
+import { getMorelordCoreApi } from "./morelord-core-api.mjs";
 
 export const CONFIGURE_SOURCES_CHANGED = "morelordCoreConfigureSourcesChanged";
 
@@ -35,7 +36,9 @@ export async function refreshAfterConfigureSourcesChange({
       app.catalog = null;
     }
     try {
-      await app.render({ force: true });
+      const renderInBackground = getMorelordCoreApi()?.ui?.renderInBackground;
+      if (typeof renderInBackground === "function") await renderInBackground(app);
+      else await app.render({ force: false });
     } catch (error) {
       console.warn(
         "Morelord Craftworks | Could not refresh a window after Configure Sources changed.",

@@ -12,6 +12,7 @@ export class CraftCompletionApp
   extends ScrollPreservingApplicationMixin(
   HandlebarsApplicationMixin(ApplicationV2)
 ) {
+  #placing = false;
 
   constructor(
     craftworks,
@@ -137,32 +138,36 @@ export class CraftCompletionApp
 
   async _onRender(context, options) {
     await super._onRender(context, options);
-
-    this.element
-      .querySelector("[data-action='open-item']")
-      ?.addEventListener(
-        "click",
-        () => this.resolvedOutput?.source
-          ?.sheet?.render(true)
-      );
-
-    this.element
-      .querySelector("[data-action='place-self']")
-      ?.addEventListener(
-        "click",
-        () => this.#place(this.crafter)
-      );
-
-    this.element
-      .querySelector("[data-action='place-party']")
-      ?.addEventListener(
-        "click",
-        () => this.#place(this.partyActor)
-      );
+    const root = this.element;
+    if (!root || root.dataset.craftCompletionBound === "true") return;
+    root.dataset.craftCompletionBound = "true";
+    root.addEventListener("click", event => {
+      const action = event.target?.closest?.("[data-action]")?.dataset.action;
+      if (!action) return;
+      if (action === "open-item") {
+        event.preventDefault();
+        this.resolvedOutput?.source?.sheet?.render(true);
+        return;
+      }
+      if (action === "place-self") {
+        event.preventDefault();
+        void this.#place(this.crafter);
+        return;
+      }
+      if (action === "place-party") {
+        event.preventDefault();
+        void this.#place(this.partyActor);
+      }
+    });
   }
 
   async #place(destination) {
-    if (!destination) return;
+    if (this.#placing || !destination) return;
+    this.#placing = true;
+    const buttons = [...this.element?.querySelectorAll?.(
+      "[data-action='place-self'], [data-action='place-party']"
+    ) ?? []];
+    for (const button of buttons) button.disabled = true;
 
     try {
       const awarded =
@@ -187,6 +192,8 @@ export class CraftCompletionApp
 
       await this.close();
     } catch (error) {
+      this.#placing = false;
+      for (const button of buttons) button.disabled = false;
       console.error(
         "Morelord Craftworks | Failed to place crafted output.",
         error
