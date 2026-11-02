@@ -1,4 +1,4 @@
-# Unreleased
+# Morelord Craftworks 0.5.3
 
 ## What Changed
 
@@ -15,5 +15,4 @@
 
 ## Verification
 
-- `npm test`: 174 passed, 1 skipped. The skip is the local compendium index check. Tests cover a missing Core sources API denying compendium packs, a chat-card row that warns and does not call `fromUuid` when Configure Sources disallows the source, Hoard search results that do not open an item sheet, frozen facility defaults, and Materials, Recipes, and Settings templates that no longer show those counts.
-- Live Foundry verification was not run from this environment.
+- Dev1 checks passed on eec8bf3: the Hoard click, the disabled-source chat link, and the counts removed.
