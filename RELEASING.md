@@ -23,11 +23,11 @@ The workflow passes those values only as environment variables on the publish st
 | `version` | empty | Explicit `x.y.z`. When set, `bump` is ignored |
 | `publish_only` | false | Skip the version bump, tag, and GitHub Release. Publish that version to the website and then to Foundry |
 
-With `module.json` at `0.5.2` and no explicit version, the bumps are:
+With `module.json` at `0.5.3` and no explicit version, the bumps are:
 
 | `bump` | Next version |
 | --- | --- |
-| `patch` | `0.5.3` |
+| `patch` | `0.5.4` |
 | `minor` | `0.6.0` |
 | `major` | `1.0.0` |
 
