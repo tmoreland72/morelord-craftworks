@@ -10,7 +10,7 @@ test("Lucky Finds uses corrected results and canonical item sources without awar
   const resolved = [];
   const resolver = { resolve: async (name, options) => { resolved.push({name, ...options}); return {name, uuid: `Compendium.dmg.Item.item`}; },
     resolveAny: async name => ({name, uuid: 'Compendium.dmg.Item.item'}) };
-  globalThis.game = { user: {isGM:true}, modules: new Map([['drakkenheim-core',{active:true}]]),
+  globalThis.game = { user: {isGM:true}, modules: new Map([['drakkenheim-core',{active:true}], ['morelord-core', { api: { sources: { filter: { isPackEnabled: () => true } } } }]]),
     packs: new Map([['drakkenheim-core.tables',{}], ['drakkenheim-monsters.items',{getIndex:async()=>[{_id:'chip',name:'Delerium Chip'}]}]]) };
   const service = new LuckyFindsService({contentPacks:{isEnabled:()=>true},itemResolver:resolver});
   const describe = (range, description) => service.describe({toObject:()=>({range,description})});

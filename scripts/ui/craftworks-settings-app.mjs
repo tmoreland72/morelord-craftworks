@@ -210,7 +210,6 @@ export class CraftworksSettingsApp extends ScrollPreservingApplicationMixin(
         lootCoinMultiplier: getSetting(SETTINGS.LOOT_COIN_MULTIPLIER)
       },
 
-      recipeCount: craftworks?.recipes?.all()?.length ?? 0,
       premiumCraftingAvailable:
         EntitlementService.hasFeature("craftworks.advanced-crafting")
     }, { inplace:false });

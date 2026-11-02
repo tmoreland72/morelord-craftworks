@@ -253,7 +253,17 @@ test("facility choices offer a type or one Core specialty, and a saved type stay
   assert.deepEqual(parseFacilityRule("forge"), { type: "forge", specialty: "" });
 });
 
-test("Assign Defaults produces the Demo1 facility map", () => {
+test("facility defaults are a frozen hard-coded map", () => {
+  const source = readFileSync(new URL("../scripts/crafting/crafting-environment-service.mjs", import.meta.url), "utf8");
+  assert.match(source, /never read from any world/);
+  assert.equal(source.includes("Demo1"), false);
+  assert.equal(Object.isFrozen(DEFAULT_CRAFTING_FACILITY_RULES), true);
+  const values = Object.values(DEFAULT_CRAFTING_FACILITY_RULES);
+  assert.equal(values.length, 17);
+  for (const value of values) assert.match(value, /^(forge|workshop:[a-z]+)$/);
+});
+
+test("Assign Defaults produces the built-in facility map", () => {
   assert.deepEqual(assignFacilityDefaults(), {
     "Alchemist's Supplies": "workshop:alchemist",
     "Brewer's Supplies": "workshop:brewer",

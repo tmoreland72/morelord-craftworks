@@ -59,25 +59,16 @@ function configuredPack(pack) {
 }
 
 /**
- * Actor and Item packs wait for Core. Other document types are outside
- * dnd5e Configure Sources (that screen only lists Actor and Item packs).
- * TODO(morelord-core): this returns every Actor/Item pack when Core has not
- * exported getAllowedPacks or isUuidAllowed and has no sources.filter.
- * It does not read packSourceConfiguration.
+ * Actor and Item packs require Core's sources filter. Other document types
+ * are outside dnd5e Configure Sources and stay available when that filter is
+ * present. Without the filter, every pack is denied.
  */
 function bridgeAllows(pack) {
-  if (!pack || !configuredPack(pack)) return Boolean(pack);
+  if (!pack) return false;
   const sources = coreSources();
-  if (typeof sources?.filter?.isPackEnabled === "function") {
-    return Boolean(sources.filter.isPackEnabled(pack));
-  }
-  if (
-    typeof sources?.getAllowedPacks !== "function"
-    && typeof sources?.isUuidAllowed !== "function"
-  ) {
-    return true;
-  }
-  return false;
+  if (typeof sources?.filter?.isPackEnabled !== "function") return false;
+  if (!configuredPack(pack)) return true;
+  return Boolean(sources.filter.isPackEnabled(pack));
 }
 
 function narrow(packs, { documentName = null, visible = null, packageName = null } = {}) {
@@ -126,9 +117,7 @@ export function isUuidAllowed(uuid) {
   const collection = compendiumCollection(uuid);
   if (!collection) return true;
   const pack = readPack(collection);
-  if (!pack) {
-    return !(sources?.getAllowedPacks || sources?.filter || sources?.isUuidAllowed);
-  }
+  if (!pack) return false;
   if (typeof sources?.getAllowedPacks === "function") {
     return Boolean(getAllowedPack(collection));
   }

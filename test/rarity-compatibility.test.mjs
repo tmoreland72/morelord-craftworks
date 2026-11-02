@@ -14,7 +14,7 @@ test("legacy and v6 indexes retain potions, special treasure, and recipe output 
       return [row];
     } };
     const packs = [pack]; packs.get = id => packs.find(p => p.collection === id);
-    globalThis.game = { packs };
+    globalThis.game = { packs, modules: new Map([["morelord-core", { api: { sources: { filter: { isPackEnabled: () => true } } } }]]) };
     const potions = await new PotionGeneratorService().availablePotions();
     assert.equal(potions.length, 1);
     assert.equal(potions[0].rarity, "rare");

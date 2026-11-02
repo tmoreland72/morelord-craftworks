@@ -39,7 +39,6 @@
                     data-filter-group="knowledge"
                     data-filter-value="{{id}}">
               <span>{{label}}</span>
-              <small>{{count}}</small>
               <i class="fa-solid {{#if included}}fa-plus{{else if excluded}}fa-minus{{else}}fa-circle{{/if}}"></i>
             </button>
           {{/each}}
@@ -56,7 +55,6 @@
                     data-filter-group="pack"
                     data-filter-value="{{id}}">
               <span>{{label}}</span>
-              <small>{{recipeCount}}</small>
               <i class="fa-solid {{#if included}}fa-plus{{else if excluded}}fa-minus{{else}}fa-circle{{/if}}"></i>
             </button>
           {{/each}}
@@ -73,7 +71,6 @@
                     data-filter-group="category"
                     data-filter-value="{{id}}">
               <span>{{label}}</span>
-              <small>{{count}}</small>
               <i class="fa-solid {{#if included}}fa-plus{{else if excluded}}fa-minus{{else}}fa-circle{{/if}}"></i>
             </button>
           {{/each}}
@@ -90,7 +87,6 @@
                     data-filter-group="tool"
                     data-filter-value="{{id}}">
               <span>{{label}}{{#if proficient}} <i class="fa-solid fa-circle-check" title="Character is proficient"></i>{{/if}}</span>
-              <small>{{count}}</small>
               <i class="fa-solid {{#if included}}fa-plus{{else if excluded}}fa-minus{{else}}fa-circle{{/if}}"></i>
             </button>
           {{/each}}
@@ -107,7 +103,6 @@
                     data-filter-group="rarity"
                     data-filter-value="{{id}}">
               <span>{{label}}</span>
-              <small>{{count}}</small>
               <i class="fa-solid {{#if included}}fa-plus{{else if excluded}}fa-minus{{else}}fa-circle{{/if}}"></i>
             </button>
           {{/each}}
@@ -125,7 +120,6 @@
                     data-filter-group="tag"
                     data-filter-value="{{id}}">
               <span>{{label}}</span>
-              <small>{{count}}</small>
               <i class="fa-solid {{#if included}}fa-plus{{else if excluded}}fa-minus{{else}}fa-circle{{/if}}"></i>
             </button>
           {{/each}}
@@ -156,8 +150,7 @@
           <div>
             <strong>{{prospectiveCount}} recipes match the current filters.</strong>
             <span>
-              Showing the first <strong>{{displayLimit}}</strong>. Filter totals continue
-              to reflect all available matching recipes.
+              Showing the first <strong>{{displayLimit}}</strong>.
             </span>
           </div>
         </div>

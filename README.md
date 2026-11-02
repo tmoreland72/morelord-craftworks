@@ -31,7 +31,7 @@ Encounter Loot lists defeated creatures in full-width selection rows with a chec
 
 ## Support baseline
 
-The Recipes browser counts ingredient tags in one pass per recipe using a shared material-catalog snapshot for each refresh. Reference cards use indexed compendium output names and images; full Items are loaded when opened or crafted. World Items and compendium outputs missing display metadata still resolve on refresh. Filter counts rebuild from the current catalog, so material edits do not leave a persistent cache stale.
+The Recipes browser reads ingredient tags from one shared material-catalog snapshot per refresh. Reference cards use indexed compendium output names and images; full Items are loaded when opened or crafted. World Items and compendium outputs missing display metadata still resolve on refresh. Filters list the tags present in that snapshot, so material edits do not leave a persistent cache stale.
 
 - Foundry Virtual Tabletop v14
 - D&D5e 5.3+
@@ -348,7 +348,8 @@ not interpret that setting. Every Actor and Item compendium read goes through
 `scripts/core/allowed-packs.mjs`, which calls Morelord Core's shared helper
 (`sources.getAllowedPacks` and `sources.isUuidAllowed`) once Core exports it.
 Until that export exists, the same file forwards Actor and Item packs to the
-filter Core already publishes and does not copy the dnd5e rule.
+filter Core already publishes and does not copy the dnd5e rule. If that
+filter is missing, compendium packs are denied.
 
 A compendium Core does not allow is not indexed, listed, offered, or used as a
 name or UUID fallback. Craftworks Content Pack settings only narrow that set.
@@ -395,7 +396,9 @@ official PHB/DMG or other sourcebook compendiums.
 
 Hoard chat cards use native Foundry UUID content links for resolved Material and
 Special Treasure Items. The displayed names therefore open the actual Item
-documents used by Craftworks rather than acting as plain text labels.
+documents used by Craftworks rather than acting as plain text labels. Clicking
+the row outside that link checks Configure Sources first. A disabled source
+warns and does not open.
 
 
 ### Randomized compendium priority
@@ -515,7 +518,7 @@ Publish the release:
 .\release.ps1 -Version 0.1.0
 ```
 
-Crafting facility requirements are configured per artisan tool in module Settings. Each tool can require an activity, or one specialty of that activity. An activity alone accepts any specialty. A named specialty accepts a sufficient tier whose specialty includes it or is Any, including a legacy single saved specialty. Alchemist's Supplies and Poisoner's Kit use the Workshop specialty Alchemist's Supplies. A saved `alchemist` setting is kept as `workshop:alchemist`. Recipe cards show the resulting requirement, with the crafted item’s rarity as the minimum facility tier; higher tiers qualify. A saved Blacksmith's Tools facility rule still applies to Smith's Tools. The recipe DC and all recipe filter counts are visible. The recipe editor begins with Item to Be Crafted and supports mandatory AND groups containing OR material choices. Offline Harvest and Gather characters can be played by the GM. Potion and scroll draft quantities default to one and may be edited before sharing or awarding.
+Crafting facility requirements are configured per artisan tool in module Settings. Each tool can require an activity, or one specialty of that activity. An activity alone accepts any specialty. A named specialty accepts a sufficient tier whose specialty includes it or is Any, including a legacy single saved specialty. Alchemist's Supplies and Poisoner's Kit use the Workshop specialty Alchemist's Supplies. A saved `alchemist` setting is kept as `workshop:alchemist`. Recipe cards show the resulting requirement, with the crafted item’s rarity as the minimum facility tier; higher tiers qualify. A saved Blacksmith's Tools facility rule still applies to Smith's Tools. The recipe DC is visible. The recipe editor begins with Item to Be Crafted and supports mandatory AND groups containing OR material choices. Offline Harvest and Gather characters can be played by the GM. Potion and scroll draft quantities default to one and may be edited before sharing or awarding.
 
 ### Shared UI and current crafting rules
 
@@ -530,7 +533,7 @@ Character choices for crafting, gathering, harvesting, delerium search, and item
 
 Settings use Morelord Core’s shared headers, sections, content cards, settings rows, and footer. Descriptions remain beside checkboxes at narrow widths.
 
-D&D5e Configure Sources filtering is delegated to Morelord Core. Craftworks keeps one call site, `scripts/core/allowed-packs.mjs`, for `getAllowedPacks` and `isUuidAllowed`. Content Pack settings and source priority only narrow packs that helper allows. Copied SRD documents still use Core's source-label check.
+D&D5e Configure Sources filtering is delegated to Morelord Core. Craftworks keeps one call site, `scripts/core/allowed-packs.mjs`, for `getAllowedPacks` and `isUuidAllowed`. Content Pack settings and source priority only narrow packs that helper allows. If Core does not provide that filter, compendium packs are denied. Copied SRD documents still use Core's source-label check.
 
 ## Optional usage and error reports
 

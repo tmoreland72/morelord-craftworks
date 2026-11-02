@@ -42,7 +42,7 @@ test("concurrent material searches share one index; catalog changes, hooks, and 
   let materials = [{ materialId: "fixture" }];
   const pack = { getDocuments: async () => { calls++; await gate; return [{ name: "Monster", uuid: "Actor.test" }]; } };
   const api = { materials: { all: () => materials }, contentPacks: { isEnabled: () => true } };
-  globalThis.game = { user: { isGM: true }, packs: new Map([["drakkenheim-monsters.monsters", pack]]) };
+  globalThis.game = { user: { isGM: true }, packs: new Map([["drakkenheim-monsters.monsters", pack]]), modules: new Map([["morelord-core", { api: { sources: { filter: { isPackEnabled: () => true } } } }]]) };
   const originalInspect = parser.inspectHarvestData, originalMatch = matcher.matchHarvestComponents;
   parser.inspectHarvestData = async () => { inspected++; return { harvestDocuments: [{}] }; };
   matcher.matchHarvestComponents = async () => [];
@@ -75,7 +75,7 @@ test("failed index loads are retried rather than cached as empty results", async
   clearDrakkenheimSourceCache();
   let calls = 0;
   const api = { materials: { all: () => [] }, contentPacks: { isEnabled: () => true } };
-  globalThis.game = { user: { isGM: true }, packs: new Map([["drakkenheim-monsters.monsters", { getDocuments: async () => { if (++calls === 1) throw Error("unavailable"); return []; } }]]) };
+  globalThis.game = { user: { isGM: true }, packs: new Map([["drakkenheim-monsters.monsters", { getDocuments: async () => { if (++calls === 1) throw Error("unavailable"); return []; } }]]), modules: new Map([["morelord-core", { api: { sources: { filter: { isPackEnabled: () => true } } } }]]) };
   await assert.rejects(getDrakkenheimSourceIndex(api), /unavailable/);
   assert.deepEqual((await getDrakkenheimSourceIndex(api)).entries, []);
   assert.equal(calls, 2);

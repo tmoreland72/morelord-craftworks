@@ -186,7 +186,7 @@ Materials and Recipes use a search field and persistent filter rail. Facets cycl
 | Plus | Include | Results must match the value. |
 | Minus | Exclude | Matching results are removed. |
 
-Search and filter totals always reflect the complete catalog. The browser initially renders up to 300 matching cards to keep very large catalogs responsive.
+The match total always reflects the complete catalog. Filter rows do not show a count for each option. The browser initially renders up to 300 matching cards to keep very large catalogs responsive.
 
 Materials can be filtered by source pack, rarity, category, processing stage, and material tags. Recipes add filters for recipe/output rarity and knowledge state.
 
@@ -208,7 +208,7 @@ Standard material loot now includes all 172 Standard catalog materials. Newly ad
 
 ![Drakkenheim materials are organized into concise setting-specific families.](assets/materials-drakkenheim-families.png)
 
-Every recipe filter displays its catalog count, including Knowledge, Content Pack, Category, Preferred Artisan Tool, Rarity, and ingredient tags. Counts describe the visible enabled catalog.
+Recipe filters cover Knowledge, Content Pack, Category, Preferred Artisan Tool, Rarity, and ingredient tags. Those rows do not show a catalog count. The heading above the results shows how many recipes match.
 
 Craftworks crafting checks use the listed artisan tool at the recipe’s DC. Missing either the tool in the crafter’s inventory or its proficiency imposes disadvantage; it never increases the DC. The underlying ability still supplies the tool roll modifier and can be chosen in the native roll dialog. Recipes with an explicit skill and no tool retain that skill. Monsters of Drakkenheim recipes, including custom Drakkenheim recipes, require no crafting roll: supply the materials and use a Workshop of the item’s rarity or higher, then choose Craft Item. That Workshop requirement is independent of the artisan-tool facility settings. [Shared Locations](#shared-locations) explains the tier, Specialty, and what players see when the place does not qualify. Drakkenheim crafting has no time requirement, including when resuming an older saved crafting job.
 
@@ -399,7 +399,7 @@ Loot is a party-level post-combat workflow and resolves applicable defeated crea
 5. Choose a player character or Group actor under **Recipient**.
 6. Select **Award Encounter Loot**.
 
-A result can include materials, coin, potions, spell scrolls, and special treasure. The final award is summarized in a consolidated public chat card with clickable item references.
+A result can include materials, coin, potions, spell scrolls, and special treasure. The final award is summarized in a consolidated public chat card with clickable item references. Clicking the row outside the item name opens that document when Configure Sources allows it. A disabled source warns that the source is disabled in Configure Sources and does not open.
 
 ![Encounter Loot begins with the resolved creatures, enabled reward categories, and recipient context.](assets/loot-gm-setup.png)
 
@@ -417,7 +417,7 @@ Use Hoard for a vault, cache, lair, reward chest, or other accumulated treasure 
 4. Choose a player character or Group actor.
 5. Award the hoard.
 
-Every generated hoard includes potion and spell-scroll rewards in addition to its other configured results. Awards produce a consolidated chat card.
+Every generated hoard includes potion and spell-scroll rewards in addition to its other configured results. The open icon on a special-treasure row opens that item. Choosing an item from search adds it to the hoard and does not open its sheet. Awards produce a consolidated chat card.
 
 ![Hoard setup provides a challenge range and recipient before generation.](assets/hoard-gm-setup.png)
 

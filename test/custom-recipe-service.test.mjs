@@ -26,7 +26,11 @@ function environment(initial = []) {
     deepClone: structuredClone,
     getProperty: (object, path) => path.split(".").reduce((value, key) => value?.[key], object)
   } };
-  globalThis.game = { user: { isGM: true }, packs: new Map([[pack.collection, pack]]) };
+  globalThis.game = {
+    user: { isGM: true },
+    packs: new Map([[pack.collection, pack]]),
+    modules: new Map([["morelord-core", { api: { sources: { filter: { isPackEnabled: () => true } } } }]])
+  };
   globalThis.CONFIG = { JournalEntry: { documentClass: class {
     static async createDocuments(documents) {
       for (const document of documents) rows.push({ _id: String(rows.length + 1), ...structuredClone(document) });

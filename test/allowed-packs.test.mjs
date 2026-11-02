@@ -84,9 +84,12 @@ test("the Core bridge allows only Actor and Item packs its filter accepts", () =
   assert.deepEqual(packAccess("missing.pack"), { present: false, allowed: false, pack: null });
 });
 
-test("a missing Core helper does not invent Configure Sources rules", () => {
+test("a missing Core sources API denies every compendium pack", () => {
   const packs = [pack("dnd5e.items", "Item"), pack("module.journal", "JournalEntry")];
   globalThis.game = { packs, modules: new Map() };
-  assert.deepEqual(getAllowedPacks().map(entry => entry.collection), ["dnd5e.items", "module.journal"]);
-  assert.equal(isUuidAllowed("Compendium.dnd5e.items.Item.rope"), true);
+  assert.deepEqual(getAllowedPacks(), []);
+  assert.equal(isUuidAllowed("Compendium.dnd5e.items.Item.rope"), false);
+  assert.equal(isUuidAllowed("Compendium.module.journal.JournalEntry.note"), false);
+  assert.equal(isUuidAllowed("Compendium.missing.pack.Item.rope"), false);
+  assert.equal(isUuidAllowed("Actor.world"), true);
 });

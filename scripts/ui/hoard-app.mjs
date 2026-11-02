@@ -95,7 +95,7 @@ export class HoardApp extends ScrollPreservingApplicationMixin(
     this.#activateResultEditing();
 
 
-    this.element.querySelectorAll("[data-item-uuid]")
+    this.element.querySelectorAll(".ml-craftworks-special-item-open[data-item-uuid]")
       .forEach(element => {
         element.addEventListener("click", async event => {
           event.preventDefault();
