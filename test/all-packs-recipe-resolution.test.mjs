@@ -138,7 +138,9 @@ test("a rarity-field index error does not drop the SRD item book", async () => {
     }
   };
   globalThis.game.packs = { get: id => id === pack.collection ? pack : null };
-  globalThis.game.modules = new Map();
+  globalThis.game.modules = new Map([["morelord-core", { api: { sources: {
+    filter: { isPackEnabled: () => true }
+  } } }]]);
   const recipes = registry({});
   await recipes.loadStandardSeed();
   assert.equal(
@@ -199,7 +201,9 @@ test("installed compendiums load 279 unique recipes, or 275 without the SRD book
   };
 
   use(new Set(Object.keys(collections)));
-  globalThis.game.modules = new Map();
+  globalThis.game.modules = new Map([["morelord-core", { api: { sources: {
+    filter: { isPackEnabled: () => true }
+  } } }]]);
   const allowedSources = registry({});
   await allowedSources.loadStandardSeed();
   assert.deepEqual(counts(allowedSources), {
@@ -235,7 +239,9 @@ test("installed compendiums load 279 unique recipes, or 275 without the SRD book
   for (const packId of ["srd-5.1", "srd-5.2", "phb", "dmg", "monsters-of-drakkenheim"]) {
     assert.equal(counts(deniedSources).byPack[packId] ?? 0, 0, packId);
   }
-  globalThis.game.modules = new Map();
+  globalThis.game.modules = new Map([["morelord-core", { api: { sources: {
+    filter: { isPackEnabled: () => true }
+  } } }]]);
 
   use(new Set([
     "dnd-players-handbook.equipment",

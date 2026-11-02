@@ -25,7 +25,8 @@ test("available spells intersect D&D source and Craftworks SRD settings", async 
       spellPack("dnd5e.spells", "SRD 5.1 Spell"),
       spellPack("dnd5e.spells24", "SRD 5.2 Spell"),
       spellPack("module.enabled-spells", "Enabled Module Spell")
-    ]
+    ],
+    modules: new Map([["morelord-core", { api: { sources: { filter: { isPackEnabled: () => true } } } }]])
   };
   globalThis.foundry = {
     utils: {
@@ -54,7 +55,8 @@ test("available spells intersect D&D source and Craftworks SRD settings", async 
 
 test("an SRD spell copied into an enabled pack still honors its source exclusion", async () => {
   globalThis.game = {
-    packs: [spellPack("world.copied-spells", "Copied SRD Spell")]
+    packs: [spellPack("world.copied-spells", "Copied SRD Spell")],
+    modules: new Map([["morelord-core", { api: { sources: { filter: { isPackEnabled: () => true } } } }]])
   };
   globalThis.foundry = {
     utils: {

@@ -5,7 +5,7 @@ const VALID_TIERS = new Set(["common", "uncommon", "rare", "veryRare", "legendar
 export const CRAFTING_FACILITY_RULES = "craftingFacilityRules";
 export const ARTISAN_TOOLS = ["Alchemist's Supplies", "Brewer's Supplies", "Calligrapher's Supplies", "Carpenter's Tools", "Cobbler's Tools", "Cook's Utensils", "Glassblower's Tools", "Jeweler's Tools", "Leatherworker's Tools", "Mason's Tools", "Painter's Supplies", "Potter's Tools", "Smith's Tools", "Tinker's Tools", "Weaver's Tools", "Woodcarver's Tools"];
 
-// Facility defaults from the Demo1 world setting craftingFacilityRules.
+// Hard-coded defaults applied by Assign Defaults, never read from any world.
 // Alchemist's Supplies and Poisoner's Kit were stored as the Alchemist
 // activity. That activity is now the Workshop specialty "alchemist".
 // A fresh world stays empty until Assign Defaults.

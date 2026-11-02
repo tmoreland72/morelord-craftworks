@@ -107,24 +107,14 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
     const monsterIndex = game.user.isGM && checkMonsterSources ? peekDrakkenheimSourceIndex(this.craftworks) : null;
     const availabilityReady = game.user.isGM ? Boolean(monsterIndex) : this._playerHarvestableIds !== null;
 
-    const materialCountsByPack = allMaterials.reduce((counts, material) => {
-      counts.set(
-        material.packId,
-        (counts.get(material.packId) ?? 0) + 1
-      );
-      return counts;
-    }, new Map());
+    const packHasMaterials = new Set(allMaterials.map(material => material.packId));
 
     const enabledPacks = (
       this.craftworks.contentPacks
         ?.enabled({ capability: "materials" })
       ?? []
     )
-      .map(pack => ({
-        ...pack,
-        materialCount: materialCountsByPack.get(pack.id) ?? 0
-      }))
-      .filter(pack => pack.materialCount > 0);
+      .filter(pack => packHasMaterials.has(pack.id));
 
     const validPackIds = new Set(enabledPacks.map(pack => pack.id));
     this.selectedPackIds = this.selectedPackIds
@@ -276,7 +266,6 @@ export class MaterialBrowserApp extends ScrollPreservingApplicationMixin(
       packs: enabledPacks.map(pack => ({
         id: pack.id,
         label: pack.label,
-        materialCount: pack.materialCount,
         state:
           this.selectedPackIds.includes(pack.id)
             ? 1

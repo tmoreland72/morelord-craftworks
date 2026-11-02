@@ -122,29 +122,12 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
           this.craftworks.toolInspector
         )
       );
-    const visibleRecipeCountByPack = new Map();
-    for (const recipe of visibleRecipes) {
-      visibleRecipeCountByPack.set(
-        recipe.packId,
-        (visibleRecipeCountByPack.get(recipe.packId) ?? 0) + 1
-      );
-    }
 
     const catalogTools = new Set(
       catalogRecipes
         .map(recipe => canonicalArtisanToolName(recipe.craft?.tool))
         .filter(Boolean)
     );
-    const visibleToolCounts = new Map();
-    for (const recipe of visibleRecipes) {
-      const tool = canonicalArtisanToolName(recipe.craft?.tool);
-      if (tool) {
-        visibleToolCounts.set(
-          tool,
-          (visibleToolCounts.get(tool) ?? 0) + 1
-        );
-      }
-    }
     const validTools = new Set(catalogTools);
     this.selectedTools = this.selectedTools.filter(tool => validTools.has(tool));
     this.excludedTools = this.excludedTools.filter(tool => validTools.has(tool));
@@ -153,7 +136,6 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
       .map(tool => ({
         id: tool,
         label: tool,
-        count: visibleToolCounts.get(tool) ?? 0,
         proficient: Boolean(
           crafter
           && this.craftworks.toolInspector?.inspect(crafter, tool)?.proficient
@@ -169,10 +151,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
 
     const effectiveRecipePacks = this.craftworks.recipes
       .packs({ includeDisabled: false })
-      .map(pack => ({
-        ...pack,
-        recipeCount: visibleRecipeCountByPack.get(pack.id) ?? 0
-      }));
+      .map(({ recipeCount, ...pack }) => pack);
 
     const validPackIds = new Set(
       effectiveRecipePacks.map(pack => pack.id)
@@ -186,15 +165,9 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
     const rarityFilters =
       this.#buildRarityFilters(visibleRecipes);
 
-    // Count each recipe once per tag using one material catalog snapshot.
-    const ingredientTagCounts = new Map();
+    // One material catalog snapshot for this render.
     const materialCatalog = this.craftworks.materials.all();
-    for (const recipe of visibleRecipes) {
-      for (const tag of this.#ingredientTags([recipe], materialCatalog)) {
-        ingredientTagCounts.set(tag, (ingredientTagCounts.get(tag) ?? 0) + 1);
-      }
-    }
-    const rawIngredientTags = [...ingredientTagCounts.keys()];
+    const rawIngredientTags = this.#ingredientTags(visibleRecipes, materialCatalog);
     const ingredientTagGroups = buildMaterialTagGroups(rawIngredientTags, {
       included: this.selectedIngredientTags,
       excluded: this.excludedIngredientTags
@@ -594,7 +567,7 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         })
       ),
 
-      ingredientTagGroups: ingredientTagGroups.map(group => ({ ...group, options: group.options.map(option => ({ ...option, count: ingredientTagCounts.get(option.id) ?? 0 })) })),
+      ingredientTagGroups,
 
       categories: Array.from(
         new Set(
@@ -606,7 +579,6 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         .sort()
         .map(category => ({
           id: category,
-          count: visibleRecipes.filter(recipe => recipe.category === category).length,
           label: category
             .split("-")
             .map(part => part.charAt(0).toUpperCase() + part.slice(1))
@@ -629,7 +601,6 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         {
           id: "known",
           label: "Known",
-          count: visibleRecipes.filter(recipe => game.user.isGM ? !hiddenRecipeIds.has(recipe.id) : isRecipeKnownToActor(recipe, crafter, this.craftworks.toolInspector)).length,
           state:
             this.knownFilterState,
           included:
@@ -640,7 +611,6 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
         {
           id: "unknown",
           label: "Unknown",
-          count: visibleRecipes.filter(recipe => game.user.isGM ? hiddenRecipeIds.has(recipe.id) : !isRecipeKnownToActor(recipe, crafter, this.craftworks.toolInspector)).length,
           state:
             this.unknownFilterState,
           included:
@@ -1409,98 +1379,23 @@ export class RecipeBrowserApp extends ScrollPreservingApplicationMixin(
 
   #buildRarityFilters(recipes = this.craftworks.recipes.all()) {
     const standardRarities = [
-      {
-        id: "common",
-        label: "Common"
-      },
-      {
-        id: "uncommon",
-        label: "Uncommon"
-      },
-      {
-        id: "rare",
-        label: "Rare"
-      },
-      {
-        id: "very rare",
-        label: "Very Rare"
-      },
-      {
-        id: "legendary",
-        label: "Legendary"
-      },
-      {
-        id: "artifact",
-        label: "Artifact"
-      }
+      { id: "common", label: "Common" },
+      { id: "uncommon", label: "Uncommon" },
+      { id: "rare", label: "Rare" },
+      { id: "very rare", label: "Very Rare" },
+      { id: "legendary", label: "Legendary" },
+      { id: "artifact", label: "Artifact" }
     ];
-
-    const counts =
-      new Map(
-        standardRarities.map(
-          rarity => [
-            rarity.id,
-            0
-          ]
-        )
-      );
-
-    for (
-      const recipe of
-      recipes
-    ) {
-      const rarity =
-        this.#recipeRarity(recipe);
-
-      if (!rarity) continue;
-
-      counts.set(
-        rarity,
-        (counts.get(rarity) ?? 0)
-        + 1
-      );
-    }
-
-    const rows =
-      standardRarities.map(
-        rarity => ({
-          ...rarity,
-          count:
-            counts.get(rarity.id)
-            ?? 0
-        })
-      );
-
-    // Preserve any non-standard public rarities supplied by a content pack.
-    for (
-      const [id, count] of
-      counts.entries()
-    ) {
-      if (
-        standardRarities.some(
-          rarity =>
-            rarity.id === id
-        )
-      ) {
-        continue;
-      }
-
-      rows.push({
+    const present = new Set(
+      recipes.map(recipe => this.#recipeRarity(recipe)).filter(Boolean)
+    );
+    const extras = [...present]
+      .filter(id => !standardRarities.some(rarity => rarity.id === id))
+      .map(id => ({
         id,
-        label:
-          id
-            .split(" ")
-            .map(part =>
-              part.charAt(0)
-              .toUpperCase()
-              + part.slice(1)
-            )
-            .join(" "),
-        count
-      });
-    }
-
-    return rows;
+        label: id.split(" ").map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(" ")
+      }));
+    return [...standardRarities, ...extras];
   }
 
   #recipeRarity(recipe) { return recipeRarity(recipe); }

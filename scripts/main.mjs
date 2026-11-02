@@ -65,6 +65,7 @@ import { isCharacterMemberOfGroup } from "./crafting/group-membership.mjs";
 import { getMorelordCoreApi } from "./core/morelord-core-api.mjs";
 import { startCraftworksPartyInventoryRelay } from "./core/party-inventory-relay.mjs";
 import { CRAFTWORKS_DOCUMENTATION } from "./documentation/product-documentation.mjs";
+import { handleCraftworksChatLinkClick } from "./ui/craftworks-chat-link.mjs";
 import { CraftworksSettingsApp } from "./ui/craftworks-settings-app.mjs";
 import { MaterialBrowserApp } from "./ui/material-browser-app.mjs";
 import { RecipeBrowserApp } from "./ui/recipe-browser-app.mjs";
@@ -90,27 +91,8 @@ Hooks.once("init", () => {
 
 Hooks.once("ready", () => {
   getMorelordCoreApi()?.ui?.documentation?.register(CRAFTWORKS_DOCUMENTATION);
-  document.addEventListener("click", async event => {
-    const row = event.target.closest?.("[data-ml-craftworks-link-target]");
-    if (!row) return;
-
-    // Let Foundry handle its native UUID link so the normal document preview,
-    // pinning, and click behavior remain available on the linked item name.
-    if (event.target.closest?.(".content-link")) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    const uuid = row.dataset.mlCraftworksLinkTarget;
-    if (!uuid) return;
-
-    try {
-      const document = await fromUuid(uuid);
-      if (!document) throw new Error("Document not found");
-      document.sheet?.render(true);
-    } catch {
-      ui.notifications.warn("The source Item could not be opened.");
-    }
+  document.addEventListener("click", event => {
+    handleCraftworksChatLinkClick(event);
   });
 });
 

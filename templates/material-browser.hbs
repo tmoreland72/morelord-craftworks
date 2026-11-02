@@ -47,7 +47,6 @@
                     data-filter-value="{{id}}"
                     title="Click: include → exclude → neutral">
               <span>{{label}}</span>
-              <small>{{materialCount}}</small>
               <i class="fa-solid {{#if included}}fa-plus{{else if excluded}}fa-minus{{else}}fa-circle{{/if}}"></i>
             </button>
           {{/each}}
@@ -99,8 +98,7 @@
           <div>
             <strong>{{prospectiveCount}} materials match the current filters.</strong>
             <span>
-              Showing the first <strong>{{displayLimit}}</strong>. Filter totals continue
-              to reflect all available matching materials.
+              Showing the first <strong>{{displayLimit}}</strong>.
             </span>
           </div>
         </div>

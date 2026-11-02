@@ -139,7 +139,7 @@ test("recipe editor round-trips nested choices and legacy complete alternatives 
   assert.equal(saved.output.rarity, "rare");
 });
 
-test("recipe facets count the visible catalog and cards expose tool checks and a named facility", async () => {
+test("recipe facets list the visible catalog and cards expose tool checks and a named facility", async () => {
   setup();
   game.settings.get = () => '["unknown"]';
   const material = { id: "iron", materialId: "iron", name: "Iron", tags: ["metal"], rarity: "common" };
@@ -154,12 +154,13 @@ test("recipe facets count the visible catalog and cards expose tool checks and a
     craftingEnvironment: { facilityOptions: () => ({ types: [{ id: "forge", name: "Forge" }] }) }
   });
   const context = await app._prepareContext();
-  assert.deepEqual(context.knowledgeFilters.map(row => row.count), [1, 1]);
-  assert.equal(context.categories[0].count, 2);
-  assert.equal(context.packs[0].recipeCount, 2);
-  assert.equal(context.toolFilters[0].count, 2);
-  assert.equal(context.ingredientRarities.find(row => row.id === "uncommon").count, 2);
-  assert.equal(context.ingredientTagGroups.flatMap(group => group.options).find(row => row.id === "metal").count, 2);
+  assert.deepEqual(context.knowledgeFilters.map(row => row.id), ["known", "unknown"]);
+  assert.deepEqual(context.categories.map(row => row.id), ["weapon"]);
+  assert.deepEqual(context.packs.map(row => row.id), ["test"]);
+  assert.deepEqual(context.toolFilters.map(row => row.id), ["Smith's Tools"]);
+  assert.ok(context.ingredientRarities.map(row => row.id).includes("uncommon"));
+  assert.deepEqual(context.ingredientTagGroups.flatMap(group => group.options).map(row => row.id), ["metal"]);
+  assert.deepEqual(context.recipeGroups[0].recipes.map(recipe => recipe.id).sort(), ["known", "unknown"]);
   const card = context.recipeGroups[0].recipes[0];
   assert.equal(card.craftMeta.check, "Smith's Tools");
   assert.equal(card.craftMeta.dc, 13);
@@ -235,6 +236,7 @@ test("recipe cards and the Craft window list several specialties, an empty Speci
 test("recipe browsing snapshots materials once and uses indexed outputs without loading full documents", async () => {
   setup();
   game.settings.get = () => "[]";
+  game.modules = new Map([["morelord-core", { api: { sources: { isUuidAllowed: () => true } } }]]);
   let reads = 0;
   const resolutions = [];
   globalThis.fromUuid = async uuid => {
@@ -257,8 +259,7 @@ test("recipe browsing snapshots materials once and uses indexed outputs without 
   assert.equal(reads, 1);
   assert.deepEqual(resolutions, []);
   const tags = first.ingredientTagGroups.flatMap(group => group.options);
-  assert.equal(tags.length, 10);
-  assert.ok(tags.every(tag => tag.count === 30));
+  assert.deepEqual(tags.map(tag => tag.id).sort(), Array.from({ length: 10 }, (_, i) => `tag-${i}`));
   assert.equal(first.recipeGroups[0].recipes[0].outputDocumentUuid, recipes[0].output.uuid);
 
   // The snapshot belongs to this render: catalog edits cannot leave stale facets.
@@ -269,7 +270,7 @@ test("recipe browsing snapshots materials once and uses indexed outputs without 
   assert.equal(reads, 2);
   assert.deepEqual(new Set(resolutions), new Set(["Item.world", recipes[1].output.uuid]));
   const changedTags = second.ingredientTagGroups.flatMap(group => group.options);
-  assert.deepEqual(changedTags.map(tag => [tag.id, tag.count]), [["changed", 30]]);
+  assert.deepEqual(changedTags.map(tag => tag.id), ["changed"]);
   assert.equal(second.recipeGroups[0].recipes.find(recipe => recipe.id === "r0").output.label, "Live name");
 });
 

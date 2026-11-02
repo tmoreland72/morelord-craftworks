@@ -61,7 +61,7 @@ test("a player never falls back to catalog flags when no GM can verify availabil
 test("GM availability response contains IDs only; players cannot build or fetch the private index", async () => {
   clearDrakkenheimSourceCache();
   const { api } = fixture({});
-  globalThis.game = { user: { isGM: true }, packs: new Map([["drakkenheim-monsters.monsters", { getDocuments: async () => [{ name: "Private monster", uuid: "Actor.private" }] }]]) };
+  globalThis.game = { user: { isGM: true }, packs: new Map([["drakkenheim-monsters.monsters", { getDocuments: async () => [{ name: "Private monster", uuid: "Actor.private" }] }]]), modules: new Map([["morelord-core", { api: { sources: { filter: { isPackEnabled: () => true } } } }]]) };
   const previous = [parser.inspectHarvestData, matcher.matchHarvestComponents];
   parser.inspectHarvestData = async () => ({ rarity: "Rare", harvestDocuments: [{}] });
   matcher.matchHarvestComponents = async () => [{ matched: true, item: { materialId: "supported" }, component: { category: "Bones", name: "Skull" } }];

@@ -92,7 +92,7 @@ test("ordinary materials never inspect or mention Drakkenheim; loot reflects rea
 test("Drakkenheim lookup reports progress and retains Actor UUID and form rarity without unrelated loot", async () => {
   const originals = [monsters.inspectHarvestData, monsters.parseHarvestComponents, matcher.matchHarvestComponents];
   const actor = { name: "Test monster", uuid: "Compendium.test.monsters.Actor.test" };
-  globalThis.game = { user: { isGM: true }, packs: new Map([["drakkenheim-monsters.monsters", { getDocuments: async () => [actor] }]]) };
+  globalThis.game = { user: { isGM: true }, packs: new Map([["drakkenheim-monsters.monsters", { getDocuments: async () => [actor] }]]), modules: new Map([["morelord-core", { api: { sources: { filter: { isPackEnabled: () => true } } } }]]) };
   monsters.inspectHarvestData = async () => ({ harvestDocuments: [{ html: "fixture" }], rarity: "Rare",
     rarityData: { rarities: { Adult: "Rare" } }, specialItems: [{ text: "One special item" }] });
   monsters.parseHarvestComponents = () => [{ category: "Delerium", components: ["1 shard"] }];

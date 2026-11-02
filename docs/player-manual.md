@@ -85,7 +85,7 @@ Recipe rarity describes the public recipe or output rarity. It remains visible f
 
 The Recipes browser can filter by Content Pack, category, recipe rarity, ingredient rarity, ingredient material tag, knowledge, and inventory craftability. Enable **Only Show Craftable Recipes** to compare requirements with the current **Ingredient Inventory**.
 
-Changing the search text or a facet updates the matching catalog and result count.
+Changing the search text or a facet updates the matching catalog. The heading shows how many entries match. Filter rows do not show a count for each option.
 
 ![The Recipes browser shows recipe knowledge, requirements, filters, and crafting status.](assets/recipes-browser-overview.png)
 
@@ -214,7 +214,7 @@ An attempt is tracked for your character on that scene, so closing and reopening
 
 Your GM can configure acquired Craftworks materials to go directly to participating characters or to a shared dnd5e Group actor. Loot and Hoard awards also let the GM choose a player character or Group actor as recipient.
 
-When Craftworks commits an award, it posts a consolidated public chat card. The card can include the recipient, linked item names, images, rarities, quantities, and currency. Select a linked item to inspect its document.
+When Craftworks commits an award, it posts a consolidated public chat card. The card can include the recipient, linked item names, images, rarities, quantities, and currency. Select a linked item to inspect its document. Clicking the row outside that link opens the same document when Configure Sources allows it. A disabled source warns that the source is disabled in Configure Sources and does not open.
 
 Harvest is different while it is in progress: a component appears on the final award card only after the GM finalizes the session.
 
