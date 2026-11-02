@@ -51,7 +51,7 @@
     "canUpload": true
   },
   "socket": true,
-  "download": "https://github.com/tmoreland72/morelord-craftworks/releases/download/v0.5.2/morelord-craftworks.zip",
+  "download": "https://github.com/tmoreland72/morelord-craftworks/releases/download/v0.5.3/morelord-craftworks.zip",
   "url": "https://github.com/tmoreland72/morelord-craftworks",
   "changelog": "https://github.com/tmoreland72/morelord-craftworks/releases",
   "manifest": "https://raw.githubusercontent.com/tmoreland72/morelord-craftworks/main/module.json"
