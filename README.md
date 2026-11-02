@@ -496,7 +496,7 @@ https://raw.githubusercontent.com/tmoreland72/morelord-craftworks/main/module.js
 
 ## Release workflow
 
-Morelord Craftworks uses the standard Morelord Foundry module release workflow shared with Morelord Marketplace, Morelord Journeys, and Morelord Encounters.
+Morelord Craftworks uses the standard Morelord Foundry module release workflow shared with Morelord Marketplace, Morelord Journeys, and Morelord Encounters. GitHub Actions runs it from `.github/workflows/release.yml`. Dispatch **Release** from `main` after that file is on `main`. The inputs are `bump`, `version`, and `publish_only`. The job requires the `FOUNDRY_RELEASE_TOKEN` and `RELEASE_PUBLISH_TOKEN` secrets. See `RELEASING.md`.
 
 Project-specific release settings are stored in `release.config.json`. Local website publishing credentials belong in `.env`:
 
@@ -516,6 +516,12 @@ Publish the release:
 
 ```powershell
 .\release.ps1 -Version 0.1.0
+```
+
+Publish an existing version to Foundry only:
+
+```powershell
+.\release.ps1 -Version 0.1.0 -FoundryOnly
 ```
 
 Crafting facility requirements are configured per artisan tool in module Settings. Each tool can require an activity, or one specialty of that activity. An activity alone accepts any specialty. A named specialty accepts a sufficient tier whose specialty includes it or is Any, including a legacy single saved specialty. Alchemist's Supplies and Poisoner's Kit use the Workshop specialty Alchemist's Supplies. A saved `alchemist` setting is kept as `workshop:alchemist`. Recipe cards show the resulting requirement, with the crafted item’s rarity as the minimum facility tier; higher tiers qualify. A saved Blacksmith's Tools facility rule still applies to Smith's Tools. The recipe DC is visible. The recipe editor begins with Item to Be Crafted and supports mandatory AND groups containing OR material choices. Offline Harvest and Gather characters can be played by the GM. Potion and scroll draft quantities default to one and may be edited before sharing or awarding.
