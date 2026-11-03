@@ -1,4 +1,5 @@
 import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
+import { getMorelordCurrency } from "../core/morelord-core-api.mjs";
 import { isUuidAllowed } from "../core/allowed-packs.mjs";
 import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
 import { MODULE_ID } from "../constants.mjs";
@@ -193,7 +194,10 @@ export class LootService {
           copper,
           label: this.adapter.formatCopper(copper)
         };
-        this.#addCopperToCurrency(coins, copper);
+        const added = getMorelordCurrency().cpToCurrency(Math.max(0, Math.round(Number(copper ?? 0))));
+        for (const [denomination, amount] of Object.entries(added)) {
+          coins[denomination] += amount;
+        }
       }
 
       if (magicLootTypeRoll != null) {
@@ -255,7 +259,7 @@ export class LootService {
       special.label = treasure.itemName ?? "Special treasure opportunity";
     }
 
-    const totalCopper = this.#currencyToCopper(coins);
+    const totalCopper = getMorelordCurrency().currencyToCp(coins);
 
     session.result = {
       channels: {
@@ -441,40 +445,15 @@ export class LootService {
       Number(getSetting(SETTINGS.LOOT_COIN_MULTIPLIER) ?? 1)
     );
 
-    const minCopper = Math.max(0, Math.round(Number(minGp ?? 0) * 100 * multiplier));
+    const perGp = getMorelordCurrency().copperRate("gp");
+    const minCopper = Math.max(0, Math.round(Number(minGp ?? 0) * perGp * multiplier));
     const maxCopper = Math.max(
       minCopper,
-      Math.round(Number(maxGp ?? minGp ?? 0) * 100 * multiplier)
+      Math.round(Number(maxGp ?? minGp ?? 0) * perGp * multiplier)
     );
 
     if (maxCopper <= 0) return 0;
     return randomInt(minCopper, maxCopper);
-  }
-
-  #addCopperToCurrency(currency, copper) {
-    // Preserve a readable mixed-denomination display while maintaining exact value.
-    let remaining = Math.max(0, Math.round(copper));
-    const denominations = [
-      ["pp", 1000],
-      ["gp", 100],
-      ["ep", 50],
-      ["sp", 10],
-      ["cp", 1]
-    ];
-
-    for (const [denom, value] of denominations) {
-      const amount = Math.floor(remaining / value);
-      currency[denom] += amount;
-      remaining %= value;
-    }
-  }
-
-  #currencyToCopper(currency) {
-    return Number(currency.pp ?? 0) * 1000
-      + Number(currency.gp ?? 0) * 100
-      + Number(currency.ep ?? 0) * 50
-      + Number(currency.sp ?? 0) * 10
-      + Number(currency.cp ?? 0);
   }
 
   #requireOpen(sessionId) {

@@ -1,4 +1,5 @@
 import { itemRarity } from "../../../morelord-core/scripts/services/item-rarity.js";
+import { getMorelordCurrency } from "../core/morelord-core-api.mjs";
 import { isUuidAllowed } from "../core/allowed-packs.mjs";
 import { AwardChatCardService } from "../core/award-chat-card-service.mjs";
 import { SETTINGS, getSetting } from "../core/settings.mjs";
@@ -82,8 +83,9 @@ export class HoardService {
         0,
         Number(getSetting(SETTINGS.LOOT_COIN_MULTIPLIER) ?? 1)
       );
-      const minCopper = Math.round(profile.coinGp.min * 100 * multiplier);
-      const maxCopper = Math.round(profile.coinGp.max * 100 * multiplier);
+      const perGp = getMorelordCurrency().copperRate("gp");
+      const minCopper = Math.round(profile.coinGp.min * perGp * multiplier);
+      const maxCopper = Math.round(profile.coinGp.max * perGp * multiplier);
       coinCopper = maxCopper > 0
         ? randomInt(Math.max(0, minCopper), Math.max(0, maxCopper))
         : 0;

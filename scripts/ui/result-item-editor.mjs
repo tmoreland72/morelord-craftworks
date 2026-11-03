@@ -1,28 +1,27 @@
 import { getAllowedPacks } from "../core/allowed-packs.mjs";
+import { getMorelordCurrency } from "../core/morelord-core-api.mjs";
 
 const MAX_RESULTS = 20;
-const COIN_VALUES = Object.freeze({ pp: 1000, gp: 100, ep: 50, sp: 10, cp: 1 });
 
 export function coinEditorValues(result) {
-  let remaining = Math.max(0, Math.round(Number(
+  const amount = Math.max(0, Math.round(Number(
     result?.coinTotalCopper ?? result?.coinCopper ?? 0
   )));
-  return Object.entries(COIN_VALUES).map(([denomination, copper]) => {
-    const value = Math.floor(remaining / copper);
-    remaining %= copper;
-    return { denomination, label: denomination.toUpperCase(), value };
-  });
+  return Object.entries(getMorelordCurrency().cpToCurrency(amount)).map(([denomination, value]) => ({
+    denomination,
+    label: denomination.toUpperCase(),
+    value
+  }));
 }
 
 export function updateResultCoins(result, values, adapter) {
   if (!result) return;
+  const currency = getMorelordCurrency();
   const coins = {};
-  let totalCopper = 0;
-  for (const [denomination, copper] of Object.entries(COIN_VALUES)) {
-    const value = Math.max(0, Math.floor(Number(values?.[denomination] ?? 0)));
-    coins[denomination] = value;
-    totalCopper += value * copper;
+  for (const denomination of Object.keys(currency.cpToCurrency(0))) {
+    coins[denomination] = Math.max(0, Math.floor(Number(values?.[denomination] ?? 0)));
   }
+  const totalCopper = currency.currencyToCp(coins);
 
   if ("coinTotalCopper" in result) {
     result.coins = coins;
