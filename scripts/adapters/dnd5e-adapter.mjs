@@ -1,5 +1,5 @@
 import { SystemAdapter } from "../core/system-adapter.mjs";
-import { getMorelordCoreService } from "../core/morelord-core-api.mjs";
+import { getMorelordCoreService, getMorelordCurrency } from "../core/morelord-core-api.mjs";
 import { compendiumCollection, isUuidAllowed } from "../core/allowed-packs.mjs";
 import { addItemAsGm, needsGmForInventoryWrite } from "../core/party-inventory-relay.mjs";
 
@@ -103,40 +103,19 @@ export class Dnd5eAdapter extends SystemAdapter {
   }
 
   getCurrencyCopper(actor) {
-    const currency = actor?.system?.currency ?? {};
-    const values = { pp: 1000, gp: 100, ep: 50, sp: 10, cp: 1 };
-    return Object.entries(values).reduce(
-      (total, [denom, multiplier]) => total + Number(currency[denom] ?? 0) * multiplier,
-      0
-    );
+    return getMorelordCurrency().getCurrencyCopper(actor);
   }
 
   formatCopper(copper) {
-    let remaining = Math.max(0, Math.round(Number(copper ?? 0)));
-    const parts = [];
-    for (const [denom, value] of [["pp", 1000], ["gp", 100], ["ep", 50], ["sp", 10], ["cp", 1]]) {
-      const quantity = Math.floor(remaining / value);
-      remaining %= value;
-      if (quantity) parts.push(`${quantity} ${denom}`);
-    }
+    const amount = Math.max(0, Math.round(Number(copper ?? 0)));
+    const parts = Object.entries(getMorelordCurrency().cpToCurrency(amount))
+      .filter(([, quantity]) => quantity)
+      .map(([denomination, quantity]) => `${quantity} ${denomination}`);
     return parts.length ? parts.join(", ") : "0 gp";
   }
 
   async adjustCurrencyCopper(actor, deltaCopper) {
-    if (!actor) throw new Error("A currency Actor is required.");
-    const current = this.getCurrencyCopper(actor);
-    const next = current + Math.round(Number(deltaCopper ?? 0));
-    if (next < 0) throw new Error(`${actor.name} does not have enough currency.`);
-
-    let remaining = next;
-    const currency = {};
-    for (const [denom, value] of [["pp", 1000], ["gp", 100], ["ep", 50], ["sp", 10], ["cp", 1]]) {
-      currency[denom] = Math.floor(remaining / value);
-      remaining %= value;
-    }
-
-    await actor.update({ "system.currency": currency });
-    return currency;
+    return getMorelordCurrency().adjustCurrencyCopper(actor, deltaCopper);
   }
 
   async addItemToActor(actor, sourceItem, quantity = 1) {

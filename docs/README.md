@@ -7,7 +7,7 @@ version: 0.5.3
 
 # Morelord Craftworks Documentation
 
-Requires **Morelord Core 0.8.2 or later** for the Morelord Tools scene control, shared material-source cards, action pills, and image links.
+Requires **Morelord Core 0.8.2 or later** for the Morelord Tools scene control, shared material-source cards, action pills, and image links. Coin conversion uses Core's `api.currency`, which is on Core main and is not in released Core 0.9.0. Craftworks main needs that Core build until the next Core release.
 
 ## Overview
 

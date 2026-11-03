@@ -7,3 +7,15 @@ export function getMorelordCoreApi() {
 export function getMorelordCoreService(serviceName) {
   return getMorelordCoreApi()?.[String(serviceName)] ?? null;
 }
+
+export function getMorelordCurrency() {
+  const currency = getMorelordCoreService("currency");
+  if (!currency?.adjustCurrencyCopper
+    || !currency?.copperRate
+    || !currency?.cpToCurrency
+    || !currency?.currencyToCp
+    || !currency?.getCurrencyCopper) {
+    throw new Error("Morelord Core currency services are unavailable.");
+  }
+  return currency;
+}
