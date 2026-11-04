@@ -101,7 +101,7 @@ export function initializeDeleriumChatRequests(api) {
     const session = record.author?.isGM && record.getFlag(ID, "chatSearch");
     if (!session || rollAuthority(record)?.id !== game.user.id) continue;
     const recover = async () => {
-      if (!record.whisper.length) await record.update({ whisper: game.users.filter(user => user.isGM).map(user => user.id) });
+      if (!record.whisper?.length) await record.update({ whisper: game.users.filter(user => user.isGM).map(user => user.id) });
       if ((session.status === "complete" || session.selectedCharacterUuids.every(uuid => Object.values(session.participants).some(entry => entry.actorUuid === uuid)))
         && !game.messages.some(message => message.getFlag(ID, "chatSearchResult")?.sessionMessageId === record.id)) {
         await channel.executeAsUser("finalize", { messageId: record.id }, game.user.id);
