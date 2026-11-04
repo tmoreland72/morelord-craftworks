@@ -30,7 +30,78 @@ export class AwardChatCardService {
       return null;
     }
 
-    const content = `
+    const content = typeof MorelordCore?.ui?.itemCard === "function"
+      ? this.#coreCard({
+        recipient,
+        items: normalizedItems,
+        coinLabel,
+        hasCoin,
+        title,
+        subtitle,
+        icon
+      })
+      : this.#fallbackCard({
+        recipient,
+        items: normalizedItems,
+        coinLabel,
+        hasCoin,
+        title,
+        subtitle,
+        icon
+      });
+
+    return ChatMessage.create({
+      speaker: ChatMessage.getSpeaker({
+        actor: speakerActor ?? recipient ?? null
+      }),
+      content
+    }, messageMode ? { messageMode } : {});
+  }
+
+  static #coreCard({
+    recipient,
+    items,
+    coinLabel,
+    hasCoin,
+    title,
+    subtitle,
+    icon
+  }) {
+    return this.#linkTargets(MorelordCore.ui.itemCard({
+      title,
+      icon,
+      recipientName: recipient?.name ?? "",
+      subtitle: subtitle ?? "",
+      items,
+      coinLabel: hasCoin ? String(coinLabel) : "",
+      footer: MODULE_TITLE
+    }));
+  }
+
+  // The shared row has no uuid attribute. Put the existing click target back
+  // on each linked article; Foundry still owns the enriched name link.
+  static #linkTargets(html) {
+    return String(html ?? "").replace(
+      /<article class="ml-award-card__item">([\s\S]*?)<\/article>/g,
+      (article, body) => {
+        const uuid = body.match(/@UUID\[([^\]]+)\]/)?.[1];
+        if (!uuid) return article;
+        const target = this.#escapeAttribute(this.#unescape(uuid));
+        return `<article class="ml-award-card__item" data-ml-craftworks-link-target="${target}">${body}</article>`;
+      }
+    );
+  }
+
+  static #fallbackCard({
+    recipient,
+    items,
+    coinLabel,
+    hasCoin,
+    title,
+    subtitle,
+    icon
+  }) {
+    return `
       <section class="ml-chat-card ml-craftworks-award-card">
         <header class="ml-craftworks-award-card-header">
           <div class="ml-craftworks-award-card-icon">
@@ -55,10 +126,10 @@ export class AwardChatCardService {
         </header>
 
         ${
-          normalizedItems.length
+          items.length
             ? `
               <div class="ml-craftworks-award-card-items">
-                ${normalizedItems.map(item => this.#renderItem(item)).join("")}
+                ${items.map(item => this.#renderItem(item)).join("")}
               </div>
             `
             : ""
@@ -80,13 +151,6 @@ export class AwardChatCardService {
         </footer>
       </section>
     `;
-
-    return ChatMessage.create({
-      speaker: ChatMessage.getSpeaker({
-        actor: speakerActor ?? recipient ?? null
-      }),
-      content
-    }, messageMode ? { messageMode } : {});
   }
 
   static #normalizeItem(entry) {
@@ -176,5 +240,14 @@ export class AwardChatCardService {
   static #escapeAttribute(value) {
     return this.#escape(value)
       .replace(/"/g, "&quot;");
+  }
+
+  static #unescape(value) {
+    return String(value)
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, "\"")
+      .replace(/&#39;/g, "'")
+      .replace(/&amp;/g, "&");
   }
 }

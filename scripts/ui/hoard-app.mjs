@@ -1,6 +1,7 @@
 import { listCharacterActors } from "../../../morelord-core/scripts/ui/actor-participation.js";
 import { MODULE_TITLE } from "../constants.mjs";
 import { HOARD_PROFILES, getHoardProfile } from "../acquisition/hoard-profiles.mjs";
+import { getMorelordCurrency } from "../core/morelord-core-api.mjs";
 
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
 import {
@@ -216,6 +217,116 @@ export class HoardApp extends ScrollPreservingApplicationMixin(
       return;
     }
 
+    const content = typeof MorelordCore?.ui?.itemCard === "function"
+      ? await this.#coreChatCard()
+      : await this.#legacyChatCard();
+
+    const enrichedContent = await TextEditor.enrichHTML(
+      content,
+      {
+        async: true,
+        documents: true
+      }
+    );
+
+    await ChatMessage.create({
+      speaker: ChatMessage.getSpeaker(),
+      content: enrichedContent
+    });
+
+    ui.notifications.info(
+      "Treasure hoard sent to chat."
+    );
+  }
+
+  async #coreChatCard() {
+    const materials = [];
+    for (const material of this.result.materials ?? []) {
+      let item = null;
+      try {
+        item = await this.craftworks.materials.resolveItem(material.materialId);
+      } catch {
+        item = null;
+      }
+      materials.push({
+        uuid: item?.uuid ?? material.uuid ?? "",
+        name: material.name,
+        img: item?.img ?? material.img ?? "",
+        quantity: Number(material.quantity ?? 1)
+      });
+    }
+
+    const sections = [];
+    if (materials.length) {
+      sections.push({ heading: "Crafting Materials", items: materials });
+    }
+    sections.push({
+      heading: "Potions",
+      items: (this.result.potions ?? []).map(potion => ({
+        uuid: potion.uuid,
+        name: potion.name,
+        img: potion.img ?? "",
+        rarity: potion.rarity ?? "",
+        quantity: 1
+      }))
+    });
+    sections.push({
+      heading: "Spell Scrolls",
+      items: (this.result.spellScrolls ?? []).map(spell => ({
+        uuid: spell.uuid,
+        name: `Spell Scroll: ${spell.name}`,
+        img: spell.img ?? "",
+        quantity: 1,
+        value: `Level ${Number(spell.level ?? 0)}`
+      }))
+    });
+
+    const customItems = this.result.customItems ?? [];
+    if (customItems.length) {
+      sections.push({
+        heading: "Added Items",
+        items: customItems.map(item => ({
+          uuid: item.uuid,
+          name: item.name,
+          img: item.img ?? "",
+          quantity: Number(item.quantity ?? 1),
+          value: item.sourceLabel ?? ""
+        }))
+      });
+    }
+
+    if (this.result.special?.enabled) {
+      const specialItems = this.result.special.triggered
+        ? (this.result.special.items ?? [])
+        : [];
+      sections.push({
+        heading: "Special Treasure",
+        items: specialItems.map(item => ({
+          uuid: item.itemUuid ?? "",
+          name: item.itemName ?? "Special Treasure",
+          img: item.itemImg ?? "",
+          rarity: item.rarity ?? "",
+          quantity: 1,
+          value: [item.sourceLabel ?? "Unknown Source", item.tableName]
+            .filter(Boolean)
+            .join(" · ")
+        }))
+      });
+    }
+
+    const copper = Math.max(0, Math.round(Number(this.result.coinCopper ?? 0)));
+    return MorelordCore.ui.itemCard({
+      title: "Treasure Hoard",
+      icon: "fa-solid fa-vault",
+      subtitle: this.result.profileLabel ?? "",
+      sections,
+      emptyText: "None.",
+      coins: copper > 0 ? getMorelordCurrency().cpToCurrency(copper) : null,
+      footer: MODULE_TITLE
+    });
+  }
+
+  async #legacyChatCard() {
     const escape = foundry.utils.escapeHTML;
 
     const materialRows = [];
@@ -346,22 +457,7 @@ export class HoardApp extends ScrollPreservingApplicationMixin(
       </div>
     `;
 
-    const enrichedContent = await TextEditor.enrichHTML(
-      content,
-      {
-        async: true,
-        documents: true
-      }
-    );
-
-    await ChatMessage.create({
-      speaker: ChatMessage.getSpeaker(),
-      content: enrichedContent
-    });
-
-    ui.notifications.info(
-      "Treasure hoard sent to chat."
-    );
+    return content;
   }
 
   async #award() {

@@ -1,3 +1,5 @@
+import { MODULE_TITLE } from "../constants.mjs";
+
 export class SpellbookGeneratorService {
   constructor({
     spellScrollGenerator = null,
@@ -256,51 +258,64 @@ export class SpellbookGeneratorService {
     spellbook,
     spells
   }) {
-    const groups = new Map();
+    const content = typeof MorelordCore?.ui?.itemCard === "function"
+      ? this.#coreSpellbookCard({ recipient, spellbook, spells })
+      : this.#legacySpellbookCard({ recipient, spellbook, spells });
 
-    for (const spell of spells) {
-      const level =
-        Number(spell.level ?? 0);
+    await ChatMessage.create({
+      speaker: ChatMessage.getSpeaker({ actor: recipient }),
+      content
+    });
+  }
 
-      if (!groups.has(level)) {
-        groups.set(level, []);
-      }
+  #coreSpellbookCard({
+    recipient,
+    spellbook,
+    spells
+  }) {
+    return MorelordCore.ui.itemCard({
+      title: spellbook.name,
+      icon: "fa-solid fa-book",
+      recipientName: recipient?.name ?? "",
+      items: [{
+        uuid: spellbook.uuid,
+        name: spellbook.name,
+        img: spellbook.img,
+        quantity: 1
+      }],
+      sections: this.#spellLevels(spells).map(([level, entries]) => ({
+        heading: level === 0 ? "Cantrips" : `Level ${level}`,
+        items: entries.map(spell => ({
+          uuid: spell.uuid,
+          name: spell.name,
+          img: spell.img,
+          quantity: 1
+        }))
+      })),
+      footer: MODULE_TITLE
+    });
+  }
 
-      groups.get(level).push(spell);
-    }
+  #legacySpellbookCard({
+    recipient,
+    spellbook,
+    spells
+  }) {
+    const sections = this.#spellLevels(spells).map(([level, entries]) => {
+      const heading = level === 0 ? "Cantrips" : `Level ${level}`;
+      const links = entries
+        .map(spell => `<li>@UUID[${spell.uuid}]{${spell.name}}</li>`)
+        .join("");
 
-    const sections =
-      [...groups.entries()]
-        .sort(([a], [b]) => a - b)
-        .map(([level, entries]) => {
-          const heading =
-            level === 0
-              ? "Cantrips"
-              : `Level ${level}`;
-
-          const links =
-            entries
-              .map(
-                spell =>
-                  `<li>@UUID[${spell.uuid}]{${spell.name}}</li>`
-              )
-              .join("");
-
-          return `
+      return `
             <div class="ml-craftworks-spellbook-card-level">
               <strong>${heading}</strong>
               <ul>${links}</ul>
             </div>
           `;
-        })
-        .join("");
+    }).join("");
 
-    await ChatMessage.create({
-      speaker:
-        ChatMessage.getSpeaker({
-          actor: recipient
-        }),
-      content: `
+    return `
         <section class="ml-craftworks-spellbook-card">
           <header>
             <img
@@ -317,7 +332,16 @@ export class SpellbookGeneratorService {
           </div>
           <footer>Morelord Craftworks</footer>
         </section>
-      `
-    });
+      `;
+  }
+
+  #spellLevels(spells) {
+    const groups = new Map();
+    for (const spell of spells ?? []) {
+      const level = Number(spell.level ?? 0);
+      if (!groups.has(level)) groups.set(level, []);
+      groups.get(level).push(spell);
+    }
+    return [...groups.entries()].sort(([a], [b]) => a - b);
   }
 }
