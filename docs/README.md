@@ -2,12 +2,12 @@
 title: Morelord Craftworks Documentation
 slug: morelord-craftworks
 product: morelord-craftworks
-version: 0.5.3
+version: 0.5.4
 ---
 
 # Morelord Craftworks Documentation
 
-Requires **Morelord Core 0.8.2 or later** for the Morelord Tools scene control, shared material-source cards, action pills, and image links. Coin conversion uses Core's `api.currency`, which is on Core main and is not in released Core 0.9.0. Craftworks main needs that Core build until the next Core release.
+Requires **Morelord Core 0.9.2 or later** for the Morelord Tools scene control, shared material-source cards, action pills, image links, and coin conversion. Update Core before Craftworks. Core 0.9.1 does not include the currency API this version calls.
 
 ## Overview
 
@@ -56,7 +56,7 @@ Craftworks can also support exceptional add-on content packs that go beyond the 
 - [Game Master Manual](gm-manual.md) — installation, world configuration, content synchronization, Harvest, Gather, Loot, Hoard, generators, [shared locations](gm-manual.md#shared-locations), exceptional content packs, and troubleshooting.
 - [Player Manual](player-manual.md) — browsing materials and recipes, planning and completing crafting projects, Harvest, Gather, shared party storage, and optional Drakkenheim content.
 
-These manuals describe Morelord Craftworks 0.5.3 for Foundry Virtual Tabletop v14 and dnd5e 5.3 or later. The in-Foundry **Documentation** button on the Craftworks dashboard opens the current product guide through Morelord Core.
+These manuals describe Morelord Craftworks 0.5.4 for Foundry Virtual Tabletop v14 and dnd5e 5.3 or later. The in-Foundry **Documentation** button on the Craftworks dashboard opens the current product guide through Morelord Core.
 
 Page sections use Morelord Core bordered, shaded surfaces with shared padding, section headings, and spacing, matching Downtime. Older screenshots illustrate the workflows but may show the previous panel styling or omit the new add/remove controls. Refer to the manual text for current controls.
 

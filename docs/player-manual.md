@@ -4,7 +4,7 @@ description: Browse materials and recipes, manage crafting projects, and partici
 slug: morelord-craftworks/player
 product: morelord-craftworks
 audience: player
-version: 0.5.3
+version: 0.5.4
 foundry: 14
 ---
 
@@ -12,7 +12,7 @@ foundry: 14
 
 Morelord Craftworks lets you browse your campaign's materials and recipes, plan crafting projects, work from personal or shared inventories, and take part in Harvest and Gather sessions started by your Game Master.
 
-This manual applies to Morelord Craftworks 0.5.3.
+This manual applies to Morelord Craftworks 0.5.4.
 
 ## Contents
 
@@ -214,7 +214,7 @@ An attempt is tracked for your character on that scene, so closing and reopening
 
 Your GM can configure acquired Craftworks materials to go directly to participating characters or to a shared dnd5e Group actor. Loot and Hoard awards also let the GM choose a player character or Group actor as recipient.
 
-When Craftworks commits an award, it posts a consolidated public chat card. The card can include the recipient, linked item names, images, rarities, quantities, and currency. Select a linked item to inspect its document. Clicking the row outside that link opens the same document when Configure Sources allows it. A disabled source warns that the source is disabled in Configure Sources and does not open.
+When Craftworks commits an award, it posts a consolidated public chat card. When Morelord Core provides its item card, Craftworks uses that card. The card can include the recipient, linked item names, images, rarities, quantities, and currency. Select a linked item to inspect its document. Clicking the row outside that link opens the same document when Configure Sources allows it. A disabled source warns that the source is disabled in Configure Sources and does not open.
 
 Harvest is different while it is in progress: a component appears on the final award card only after the GM finalizes the session.
 

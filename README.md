@@ -35,7 +35,7 @@ The Recipes browser reads ingredient tags from one shared material-catalog snaps
 
 - Foundry Virtual Tabletop v14
 - D&D5e 5.3+
-- Morelord Core 0.8.2 or later for the Morelord Tools scene control, shared UI components, Morelord Gaming account access, and premium entitlements. Coin conversion uses Core's `api.currency`. That API is on Core main and is not in released Core 0.9.0, so Craftworks main needs Core main until the next Core release. The declared Core minimum stays 0.8.2 until then.
+- Morelord Core 0.9.2 or later for the Morelord Tools scene control, shared UI components, Morelord Gaming account access, premium entitlements, and coin conversion. Core 0.9.1 does not include `api.currency`. Update Core before Craftworks. dnd5e 5.3 or later remains the supported game system.
 - `socketlib` for multiplayer acquisition sessions
 
 Foundry v13 compatibility is intentionally out of scope.
