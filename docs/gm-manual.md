@@ -4,7 +4,7 @@ description: Install, configure, and operate Morelord Craftworks acquisition, cr
 slug: morelord-craftworks/gm
 product: morelord-craftworks
 audience: game-master
-version: 0.5.3
+version: 0.5.4
 foundry: 14
 ---
 
@@ -12,7 +12,7 @@ foundry: 14
 
 Morelord Craftworks gives a dnd5e world a connected system for harvesting creatures, gathering by terrain, generating encounter loot and hoards, managing materials and recipes, and running long-term crafting projects.
 
-This manual applies to Morelord Craftworks 0.5.3, Foundry VTT v14, and dnd5e 5.3 or later.
+This manual applies to Morelord Craftworks 0.5.4, Foundry VTT v14, and dnd5e 5.3 or later.
 
 ## Contents
 
@@ -51,9 +51,9 @@ Premium access is managed by Morelord Core. A content pack may also depend on of
 
 - Foundry Virtual Tabletop v14
 - dnd5e 5.3 or later
-- Morelord Core 0.8.2 or later. Update Core first, then refresh every connected GM and player client after updating Craftworks so each client registers the current source-availability socket handler. Coin conversion uses Core's `api.currency`. That API is on Core main and is not in released Core 0.9.0, so this Craftworks build needs Core main until the next Core release.
+- Morelord Core 0.9.2 or later. Update Core first, then refresh every connected GM and player client after updating Craftworks so each client registers the current source-availability socket handler. Coin conversion uses Core's currency API, which Core 0.9.1 does not include.
 - SocketLib 1.1.3 or later
-- Morelord Craftworks 0.5.3 or later
+- Morelord Craftworks 0.5.4 or later
 
 ### Install with the manifest
 
@@ -399,7 +399,7 @@ Loot is a party-level post-combat workflow and resolves applicable defeated crea
 5. Choose a player character or Group actor under **Recipient**.
 6. Select **Award Encounter Loot**.
 
-A result can include materials, coin, potions, spell scrolls, and special treasure. The final award is summarized in a consolidated public chat card with clickable item references. Clicking the row outside the item name opens that document when Configure Sources allows it. A disabled source warns that the source is disabled in Configure Sources and does not open.
+A result can include materials, coin, potions, spell scrolls, and special treasure. Loot and Hoard convert coin amounts with Morelord Core's dnd5e rates for pp, gp, ep, sp, and cp. The standard rates remain 1 pp = 10 gp and 1 gp = 2 ep = 10 sp = 100 cp. A world that changes the dnd5e currency conversion uses those rates. The final award is summarized in a consolidated public chat card with clickable item references. When Core provides its item card, Craftworks uses that card. Clicking the row outside the item name opens that document when Configure Sources allows it. A disabled source warns that the source is disabled in Configure Sources and does not open.
 
 ![Encounter Loot begins with the resolved creatures, enabled reward categories, and recipient context.](assets/loot-gm-setup.png)
 
@@ -417,7 +417,7 @@ Use Hoard for a vault, cache, lair, reward chest, or other accumulated treasure 
 4. Choose a player character or Group actor.
 5. Award the hoard.
 
-Every generated hoard includes potion and spell-scroll rewards in addition to its other configured results. The open icon on a special-treasure row opens that item. Choosing an item from search adds it to the hoard and does not open its sheet. Awards produce a consolidated chat card.
+Every generated hoard includes potion and spell-scroll rewards in addition to its other configured results. The open icon on a special-treasure row opens that item. Choosing an item from search adds it to the hoard and does not open its sheet. Awards produce a consolidated chat card. When Core provides its item card, that card is the one posted.
 
 ![Hoard setup provides a challenge range and recipient before generation.](assets/hoard-gm-setup.png)
 
@@ -436,6 +436,8 @@ Use **Save as Default** to remember the search area and selected characters for 
 **What the Party Finds** lists cumulative rewards: 0–2 successes find nothing; 3 successes find 3d6 chips; 4 successes find 3d6 chips **and** 1d6 fragments; 5 or more find both of those rewards **and** one shard. Click the dice buttons for reference rolls in chat. These reference rolls do not award items or set the final quantity.
 
 Select **Finalize Search**, choose a character or party Group under **Recipient**, and use **Roll & Award All Delerium**. This rolls each quantity and awards all earned original Delerium Chip, Fragment, and Shard items from the **Monsters of Drakkenheim** Item compendium. Open a reward to inspect its source document. A result can only be awarded once; if a delivery fails partway through, retry with the same recipient to finish the remaining rewards. When an encounter is required, the results window can open Morelord Encounters if it is active.
+
+Reloading restores a finished search whose chat message has no whisper list. Craftworks whispers that message to the GMs and posts the saved result once. It does not roll or award the search again.
 
 ## Content-pack availability
 
@@ -513,7 +515,7 @@ Use an item's trash button to remove that individual entry; duplicates are separ
 6. Choose a recipient.
 7. Select **Create & Award Spellbook**.
 
-Craftworks creates one custom spellbook Item containing clickable spell links and posts a public award card.
+Craftworks creates one custom spellbook Item containing clickable spell links and posts a public award card. When Core provides its item card, that card is the one posted. The book and its spells stay grouped by level.
 
 ![Spellbook Generator accepts a book name and independent spell counts at every level.](assets/spellbook-generator-setup.png)
 
