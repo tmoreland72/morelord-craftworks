@@ -573,6 +573,8 @@ If the official Drakkenheim creature or harvesting data cannot be resolved, Craf
 
 ## Troubleshooting
 
+If Hoard or Loot reports **No eligible magic items were found**, check D&D5e **Configure Sources** and enable a visible Item compendium containing magic items. Special treasure searches those enabled compendiums; world Items are not included. Craftworks 0.5.5 fixes a compendium-index error that could cause this warning even when eligible sources were enabled. After updating, reload Foundry and generate a new result.
+
 When harvesting gives unexpected materials, use Core's **Download Troubleshooting File** before **Sync with Compendiums**, and download a second file afterward. With updated Core and Craftworks, the report includes pack configuration and access, catalog counts, known compendium availability and source filters, sync status, and recent harvest fallback reasons. It contains no creature identities or raw console logs. Recent outcomes reset when that client reloads; reproduce the issue and export from the GM client that performed the harvest.
 
 ### Materials or recipes are missing

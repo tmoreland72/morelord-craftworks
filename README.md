@@ -370,9 +370,16 @@ changed; it stays out of the catalog while that output compendium is off.
 ### Hoard chat and special treasure
 
 Generated Hoards can be sent to chat as a formatted Craftworks card. Special
-treasure results resolve to actual Item documents. When a RollTable produces a
-plain-text item name, Craftworks attempts to resolve that name against enabled
-Item compendiums before awarding the result.
+treasure selects magic items by rarity from visible Item compendiums enabled
+in D&D5e **Configure Sources** and resolves them to actual Item documents.
+World Items are not part of this pool. If no eligible items are found, enable
+an Item compendium containing magic items in **Configure Sources**. Compendium
+index failures are logged in the browser console.
+
+Regression test (Dev1 only): import `specialTreasureCheck` from
+`scripts/testing/special-treasure.mjs` and pass it to Core's `runInGameTests`.
+It requests real compendium indexes and resolves treasure for challenge 11–16
+without awarding or modifying Items.
 
 ### Generated spell scrolls
 

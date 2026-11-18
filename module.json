@@ -2,7 +2,7 @@
   "id": "morelord-craftworks",
   "title": "Morelord Craftworks",
   "description": "System-agnostic gathering, harvesting, looting, selling, materials, recipes, and premium crafting workflows for Foundry VTT.",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "authors": [
     {
       "name": "Morelord Gaming"
@@ -10,7 +10,7 @@
   ],
   "compatibility": {
     "minimum": "14",
-    "verified": "14.369"
+    "verified": "14.370"
   },
   "esmodules": [
     "scripts/main.mjs"
@@ -51,7 +51,7 @@
     "canUpload": true
   },
   "socket": true,
-  "download": "https://github.com/tmoreland72/morelord-craftworks/releases/download/v0.5.4/morelord-craftworks.zip",
+  "download": "https://github.com/tmoreland72/morelord-craftworks/releases/download/v0.5.5/morelord-craftworks.zip",
   "url": "https://github.com/tmoreland72/morelord-craftworks",
   "changelog": "https://github.com/tmoreland72/morelord-craftworks/releases",
   "manifest": "https://raw.githubusercontent.com/tmoreland72/morelord-craftworks/main/module.json"

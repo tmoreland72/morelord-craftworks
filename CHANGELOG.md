@@ -1,5 +1,16 @@
 # Morelord Craftworks Changelog
 
+## 0.5.5
+
+### Fixed
+
+- Fixed Hoard and Loot special treasure reporting no eligible magic items when Foundry rejected overlapping compendium index fields. Magic items now load from visible Item compendiums enabled in D&D5e Configure Sources.
+- The empty-pool warning now identifies the enabled compendium sources it searches.
+
+### Compatibility
+
+- Verified on Foundry VTT 14.370 with D&D5e 6.1.1. Existing minimum support and the Morelord Core 0.9.2 requirement are unchanged.
+
 ## 0.5.4
 
 ### Fixed

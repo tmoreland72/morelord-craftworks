@@ -2,6 +2,13 @@
 
 This file contains development-build notes and historical implementation notes.
 
+## Hotfix 0.5.5 — November 18, 2026
+
+- Fixed Hoard and Loot special treasure skipping Item compendiums when Foundry rejects overlapping `system.source` and `system.source.book` index fields. The index requests the complete source object and keeps Core's Configure Sources filtering.
+- Updated the empty-pool warning to identify visible Item compendiums enabled in D&D5e Configure Sources.
+- Added an offline projection-collision regression and a read-only Dev1 regression in `scripts/testing/special-treasure.mjs` using Core's shared runner.
+- Verification: all five shared-runner checks passed in verified Dev1 on Foundry 14.370 / D&D5e 6.1.1, including real compendium indexing and challenge 11–16 treasure resolution. Evidence: `test/in-game-reports/2026-11-18-special-treasure.json`. The nine focused Node tests passed. Release preparation refreshed the cumulative changelog with LF endings, resolving the two Windows checkout failures; the full suite then passed 182, skipped one, and failed zero. Compatibility verification advances to 14.370 without changing supported minimums.
+
 > Development release history below was migrated from the project README in dev.55.
 > Going forward, dev release notes belong here rather than in `README.md`.
 

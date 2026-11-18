@@ -79,7 +79,7 @@ export class SpecialTreasureService {
         sourceLabel: null,
         tableName: null,
         detail:
-          "No eligible magic items were found in the world or the D&D5e system compendiums."
+          "No eligible magic items were found in visible Item compendiums enabled in D&D5e Configure Sources."
       };
     }
 
@@ -197,9 +197,9 @@ export class SpecialTreasureService {
             "img",
             "type",
             "system.rarity", "system.rarities",
-            "system.source.book",
-            "system.source.custom",
-      "flags.morelord-craftworks.materialId"
+            // D&D5e already indexes this parent; child paths collide in Foundry's projection.
+            "system.source",
+            "flags.morelord-craftworks.materialId"
           ]
         });
 
@@ -226,7 +226,7 @@ export class SpecialTreasureService {
         }
       } catch (error) {
         console.warn(
-          `Morelord Craftworks | Unable to index system Item pack ${pack.collection} for special treasure.`,
+          `Morelord Craftworks | Unable to index Item pack ${pack.collection} for special treasure.`,
           error
         );
       }
