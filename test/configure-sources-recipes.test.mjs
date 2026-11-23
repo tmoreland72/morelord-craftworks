@@ -145,7 +145,7 @@ test("Configure Sources changes refresh catalogs and open Craftworks windows", a
   const renders = [];
   const window = {
     rendered: true,
-    options: { classes: ["ml-craftworks-window"] },
+    options: { classes: ["ml-window", "ml-craftworks-window"] },
     catalog: [{ name: "stale" }],
     async render(options) { renders.push(options); calls.push("render"); }
   };
@@ -160,7 +160,7 @@ test("Configure Sources changes refresh catalogs and open Craftworks windows", a
     recipes: { async loadStandardSeed() { calls.push("recipes"); } },
     specialTreasure: { invalidateCache() { calls.push("treasure"); } },
     clearDrakkenheim() { calls.push("drakkenheim"); },
-    applications: [window, dialog, { rendered: false, options: { classes: ["ml-craftworks-window"] }, async render() { calls.push("closed"); } }]
+    applications: [window, dialog, { rendered: false, options: { classes: ["ml-window", "ml-craftworks-window"] }, async render() { calls.push("closed"); } }]
   });
   assert.deepEqual(calls, ["resolver", "materials", "recipes", "treasure", "drakkenheim", "render"]);
   assert.deepEqual(renders, [{ force: false }]);

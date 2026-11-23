@@ -51,7 +51,7 @@ Premium access is managed by Morelord Core. A content pack may also depend on of
 
 - Foundry Virtual Tabletop v14
 - dnd5e 5.3 or later
-- Morelord Core 0.9.2 or later. Update Core first, then refresh every connected GM and player client after updating Craftworks so each client registers the current source-availability socket handler. Coin conversion uses Core's currency API, which Core 0.9.1 does not include.
+- Morelord Core 0.9.4 or later. Update Core first, then refresh every connected GM and player client after updating Craftworks so each client registers the current source-availability socket handler. Coin conversion uses Core's currency API, which Core 0.9.1 does not include.
 - SocketLib 1.1.3 or later
 - Morelord Craftworks 0.5.4 or later
 

@@ -41,8 +41,6 @@ test('the player dashboard does not include a Player Resources section', () => {
 
 test('page actions use the right-justified form footer', () => {
   const css = readFileSync(new URL('styles/features/craftworks-foundation.css', root), 'utf8');
-  assert.match(css, /\.ml-window \.ml-page-footer\.ml-form-footer \{[^}]*justify-content: flex-end;/s);
-  assert.match(css, /\.ml-window \.ml-page-footer\.ml-form-footer > button:not\(\.ml-icon-button\) \{[^}]*width: auto;/s);
   assert.doesNotMatch(css, /\.ml-confirm-dialog[^{]*ml-form-footer/);
   for (const file of templates.filter(name => !name.includes('partials'))) {
     const source = readFileSync(new URL(`templates/${file.replaceAll('\\', '/')}`, root), 'utf8');

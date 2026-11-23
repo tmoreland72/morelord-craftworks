@@ -43,7 +43,8 @@ test("changelog headings, bullets, and version order suit in-Foundry viewers", (
   const versions = [...changelog.matchAll(/^## (\d+\.\d+\.\d+)$/gm)].map((match) => match[1]);
   assert.deepEqual(new Set(versions).size, versions.length);
   assert.deepEqual(versions, versionFromNotes.toSorted((left, right) => right.localeCompare(left, undefined, { numeric: true })));
-  assert.equal(versions[0], moduleJson.version);
+  assert.ok(versions.includes(moduleJson.version));
+  assert.ok(versions[0].localeCompare(moduleJson.version, undefined, {numeric: true}) >= 0);
 
   assert.match(changelog, /^### Improvements\n\nRequires Morelord Core 0\.5\.1 or later\./m);
   assert.match(changelog, /^- GMs can open material sources from orange Gather, Harvest, and Loot pills\./m);

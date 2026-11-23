@@ -57,7 +57,7 @@
     </section>
   </main>
   <footer class="ml-form-footer ml-page-footer ml-actions">
-    <span>{{#if completed}}Harvesting Completed{{else}}Creature {{creatureNumber}} of {{summary.creatures}}{{/if}}</span>
+    <span class="ml-footer-status">{{#if completed}}Harvesting Completed{{else}}Creature {{creatureNumber}} of {{summary.creatures}}{{/if}}</span>
     <div class="ml-actions">
       {{#if completed}}<button type="button" data-action="close">Close</button>
       {{else if isLastCreature}}<button type="button" data-action="done-creature"><i class="fa-solid fa-check"></i> Done</button>

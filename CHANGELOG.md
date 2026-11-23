@@ -1,5 +1,15 @@
 # Morelord Craftworks Changelog
 
+## 0.5.6
+
+### Improvements
+
+- Normalized the cumulative changelog to LF line endings and pinned that format in Git so Windows checkouts retain the expected format.
+
+- Removed local shared-footer overrides. Harvesting status text now explicitly uses Core's `ml-footer-status`; buttons retain Core's right-aligned, natural-width layout.
+
+- Requires Morelord Core 0.9.4 or later. Update Core first, then refresh connected clients.
+
 ## 0.5.5
 
 ### Fixed
