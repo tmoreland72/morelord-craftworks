@@ -4,7 +4,7 @@ description: Install, configure, and operate Morelord Craftworks acquisition, cr
 slug: morelord-craftworks/gm
 product: morelord-craftworks
 audience: game-master
-version: 0.5.4
+version: 0.5.6
 foundry: 14
 ---
 
