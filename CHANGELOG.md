@@ -1,5 +1,15 @@
 # Morelord Craftworks Changelog
 
+## 0.5.7
+
+### Improvements
+
+- Harvest offers mutually exclusive Skip Skill Checks and One Check for All Creatures options. Leave both unchecked for separate creature checks.
+- One Check for All Creatures requests one check per character before the creature walkthrough, using the lowest Harvest DC among selected creatures. Success unlocks all creatures; failure shows “Failed to recover any components” with only Done available. Reopening and retries preserve the result.
+- Delerium Search opens character-specific windows matching Gather, including character portraits, skill buttons with bonuses, and Decline/Close footer actions. Skill buttons open native D&D5e roll configuration.
+- The GM can reopen pending Delerium Search windows and roll for offline characters, including players who disconnect. Existing summaries, results, and award recovery remain available.
+- Updated the GM and player documentation for Harvest options and Delerium Search.
+
 ## 0.5.6
 
 ### Improvements

@@ -118,6 +118,16 @@ export function generatorAndHarvestChecks({ capture = async () => {} } = {}) {
         session = await api.harvest.start({ creatureContexts: creatures, harvestActorsByUser: { [game.user.id]: [actor.uuid, other.uuid] } });
         assert(session.rollMode === "creature", "New sessions must use per-creature rolls.");
         gmApp = await api.openHarvest();
+        const skip = gmApp.element.querySelector('[name="skipSkillChecks"]');
+        const single = gmApp.element.querySelector('[name="singleSkillCheck"]');
+        assert(skip && single && !skip.checked && !single.checked, "Both Harvest check options must default to unchecked.");
+        single.click();
+        assert(gmApp.singleSkillCheck && !gmApp.skipSkillChecks, "One-check selection must reach the GM state.");
+        skip.click();
+        assert(!single.checked && !gmApp.singleSkillCheck && gmApp.skipSkillChecks, "Skipping checks must clear one-check mode.");
+        single.click();
+        assert(!skip.checked && !gmApp.skipSkillChecks && gmApp.singleSkillCheck, "One-check mode must clear skip checks.");
+        await capture(gmApp, "harvest-check-options");
         await gmApp.setSession(session);
         api.adapter.rollSkill = async (who, skill, options) => {
           rolls++;
@@ -181,6 +191,51 @@ export function generatorAndHarvestChecks({ capture = async () => {} } = {}) {
         await open(other);
         assert(!app.element.querySelector('[data-action="roll-harvest-checks"]'), "Skipped characters must stay completed after reopening.");
         await capture(app, "harvest-walkthrough-completed");
+        await app.close();
+        api.sessions.delete(session.id);
+        // Use fresh fixture tokens so earlier attempts remain isolated.
+        const fresh = await scene.createEmbeddedDocuments("Token", tokens.map(token => ({ name: token.name, x: token.x, y: token.y })));
+        session = await api.harvest.start({ creatureContexts: creatures.map((creature, index) => ({ ...creature, tokenUuid: fresh[index].uuid })),
+          harvestActorsByUser: { [game.user.id]: [actor.uuid] }, rollMode: "session" });
+        await gmApp.setSession(session);
+        const before = rolls;
+        await open(actor);
+        assert(!app.element.querySelector('[data-creature-token]'), "The session check must precede the creature walkthrough.");
+        assert(app.element.textContent.includes("Harvest DC -1000"), "The initial check must show the lowest creature DC.");
+        await capture(app, "harvest-one-check-before");
+        const select = app.element.querySelector('[data-action="select-harvest-skill"]');
+        select.value = "nat"; select.dispatchEvent(new Event("change"));
+        app.element.querySelector('[data-action="roll-harvest-checks"]').click();
+        await until(() => !app.rolling && api.harvest.getParticipant(session.id, actor.uuid, fresh[1].uuid), "Session check did not resolve all creatures.");
+        assert(rolls === before + 1, "One-check mode must roll exactly once.");
+        const first = api.harvest.getParticipant(session.id, actor.uuid, fresh[0].uuid);
+        const second = api.harvest.getParticipant(session.id, actor.uuid, fresh[1].uuid);
+        assert(first.total === second.total && second.status === "awaiting-claim", "Passing the lowest DC must unlock all creatures.");
+        assert(api.harvest.getParticipant(session.id, actor.uuid, fresh[2].uuid).total === first.total, "One session check must cover all creatures.");
+        await app.close(); await open(actor);
+        assert(rolls === before + 1 && !app.element.querySelector('[data-action="roll-harvest-checks"]'), "Reopening must reuse the recorded session check.");
+        assert(!(session.completedParticipantIds ?? []).includes(actor.uuid), "Session checks must wait for explicit completion.");
+        await capture(app, "harvest-one-check");
+        app.element.querySelector('[data-action="skip-creature"]').click();
+        await until(() => !app.rendered && session.completedParticipantIds?.includes(actor.uuid), "One-check mode must support Skip Remaining.");
+        api.sessions.delete(session.id);
+        const failedTokens = await scene.createEmbeddedDocuments("Token", [{ name: "Harvest failed check", x: 0, y: 0 }, { name: "Harvest higher DC", x: 100, y: 0 }]);
+        session = await api.harvest.start({ creatureContexts: failedTokens.map((token, index) => ({ ...creatures[0], tokenUuid: token.uuid, dc: 1000 + index })),
+          harvestActorsByUser: { [game.user.id]: [actor.uuid] }, rollMode: "session" });
+        await gmApp.setSession(session);
+        await open(actor);
+        const failedSelect = app.element.querySelector('[data-action="select-harvest-skill"]');
+        failedSelect.value = "nat"; failedSelect.dispatchEvent(new Event("change"));
+        app.element.querySelector('[data-action="roll-harvest-checks"]').click();
+        await until(() => !app.rolling && app.element.textContent.includes("Failed to recover any components"), "Failed session must show the requested failure message.");
+        assert(!app.element.querySelector('[data-creature-token], [data-action="claim"], [data-action="next-creature"], [data-action="skip-creature"], [data-action="roll-harvest-checks"]'), "Failed sessions must not allow creature navigation or claims.");
+        assert(app.element.querySelectorAll('.window-content button').length === 1 && app.element.querySelector('[data-action="done-creature"]'), "Only Done must be available after failure.");
+        await capture(app, "harvest-one-check-failed");
+        await app.close(); await open(actor);
+        assert(app.element.textContent.includes("Failed to recover any components"), "Reopening must preserve the failed check.");
+        app.element.querySelector('[data-action="done-creature"]').click();
+        await until(() => !app.rendered && session.completedParticipantIds?.includes(actor.uuid), "Failed-session Done must notify the GM.");
+
       } finally {
         api.adapter.rollSkill = originalRoll;
         await app?.close(); await gmApp?.close();

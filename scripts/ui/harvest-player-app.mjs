@@ -1,6 +1,8 @@
+import { setDisabled } from "../../../morelord-core/scripts/ui/disabled-reason.js";
 import { combinedCraftingInventory } from "../crafting/group-membership.mjs";
 import { MODULE_TITLE } from "../constants.mjs";
 import { materialTagsSatisfy } from "../materials/material-match-utils.mjs";
+import { getHarvestSessionDC } from "../acquisition/harvest-rules.mjs";
 import { harvestParticipantKey } from "../acquisition/harvest-participants.mjs";
 
 import { ScrollPreservingApplicationMixin } from "./scroll-preserving-application-mixin.mjs";
@@ -288,7 +290,12 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
     const currentIndex = this.session.participantProgress?.[this.actorUuid] ?? 0;
     const currentCreature = creatures[currentIndex] ?? null;
     const completed = (this.session.completedParticipantIds ?? []).includes(this.actorUuid);
-    const availableSkillCheckCount = !completed && currentCreature?.requiresSkillCheck ? 1 : 0;
+    const sessionCheck = this.session.rollMode === "session" && !this.session.skipSkillChecks;
+    const sessionDC = getHarvestSessionDC(this.session);
+    const recordedRoll = this.session.harvestRolls?.[this.actorUuid];
+    const awaitingSessionCheck = sessionCheck && !recordedRoll && !completed && creatures.some(creature => creature.requiresSkillCheck);
+    const sessionCheckFailed = sessionCheck && recordedRoll && recordedRoll.total < sessionDC && !completed;
+    const availableSkillCheckCount = awaitingSessionCheck || (!sessionCheck && !completed && currentCreature?.requiresSkillCheck) ? 1 : 0;
 
     const skillOptions =
       this.craftworks.harvest
@@ -308,6 +315,9 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
 
     return foundry.utils.mergeObject(context, {
       session: this.session,
+      awaitingSessionCheck,
+      sessionCheckFailed,
+      sessionDC,
       actor: actor ? { name: actor.name, img: actor.img, uuid: actor.uuid } : null,
       skills: skillOptions,
       selectedHarvestSkill: this.selectedHarvestSkill,
@@ -385,6 +395,8 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
 
   async _onRender(context, options) {
     await super._onRender(context, options);
+    const checkButton = this.element.querySelector("[data-action='roll-harvest-checks']");
+    setDisabled(checkButton, this.rolling ? "Harvest check in progress" : !this.selectedHarvestSkill ? "Choose a Harvest skill before rolling" : "");
 
     this.element
       .querySelector(
@@ -415,6 +427,7 @@ export class HarvestPlayerApp extends ScrollPreservingApplicationMixin(
             rollButton.disabled =
               !this.selectedHarvestSkill
               || available <= 0 || this.rolling;
+            setDisabled(rollButton, this.rolling ? "Harvest check in progress" : !this.selectedHarvestSkill ? "Choose a Harvest skill before rolling" : available <= 0 ? "Harvest check already resolved" : "");
             const label = rollButton.querySelector("[data-roll-skill-label]");
             const option = event.currentTarget.selectedOptions?.[0];
             if (label) label.textContent = this.harvestRoll ? "Resolve Recorded Roll" : option?.dataset.skillLabel

@@ -871,12 +871,12 @@ Hooks.once("ready", async () => {
     await playerGatherApp.render({ force: true });
   });
 
-  socket.on("delerium-search.open", async ({ session }) => {
+  socket.on("delerium-search.open", async ({ session, actorUuid }) => {
     if (game.user.isGM) return { opened: false, reason: "gm-user" };
     if (!session?.id) throw new Error("Cannot open a Delerium Search without a session.");
     const imported = sessions.import(session);
     if (playerDeleriumSearchApp?.rendered) await playerDeleriumSearchApp.close();
-    playerDeleriumSearchApp = new DeleriumSearchPlayerApp(api, imported);
+    playerDeleriumSearchApp = new DeleriumSearchPlayerApp(api, imported, actorUuid ?? adapter.getActorForUser(game.user)?.uuid);
     await playerDeleriumSearchApp.render({ force: true });
     playerDeleriumSearchApp.bringToFront();
     return { opened: true, sessionId: imported.id };

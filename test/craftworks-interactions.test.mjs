@@ -281,7 +281,7 @@ test("recipe browsing snapshots materials once and uses indexed outputs without 
   const originalError = ui.notifications.error;
   ui.notifications.error = message => errors.push(message);
   try {
-    const session = { id: "single-roll", creatures: [1, 2, 3].map(n => ({ tokenUuid: "Token." + n, dc: 10 + n })), harvestActorsByUser: { gm: ["Actor.offline"] } };
+    const session = { id: "single-roll", rollMode: "session", creatures: [1, 2, 3].map(n => ({ tokenUuid: "Token." + n, dc: 10 + n })), harvestActorsByUser: { gm: ["Actor.offline"] } };
     const app = new HarvestPlayerApp({
       harvest: { hasHarvested: async () => false },
       adapter: { rollSkill: async () => { rolls++; return { total: 18, naturalD20: 16 }; } },
@@ -323,5 +323,34 @@ test("walkthrough retries only the current creature without rerolling and sends 
     app.close = async () => { closed++; };
     await Promise.all([skip(), skip()]);
     assert.equal(closed, 1);
+  } finally { ui.notifications.error = originalError; }
+});
+
+test("Delerium uses its assigned character, native configuration, and retries without a second roll", async () => {
+  const { actors } = setup();
+  game.actors.get = id => actors.find(actor => actor.uuid === `Actor.${id}`);
+  const { DeleriumSearchPlayerApp } = await import("../scripts/ui/delerium-search-player-app.mjs");
+  let rolls = 0, sends = 0, cancelled = true;
+  const errors = [], originalError = ui.notifications.error;
+  ui.notifications.error = error => errors.push(error);
+  MorelordCore.rolls = { skill: async (actor, skill, options) => {
+    assert.equal(actor, actors[0]); assert.equal(skill, "arc"); assert.equal(options.configure, true); assert.equal(options.create, false);
+    rolls++; return cancelled ? { cancelled: true } : { roll: { toJSON: () => ({ total: 18 }) } };
+  } };
+  try {
+    const app = new DeleriumSearchPlayerApp({
+      adapter: { getActorForUser: assert.fail },
+      submitDeleriumSearch: async (skill, data) => {
+        sends++; assert.equal(skill, "arc"); assert.equal(data.total, 18);
+        if (sends === 1) throw Error("Disconnected");
+        return { status: "succeeded", total: 18 };
+      }
+    }, { id: "search", zone: { name: "Outer City", dc: 15 } }, actors[0].uuid);
+    const click = bind(app, "[data-action='roll']", { dataset: { skill: "arc" } });
+    await click(); assert.equal(sends, 0); assert.equal(app.searchState, null);
+    cancelled = false;
+    await click(); await click();
+    assert.equal(rolls, 2); assert.equal(sends, 2); assert.equal(app.searchState.status, "succeeded");
+    assert.deepEqual(errors, ["Disconnected"]);
   } finally { ui.notifications.error = originalError; }
 });

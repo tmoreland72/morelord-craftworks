@@ -4,7 +4,8 @@ const playwright = process.env.MORELORD_PLAYWRIGHT || "C:/Users/troy/.cache/code
 const { chromium } = await import(pathToFileURL(playwright).href);
 const browser = await chromium.launch({ headless: true });
 const folder = "test/in-game-reports";
-const harvestOnly = process.argv.includes("--harvest-only");
+const deleriumOnly = process.argv.includes("--delerium-only");
+const harvestOnly = process.argv.includes("--harvest-only") || deleriumOnly;
 const stamp = harvestOnly ? new Date().toISOString().slice(0, 10) : "2026-09-24";
 await fs.mkdir(folder, { recursive: true });
 try {
@@ -22,7 +23,10 @@ try {
   if (world.toLowerCase() !== "dev1") {
     console.log(JSON.stringify({ skipped: true, reason: "Loaded world is not Dev1." }));
   } else {
-    await page.locator('input[name="username"]').fill(process.env.FOUNDRY_TEST_GM || "Chuck");
+    await page.locator('select[name="userId"], input[name="username"]').first().waitFor();
+    const userSelect = page.locator('select[name="userId"]');
+    if (await userSelect.count()) await userSelect.selectOption({ label: process.env.FOUNDRY_TEST_GM || "Chuck" });
+    else await page.locator('input[name="username"]').fill(process.env.FOUNDRY_TEST_GM || "Chuck");
     await page.locator('input[name="password"]').fill(process.env.FOUNDRY_TEST_PASSWORD || "");
     await page.locator('button[name="join"]').click();
     try {
@@ -35,12 +39,14 @@ try {
     }
     if ((await page.evaluate(() => game.world.id)).toLowerCase() !== "dev1") throw new Error("World identity changed; tests skipped.");
     await page.exposeFunction("captureCraftworks", async (name, id) => {
-      await page.locator(`[id="${id}"]`).screenshot({ path: `${folder}/${stamp}-${name}.png` });
+      const bounds = await page.locator(`[id="${id}"]`).boundingBox();
+      if (!bounds) throw new Error(`Cannot capture closed application ${id}.`);
+      await page.screenshot({ path: `${folder}/${stamp}-${name}.png`, clip: bounds });
     });
     const visualOnly = process.argv.includes("--visual-only");
     const generatorsOnly = process.argv.includes("--generators-only");
     if (visualOnly) await page.setViewportSize({ width: 1600, height: 1900 });
-    const report = await page.evaluate(async ({ visualOnly, generatorsOnly, harvestOnly }) => {
+    const report = await page.evaluate(async ({ visualOnly, generatorsOnly, harvestOnly, deleriumOnly }) => {
       if (visualOnly) {
         const { SpellScrollGeneratorApp } = await import("./modules/morelord-craftworks/scripts/ui/spell-scroll-generator-app.mjs");
         const { MagicItemGeneratorApp } = await import("./modules/morelord-craftworks/scripts/ui/magic-item-generator-app.mjs");
@@ -74,18 +80,22 @@ try {
       }
       const { runInGameTests } = await import("./modules/morelord-core/scripts/testing/in-game.js");
       const { generatorAndHarvestChecks } = await import("./modules/morelord-craftworks/scripts/testing/generators-and-harvest.mjs");
-      return runInGameTests({ checks: generatorAndHarvestChecks({ capture: async (app, name) => {
+      const { deleriumNativeCheck } = await import("./modules/morelord-craftworks/scripts/testing/delerium-native.mjs");
+      return runInGameTests({ checks: [...generatorAndHarvestChecks({ capture: async (app, name) => {
         ui.notifications.clear();
         for (const width of [820, 460]) {
           app.setPosition({ width, left: 50, top: 50 });
           await new Promise(resolve => setTimeout(resolve, 150));
+          app.setPosition({ width, left: 50, top: 50 });
+          await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+          await window.captureCraftworks(`${name}-${width}`, app.id);
           const content = app.element.querySelector('.window-content');
           if (content.scrollWidth > content.clientWidth + 1) throw new Error(`${name} overflows at ${width}px.`);
           const walkthrough = app.element.querySelector('.ml-craftworks-harvest-walkthrough');
           if (walkthrough) {
             const [ledger, creature] = [...walkthrough.children].map(element => element.getBoundingClientRect());
             if (width === 460 && Math.abs(ledger.left - creature.left) > 1) throw new Error("Narrow Harvest panels must stack.");
-            if (width === 820 && creature.width <= ledger.width) throw new Error("The current-creature panel must be wider than the claim ledger.");
+            if (width === 820 && creature.width <= ledger.width) throw new Error(`The current-creature panel must be wider than the claim ledger: ${JSON.stringify({width: app.element.getBoundingClientRect().width, ledger: ledger.width, creature: creature.width, columns: getComputedStyle(walkthrough).gridTemplateColumns})}`);
           }
           await window.captureCraftworks(`${name}-${width}`, app.id);
           const lastInput = [...app.element.querySelectorAll('input,select')].at(-1);
@@ -95,9 +105,9 @@ try {
             await window.captureCraftworks(`${name}-${width}-controls`, app.id);
           }
         }
-      } }).filter(check => (!generatorsOnly || !check.id.includes("harvest")) && (!harvestOnly || check.id.includes("harvest"))) });
-    }, { visualOnly, generatorsOnly, harvestOnly });
-    await fs.writeFile(`${folder}/${stamp}-${visualOnly ? "generator-visuals" : generatorsOnly ? "generator-controls" : harvestOnly ? "harvest-skip" : "generators-and-harvest"}.json`, JSON.stringify(report, null, 2));
+      } }).filter(check => !deleriumOnly && (!generatorsOnly || !check.id.includes("harvest")) && (!harvestOnly || check.id.includes("harvest"))), ...(harvestOnly ? [deleriumNativeCheck] : [])] });
+    }, { visualOnly, generatorsOnly, harvestOnly, deleriumOnly });
+    await fs.writeFile(`${folder}/${stamp}-${visualOnly ? "generator-visuals" : generatorsOnly ? "generator-controls" : deleriumOnly ? "delerium-gather-window" : harvestOnly ? "harvest-skip" : "generators-and-harvest"}.json`, JSON.stringify(report, null, 2));
     console.log(JSON.stringify(report));
     if (!report.ok) process.exitCode = 1;
   }

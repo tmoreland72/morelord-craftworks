@@ -4,7 +4,7 @@ import { AcquisitionSessionManager } from "../scripts/acquisition/session-manage
 globalThis.foundry = { applications: { api: { ApplicationV2: class {}, HandlebarsApplicationMixin: Base => Base } } };
 const { HarvestService } = await import("../scripts/acquisition/harvest-service.mjs");
 
-test("one authoritative Harvest total resolves every DC, preserves nat20 bonus, ignores bypass and duplicate submissions", async () => {
+test("one authoritative Harvest total uses the lowest DC, preserves nat20 bonus, ignores bypass and duplicate submissions", async () => {
   globalThis.foundry = { utils: { deepClone: structuredClone, randomID: () => "session" } };
   globalThis.canvas = { scene: { id: "test" } };
   globalThis.game = { user: { id: "gm" }, settings: { get: (_module, key) => key === "harvestNat20DoubleClaim" } };
@@ -13,7 +13,7 @@ test("one authoritative Harvest total resolves every DC, preserves nat20 bonus, 
   const materials = new Map([1, 2].map(n => [`m${n}`, { materialId: `m${n}`, name: `Material ${n}` }]));
   const sessions = new AcquisitionSessionManager();
   const service = new HarvestService({ sessions, materialRegistry: materials });
-  const creatures = [10, 25].map(dc => ({ tokenUuid: `Token.${dc}`, dc, harvestMode: "drakkenheim",
+  const creatures = [10, 25].map(dc => ({ tokenUuid: `Token.${dc}`, dc, harvestMode: "kibbles",
     components: [...materials.values()].map(m => ({ ...m, id: `${dc}-${m.materialId}`, matched: true })) }));
   const session = await service.start({ creatureContexts: creatures, harvestActorsByUser: { player: ["Actor.hero"] },
     rollMode: "session",
@@ -23,12 +23,21 @@ test("one authoritative Harvest total resolves every DC, preserves nat20 bonus, 
   await Promise.all([service.recordBatchAttempt(args), service.recordBatchAttempt({ ...args, total: 99 })]);
   const states = Object.values(session.participants);
   assert.deepEqual(states.map(s => s.total), [20, 20]);
-  assert.deepEqual(states.map(s => s.status), ["awaiting-claim", "failed"]);
+  assert.deepEqual(states.map(s => s.status), ["awaiting-claim", "awaiting-claim"]);
   assert.equal(states[0].claimsAllowed, 2);
-  assert.equal(records.get("Token.25")["Actor.hero"].total, 20);
+  assert.equal(states[1].claimsAllowed, 2);
+  assert.deepEqual(await service.updatePlayerCompletions(session.id), []);
+  assert.equal(session.completedParticipantIds, undefined);
   await service.recordBatchAttempt({ ...args, total: 99 });
   assert.deepEqual(Object.values(session.participants), states);
   await assert.rejects(service.recordAttempt({ ...args, creatureTokenUuid: "Token.10" }), /already attempted/);
+  const failed = await service.start({ creatureContexts: creatures, harvestActorsByUser: { player: ["Actor.hero"] }, rollMode: "session" });
+  await service.recordBatchAttempt({ ...args, sessionId: failed.id, total: 9, naturalD20: 9 });
+  assert.deepEqual(Object.values(failed.participants).map(state => state.status), ["failed", "failed"]);
+  assert.equal(records.get("Token.25")["Actor.hero"].total, 9);
+  await assert.rejects(service.claim({ ...args, sessionId: failed.id, creatureTokenUuid: "Token.10", materialId: "m1" }), /successful harvest check/);
+  service.advance({ ...args, sessionId: failed.id, creatureTokenUuid: "Token.10", action: "done" });
+  assert.deepEqual(failed.completedParticipantIds, ["Actor.hero"]);
 });
 
 test("GM skip opens all component choices without a roll or nat20 bonus and cannot be supplied by players", async () => {

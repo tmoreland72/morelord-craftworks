@@ -4,7 +4,7 @@ description: Browse materials and recipes, manage crafting projects, and partici
 slug: morelord-craftworks/player
 product: morelord-craftworks
 audience: player
-version: 0.5.6
+version: 0.5.7
 foundry: 14
 ---
 
@@ -12,7 +12,7 @@ foundry: 14
 
 Morelord Craftworks lets you browse your campaign's materials and recipes, plan crafting projects, work from personal or shared inventories, and take part in Harvest and Gather sessions started by your Game Master.
 
-This manual applies to Morelord Craftworks 0.5.4.
+This manual applies to Morelord Craftworks 0.5.7.
 
 ## Contents
 
@@ -168,7 +168,7 @@ Harvest begins when the GM selects defeated creatures and starts a synchronized 
 
 1. Wait for the Harvest window to open.
 2. Review the current creature in the larger right panel; your character’s claimed components appear on the left.
-3. For a non-Drakkenheim creature, choose a skill and select **Roll Harvest Check** once for that creature. Drakkenheim creatures open directly to claims.
+3. Normally, choose a skill and select **Roll Harvest Check** for each non-Drakkenheim creature; Drakkenheim creatures open directly to claims. If the GM selects **One Check for All Creatures**, roll once before the walkthrough against the lowest selected creature DC. Success unlocks all creatures. Failure shows **Failed to recover any components** and only **Done**. If the GM selects **Skip Skill Checks**, choose components without rolling.
 4. Claim your components, then select **Next** to replace this creature with the next one.
 
 Each creature uses its own Harvest DC. A success reveals claimable components; a failure consumes your character's attempt for that creature. Previously attempted or resolved creatures are not rolled again. Reopening the window or retrying delivery reuses the recorded roll. If the GM enables **Skip Skill Checks** before starting, your window opens directly to component choices without a roll. Skipped checks do not grant a natural-20 bonus. The optional natural-20 bonus still allows two component claims on a successful harvest.
@@ -285,3 +285,17 @@ Ask your GM first about enabled content, recipe knowledge, shared storage, and a
 ## Delerium Search
 
 When the GM starts a supported Drakkenheim search, selected connected characters can roll Arcana, Investigation, or Survival. Follow the search window to roll or decline. The GM finalizes the search and awards compendium delerium to a character or party Group using Recipient.
+
+### Harvest skill check options
+
+In the GM Harvest preflight, **Skill Checks** offers two mutually exclusive checkboxes, both unchecked by default:
+
+- **Skip Skill Checks**: characters choose components without rolling. No natural-20 bonus is granted.
+- **One Check for All Creatures**: each character rolls once for the session. The check happens before creature navigation and uses the lowest Harvest DC among the selected creatures. Success unlocks components across all creatures; failure shows **Failed to recover any components** with only **Done** available; the optional natural-20 bonus still applies. The recorded roll survives retries and reopened windows.
+- Leave both unchecked to require a separate check for each non-Drakkenheim creature. Selecting either option clears the other.
+
+Drakkenheim creatures require no separate creature check; the single session check covers all creatures when **One Check for All Creatures** is selected. Characters still use Next, Skip Remaining, and Done to navigate and finish; claims are awarded only when the GM selects Finalize Harvest. Offline characters can be handled through Roll as GM. These choices apply to the Harvest being started and do not change an active session.
+
+### Delerium Search skill choices
+
+Delerium Search opens a character-specific window using the same layout as Gather: character portrait, a Search Check panel with **Arcana**, **Investigation**, and **Survival** skill buttons and signed bonuses, followed by **Decline** and **Close** footer actions. Select a skill to open the native D&D5e roll dialog, where advantage, disadvantage, and roll adjustments are configured. Cancelling leaves the search pending. **Decline** submits no roll. The GM summary offers **Reopen Search / Roll as GM** for pending characters; it reopens the connected player's window or opens it for the GM when that player is offline. The GM can use the same controls for offline characters, including players who disconnect while a request is pending. Each character resolves only once; search results and awards keep their existing visibility.

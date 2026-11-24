@@ -1,5 +1,6 @@
+import { DeleriumSearchPlayerApp } from "../ui/delerium-search-player-app.mjs";
 import { DeleriumSearchResultsApp } from "../ui/delerium-search-results-app.mjs";
-import { rollAuthority } from "../../../morelord-core/scripts/services/chat-roll-requests.js";
+import { canRollForActor, rollAuthority } from "../../../morelord-core/scripts/services/chat-roll-requests.js";
 import { afterDiceAnimation } from "../../../morelord-core/scripts/services/dice-animation.js";
 const ID = "morelord-craftworks";
 const escape = value => foundry.utils.escapeHTML(String(value ?? ""));
@@ -8,7 +9,7 @@ export function initializeDeleriumChatRequests(api) {
   const requests = MorelordCore.chatRequests;
   const channel = MorelordCore.socket.createChannel("craftworks.chat-search");
   const rollMessages = record => game.messages.filter(message => message.getFlag(ID, "chatSearchRoll")?.sessionMessageId === record.id);
-  const summary = session => `<section class="ml-chat-card ml-stack"><h3>Delerium Search · ${escape(session.zone.name)}</h3><dl class="ml-data-list">${Object.values(session.participants).map(entry => `<div><dt>${escape(game.actors.get(entry.actorUuid?.split(".").at(-1))?.name ?? "Missing character")}</dt><dd>${escape(entry.total ?? "—")} · ${entry.status === "declined" ? "Declined" : entry.status === "succeeded" ? "Pass" : "Fail"}</dd></div>`).join("")}</dl><p>${session.successes} successes · ${session.failures} failures</p><p>${session.status === "complete" ? session.randomEncounter ? "Random encounter required." : "No random encounter triggered." : "Waiting for search rolls."}</p>${session.status === "complete" ? `<p>${session.rewards.map(reward => `${escape(reward.formula)} ${escape(reward.name)}`).join("<br>") || "No delerium found."}</p>${session.result ? `<p>Awarded to ${escape(session.result.recipientName)}.</p>` : ""}<button type="button" data-ml-delerium-results>${session.randomEncounter ? "Open Search Results / Encounter" : "Open Search Results"}</button>` : '<button type="button" data-ml-delerium-finalize>Finalize Search</button>'}</section>`;
+  const summary = session => `<section class="ml-chat-card ml-stack"><h3>Delerium Search · ${escape(session.zone.name)}</h3><dl class="ml-data-list">${Object.values(session.participants).map(entry => `<div><dt>${escape(game.actors.get(entry.actorUuid?.split(".").at(-1))?.name ?? "Missing character")}</dt><dd>${escape(entry.total ?? "—")} · ${entry.status === "declined" ? "Declined" : entry.status === "succeeded" ? "Pass" : "Fail"}</dd></div>`).join("")}</dl><p>${session.successes} successes · ${session.failures} failures</p><p>${session.status === "complete" ? session.randomEncounter ? "Random encounter required." : "No random encounter triggered." : "Waiting for search rolls."}</p>${session.status === "complete" ? `<p>${session.rewards.map(reward => `${escape(reward.formula)} ${escape(reward.name)}`).join("<br>") || "No delerium found."}</p>${session.result ? `<p>Awarded to ${escape(session.result.recipientName)}.</p>` : ""}<button type="button" data-ml-delerium-results>${session.randomEncounter ? "Open Search Results / Encounter" : "Open Search Results"}</button>` : `${(session.selectedCharacterUuids ?? []).filter(uuid => !Object.values(session.participants).some(entry => entry.actorUuid === uuid)).map(uuid => `<button type="button" data-ml-delerium-reopen="${escape(uuid)}">Reopen Search / Roll as GM · ${escape(game.actors.get(uuid.split(".").at(-1))?.name ?? "Character")}</button>`).join("")}<button type="button" data-ml-delerium-finalize>Finalize Search</button>`}</section>`;
   async function finishSearch(record, session) {
     if (rollMessages(record).some(message => message._dice3danimating)) throw new Error("Wait for the search dice to finish before opening results.");
     if (!session.selectedCharacterUuids.every(uuid => Object.values(session.participants).some(entry => entry.actorUuid === uuid))) throw new Error("Each character must roll or decline before finalizing.");
@@ -29,7 +30,7 @@ export function initializeDeleriumChatRequests(api) {
       else await record.update({ content: summary(session) });
     }, "craftworks.delerium").catch(error => ui.notifications.warn(`Search rolls recorded. Use Finalize Search to retry: ${error.message}`));
   }
-  requests.register("craftworks.delerium", async ({ sessionMessageId }, context) => {
+  async function resolveSearch({ sessionMessageId }, context) {
     const record = game.messages.get(sessionMessageId);
     const stored = record?.author?.isGM && record.getFlag(ID, "chatSearch");
     if (!stored || !stored.selectedCharacterUuids.includes(context.actor?.uuid)) return { accepted: false, reason: "This search is unavailable." };
@@ -40,7 +41,7 @@ export function initializeDeleriumChatRequests(api) {
       if (context.choice === "decline") api.deleriumSearch.decline(values);
       else {
         if (!api.deleriumSearch.getSkillOptions().some(skill => skill.id === context.choice)) throw new Error("Choose a search skill.");
-        const { roll } = await MorelordCore.rolls.skill(context.actor, context.choice, { dc: session.zone.dc, configure: false, create: false, advantage: context.mode === "adv", disadvantage: context.mode === "dis" });
+        const roll = context.rollData ? Roll.fromData(context.rollData) : null;
         if (!Number.isFinite(roll?.total)) throw new Error("The search roll did not return a total.");
         api.deleriumSearch.attempt({ ...values, skillId: context.choice, total: roll.total, naturalD20: MorelordCore.rolls.naturalD20(roll) });
         await record.setFlag(ID, "chatSearch", foundry.utils.deepClone(session));
@@ -50,8 +51,51 @@ export function initializeDeleriumChatRequests(api) {
       await record.setFlag(ID, "chatSearch", foundry.utils.deepClone(session));
     }
     scheduleSummary(record);
-    return { accepted: true };
+    return { accepted: true, state: session.participants[userId] };
+  }
+  requests.register("craftworks.delerium", {
+    async prepare(entry, choice) {
+      if (choice === "decline") return {};
+      const actor = await fromUuid(entry.actorUuid);
+      if (!api.deleriumSearch.getSkillOptions().some(skill => skill.id === choice)) throw new Error("Choose a search skill.");
+      const result = await MorelordCore.rolls.skill(actor, choice, { dc: entry.dc, configure: true, create: false });
+      if (result?.cancelled || !result?.roll) return null;
+      return result.roll.toJSON();
+    },
+    resolve: resolveSearch
   }, { serialize: "craftworks.delerium" });
+  const windows = new Map();
+  channel.on("open", async ({ session, actorUuid }, execution) => {
+    if (!game.users.get(execution.senderUserId)?.isGM || !session?.selectedCharacterUuids?.includes(actorUuid)) throw new Error("Only a GM can open a selected character's search.");
+    await windows.get(actorUuid)?.close();
+    const facade = { ...api, submitDeleriumSearch: async (choice, rollData) => {
+      const result = await channel.executeAsUser("attempt", { messageId: session.messageId, actorUuid, choice, rollData }, session.gmUserId);
+      if (!result?.accepted) throw new Error(result?.reason ?? "The search is unavailable.");
+      return result.state;
+    } };
+    const app = new DeleriumSearchPlayerApp(facade, session, actorUuid);
+    windows.set(actorUuid, app);
+    await app.render({ force: true });
+    return { opened: true };
+  });
+  channel.on("attempt", async ({ messageId, actorUuid, choice, rollData }, execution) => {
+    const record = game.messages.get(messageId);
+    const actor = await fromUuid(actorUuid);
+    if (!record?.author?.isGM || rollAuthority(record)?.id !== game.user.id || !canRollForActor(actor, game.users.get(execution.senderUserId))) throw new Error("This character's search is assigned to another user.");
+    return resolveSearch({ sessionMessageId: messageId }, { actor, choice, rollData });
+  }, { serialize: "craftworks.delerium" });
+  async function openCharacter(record, actorUuid) {
+    const session = record.getFlag(ID, "chatSearch");
+    const actor = await fromUuid(actorUuid);
+    const user = MorelordCore.users.activePlayerForActor(actor) ?? game.user;
+    await channel.executeAsUser("open", { session: { ...session, messageId: record.id }, actorUuid }, user.id);
+  }
+  channel.on("reopen", async ({ messageId, actorUuid }, execution) => {
+    const record = game.messages.get(messageId);
+    if (!game.users.get(execution.senderUserId)?.isGM || !record?.author?.isGM || rollAuthority(record)?.id !== game.user.id || !record.getFlag(ID, "chatSearch")?.selectedCharacterUuids?.includes(actorUuid)) throw new Error("Only the active GM can reopen this search.");
+    await openCharacter(record, actorUuid);
+    return { opened: true };
+  });
   channel.on("finalize", async ({ messageId }, execution) => {
     const message = game.messages.get(messageId);
     if (!game.users.get(execution.senderUserId)?.isGM || !message?.author?.isGM || rollAuthority(message)?.id !== game.user.id) throw new Error("Only the active GM can finalize search results.");
@@ -71,6 +115,13 @@ export function initializeDeleriumChatRequests(api) {
     return foundry.utils.deepClone(session);
   }, { serialize: "craftworks.delerium" });
   Hooks.on("renderChatMessageHTML", (message, html) => {
+    html.querySelectorAll?.("[data-ml-delerium-reopen]").forEach(button => {
+      if (!game.user.isGM) { button.remove(); return; }
+      button.addEventListener("click", async () => {
+        try { await channel.executeAsUser("reopen", { messageId: message.id, actorUuid: button.dataset.mlDeleriumReopen }, rollAuthority(message)?.id); }
+        catch (error) { ui.notifications.error(error.message); }
+      });
+    });
     const finalize = html.querySelector("[data-ml-delerium-finalize]");
     if (finalize) {
       if (!game.user.isGM) finalize.remove();
@@ -115,8 +166,9 @@ export function initializeDeleriumChatRequests(api) {
     session.selectedCharacterUuids = [...new Set(actorUuids)];
     session.messageMode = "public";
     const record = await ChatMessage.create({ content: summary(session), whisper: game.users.filter(user => user.isGM).map(user => user.id), flags: { [ID]: { chatSearch: foundry.utils.deepClone(session) } } }, { messageMode: "gm" });
-    for (const actorUuid of session.selectedCharacterUuids) await requests.create({ type: "craftworks.delerium", groupKey: session.id, key: `${session.id}:${actorUuid}`, title: `Delerium Search · ${session.zone.name}`, dc: session.zone.dc, actorUuid,
-      choices: [...api.deleriumSearch.getSkillOptions(), { id: "decline", label: "Decline search" }], data: { sessionMessageId: record.id } });
+    session.messageId = record.id;
+    await record.setFlag(ID, "chatSearch", foundry.utils.deepClone(session));
+    for (const actorUuid of session.selectedCharacterUuids) await openCharacter(record, actorUuid);
     return session;
   };
 }

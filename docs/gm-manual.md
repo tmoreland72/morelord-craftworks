@@ -4,7 +4,7 @@ description: Install, configure, and operate Morelord Craftworks acquisition, cr
 slug: morelord-craftworks/gm
 product: morelord-craftworks
 audience: game-master
-version: 0.5.6
+version: 0.5.7
 foundry: 14
 ---
 
@@ -12,7 +12,7 @@ foundry: 14
 
 Morelord Craftworks gives a dnd5e world a connected system for harvesting creatures, gathering by terrain, generating encounter loot and hoards, managing materials and recipes, and running long-term crafting projects.
 
-This manual applies to Morelord Craftworks 0.5.4, Foundry VTT v14, and dnd5e 5.3 or later.
+This manual applies to Morelord Craftworks 0.5.7, Foundry VTT v14, and dnd5e 5.3 or later.
 
 ## Contents
 
@@ -53,7 +53,7 @@ Premium access is managed by Morelord Core. A content pack may also depend on of
 - dnd5e 5.3 or later
 - Morelord Core 0.9.4 or later. Update Core first, then refresh every connected GM and player client after updating Craftworks so each client registers the current source-availability socket handler. Coin conversion uses Core's currency API, which Core 0.9.1 does not include.
 - SocketLib 1.1.3 or later
-- Morelord Craftworks 0.5.4 or later
+- Morelord Craftworks 0.5.7 or later
 
 ### Install with the manifest
 
@@ -350,7 +350,7 @@ At least one defeated NPC and one player character must be selected. Each select
 
 ### Monitor checks and claims
 
-Each character sees one creature at a time in the larger right panel and their own reserved components in the left panel. Non-Drakkenheim creatures require one **Roll Harvest Check** each. Success exposes component choices; failure consumes that character’s attempt for that creature. Drakkenheim creatures open directly to component choices without a skill check. Reopening restores the current creature and its recorded outcomes; retrying delivery does not reroll. Before starting, the GM can enable **Skip Skill Checks** in the Skill Checks section to send all included characters directly to component choices, including Drakkenheim harvesting. Skipping does not grant a natural-20 bonus or reset previous attempts. When checks are enabled, the optional natural-20 double-component bonus still applies.
+Each character normally sees one creature at a time in the larger right panel and their own reserved components in the left panel. With both Skill Checks options unchecked, non-Drakkenheim creatures require a separate **Roll Harvest Check**; Drakkenheim creatures open directly to component choices. **One Check for All Creatures** instead requires one initial roll per character against the lowest Harvest DC of the selected creatures before showing the creature walkthrough. Success unlocks components for all creatures; failure shows **Failed to recover any components** with only **Done** available. **Skip Skill Checks** sends all included characters directly to component choices without rolling. Both checkboxes default to unchecked, and selecting either clears the other. Reopening restores the current creature and recorded outcome; retries do not reroll. Skipping does not grant a natural-20 bonus or reset previous attempts. When checks are enabled, the optional natural-20 double-component bonus still applies.
 
 A claim reserves a component but does not add it to inventory. Open Harvest windows synchronize reservations and claimants. Drakkenheim parts are exclusive; standard components can be harvested independently by each character.
 
@@ -635,3 +635,17 @@ Potion, treasure, recipe, and material workflows accept legacy rarity fields and
 Generator category and school filters keep each checkbox with its label and wrap complete options as the window narrows.
 
 Encounter Stories can open Hoard with a selected starting profile via `game.modules.get("morelord-craftworks").api.openHoard({ profileId: "5-10" })`. Existing calls without options still start at Challenge 0–4; unknown profile IDs use that default. This only opens the normal interface: the GM must generate, review, and award explicitly.
+
+### Harvest skill check options
+
+In the GM Harvest preflight, **Skill Checks** offers two mutually exclusive checkboxes, both unchecked by default:
+
+- **Skip Skill Checks**: characters choose components without rolling. No natural-20 bonus is granted.
+- **One Check for All Creatures**: each character rolls once for the session. The check happens before creature navigation and uses the lowest Harvest DC among the selected creatures. Success unlocks components across all creatures; failure shows **Failed to recover any components** with only **Done** available; the optional natural-20 bonus still applies. The recorded roll survives retries and reopened windows.
+- Leave both unchecked to require a separate check for each non-Drakkenheim creature. Selecting either option clears the other.
+
+Drakkenheim creatures require no separate creature check; the single session check covers all creatures when **One Check for All Creatures** is selected. Characters still use Next, Skip Remaining, and Done to navigate and finish; claims are awarded only when the GM selects Finalize Harvest. Offline characters can be handled through Roll as GM. These choices apply to the Harvest being started and do not change an active session.
+
+### Delerium Search skill choices
+
+Delerium Search opens a character-specific window using the same layout as Gather: character portrait, a Search Check panel with **Arcana**, **Investigation**, and **Survival** skill buttons and signed bonuses, followed by **Decline** and **Close** footer actions. Select a skill to open the native D&D5e roll dialog, where advantage, disadvantage, and roll adjustments are configured. Cancelling leaves the search pending. **Decline** submits no roll. The GM summary offers **Reopen Search / Roll as GM** for pending characters; it reopens the connected player's window or opens it for the GM when that player is offline. The GM can use the same controls for offline characters, including players who disconnect while a request is pending. Each character resolves only once; search results and awards keep their existing visibility.

@@ -1,7 +1,7 @@
 import { HARVEST_SKILLS_DND5E, MODULE_ID } from "../constants.mjs";
 import { SETTINGS, getSetting } from "../core/settings.mjs";
 import { harvestParticipantKey } from "./harvest-participants.mjs";
-import { getHarvestChoiceCount, getHarvestDC } from "./harvest-rules.mjs";
+import { getHarvestChoiceCount, getHarvestDC, getHarvestSessionDC } from "./harvest-rules.mjs";
 import { findHarvestProfile } from "./harvest-profiles.mjs";
 import { resolveKibblesHarvest } from "./kibbles-harvest-resolver.mjs";
 import { weightedDistinctSample } from "./weighted-choice.mjs";
@@ -251,20 +251,17 @@ export class HarvestService {
       participantProgress: {}
     });
 
-    if (session.skipSkillChecks || rollMode === "creature") {
-      for (const [userId, actors] of Object.entries(session.harvestActorsByUser)) {
-        for (const actorUuid of Array.isArray(actors) ? actors : [actors]) {
-          for (const creature of session.creatures) {
-            if (rollMode === "creature" && await this.hasHarvested(creature.tokenUuid, actorUuid)) {
-              session.participants[harvestParticipantKey(actorUuid, creature.tokenUuid)] = {
-                userId, actorUuid, creatureTokenUuid: creature.tokenUuid, status: "previously-harvested"
-              };
-              continue;
-            }
-            if (!session.skipSkillChecks && creature.harvestMode !== "drakkenheim") continue;
-            if (await this.hasHarvested(creature.tokenUuid, actorUuid)) continue;
-            await this.recordAttempt({ sessionId: session.id, userId, actorUuid, creatureTokenUuid: creature.tokenUuid });
+    for (const [userId, actors] of Object.entries(session.harvestActorsByUser)) {
+      for (const actorUuid of Array.isArray(actors) ? actors : [actors]) {
+        for (const creature of session.creatures) {
+          if (await this.hasHarvested(creature.tokenUuid, actorUuid)) {
+            session.participants[harvestParticipantKey(actorUuid, creature.tokenUuid)] = {
+              userId, actorUuid, creatureTokenUuid: creature.tokenUuid, status: "previously-harvested"
+            };
+            continue;
           }
+          if (!session.skipSkillChecks && (rollMode === "session" || creature.harvestMode !== "drakkenheim")) continue;
+          await this.recordAttempt({ sessionId: session.id, userId, actorUuid, creatureTokenUuid: creature.tokenUuid });
         }
       }
     }
@@ -456,6 +453,7 @@ export class HarvestService {
   }
 
   #buildSuccessfulState({
+    ignoreComponentDC = false,
     creature,
     userId,
     actorUuid,
@@ -464,7 +462,7 @@ export class HarvestService {
     naturalD20 = null
   }) {
     const choices =
-      this.#buildChoices(creature, total);
+      this.#buildChoices(creature, ignoreComponentDC ? null : total);
 
     if (!choices.length) {
       return {
@@ -560,7 +558,7 @@ export class HarvestService {
     const key = harvestParticipantKey(actorUuid, creature.tokenUuid);
     if (session.participants[key]?.status) throw new Error("This player has already attempted to harvest this creature.");
 
-    if (session.skipSkillChecks === true || (session.rollMode === "creature" && creature.harvestMode === "drakkenheim")) {
+    if (session.skipSkillChecks === true || (session.rollMode !== "session" && creature.harvestMode === "drakkenheim")) {
       const state = this.#buildSuccessfulState({ creature, userId, actorUuid, skillId: null, total: null });
       session.participants[key] = state;
       if (state.status === "no-results") {
@@ -582,7 +580,7 @@ export class HarvestService {
     }
     // Reserve the roll before asynchronous work so retries cannot reroll it.
     session.harvestRolls[rollKey] ??= { skillId, total: numericTotal, naturalD20 };
-    const success = Number.isFinite(numericTotal) && numericTotal >= creature.dc;
+    const success = Number.isFinite(numericTotal) && numericTotal >= (session.rollMode === "session" ? getHarvestSessionDC(session) : creature.dc);
     if (!success) {
       session.participants[key] = {
         userId,
@@ -605,6 +603,7 @@ export class HarvestService {
 
     const successState =
       this.#buildSuccessfulState({
+        ignoreComponentDC: session.rollMode === "session",
         creature,
         userId,
         actorUuid,
@@ -671,7 +670,7 @@ export class HarvestService {
       if (index >= session.creatures.length - 1) throw new Error("Use Done on the last creature.");
       session.participantProgress[actorUuid] = index + 1;
     } else {
-      if (action === "done" && index !== session.creatures.length - 1) throw new Error("Use Skip Remaining to finish early.");
+      if (action === "done" && index !== session.creatures.length - 1 && !(session.rollMode === "session" && session.harvestRolls?.[actorUuid]?.total < getHarvestSessionDC(session))) throw new Error("Use Skip Remaining to finish early.");
       for (const creature of session.creatures) {
         const key = harvestParticipantKey(actorUuid, creature.tokenUuid);
         const state = session.participants[key];
@@ -963,7 +962,7 @@ export class HarvestService {
   async updatePlayerCompletions(sessionId) {
     const session = this.sessions.get(sessionId);
     if (!session) throw new Error("Harvest session not found.");
-    if (session.rollMode === "creature") return []; // Completion is explicitly acknowledged with Done or Skip Remaining.
+    if (["creature", "session"].includes(session.rollMode)) return []; // Completion is explicitly acknowledged with Done or Skip Remaining.
 
     const participants = new Map(
       Object.values(session.participants ?? {})

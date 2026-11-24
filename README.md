@@ -579,3 +579,13 @@ Completed searches saved before this fix are recovered by their coordinating GM 
 This release requires Morelord Core 0.4.0 or newer for shared roll requests, outcome scheduling, and consistent UI.
 
 Per-version release history lives in `release-notes/` and is excluded from release packages. The packaged `CHANGELOG.md` is the cumulative user-facing history. Foundry links to the GitHub Releases page through the manifest `changelog` URL. Use the module-local `/tmp/` directory for working files; it is ignored by Git and excluded from release packages.
+
+### Harvest skill check options
+
+In the GM Harvest preflight, **Skill Checks** offers two mutually exclusive checkboxes, both unchecked by default:
+
+- **Skip Skill Checks**: characters choose components without rolling. No natural-20 bonus is granted.
+- **One Check for All Creatures**: each character rolls once for the session. The check happens before creature navigation and uses the lowest Harvest DC among the selected creatures. Success unlocks components across all creatures; failure shows **Failed to recover any components** with only **Done** available; the optional natural-20 bonus still applies. The recorded roll survives retries and reopened windows.
+- Leave both unchecked to require a separate check for each non-Drakkenheim creature. Selecting either option clears the other.
+
+Drakkenheim creatures require no separate creature check; the single session check covers all creatures when **One Check for All Creatures** is selected. Characters still use Next, Skip Remaining, and Done to navigate and finish; claims are awarded only when the GM selects Finalize Harvest. Offline characters can be handled through Roll as GM. These choices apply to the Harvest being started and do not change an active session.

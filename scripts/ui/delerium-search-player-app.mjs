@@ -3,13 +3,20 @@ import { ScrollPreservingApplicationMixin } from "./scroll-preserving-applicatio
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 export class DeleriumSearchPlayerApp extends ScrollPreservingApplicationMixin(HandlebarsApplicationMixin(ApplicationV2)) {
-  constructor(craftworks, session, options = {}) { super(options); this.craftworks = craftworks; this.session = session; this.searchState = null; }
+  constructor(craftworks, session, actorUuid, options = {}) {
+    const actorName = game.actors.get(actorUuid?.split(".").pop())?.name;
+    super({ ...options, id: `morelord-craftworks-delerium-search-player-${actorUuid?.split(".").pop() ?? game.user.id}`,
+      window: { ...options.window, title: actorName ? `${MODULE_TITLE} — Delerium Search — ${actorName}` : `${MODULE_TITLE} — Delerium Search` } });
+    this.craftworks = craftworks; this.session = session; this.actorUuid = actorUuid;
+    this.searchState = Object.values(session.participants ?? {}).find(state => state.actorUuid === actorUuid) ?? null;
+    this.pendingRoll = null; this.rolling = false;
+  }
   static DEFAULT_OPTIONS = { id: "morelord-craftworks-delerium-search-player", classes: ["ml-window", "ml-craftworks-module", "ml-craftworks-window"], position: { width: 680, height: "auto" }, window: { title: `${MODULE_TITLE} — Delerium Search`, resizable: true } };
   static PARTS = { content: { template: "modules/morelord-craftworks/templates/delerium-search-player.hbs" } };
   setState(state) { this.searchState = state; return this.render(); }
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
-    const actor = this.craftworks.adapter.getActorForUser(game.user);
+    const actor = await fromUuid(this.actorUuid);
     const skills = this.craftworks.deleriumSearch.getSkillOptions().map(skill => {
       const value = Number(actor?.system?.skills?.[skill.id]?.total ?? actor?.system?.skills?.[skill.id]?.mod ?? 0);
       return { ...skill, modifier: value, modifierLabel: value >= 0 ? `+${value}` : String(value) };
@@ -24,19 +31,27 @@ export class DeleriumSearchPlayerApp extends ScrollPreservingApplicationMixin(Ha
   }
   async #roll(event) {
     const button = event.currentTarget;
-    const actor = this.craftworks.adapter.getActorForUser(game.user);
+    const actor = await fromUuid(this.actorUuid);
     if (!actor) return ui.notifications.error("Select a token you own or configure a user character first.");
+    if (this.rolling || this.searchState) return;
+    this.rolling = true;
     button.disabled = true;
     try {
-      const skillId = button.dataset.skill;
-      const roll = await this.craftworks.adapter.rollSkill(actor, skillId, { dc: this.session.zone.dc, flavor: `Search for Delerium in the ${this.session.zone.name} — DC ${this.session.zone.dc}` });
-      if (roll?.cancelled) { button.disabled = false; return; }
-      await this.craftworks.socket.emit("delerium-search.attempt", { sessionId: this.session.id, userId: game.user.id, actorUuid: actor.uuid, skillId, total: roll.total, naturalD20: roll.naturalD20 });
-    } catch (error) { ui.notifications.error(error.message); button.disabled = false; }
+      const skillId = this.pendingRoll?.skillId ?? button.dataset.skill;
+      if (!this.pendingRoll) {
+        const result = await MorelordCore.rolls.skill(actor, skillId, { dc: this.session.zone.dc, flavor: `Search for Delerium in the ${this.session.zone.name}`, configure: true, create: false });
+        if (!result || result.cancelled) return;
+        this.pendingRoll = { skillId, rollData: result.roll.toJSON() };
+      }
+      await this.setState(await this.craftworks.submitDeleriumSearch(skillId, this.pendingRoll.rollData));
+    } catch (error) { ui.notifications.error(error.message); }
+    finally { this.rolling = false; if (button.isConnected) button.disabled = false; }
   }
   async #decline(event) {
-    event.currentTarget.disabled = true;
-    const actor = this.craftworks.adapter.getActorForUser(game.user);
-    await this.craftworks.socket.emit("delerium-search.decline", { sessionId: this.session.id, userId: game.user.id, actorUuid: actor?.uuid ?? null });
+    if (this.rolling || this.searchState) return;
+    this.rolling = true; event.currentTarget.disabled = true;
+    try { await this.setState(await this.craftworks.submitDeleriumSearch("decline")); }
+    catch (error) { ui.notifications.error(error.message); }
+    finally { this.rolling = false; if (event.currentTarget.isConnected) event.currentTarget.disabled = false; }
   }
 }
