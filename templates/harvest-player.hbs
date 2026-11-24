@@ -1,6 +1,15 @@
 <div class="ml-app ml-app-shell ml-craftworks-harvest-shell" data-ml-responsive>
-  <header class="ml-hero"><i class="fa-solid fa-scalpel ml-hero__icon"></i><div class="ml-hero__body"><h1>Harvesting</h1><p>Choose components from {{session.sceneName}}, one creature at a time.</p></div><div class="ml-actions"><button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button></div></header>
+  <header class="ml-hero"><i class="fa-solid fa-scalpel ml-hero__icon"></i><div class="ml-hero__body"><h1>Harvesting</h1><p>Choose components from {{session.sceneName}}, one creature at a time.</p></div><div class="ml-actions">{{#unless sessionCheckFailed}}<button type="button" data-action="open-module-documentation"><i class="fa-solid fa-book-open"></i> Documentation</button>{{/unless}}</div></header>
   {{#if actor}}<div class="ml-actor-identity"><img class="ml-avatar" src="{{actor.img}}" alt=""><span>{{actor.name}}</span></div>{{else}}<p class="ml-text" data-tone="warning">No harvesting character is available.</p>{{/if}}
+  {{#if awaitingSessionCheck}}
+  <main class="ml-surface ml-section ml-stack" data-gap="3">
+    <div class="ml-section-heading"><div><h2>Harvest Skill Check</h2><p>One check for all creatures · Harvest DC {{sessionDC}}</p></div></div>
+    <select data-action="select-harvest-skill" aria-label="Harvest skill"><option value="">Choose skill...</option>{{#each skills}}<option value="{{id}}" data-skill-label="{{label}} {{modifierLabel}}" {{#if selected}}selected{{/if}}>{{label}} ({{modifierLabel}})</option>{{/each}}</select>
+    <button type="button" data-action="roll-harvest-checks" data-available-count="1" {{#unless canRollHarvestChecks}}disabled{{/unless}}><i class="fa-solid fa-dice-d20"></i> <span data-roll-skill-label>Roll One Check for All Creatures</span></button>
+  </main>
+  {{else if sessionCheckFailed}}
+  <main class="ml-surface ml-section ml-stack" data-gap="3"><p class="ml-text" data-tone="danger">Failed to recover any components</p></main>
+  {{else}}
   <main class="ml-grid ml-craftworks-harvest-walkthrough" data-columns="2">
     <aside class="ml-surface ml-section ml-stack" data-gap="3">
       <div class="ml-section-heading"><div><h2>Claimed Components</h2><p>{{summary.claimed}} claimed by your character. The GM finalizes awards.</p></div></div>
@@ -28,7 +37,7 @@
               <strong>Harvest Skill Check</strong><p class="notes">Roll once for this creature. A successful check reveals claimable components.</p>
               <div class="ml-grid" data-columns="2">
                 <select data-action="select-harvest-skill" aria-label="Harvest skill"><option value="">Choose skill...</option>{{#each @root.skills}}<option value="{{id}}" data-skill-label="{{label}} {{modifierLabel}}" {{#if selected}}selected{{/if}}>{{label}} ({{modifierLabel}})</option>{{/each}}</select>
-                <button type="button" data-action="roll-harvest-checks" data-available-count="1" {{#unless @root.canRollHarvestChecks}}disabled{{/unless}}><i class="fa-solid fa-dice-d20"></i> <span data-roll-skill-label>Roll Harvest Check</span></button>
+                <button type="button" data-action="roll-harvest-checks" data-available-count="1" {{#unless @root.canRollHarvestChecks}}disabled{{/unless}}><i class="fa-solid fa-dice-d20"></i> <span data-roll-skill-label>{{#if (eq @root.session.rollMode "session")}}Roll One Check for All Creatures{{else}}Roll Harvest Check{{/if}}</span></button>
               </div>
             </section>
           {{/if}}
@@ -56,10 +65,13 @@
       {{/if}}
     </section>
   </main>
+  {{/if}}
   <footer class="ml-form-footer ml-page-footer ml-actions">
-    <span class="ml-footer-status">{{#if completed}}Harvesting Completed{{else}}Creature {{creatureNumber}} of {{summary.creatures}}{{/if}}</span>
+    <span class="ml-footer-status">{{#if awaitingSessionCheck}}Harvest DC {{sessionDC}}{{else if sessionCheckFailed}}Harvest failed{{else if completed}}Harvesting Completed{{else}}Creature {{creatureNumber}} of {{summary.creatures}}{{/if}}</span>
     <div class="ml-actions">
-      {{#if completed}}<button type="button" data-action="close">Close</button>
+      {{#if awaitingSessionCheck}}
+      {{else if sessionCheckFailed}}<button type="button" data-action="done-creature"><i class="fa-solid fa-check"></i> Done</button>
+      {{else if completed}}<button type="button" data-action="close">Close</button>
       {{else if isLastCreature}}<button type="button" data-action="done-creature"><i class="fa-solid fa-check"></i> Done</button>
       {{else}}<button type="button" data-action="skip-creature">Skip Remaining</button><button type="button" data-action="next-creature" {{#unless canAdvance}}disabled{{/unless}}>Next <i class="fa-solid fa-arrow-right"></i></button>{{/if}}
     </div>
