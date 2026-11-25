@@ -1,5 +1,12 @@
 # Morelord Craftworks Changelog
 
+## 0.5.8
+
+### Fixed
+
+- Content Pack Enabled/Disabled labels immediately reflect unsaved checkbox changes using Core's shared behavior.
+- Requires Morelord Core 0.9.5 or later for the live checkbox labels.
+
 ## 0.5.7
 
 ### Improvements

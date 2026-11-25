@@ -93,8 +93,8 @@
               {{/each}}
             </div>
 
-            <label class="ml-check">
-              <span>{{#if enabled}}Enabled{{else}}Disabled{{/if}}</span>
+            <label class="ml-check" data-ml-check-state>
+              <span data-ml-check-label>{{#if enabled}}Enabled{{else}}Disabled{{/if}}</span>
               <input
                 type="checkbox"
                 name="pack:{{id}}"
